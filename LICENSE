@@ -203,4 +203,3 @@
 
 This repository contains also code from other authors, which is licensed under the following licences:
 * mGST under MIT License (in `src/mGST`) by Raphael Brieger, Ingo Roth, Martin Kliesch (see LICENSE file in mGST folder)
-* QEDC_app_oriented (in `src/QEDC_app_oriented`) under Apache 2 License by the QED-C project (see LICENSE file in QEDC_app_oriented folder)

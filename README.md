@@ -137,10 +137,6 @@ EXAMPLE_EXPERIMENT.run()
 
 Full examples on how to run benchmarks and analyze the results can be found in the `examples` folder.
 
-### Application-Oriented Benchmarks (QED-C)
-
-The [app-oriented benchmarks from the QED-C](https://github.com/SRI-International/QC-App-Oriented-Benchmarks) are also hosted within the IQM Benchmarks suite under the `src/QEDC_app_oriented` folder, and can be easily executed in IQM's hardware with the `benchmarks_qiskit_IQM` Jupyter notebook.
-
 ### Scheduled benchmarks using a CI/CD Pipeline
 
 This repository can be setup to perform a scheduled (weekly, daily...) benchmark from a Gitlab pipeline, executed on a real device. An example configuration is given in the `scheduled_experiments` folder.
