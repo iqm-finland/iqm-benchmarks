@@ -8,7 +8,7 @@ Below is a list of the benchmarks currently available in the suite:
 * Quantum Volume: A benchmark for characterizing the performance of quantum computers.
 * Q-Score: A benchmark that estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
 * GHZ State Benchmarking: A benchmark for characterizing the performance of multi-qubit entangled states.
-* QED-C App-Oriented Benchmarks: A suite of benchmarks by the Quantum Economic Development Consortium for characterizing the performance of quantum algorithms (Deutsch-Jozsa, Bernstein-Vazirani, Hidden Shift; Quantum Fourier Transform, Grover's Search; Phase Estimation, Amplitude Estimation, HHL Linear Solver; Monte Carlo, Hamiltonian (and HamLib) Simulation, Variational Quantum Eigensolver, Shor's Order Finding Algorithm; MaxCut, Hydrogen-Lattice).
+
 
 The project is split into different benchmarks, all sharing the `Benchmark` class or the legacy `BenchmarkBase` class. Each individual benchmark takes as an argument their own `BenchmarkConfigurationBase` class. All the (legacy) benchmarks executed at once are wrapped by the `BenchmarkExperiment` class, which handles dependencies among the benchmarks, storing the results, producing the plots...
 
