@@ -128,7 +128,7 @@ class compressive_GST(BenchmarkBase):
         The random circuits are distributed among different depths ranging from L_MIN
         to L_MAX, both are configurable and stored in self.seq_len_list.
         No transpilation other than mapping to the desired qubits is performed,
-        as the gates need to be executed axactly as described for GST to give
+        as the gates need to be executed exactly as described for GST to give
         meaningful results
 
         Returns:
@@ -320,11 +320,11 @@ class compressive_GST(BenchmarkBase):
         Returns
         -------
         X_array : numpy array
-            Array containing all estimated gate tensors of different bootstrapping repretitions along first axis
+            Array containing all estimated gate tensors of different bootstrapping repetitions along first axis
         E_array : numpy array
-            Array containing all estimated POVM tensors of different bootstrapping repretitions along first axis
+            Array containing all estimated POVM tensors of different bootstrapping repetitions along first axis
         rho_array : numpy array
-            Array containing all estimated initial states of different bootstrapping repretitions along first axis
+            Array containing all estimated initial states of different bootstrapping repetitions along first axis
         df_g_array : numpy array
             Contains gate quality measures of bootstrapping repetitions
         df_o_array : numpy array
@@ -387,7 +387,7 @@ class compressive_GST(BenchmarkBase):
 
         Returns:
             df_o_final: Oandas DataFrame
-                The final formated results
+                The final formatted results
         """
         # filename = f"{self.results_dir}{self.device_id}_{self.timestamp}_spam_errors.html"
         if self.bootstrap_samples > 0:
@@ -435,7 +435,7 @@ class compressive_GST(BenchmarkBase):
 
         Args:
             df_g: Pandas DataFrame
-                The dataframe with properly formated results
+                The dataframe with properly formatted results
             X_opt: 3D numpy array
                 The gate set after gauge optimization
             K_target: 4D numpy array
@@ -443,7 +443,7 @@ class compressive_GST(BenchmarkBase):
 
         Returns:
             df_g_final: Pandas DataFrame
-                The dataframe with properly formated results of standard gate errors
+                The dataframe with properly formatted results of standard gate errors
             df_g_rotation Pandas DataFrame
                 A dataframe containing Hamiltonian (rotation) parameters
 
@@ -537,7 +537,7 @@ class compressive_GST(BenchmarkBase):
 
         Args:
             df_g: Pandas DataFrame
-                The dataframe with properly formated results
+                The dataframe with properly formatted results
             X_opt: 3D numpy array
                 The gate set after gauge optimization
             E_opt: 3D numpy array
@@ -549,7 +549,7 @@ class compressive_GST(BenchmarkBase):
 
         Returns:
             df_g_final: Pandas DataFrame
-                The dataframe with properly formated results of standard gate errors
+                The dataframe with properly formatted results of standard gate errors
             df_g_evals Pandas DataFrame
                 A dataframe containing eigenvalues of the Choi matrices for each gate
 
@@ -626,7 +626,7 @@ class compressive_GST(BenchmarkBase):
                         reporting.number_to_str(reporting.unitarities(X_opt_pp)[i], precision=5)
                         for i in range(len(self.gate_labels))
                     ],
-                    # "Entanglemen fidelity to depol. channel": [reporting.number_to_str(reporting.eff_depol_params(X_opt_pp)[i], precision=5)
+                    # "Entanglement fidelity to depol. channel": [reporting.number_to_str(reporting.eff_depol_params(X_opt_pp)[i], precision=5)
                     #                                            for i in range(len(gate_labels))],
                     # "Min. spectral distances": [number_to_str(df_g.values[i, 2], precision=5) for i in range(len(gate_labels))]
                 }

@@ -15,7 +15,7 @@
 Quantum Volume reflects the deepest circuit a given number of qubits can execute with meaningful results.
 
 Circuit Layer Operations per Second (CLOPS) reflects the speed at which parametrized quantum circuits can be executed
- (CLOPS_v correspoding to QV circuits, CLOPS_h to square, parallel-gate layered, circuits)
+ (CLOPS_v corresponding to QV circuits, CLOPS_h to square, parallel-gate layered, circuits)
 """
 
 from . import clops, quantum_volume

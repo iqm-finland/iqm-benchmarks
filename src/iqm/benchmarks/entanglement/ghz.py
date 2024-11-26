@@ -503,7 +503,7 @@ def get_cx_map(qubit_layout, graph) -> list[list[int]]:
 
 
 class GHZBenchmark(Benchmark):
-    """The GHZ Benchmark estimates the quality of generated Greenberger–Horne–Zeilinger states"""
+    """The GHZ Benchmark estimates the quality of generated Greenberger-Horne-Zeilinger states"""
 
     analysis_function = staticmethod(fidelity_analysis)
 
@@ -765,7 +765,7 @@ class GHZConfiguration(BenchmarkConfigurationBase):
                                         * If None, takes all qubits specified in the backend coupling map.
         qubit_counts (Optional[Sequence[int]]): A sequence (e.g., Tuple or List) of integers denoting number of qubits
         for which the benchmark is meant to be run. The largest qubit count provided here has to be smaller than the
-        smalles given qubit layout.
+        smallest given qubit layout.
         qiskit_optim_level (int): The optimization level used for transpilation to backend architecture.
             * Default: 3
         optimize_sqg (bool): Whether consecutive single qubit gates are optimized for reduced gate count via

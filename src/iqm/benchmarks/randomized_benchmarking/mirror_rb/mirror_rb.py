@@ -633,7 +633,7 @@ class MirrorRandomizedBenchmarking(Benchmark):
             backend_arg (IQMBackendBase): the IQM backend to submit the job
             qubits (Sequence[int]): the qubits to identify the submitted job
             depth (int): the depth (number of canonical layers) of the circuits to identify the submitted job
-            sorted_transpiled_circuit_dicts (Dict[str, List[QuantumCircuit]]): A dictionary contaning all MRB circuits
+            sorted_transpiled_circuit_dicts (Dict[str, List[QuantumCircuit]]): A dictionary containing all MRB circuits
         Returns:
             Dict with qubit layout, submitted job objects, type (vanilla/DD) and submission time
         """

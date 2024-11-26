@@ -38,7 +38,6 @@ import metrics
 # this seems to be required for embedding to work
 
 
-
 logger = logging.getLogger(__name__)
 
 # the currently selected provider_backend

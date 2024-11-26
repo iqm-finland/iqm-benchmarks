@@ -196,7 +196,7 @@ class QScoreBenchmark(BenchmarkBase):
 
         Args:
             graph (networkx graph): the MaxCut problem graph.
-            qubit_set (List[int]): indeces of the used qubits.
+            qubit_set (List[int]): indices of the used qubits.
         Returns:
             callable: function that gives expectation value of the cut edges from counts sampled from the ansatz
         """
@@ -294,7 +294,7 @@ class QScoreBenchmark(BenchmarkBase):
 
         Args:
             graph (networkx graph): the MaxCut problem graph.
-            qubit_set (List[int]): indeces of the used qubits.
+            qubit_set (List[int]): indices of the used qubits.
 
         Returns:
             float: the expectation value of the maximum cut size.
@@ -678,11 +678,11 @@ class QScoreBenchmark(BenchmarkBase):
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
             qcvv_logger.info(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
-            is_succesful, approximation_ratio, cut_sizes = self.execute_single_benchmark(num_nodes)[0:3]
+            is_successful, approximation_ratio, cut_sizes = self.execute_single_benchmark(num_nodes)[0:3]
             approximation_ratios.append(approximation_ratio)
 
             list_of_cut_sizes.append(cut_sizes)
-            if is_succesful:
+            if is_successful:
                 qcvv_logger.info(
                     f"Q-Score = {num_nodes} passed with:\nApproximation ratio (Beta): {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes):.4f}"
                 )

@@ -374,7 +374,7 @@ def retrieve_all_job_metadata(
         iqm_jobs List[IQMJob]: The list of IQMJob objects.
 
     Returns:
-        Dict[str, Dict[str, Any]]: Relevant metafata of all the IQMJob objects.
+        Dict[str, Dict[str, Any]]: Relevant metadata of all the IQMJob objects.
     """
     all_meta = {}
 
