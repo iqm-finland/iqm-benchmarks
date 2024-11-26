@@ -1,4 +1,4 @@
-# Copyright 2024 IQM Benchmark developers
+# Copyright 2024 IQM Benchmarks developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ from .benchmark_definition import AnalysisResult, Benchmark, RunResult
 
 try:
     # Change here if project is renamed and does not equal the package name
-    dist_name = "iqm-benchmark"
+    dist_name = "iqm-benchmarks"
     __version__ = version(dist_name)
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
