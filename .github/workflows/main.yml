@@ -1,0 +1,112 @@
+name: CI/CD Pipeline for IQM Benchmark
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11.3
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install tox==4.16.0
+      - name: Check Python packages
+        run: python -m pip check
+      - name: Run tests
+        run: tox -e test
+
+  run_benchmark:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11.3
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install tox==4.16.0
+      - name: Run benchmark
+        run: tox -e benchmark -- --backend=${{ github.event.inputs.backend || 'iqmfakeadonis' }}
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmark-results
+          path: Outputs
+
+  test_version_tag:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Verify changelog version
+        run: bash ./tag-from-pipeline.sh verify_changelog_version
+
+  automatic_tag:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create new tag
+        run: bash ./tag-from-pipeline.sh create_new_tag
+        if: |
+          github.event_name == 'push' &&
+          github.event.head_commit.message != 'skip ci' &&
+          contains(github.event.head_commit.message, 'CHANGELOG.rst')
+
+  publish_dist:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11.3
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install tox==4.16.0
+      - name: Build distribution
+        run: tox -e build
+      - name: Publish distribution
+        run: tox -e publish
+      - name: Upload version file
+        uses: actions/upload-artifact@v2
+        with:
+          name: version.txt
+          path: version.txt
