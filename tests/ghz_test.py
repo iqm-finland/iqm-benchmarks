@@ -1,8 +1,10 @@
-""" Tests for GHZ fidelity estimation using the new base class"""
+"""Tests for GHZ fidelity estimation using the new base class"""
 
-from iqm.benchmarks.entanglement.ghz import GHZConfiguration, GHZBenchmark
-from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 import numpy as np
+
+from iqm.benchmarks.entanglement.ghz import GHZBenchmark, GHZConfiguration
+from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
+
 
 backend = IQMFakeApollo()
 
@@ -11,7 +13,7 @@ class TestGHZ:
     def test_layouts(self):
         MINIMAL_GHZ = GHZConfiguration(
             state_generation_routine=f"tree",
-            custom_qubits_array=[[0,1], [0,1,4], [0,1,2,3,4,5,6]],
+            custom_qubits_array=[[0, 1], [0, 1, 4], [0, 1, 2, 3, 4, 5, 6]],
             shots=3,
             qiskit_optim_level=3,
             optimize_sqg=True,
@@ -40,6 +42,7 @@ class TestGHZ:
             benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
             benchmark.run()
             benchmark.analyze()
+
     def test_rem(self):
         for fidelity_routine in [f"coherences", f"randomized_measurements"]:
             MINIMAL_GHZ = GHZConfiguration(

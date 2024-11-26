@@ -146,7 +146,7 @@ def get_rem_hops(
 
     Args:
         backend_arg (IQMBackendBase | str): the backend to use.
-        sorted_transpiled_qc_list (Dict[Tuple, List[QuantumCircuit]]): A dictionary of lists of quantum circuits, indexed by qubiy layouts.
+        sorted_transpiled_qc_list (Dict[Tuple, List[QuantumCircuit]]): A dictionary of lists of quantum circuits, indexed by qubit layouts.
         sorted_qc_list_indices (Dict[Tuple, List[int]]): dictionary of indices (integers) corresponding to those in the original (untranspiled) list of circuits, with keys being final physical qubit measurements.
         execution_results (List[Dict[str, int]]): counts from execution of all quantum circuits.
         ideal_heavy_outputs (List[Dict[str, float]]): list of ideal heavy output dictionaries.

@@ -224,7 +224,7 @@ class M3IQM(mthree.M3Mitigation):
                 jobs.append(_job)
                 print(f"{len(circs)} calibration circuits ready to be executed!")
 
-        # Execute job and cal building in new theread.
+        # Execute job and cal building in new thread.
         self._job_error = None
         if async_cal:
             thread = threading.Thread(
