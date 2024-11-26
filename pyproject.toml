@@ -45,7 +45,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://www.github.com/iqm-finland/iqm-benchmarks"
+"Homepage" = "https://github.com/iqm-finland/iqm-benchmarks"
 
 [project.optional-dependencies]
 develop = [

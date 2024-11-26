@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-GHZ verifies the generation of Greenberger–Horne–Zeilinger states
+GHZ verifies the generation of Greenberger-Horne-Zeilinger states
 """
 
 from . import ghz

@@ -141,7 +141,7 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
 
         observations.update({qubits_idx: processed_results})
 
-        # Generate individial decay plots
+        # Generate individual decay plots
         fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, observations)
         plots[fig_name] = fig
 

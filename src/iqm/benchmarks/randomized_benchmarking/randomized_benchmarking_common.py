@@ -194,7 +194,7 @@ def generate_fixed_depth_parallel_rb_circuits(
         qubits_array (List[List[int]]): the qubits entering the quantum circuits
         cliffords_1q (Dict[str, QuantumCircuit]): dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates
         cliffords_2q (Dict[str, QuantumCircuit]): dictionary of 2-qubit Cliffords in terms of IQM-native r and CZ gates
-        sequence_length (int): the number of random Cliffords inthe circuits
+        sequence_length (int): the number of random Cliffords in the circuits
         num_samples (int): the number of circuit samples
         backend_arg (IQMBackendBase | str): the backend to transpile the circuits to
         interleaved_gate (Optional[QuantumCircuit]): whether the circuits should have interleaved gates
@@ -417,7 +417,7 @@ def submit_parallel_rb_job(
         backend_arg (IQMBackendBase): the IQM backend to submit the job
         qubits_array (List[int]): the qubits to identify the submitted job
         depth (int): the depth (number of canonical layers) of the circuits to identify the submitted job
-        sorted_transpiled_circuit_dicts (Dict[Tuple[int,...], List[QuantumCircuit]]): A dictionary contaning all MRB circuits
+        sorted_transpiled_circuit_dicts (Dict[Tuple[int,...], List[QuantumCircuit]]): A dictionary containing all MRB circuits
         shots (int): the number of shots to submit the job
         calset_id (Optional[str]): the calibration identifier
         max_gates_per_batch (Optional[str]): the maximum number of gates per batch to submit the job
@@ -450,7 +450,7 @@ def submit_sequential_rb_jobs(
     """Submit sequential RB jobs for execution in the specified IQMBackend
     Args:
         qubits (List[int]): the qubits to identify the submitted job
-        transpiled_circuits (Dict[str, List[QuantumCircuit]]): A dictionary contaning all MRB circuits
+        transpiled_circuits (Dict[str, List[QuantumCircuit]]): A dictionary containing all MRB circuits
         shots (int): the number of shots to submit per job
         backend_arg (IQMBackendBase): the IQM backend to submit the job
         calset_id (Optional[str]): the calibration identifier

@@ -13,17 +13,16 @@ Below is a list of the benchmarks currently available in the suite:
 The project is split into different benchmarks, all sharing the `Benchmark` class or the legacy `BenchmarkBase` class. Each individual benchmark takes as an argument their own `BenchmarkConfigurationBase` class. All the (legacy) benchmarks executed at once are wrapped by the `BenchmarkExperiment` class, which handles dependencies among the benchmarks, storing the results, producing the plots...
 
 
-
 ## Installation _(latest release)_
 
-Usually it makes sense to use a new Conda environment (e.g. ``iqm-benchmarks``) to isolate your setup from the global python installation. That way, you can play around without messing the rest of your system.
+Usually it makes sense to use a new Conda environment (e.g. ``iqm-benchmarks``) to isolate your setup from the global Python installation. That way, you can play around without messing the rest of your system.
 
 Start a terminal in your machine, and type
 
-````
+```
 conda create -n iqm-benchmarks python=3.11.2
 conda activate iqm-benchmarks
-````
+```
 
 Then, you can install the latest release of the IQM Benchmarks by running:
 ```bash
@@ -41,7 +40,7 @@ pip install iqm-benchmarks --upgrade
 To install in development mode with all required dependencies, you can instead clone the [repository](https://www.github.com/iqm-finland/iqm-benchmarks) and from the project directory run
 
 ```bash
-python -m pip install -e ".[develop,testing,visualization]" --upgrade --upgrade-strategy=eager
+python -m pip install -e ".[develop,test]" --upgrade --upgrade-strategy=eager
 ```
 
 To run the tests, you can use the following command:
@@ -143,4 +142,4 @@ The [app-oriented benchmarks from the QED-C](https://github.com/SRI-Internationa
 
 ### Scheduled benchmarks using a CI/CD Pipeline
 
-This repository can be setup to perform a scheduled (weekly, daily...) benchmark from a Gitlab pipeline, executed on a real device. An example configuration is given in the `scheduled_experiments` folder.
+This repository can be setup to perform a scheduled (weekly, daily...) benchmark from a Gitlab/Github pipeline, executed on a real device. An example configuration is given in the `scheduled_experiments` folder.

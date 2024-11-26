@@ -1,19 +1,17 @@
-""" Tests for volumetric benchmarks"""
+"""Tests for volumetric benchmarks"""
 
-from iqm.benchmarks.quantum_volume.quantum_volume import (
-    QuantumVolumeBenchmark,
-    QuantumVolumeConfiguration)
-from iqm.benchmarks.quantum_volume.clops import (
-    CLOPSBenchmark,
-    CLOPSConfiguration)
+from iqm.benchmarks.quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
+from iqm.benchmarks.quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
+
 
 backend = "fakeapollo"
+
 
 class TestQV:
     def test_qv(self):
         EXAMPLE_QV = QuantumVolumeConfiguration(
             num_circuits=5,
-            shots=2 ** 4,
+            shots=2**4,
             calset_id=None,
             num_sigmas=2,
             choose_qubits_routine="custom",

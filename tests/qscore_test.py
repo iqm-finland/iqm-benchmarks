@@ -1,9 +1,13 @@
-""" Tests for volumetric benchmarks"""
-from iqm.benchmarks.optimization.qscore import QScoreConfiguration
-from iqm.benchmarks.benchmark_experiment import BenchmarkExperiment
+"""Tests for volumetric benchmarks"""
+
 from unittest.mock import patch
 
+from iqm.benchmarks.benchmark_experiment import BenchmarkExperiment
+from iqm.benchmarks.optimization.qscore import QScoreConfiguration
+
+
 backend = "IQMFakeAdonis"
+
 
 class TestQScore:
     @patch('matplotlib.pyplot.figure')
@@ -18,12 +22,8 @@ class TestQScore:
             use_virtual_node=True,
             use_classically_optimized_angles=True,
             choose_qubits_routine="custom",
-            custom_qubits_array=[[2],
-                                 [2, 0],
-                                 [2, 0, 1],
-                                 [2, 0, 1, 3],
-                                 [2, 0, 1, 3, 4]],
-            seed=1
+            custom_qubits_array=[[2], [2, 0], [2, 0, 1], [2, 0, 1, 3], [2, 0, 1, 3, 4]],
+            seed=1,
         )
         EXAMPLE_EXPERIMENT = BenchmarkExperiment(backend, [EXAMPLE_QSCORE])
         EXAMPLE_EXPERIMENT.run_experiment()

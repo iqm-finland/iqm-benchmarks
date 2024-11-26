@@ -700,7 +700,7 @@ class CLOPSConfiguration(BenchmarkConfigurationBase):
                             * By definition of arXiv:2110.14108 [quant-ph] set to 100.
         clops_h_bool (bool): Whether a CLOPS value with layer definition of CLOPS_H is estimated.
                             * Default is False
-                            * This will not estimate a rigurous CLOPS_H value (as loosely defined in www.ibm.com/quantum/blog/quantum-metric-layer-fidelity)
+                            * This will not estimate a rigorous CLOPS_H value (as loosely defined in www.ibm.com/quantum/blog/quantum-metric-layer-fidelity)
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
                             * The optimization level should correspond to the one used to establish QV.
                             * Default is 3.
