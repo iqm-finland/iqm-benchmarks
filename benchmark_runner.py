@@ -1,4 +1,4 @@
-# Copyright 2024 IQM Benchmark developers
+# Copyright 2024 IQM Benchmarks developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 
 import argparse
 
-from iqm.benchmark.randomized_benchmarking.interleaved_rb.interleaved_rb import *
-from iqm.benchmark.quantum_volume.quantum_volume import *
-from iqm.benchmark.entanglement.ghz import *
+from iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb import *
+from iqm.benchmarks.quantum_volume.quantum_volume import *
+from iqm.benchmarks.entanglement.ghz import *
 
 
 if __name__ == "__main__":

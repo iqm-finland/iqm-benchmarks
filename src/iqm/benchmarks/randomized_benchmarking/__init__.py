@@ -11,3 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Randomized Benchmarking reflects the fidelity of a gate or operation on a number of qubits
+"""
+
+from . import randomized_benchmarking_common

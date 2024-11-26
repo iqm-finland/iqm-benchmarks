@@ -11,3 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Module to initialize logger.
+
+Should be used in every module to output information/warnings.
+"""
+
+import logging
+
+
+# Configure the logger to log messages to the console
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# Create the logger
+qcvv_logger = logging.getLogger(__name__)
+
+# Adjust logging level for Qiskit logger
+qiskit_logger = logging.getLogger("qiskit")
+qiskit_logger.setLevel(logging.WARNING)

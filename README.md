@@ -1,6 +1,6 @@
-# IQM Benchmark
+# IQM Benchmarks
 
-The IQM Benchmark is a suite of quantum characterization, verification, and validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
+The IQM Benchmarks is a suite of quantum characterization, verification, and validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
 
 
 Below is a list of the benchmarks currently available in the suite:
@@ -16,29 +16,29 @@ The project is split into different benchmarks, all sharing the `Benchmark` clas
 
 ## Installation _(latest release)_
 
-Usually it makes sense to use a new Conda environment (e.g. ``iqm-benchmark``) to isolate your setup from the global python installation. That way, you can play around without messing the rest of your system.
+Usually it makes sense to use a new Conda environment (e.g. ``iqm-benchmarks``) to isolate your setup from the global python installation. That way, you can play around without messing the rest of your system.
 
 Start a terminal in your machine, and type
 
 ````
-conda create -n iqm-benchmark python=3.11.2
-conda activate iqm-benchmark
+conda create -n iqm-benchmarks python=3.11.2
+conda activate iqm-benchmarks
 ````
 
-Then, you can install the latest release of the IQM Benchmark by running:
+Then, you can install the latest release of the IQM Benchmarks by running:
 ```bash
-$ pip install iqm-benchmark
+$ pip install iqm-benchmarks
 ```
 
-If you have already installed `iqm-benchmark` and want to get the latest release you can add the --upgrade flag:
+If you have already installed `iqm-benchmarks` and want to get the latest release you can add the --upgrade flag:
 
 ```bash
-pip install iqm-benchmark --upgrade
+pip install iqm-benchmarks --upgrade
 ```
 
 ## Development mode _(latest changes: recommended)_
 
-To install in development mode with all required dependencies, you can instead clone the [repository](https://www.github.com/iqm-finland/iqm-benchmark) and from the project directory run
+To install in development mode with all required dependencies, you can instead clone the [repository](https://www.github.com/iqm-finland/iqm-benchmarks) and from the project directory run
 
 ```bash
 python -m pip install -e ".[develop,testing,visualization]" --upgrade --upgrade-strategy=eager
@@ -52,7 +52,7 @@ tox -e test
 
 ## Characterize Physical Hardware
 
-The IQM Benchmark suite is designed to be used with real quantum hardware. To use the suite, you will need to have access to a quantum computer. The suite is designed to work with both IQM Resonance (IQM's quantum cloud service) and on-prem devices, but can be easily adapted to work with other quantum computing platforms.
+The IQM Benchmarks suite is designed to be used with real quantum hardware. To use the suite, you will need to have access to a quantum computer. The suite is designed to work with both IQM Resonance (IQM's quantum cloud service) and on-prem devices, but can be easily adapted to work with other quantum computing platforms.
 
 To use the suite with IQM Resonance, you will need to set up an account and obtain an API token. You can then set the `IQM_TOKEN` environment variable to your API token. The suite will automatically use this token to authenticate with IQM Resonance.
 
@@ -66,9 +66,9 @@ os.environ["IQM_TOKEN"] = "your_token"
 You can easily set up one or more benchmarks by defining a configuration for them. For example, for Randomized, Interleaved and Mirror Benchmarking, or Quantum Volume:
 
 ```python
-from iqm.benchmark.randomized_benchmarking.interleaved_rb.interleaved_rb import InterleavedRBConfiguration
-from iqm.benchmark.randomized_benchmarking.mirror_rb.mirror_rb import MirrorRBConfiguration
-from iqm.benchmark.quantum_volume.quantum_volume import QuantumVolumeConfiguration
+from iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb import InterleavedRBConfiguration
+from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import MirrorRBConfiguration
+from iqm.benchmarks.quantum_volume.quantum_volume import QuantumVolumeConfiguration
 
 EXAMPLE_IRB = InterleavedRBConfiguration(
     qubits_array=[[3,4],[8,9]],
@@ -125,7 +125,7 @@ In order to execute them, you must specify a backend.
 Also, you need to reference the benchmark configuration you want to run:
 
 ```python
-from iqm.benchmark.randomized_benchmarking.mirror_rb.mirror_rb import *
+from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import *
 # import os
 # os.environ["IQM_TOKEN"] = "your_token"
 
@@ -139,7 +139,7 @@ Full examples on how to run benchmarks and analyze the results can be found in t
 
 ### Application-Oriented Benchmarks (QED-C)
 
-The [app-oriented benchmarks from the QED-C](https://github.com/SRI-International/QC-App-Oriented-Benchmarks) are also hosted within the IQM benchmark suite under the `src/QEDC_app_oriented` folder, and can be easily executed in IQM's hardware with the `benchmarks_qiskit_IQM` Jupyter notebook.
+The [app-oriented benchmarks from the QED-C](https://github.com/SRI-International/QC-App-Oriented-Benchmarks) are also hosted within the IQM Benchmarks suite under the `src/QEDC_app_oriented` folder, and can be easily executed in IQM's hardware with the `benchmarks_qiskit_IQM` Jupyter notebook.
 
 ### Scheduled benchmarks using a CI/CD Pipeline
 

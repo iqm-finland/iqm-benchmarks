@@ -1,6 +1,6 @@
 """ Tests for GHZ fidelity estimation using the new base class"""
 
-from iqm.benchmark.entanglement.ghz import GHZConfiguration, GHZBenchmark
+from iqm.benchmarks.entanglement.ghz import GHZConfiguration, GHZBenchmark
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 import numpy as np
 

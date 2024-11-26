@@ -1,4 +1,4 @@
-# Copyright 2024 IQM Benchmark developers
+# Copyright 2024 IQM Benchmarks developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 """AUTOMATED WEEKLY EXPERIMENT CONFIGURATION EXAMPLE
 """
 
-from iqm.benchmark.randomized_benchmarking.clifford_rb.clifford_rb import CliffordRBConfiguration
-from iqm.benchmark.randomized_benchmarking.interleaved_rb.interleaved_rb import InterleavedRBConfiguration
-from iqm.benchmark.randomized_benchmarking.mirror_rb.mirror_rb import MirrorRBConfiguration
-from iqm.benchmark.quantum_volume.clops import CLOPSConfiguration
-from iqm.benchmark.quantum_volume.quantum_volume import QuantumVolumeConfiguration
-from iqm.benchmark.entanglement.ghz import GHZConfiguration
+from iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb import CliffordRBConfiguration
+from iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb import InterleavedRBConfiguration
+from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import MirrorRBConfiguration
+from iqm.benchmarks.quantum_volume.clops import CLOPSConfiguration
+from iqm.benchmarks.quantum_volume.quantum_volume import QuantumVolumeConfiguration
+from iqm.benchmarks.entanglement.ghz import GHZConfiguration
 
 WEEKLY_CRB = CliffordRBConfiguration(
     qubits_array=[[0,2]],

@@ -11,3 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""
+IQM's Python Library Benchmarking Suite QCVV.
+"""
+
+from importlib.metadata import PackageNotFoundError, version
+
+from .benchmark_definition import AnalysisResult, Benchmark, RunResult
+
+
+try:
+    # Change here if project is renamed and does not equal the package name
+    dist_name = "iqm-benchmarks"
+    __version__ = version(dist_name)
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "unknown"
+finally:
+    del version, PackageNotFoundError
