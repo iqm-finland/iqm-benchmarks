@@ -30,7 +30,7 @@ from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
 import xarray as xr
 
-from iqm.benchmark.logging_config import qcvv_logger
+from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo

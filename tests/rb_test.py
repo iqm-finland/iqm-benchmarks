@@ -1,12 +1,12 @@
 """ Tests for mirror RB"""
 
-from iqm.benchmark.randomized_benchmarking.mirror_rb.mirror_rb import (
+from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import (
     MirrorRandomizedBenchmarking,
     MirrorRBConfiguration)
-from iqm.benchmark.randomized_benchmarking.interleaved_rb.interleaved_rb import (
+from iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb import (
     InterleavedRandomizedBenchmarking,
     InterleavedRBConfiguration)
-from iqm.benchmark.randomized_benchmarking.clifford_rb.clifford_rb import (
+from iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb import (
     CliffordRandomizedBenchmarking,
     CliffordRBConfiguration)
 import numpy as np

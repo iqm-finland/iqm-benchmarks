@@ -1,6 +1,6 @@
 """ Tests for volumetric benchmarks"""
-from iqm.benchmark.optimization.qscore import QScoreConfiguration
-from iqm.benchmark.benchmark_experiment import BenchmarkExperiment
+from iqm.benchmarks.optimization.qscore import QScoreConfiguration
+from iqm.benchmarks.benchmark_experiment import BenchmarkExperiment
 from unittest.mock import patch
 
 backend = "IQMFakeAdonis"

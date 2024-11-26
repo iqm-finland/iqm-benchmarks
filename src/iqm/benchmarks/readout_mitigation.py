@@ -28,7 +28,7 @@ from mthree.utils import final_measurement_mapping
 from qiskit import QuantumCircuit, execute  # pylint: disable = no-name-in-module
 from qiskit.providers import Backend, BackendV1, BackendV2
 
-from iqm.benchmark.utils import get_iqm_backend, timeit
+from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

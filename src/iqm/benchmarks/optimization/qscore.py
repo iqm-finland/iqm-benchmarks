@@ -28,9 +28,9 @@ import numpy as np
 from qiskit import QuantumCircuit
 from scipy.optimize import basinhopping, minimize
 
-from iqm.benchmark.benchmark import BenchmarkBase, BenchmarkConfigurationBase
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.utils import perform_backend_transpilation, retrieve_all_counts, submit_execute, timeit
+from iqm.benchmarks.benchmark import BenchmarkBase, BenchmarkConfigurationBase
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.utils import perform_backend_transpilation, retrieve_all_counts, submit_execute, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

@@ -33,9 +33,9 @@ from qiskit import QuantumCircuit, transpile
 from qiskit.quantum_info import Clifford
 import xarray as xr
 
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.randomized_benchmarking.multi_lmfit import create_multi_dataset_params, multi_dataset_residual
-from iqm.benchmark.utils import get_iqm_backend, marginal_distribution, submit_execute, timeit
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.randomized_benchmarking.multi_lmfit import create_multi_dataset_params, multi_dataset_residual
+from iqm.benchmarks.utils import get_iqm_backend, marginal_distribution, submit_execute, timeit
 from iqm.qiskit_iqm import optimize_single_qubit_gates
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 

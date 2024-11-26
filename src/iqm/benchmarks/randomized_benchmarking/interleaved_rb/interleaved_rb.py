@@ -24,11 +24,11 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmark import AnalysisResult, Benchmark, RunResult
-from iqm.benchmark.benchmark import BenchmarkConfigurationBase
-from iqm.benchmark.benchmark_definition import add_counts_to_dataset
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.randomized_benchmarking.randomized_benchmarking_common import (
+from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
     fit_decay_lmfit,
     generate_all_rb_circuits,
@@ -43,7 +43,7 @@ from iqm.benchmark.randomized_benchmarking.randomized_benchmarking_common import
     validate_irb_gate,
     validate_rb_qubits,
 )
-from iqm.benchmark.utils import retrieve_all_counts, retrieve_all_job_metadata, timeit, xrvariable_to_counts
+from iqm.benchmarks.utils import retrieve_all_counts, retrieve_all_job_metadata, timeit, xrvariable_to_counts
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

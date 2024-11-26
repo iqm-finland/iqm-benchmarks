@@ -15,18 +15,18 @@ from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmark import AnalysisResult, Benchmark, RunResult
-from iqm.benchmark.benchmark import BenchmarkConfigurationBase
-from iqm.benchmark.benchmark_definition import add_counts_to_dataset
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.randomized_benchmarking.randomized_benchmarking_common import (
+from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
     fit_decay_lmfit,
     lmfit_minimizer,
     plot_rb_decay,
     validate_irb_gate,
 )
-from iqm.benchmark.utils import (
+from iqm.benchmarks.utils import (
     get_iqm_backend,
     retrieve_all_counts,
     retrieve_all_job_metadata,

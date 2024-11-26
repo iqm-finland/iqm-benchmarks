@@ -27,9 +27,9 @@ from pygsti.tools import change_basis
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import CZGate, RGate
 
-from iqm.benchmark.benchmark import BenchmarkBase, BenchmarkConfigurationBase
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.utils import (
+from iqm.benchmarks.benchmark import BenchmarkBase, BenchmarkConfigurationBase
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.utils import (
     perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,

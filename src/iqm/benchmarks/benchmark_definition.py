@@ -30,8 +30,8 @@ import matplotlib.pyplot as plt
 # import numpy as np
 import xarray as xr
 
-from iqm.benchmark.benchmark import BenchmarkConfigurationBase
-from iqm.benchmark.utils import get_iqm_backend, timeit
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 

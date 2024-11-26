@@ -1,10 +1,10 @@
 """ Tests for compressive GST benchmark"""
 
-from iqm.benchmark.compressive_gst.compressive_gst import GSTConfiguration
+from iqm.benchmarks.compressive_gst.compressive_gst import GSTConfiguration
 from unittest.mock import patch
 
 # General BenchmarkExperiment
-from iqm.benchmark.benchmark_experiment import BenchmarkExperiment
+from iqm.benchmarks.benchmark_experiment import BenchmarkExperiment
 
 backend = "iqmfakeapollo"
 

@@ -32,12 +32,12 @@ import xarray as xr
 # import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
 # from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
-from iqm.benchmark import AnalysisResult, Benchmark, RunResult
-from iqm.benchmark.benchmark import BenchmarkConfigurationBase
-from iqm.benchmark.benchmark_definition import add_counts_to_dataset
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.readout_mitigation import apply_readout_error_mitigation
-from iqm.benchmark.utils import (  # execute_with_dd,
+from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
+from iqm.benchmarks.utils import (  # execute_with_dd,
     count_native_gates,
     perform_backend_transpilation,
     retrieve_all_counts,

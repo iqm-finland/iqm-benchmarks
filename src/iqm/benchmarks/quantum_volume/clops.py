@@ -29,11 +29,11 @@ from qiskit import QuantumCircuit
 from qiskit.circuit import ParameterVector
 import xarray as xr
 
-from iqm.benchmark import Benchmark
-from iqm.benchmark.benchmark import BenchmarkConfigurationBase
-from iqm.benchmark.benchmark_definition import AnalysisResult, RunResult
-from iqm.benchmark.logging_config import qcvv_logger
-from iqm.benchmark.utils import (
+from iqm.benchmarks import Benchmark
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.utils import (
     count_2q_layers,
     count_native_gates,
     perform_backend_transpilation,

@@ -1,9 +1,9 @@
 """ Tests for volumetric benchmarks"""
 
-from iqm.benchmark.quantum_volume.quantum_volume import (
+from iqm.benchmarks.quantum_volume.quantum_volume import (
     QuantumVolumeBenchmark,
     QuantumVolumeConfiguration)
-from iqm.benchmark.quantum_volume.clops import (
+from iqm.benchmarks.quantum_volume.clops import (
     CLOPSBenchmark,
     CLOPSConfiguration)
 

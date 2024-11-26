@@ -23,8 +23,8 @@ import pickle
 from time import strftime
 from typing import List, Optional, OrderedDict, Union
 
-from iqm.benchmark.benchmark import BenchmarkBase, BenchmarkConfigurationBase
-from iqm.benchmark.utils import get_iqm_backend
+from iqm.benchmarks.benchmark import BenchmarkBase, BenchmarkConfigurationBase
+from iqm.benchmarks.utils import get_iqm_backend
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

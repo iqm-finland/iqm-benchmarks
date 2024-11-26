@@ -66,9 +66,9 @@ os.environ["IQM_TOKEN"] = "your_token"
 You can easily set up one or more benchmarks by defining a configuration for them. For example, for Randomized, Interleaved and Mirror Benchmarking, or Quantum Volume:
 
 ```python
-from iqm.benchmark.randomized_benchmarking.interleaved_rb.interleaved_rb import InterleavedRBConfiguration
-from iqm.benchmark.randomized_benchmarking.mirror_rb.mirror_rb import MirrorRBConfiguration
-from iqm.benchmark.quantum_volume.quantum_volume import QuantumVolumeConfiguration
+from iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb import InterleavedRBConfiguration
+from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import MirrorRBConfiguration
+from iqm.benchmarks.quantum_volume.quantum_volume import QuantumVolumeConfiguration
 
 EXAMPLE_IRB = InterleavedRBConfiguration(
     qubits_array=[[3,4],[8,9]],
@@ -125,7 +125,7 @@ In order to execute them, you must specify a backend.
 Also, you need to reference the benchmark configuration you want to run:
 
 ```python
-from iqm.benchmark.randomized_benchmarking.mirror_rb.mirror_rb import *
+from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import *
 # import os
 # os.environ["IQM_TOKEN"] = "your_token"
 
