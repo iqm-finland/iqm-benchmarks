@@ -1,9 +1,0 @@
-numpy
-matplotlib
-notebook
-qiskit
-qiskit-algorithms
-qiskit-aer
-qiskit[visualization]
-pytest
-scipy

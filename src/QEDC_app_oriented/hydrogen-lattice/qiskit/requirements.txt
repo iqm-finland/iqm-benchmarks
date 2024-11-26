@@ -1,8 +1,0 @@
-numpy
-matplotlib
-notebook
-qiskit
-qiskit-aer
-qiskit[visualization]
-pytest
-scipy
