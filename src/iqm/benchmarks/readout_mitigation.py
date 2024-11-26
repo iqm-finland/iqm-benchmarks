@@ -32,7 +32,8 @@ from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
-# The code here is close to the original M3 code. We deactivate this to not break functionality.
+# The code here is close to the original M3 code licenced under Apache 2 as well (https://github.com/Qiskit/qiskit-addon-mthree/blob/main/LICENSE.txt).
+# We deactivate this to not break functionality.
 # pylint: disable=too-many-instance-attributes, too-many-arguments, too-many-locals, too-many-branches, too-many-statements,
 # pylint: disable=attribute-defined-outside-init, too-few-public-methods, access-member-before-definition
 class M3IQM(mthree.M3Mitigation):

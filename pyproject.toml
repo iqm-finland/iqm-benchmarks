@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "iqm-benchmarkss"
+name = "iqm-benchmarks"
 dynamic = ["version"]
 description = "A package for implementation of Quantum Characterization, Verification and Validation (QCVV) techniques on IQM's hardware at gate level abstraction"
 authors = [
