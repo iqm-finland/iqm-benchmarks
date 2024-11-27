@@ -235,7 +235,7 @@ def clops_analysis(run: RunResult) -> AnalysisResult:
     dataset = run.dataset
 
     # Retrieve dataset values
-    backend_name = dataset.attrs["backend_configuration_name"]
+    # backend_name = dataset.attrs["backend_configuration_name"]
     num_circuits = dataset.attrs["num_circuits"]
     num_updates = dataset.attrs["num_updates"]
     num_shots = dataset.attrs["num_shots"]
@@ -272,9 +272,6 @@ def clops_analysis(run: RunResult) -> AnalysisResult:
 
         clops_h = num_circuits * num_updates * num_shots * np.mean(clops_h_depths) / clops_time
 
-    # COUNT OPERATIONS
-    all_op_counts = count_native_gates(backend_name, transpiled_qc_list)
-
     processed_results = {
         "clops_v": {"value": int(clops_v), "uncertainty": np.NaN},
         "clops_h": {"value": int(clops_h), "uncertainty": np.NaN},
@@ -285,7 +282,6 @@ def clops_analysis(run: RunResult) -> AnalysisResult:
             "assign_parameters_total": sum(all_times_parameter_assign.values()),
             "user_submit_total": sum(all_times_submit.values()),
             "user_retrieve_total": sum(all_times_retrieve.values()),
-            "operation_counts": all_op_counts,
             "parallel_2q_layers": counts_depths,
             "time_count_layers": time_count_layers,
         }
@@ -665,6 +661,9 @@ class CLOPSBenchmark(Benchmark):
         # *********************************************
         end_clops_timer = perf_counter()
 
+        # COUNT OPERATIONS
+        all_op_counts = count_native_gates(backend, [x for y in list(sorted_transpiled_qc_list.values()) for x in y])
+
         dataset.attrs.update(
             {
                 "clops_time": end_clops_timer - start_clops_timer,
@@ -677,6 +676,7 @@ class CLOPSBenchmark(Benchmark):
                 "parameters_per_update": self.parameters_per_update,
                 "job_meta_per_update": self.job_meta_per_update,
                 "counts_per_update": self.counts_per_update,
+                "operation_counts": all_op_counts,
             }
         )
 

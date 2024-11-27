@@ -117,7 +117,7 @@ def count_native_gates(
     if "barrier" not in native_operations:
         native_operations.append("barrier")
 
-    num_native_operations: Dict[str, List[int]] = {x: [] for x in native_operations}
+    num_native_operations: Dict[str, List[int]] = {x: [0] for x in native_operations}
     avg_native_operations: Dict[str, Dict[str, float]] = {x: {} for x in native_operations}
 
     for q in transpiled_qc_list:
@@ -130,11 +130,7 @@ def count_native_gates(
 
     avg_native_operations.update(
         {
-            x: (
-                {"Mean": np.mean(num_native_operations[x]), "Std": np.std(num_native_operations[x])}
-                if num_native_operations[x] != 0
-                else np.NAN
-            )
+            x: {"Mean": np.mean(num_native_operations[x]), "Std": np.std(num_native_operations[x])}
             for x in native_operations
         }
     )

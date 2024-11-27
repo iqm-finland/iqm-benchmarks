@@ -153,7 +153,7 @@ def generate_all_rb_circuits(
     sequence_lengths: List[int],
     clifford_dict: Dict[str, QuantumCircuit],
     num_circuit_samples: int,
-    backend_configuration_name: str,
+    backend_arg: str | IQMBackendBase,
     interleaved_gate: Optional[QuantumCircuit],
 ) -> Tuple[Dict[int, List[QuantumCircuit]], Dict[int, List[QuantumCircuit]]]:
     """
@@ -162,7 +162,7 @@ def generate_all_rb_circuits(
         sequence_lengths (List[int]): List of sequence lengths
         clifford_dict (Dict[str, QuantumCircuit]): the dictionary of Clifford circuits
         num_circuit_samples (int): the number of circuits samples
-        backend_configuration_name (str): the name of the backend in the configuration
+        backend_arg (str | IQMBackendBase): the backend fir which to generate the circuits.
         interleaved_gate (str): the name of the interleaved gate
     Returns:
         Tuple of untranspiled and transpiled circuits for all class-defined sequence lengths
@@ -172,7 +172,7 @@ def generate_all_rb_circuits(
     for s in sequence_lengths:
         qcvv_logger.info(f"Now at sequence length {s}")
         untranspiled[s], transpiled[s] = generate_random_clifford_seq_circuits(
-            qubits, clifford_dict, s, num_circuit_samples, backend_configuration_name, interleaved_gate
+            qubits, clifford_dict, s, num_circuit_samples, backend_arg, interleaved_gate
         )
     return untranspiled, transpiled
 

@@ -253,7 +253,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                     clifford_2q_dict,
                     seq_length,
                     self.num_circuit_samples,
-                    self.backend_configuration_name,
+                    backend,
                 )
                 time_circuit_generation[str(self.qubits_array)] += elapsed_time
 
@@ -310,7 +310,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                     self.sequence_lengths,
                     clifford_dict,
                     self.num_circuit_samples,
-                    self.backend_configuration_name,
+                    backend,
                     interleaved_gate=None,
                 )
 
@@ -320,7 +320,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         qubits,
                         rb_transpiled_circuits[str(qubits)],
                         self.shots,
-                        self.backend_configuration_name,
+                        self.backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
                     )

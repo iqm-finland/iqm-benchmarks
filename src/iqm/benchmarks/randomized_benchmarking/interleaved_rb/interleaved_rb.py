@@ -296,7 +296,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
 
         # Validate and get interleaved gate as a QC
         interleaved_gate_qc = validate_irb_gate(
-            self.interleaved_gate, self.backend_configuration_name, gate_params=self.interleaved_gate_params
+            self.interleaved_gate, backend, gate_params=self.interleaved_gate_params
         )
 
         # Auxiliary dict from str(qubits) to indices
@@ -335,7 +335,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                     clifford_2q_dict,
                     seq_length,
                     self.num_circuit_samples,
-                    self.backend_configuration_name,
+                    backend,
                     interleaved_gate=None,
                 )
                 qcvv_logger.info(f"Generating Interleaved RB circuits of sequence length {seq_length}")
@@ -352,7 +352,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                     clifford_2q_dict,
                     seq_length,
                     self.num_circuit_samples,
-                    self.backend_configuration_name,
+                    backend,
                     interleaved_gate=interleaved_gate_qc,
                 )
 
@@ -437,7 +437,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         self.sequence_lengths,
                         clifford_dict,
                         self.num_circuit_samples,
-                        self.backend_configuration_name,
+                        backend,
                         interleaved_gate=None,
                     )
                 )
@@ -452,7 +452,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                     self.sequence_lengths,
                     clifford_dict,
                     self.num_circuit_samples,
-                    self.backend_configuration_name,
+                    backend,
                     interleaved_gate=interleaved_gate_qc,
                 )
 
@@ -464,7 +464,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         qubits,
                         rb_transpiled_circuits[str(qubits)],
                         self.shots,
-                        self.backend_configuration_name,
+                        backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
                     )
@@ -474,7 +474,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         qubits,
                         rb_transpiled_interleaved_circuits[str(qubits)],
                         self.shots,
-                        self.backend_configuration_name,
+                        backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
                     )

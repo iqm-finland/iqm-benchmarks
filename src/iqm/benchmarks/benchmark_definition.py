@@ -229,7 +229,6 @@ class Benchmark(ABC):
         Runs the benchmark using the given backend and calibration_set_id.
 
         Args:
-            backend_arg: Qiskit backend used to execute circuit.
             calibration_set_id:
                 CalibrationSetId used to initialize the backend or None for the latest calibration set.
         """

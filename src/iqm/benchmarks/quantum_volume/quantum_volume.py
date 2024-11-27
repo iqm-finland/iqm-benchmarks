@@ -22,6 +22,7 @@ from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from mthree.classes import QuasiCollection
 from mthree.utils import expval
 import numpy as np
 from qiskit import QuantumCircuit
@@ -135,41 +136,20 @@ def get_ideal_heavy_outputs(
 
 
 def get_rem_hops(
-    backend_arg: IQMBackendBase | str,
-    sorted_transpiled_qc_list: Dict[Tuple, List[QuantumCircuit]],
-    sorted_qc_list_indices: Dict[Tuple, List[int]],
-    execution_results: List[Dict[str, int]],
-    ideal_heavy_outputs: List[Dict[str, float]],
-    mit_shots: int,
+    all_rem_quasidistro: List[List[QuasiCollection]], ideal_heavy_outputs: List[Dict[str, float]]
 ) -> List[float]:
     """Computes readout-error-mitigated heavy output probabilities.
 
     Args:
-        backend_arg (IQMBackendBase | str): the backend to use.
-        sorted_transpiled_qc_list (Dict[Tuple, List[QuantumCircuit]]): A dictionary of lists of quantum circuits, indexed by qubit layouts.
-        sorted_qc_list_indices (Dict[Tuple, List[int]]): dictionary of indices (integers) corresponding to those in the original (untranspiled) list of circuits, with keys being final physical qubit measurements.
-        execution_results (List[Dict[str, int]]): counts from execution of all quantum circuits.
-        ideal_heavy_outputs (List[Dict[str, float]]): list of ideal heavy output dictionaries.
-        mit_shots (int): The number of measurement shots to estimate the readout calibration errors.
-    Returns:
-        A list of readout-error-mitigated heavy output probabilities.
-    """
-    all_rem_quasidistro = []
-    for k in sorted(
-        sorted_transpiled_qc_list.keys(),
-        key=lambda x: len(sorted_transpiled_qc_list[x]),
-        reverse=True,
-    ):
-        counts_corresp_to_circs_k = [execution_results[i] for i in sorted_qc_list_indices[k]]
-        all_rem_quasidistro_batch_k, _ = apply_readout_error_mitigation(
-            backend_arg, sorted_transpiled_qc_list[k], counts_corresp_to_circs_k, mit_shots
-        )
-        all_rem_quasidistro += all_rem_quasidistro_batch_k
+        all_rem_quasidistro (List[List[QuasiCollection]]): The list of lists of quasiprobability distributions.
+        ideal_heavy_outputs (List[Dict[str, float]]): A list of the noiseless heavy output probability dictionaries.
 
+    Returns:
+        List[float]: A list of readout-error-mitigated heavy output probabilities.
+    """
     qv_result_rem = []
     for rem_quasidistro, heavy in zip(all_rem_quasidistro, ideal_heavy_outputs):
         qv_result_rem += [expval(rem_quasidistro, heavy)]
-
     return qv_result_rem
 
 
@@ -314,7 +294,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
     observations = {}
     dataset = run.dataset
     backend_name = dataset.attrs["backend_name"]
-    backend_configuration_name = dataset.attrs["backend_configuration_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     num_circuits = dataset.attrs["num_circuits"]
     num_sigmas = dataset.attrs["num_sigmas"]
@@ -354,9 +333,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         # Compute the HO probabilities
         qv_result = compute_heavy_output_probabilities(execution_results[str(qubits)], ideal_heavy_outputs[str(qubits)])
 
-        # Count operations
-        all_op_counts = count_native_gates(backend_configuration_name, transpiled_qc_list)
-
         processed_results = {
             "average_heavy_output_probability": {
                 "value": cumulative_hop(qv_result)[-1],
@@ -374,7 +350,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
                 "sorted_qc_list_indices": (sorted_qc_list_indices if rem or physical_layout == "batching" else None),
                 "cumulative_average_heavy_output_probability": cumulative_hop(qv_result),
                 "cumulative_stddev_heavy_output_probability": cumulative_std(qv_result),
-                "operation_counts": all_op_counts,
                 "heavy_output_probabilities": qv_result,
             }
         )
@@ -399,22 +374,18 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
 
     # When REM is set to True, do the post-processing with the adjusted quasi-probabilities
     mit_shots = dataset.attrs["mit_shots"]
+    rem_quasidistros = dataset.attrs["REM_quasidistributions"]
     for qubits_idx, qubits in enumerate(qubit_layouts):
         qcvv_logger.info(f"REM post-processing for layout {qubits}")
         # Retrieve
         dataset_dictionary = dataset.attrs[qubits_idx]
 
-        sorted_transpiled_qc_list = dataset.attrs["transpiled_circuits"][str(qubits)]
         qcvv_logger.info(f"Applying REM with {mit_shots} shots")
         sorted_qc_list_indices = dataset_dictionary["sorted_qc_list_indices"]
 
         qv_result_rem = get_rem_hops(
-            backend_configuration_name,
-            sorted_transpiled_qc_list,
-            sorted_qc_list_indices,
-            execution_results[str(qubits)],
+            rem_quasidistros[f"REM_quasidist_{str(qubits)}"],
             ideal_heavy_outputs[str(qubits)],
-            mit_shots,
         )
 
         rem_results = {
@@ -647,6 +618,37 @@ class QuantumVolumeBenchmark(Benchmark):
 
         return qc_list
 
+    def get_rem_quasidistro(
+        self,
+        sorted_transpiled_qc_list: Dict[Tuple, List[QuantumCircuit]],
+        sorted_qc_list_indices: Dict[Tuple, List[int]],
+        execution_results: List[Dict[str, int]],
+        mit_shots: int,
+    ) -> List[List[QuasiCollection]]:
+        """Computes readout-error-mitigated quasiprobabilities.
+
+        Args:
+            sorted_transpiled_qc_list (Dict[Tuple, List[QuantumCircuit]]): A dictionary of lists of quantum circuits, indexed by qubiy layouts.
+            sorted_qc_list_indices (Dict[Tuple, List[int]]): dictionary of indices (integers) corresponding to those in the original (untranspiled) list of circuits, with keys being final physical qubit measurements.
+            execution_results (List[Dict[str, int]]): counts from execution of all quantum circuits.
+            mit_shots (int): The number of measurement shots to estimate the readout calibration errors.
+        Returns:
+            A list of lists of quasiprobabilities.
+        """
+        all_rem_quasidistro = []
+        for k in sorted(
+            sorted_transpiled_qc_list.keys(),
+            key=lambda x: len(sorted_transpiled_qc_list[x]),
+            reverse=True,
+        ):
+            counts_corresp_to_circs_k = [execution_results[i] for i in sorted_qc_list_indices[k]]
+            all_rem_quasidistro_batch_k, _ = apply_readout_error_mitigation(
+                self.backend, sorted_transpiled_qc_list[k], counts_corresp_to_circs_k, mit_shots
+            )
+            all_rem_quasidistro += all_rem_quasidistro_batch_k
+
+        return all_rem_quasidistro
+
     def submit_single_qv_job(
         self,
         backend: IQMBackendBase,
@@ -712,6 +714,7 @@ class QuantumVolumeBenchmark(Benchmark):
         # Initialize the variable to contain the QV circuits of each layout
         self.untranspiled_circuits: Dict[str, Dict[Tuple, List[QuantumCircuit]]] = {}
         self.transpiled_circuits: Dict[str, Dict[Tuple, List[QuantumCircuit]]] = {}
+        all_op_counts = {}
 
         for qubits in self.custom_qubits_array:  # NB: jobs will be submitted for qubit layouts in the specified order
             self.untranspiled_circuits[str(qubits)] = {}
@@ -755,6 +758,9 @@ class QuantumVolumeBenchmark(Benchmark):
             self.untranspiled_circuits[str(qubits)].update({tuple(qubits): qc_list})
             self.transpiled_circuits[str(qubits)].update(sorted_transpiled_qc_list)
 
+            # Count operations
+            all_op_counts[str(qubits)] = count_native_gates(backend, transpiled_qc_list)
+
             # Submit
             all_qv_jobs.append(self.submit_single_qv_job(backend, qubits, sorted_transpiled_qc_list))
             qcvv_logger.info(f"Job for layout {qubits} submitted successfully!")
@@ -767,6 +773,7 @@ class QuantumVolumeBenchmark(Benchmark):
             execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], str(qubits))
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
+
             # Export all to dataset
             dataset.attrs.update(
                 {
@@ -780,6 +787,7 @@ class QuantumVolumeBenchmark(Benchmark):
                         "time_retrieve": time_retrieve,
                         "all_job_metadata": all_job_metadata,
                         "sorted_qc_list_indices": sorted_qc_list_indices[str(qubits)],
+                        "operation_counts": all_op_counts[str(qubits)],
                     }
                 }
             )
@@ -788,6 +796,18 @@ class QuantumVolumeBenchmark(Benchmark):
             dataset, _ = add_counts_to_dataset(execution_results, str(qubits), dataset)
 
         self.add_all_circuits_to_dataset(dataset)
+
+        if self.rem:
+            rem_quasidistros = {}
+            for qubits in self.custom_qubits_array:
+                exec_counts = xrvariable_to_counts(dataset, str(qubits), self.num_circuits)
+                rem_quasidistros[f"REM_quasidist_{str(qubits)}"] = self.get_rem_quasidistro(
+                    self.transpiled_circuits[str(qubits)],
+                    sorted_qc_list_indices[str(qubits)],
+                    exec_counts,
+                    self.mit_shots,
+                )
+            dataset.attrs.update({"REM_quasidistributions": rem_quasidistros})
 
         qcvv_logger.info(f"QV experiment execution concluded !")
         return dataset
