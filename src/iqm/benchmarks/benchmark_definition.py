@@ -35,6 +35,26 @@ from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 
 
 @dataclass
+class ObservationIdentifier:
+    """Identifier for observations for ease of use
+
+    Attributes:
+        qubit_indices: list containing the indices of the qubits the observation was executed on.
+    """
+
+    qubit_indices: list[int]
+
+    @property
+    def string_identifier(self) -> str:
+        """String version of the qubit indices for ease of use
+
+        Returns:
+            A string of the qubit indices
+        """
+        return str(self.qubit_indices)
+
+
+@dataclass
 class Observation:
     """Dataclass to store the main results of a single run of a Benchmark
 
@@ -47,8 +67,17 @@ class Observation:
 
     name: str
     value: Any
-    identifier: str
+    identifier: ObservationIdentifier
     uncertainty: Optional[Any] = None
+
+    # @property
+    # def identifier(self) -> ObservationIdentifier:
+    #     """Generates the ObservationIdentifier from the qubit_indices
+    #
+    #     Returns:
+    #         ObservationIdentifier
+    #     """
+    #     return ObservationIdentifier(qubit_indices=self.qubit_indices)
 
 
 @dataclass

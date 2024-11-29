@@ -33,7 +33,13 @@ import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import AnalysisResult, Observation, RunResult, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    AnalysisResult,
+    Observation,
+    ObservationIdentifier,
+    RunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
@@ -263,7 +269,7 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     )
                     observation_list.extend(
                         [
-                            Observation(name=key, identifier=qubit_layout, value=value)
+                            Observation(name=key, identifier=ObservationIdentifier(qubit_layout), value=value)
                             for key, value in fidelity_ghz_randomized_measurements(
                                 dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
                             ).items()
@@ -271,11 +277,13 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     )
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
-            observation_list.extend([Observation(name="fidelity", identifier=str(qubit_layout), value=fidelity[0])])
+            observation_list.extend(
+                [Observation(name="fidelity", identifier=ObservationIdentifier(qubit_layout), value=fidelity[0])]
+            )
             if len(fidelity) > 1:
 
                 observation_list.append(
-                    Observation(name="fidelity_rem", identifier=str(qubit_layout), value=fidelity[1])
+                    Observation(name="fidelity_rem", identifier=ObservationIdentifier(qubit_layout), value=fidelity[1])
                 )
     return AnalysisResult(dataset=dataset, observations=observation_list)
 
