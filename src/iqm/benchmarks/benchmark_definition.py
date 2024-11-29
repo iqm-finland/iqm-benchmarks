@@ -21,7 +21,7 @@ import copy
 from copy import deepcopy
 from dataclasses import dataclass, field
 import functools
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 import uuid
 
 from matplotlib.figure import Figure
