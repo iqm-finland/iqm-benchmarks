@@ -476,8 +476,8 @@ def mrb_analysis(run: RunResult) -> AnalysisResult:
             )
 
             # Retrieve counts
-            all_noiseless_counts[str(qubits)][str(depth)], time_retrieve_noiseless[str(qubits)][str(depth)] = (
-                retrieve_all_counts(all_noiseless_jobs)
+            all_noiseless_counts[str(qubits)][depth], time_retrieve_noiseless[str(qubits)][depth] = retrieve_all_counts(
+                all_noiseless_jobs
             )
 
             # Compute polarizations for the current depth

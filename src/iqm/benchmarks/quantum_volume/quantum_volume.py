@@ -333,17 +333,24 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         # Compute the HO probabilities
         qv_result = compute_heavy_output_probabilities(execution_results[str(qubits)], ideal_heavy_outputs[str(qubits)])
 
-        processed_results = {
-            "average_heavy_output_probability": {
-                "value": cumulative_hop(qv_result)[-1],
-                "uncertainty": cumulative_std(qv_result)[-1],
-            },
-            "is_successful": {"value": str(is_successful(qv_result, num_sigmas)), "uncertainty": np.NaN},
-            "QV_result": {
-                "value": 2 ** len(qubits) if is_successful(qv_result, num_sigmas) else 1,
-                "uncertainty": np.NaN,
-            },
-        }
+        observations = [
+            Observation(
+                name="average_heavy_output_probability",
+                value=cumulative_hop(qv_result)[-1],
+                uncertainty=cumulative_std(qv_result)[-1],
+                identifier=ObservationIdentifier(qubits),
+            ),
+            Observation(
+                name="is_succesful",
+                value=str(is_successful(qv_result, num_sigmas)),
+                identifier=ObservationIdentifier(qubits),
+            ),
+            Observation(
+                name="QV_result",
+                value=2 ** len(qubits) if is_successful(qv_result) else 1,
+                identifier=ObservationIdentifier(qubits),
+            ),
+        ]
 
         dataset.attrs[qubits_idx].update(
             {
@@ -353,20 +360,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
                 "heavy_output_probabilities": qv_result,
             }
         )
-
-        # UPDATE OBSERVATIONS
-        observations.extend(
-            [
-                Observation(
-                    name=key,
-                    identifier=ObservationIdentifier(qubits),
-                    value=values["value"],
-                    uncertainty=values["uncertainty"],
-                )
-                for key, values in processed_results.items()
-            ]
-        )
-        # observations.update({qubits_idx: processed_results})
 
         fig_name, fig = plot_hop_threshold(
             qubits,
@@ -399,18 +392,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
             ideal_heavy_outputs[str(qubits)],
         )
 
-        rem_results = {
-            "REM_average_heavy_output_probability": {
-                "value": cumulative_hop(qv_result_rem)[-1],
-                "uncertainty": cumulative_std(qv_result_rem)[-1],
-            },
-            "REM_is_successful": {"value": str(is_successful(qv_result_rem)), "uncertainty": np.NaN},
-            "REM_QV_result": {
-                "value": 2 ** len(qubits) if is_successful(qv_result_rem, num_sigmas) else 1,
-                "uncertainty": np.NaN,
-            },
-        }
-
         dataset.attrs[qubits_idx].update(
             {
                 "sorted_qc_list_indices": (sorted_qc_list_indices if physical_layout == "batching" else None),
@@ -424,15 +405,23 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         observations.extend(
             [
                 Observation(
-                    name=key,
-                    identifier=ObservationIdentifier(qubits_idx),
-                    value=values["value"],
-                    uncertainty=values["uncertainty"],
-                )
-                for key, values in rem_results.items()
+                    name="REM_average_heavy_output_probability",
+                    value=cumulative_hop(qv_result_rem)[-1],
+                    uncertainty=cumulative_std(qv_result_rem)[-1],
+                    identifier=ObservationIdentifier(qubits),
+                ),
+                Observation(
+                    name="REM_is_succesful",
+                    value=str(is_successful(qv_result_rem, num_sigmas)),
+                    identifier=ObservationIdentifier(qubits),
+                ),
+                Observation(
+                    name="REM_QV_result",
+                    value=2 ** len(qubits) if is_successful(qv_result_rem) else 1,
+                    identifier=ObservationIdentifier(qubits),
+                ),
             ]
         )
-        # observations.update({qubits_idx: rem_results})
 
         fig_name_rem, fig_rem = plot_hop_threshold(
             qubits,
