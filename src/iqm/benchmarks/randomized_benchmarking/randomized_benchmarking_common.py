@@ -285,7 +285,7 @@ def generate_random_clifford_seq_circuits(
 
     Args:
         qubits (List[int]): the list of qubits
-        clifford_dict (Optional[Dict]): A dictionary of Cliffords gates labeled by (de)stabilizers
+        clifford_dict (Dict[str, QuantumCircuit]): A dictionary of Clifford gates labeled by (de)stabilizers
         seq_length (int): the sequence length
         num_circ_samples (int): the number of samples
         backend_arg (str | IQMBackendBase):
@@ -374,9 +374,13 @@ def lmfit_minimizer(
     fit_parameters: Parameters, fit_data: np.ndarray, depths: List[int], func: Callable
 ) -> MinimizerResult:
     """
-
+    Args:
+        fit_parameters (Parameters): the parameters to fit
+        fit_data (np.ndarray): the data to fit
+        depths (List[int]): the depths of the RB experiment
+        func (Callable): the model function for fitting
     Returns:
-
+        MinimizerResult: the result of the minimization
     """
     return minimize(
         fcn=multi_dataset_residual,
@@ -490,6 +494,7 @@ def survival_probabilities_parallel(
         qubits_array (List[int]): List of qubits in which the experiment was performed
         counts (Dict[str, int]): The measurement counts for corresponding bitstrings
     Returns:
+        Dict[str, List[float]]: The survival probabilities for each qubit
     """
     # Global probability estimations
     global_probabilities = [{k: v / sum(c.values()) for k, v in c.items()} for c in counts]
@@ -548,6 +553,9 @@ def plot_rb_decay(
         interleaved_gate (Optional[str]):
         mrb_2q_density (Optional[float], optional): Density of MRB 2Q gates. Defaults to None.
         mrb_2q_ensemble (Optional[Dict[str, float]], optional): MRB ensemble of 2Q gates. Defaults to None.
+
+    Returns:
+        Tuple[str, Figure]: the plot title and the figure
     """
     fig, ax = plt.subplots()
 
@@ -825,8 +833,8 @@ def validate_rb_qubits(qubits_array: List[List[int]], backend_arg: str | IQMBack
     Args:
         qubits_array (List[List[int]]): the array of qubits
         backend_arg (IQMBackendBase): the IQM backend
-    Returns:
-        Raises ValueError if specified pairs of qubits are not connected
+    Raises:
+        ValueError if specified pairs of qubits are not connected
     """
     if isinstance(backend_arg, str):
         backend = get_iqm_backend(backend_arg)
@@ -857,6 +865,7 @@ def validate_irb_gate(
         backend_arg (IQMBackendBase): the IQM backend to verify transpilation
         gate_params (Optional[List[float]]): the gate parameters
     Returns:
+        Transpiled circuit
 
     """
     if gate_params is not None:
