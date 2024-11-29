@@ -20,7 +20,7 @@ from io import BytesIO
 from itertools import chain
 import json
 from time import strftime, time
-from typing import Dict, List, Optional, Tuple, Type, cast
+from typing import Any, Dict, List, Optional, Tuple, Type, cast
 
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
@@ -248,6 +248,7 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
     qubit_layouts = dataset.attrs["custom_qubits_array"]
     backend_name = dataset.attrs["backend_name"]
 
+    result_dict: dict[str, dict[str, Any]]
     for qubit_layout in qubit_layouts:
         if routine == "randomized_measurements":
             ideal_simulator = Aer.get_backend("statevector_simulator")
@@ -261,9 +262,9 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
-                result_dict = fidelity_ghz_randomized_measurements(
+                result_dict = {key: {"value": value, "uncertainty":  None} for key, value in fidelity_ghz_randomized_measurements(
                     dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
-                )
+                ).items()}
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
             result_dict = {"fidelity": {"value": fidelity[0], "uncertainty": None}}
@@ -411,8 +412,8 @@ def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List
             idx_1 = key.index(".QB")
             idx_2 = key.index("__QB")
             idx_3 = key.index(".fidelity")
-            qb1 = int(key[idx_1 + 3 : idx_2]) - 1
-            qb2 = int(key[idx_2 + 4 : idx_3]) - 1
+            qb1 = int(key[idx_1 + 3: idx_2]) - 1
+            qb2 = int(key[idx_2 + 4: idx_3]) - 1
             if all([qb1 in qubit_layout, qb2 in qubit_layout]):
                 list_couplings.append([qubit_mapping[qb1], qubit_mapping[qb2]])
                 list_fids.append(float(res["metrics"][key]["value"]))
