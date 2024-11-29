@@ -617,7 +617,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
             dataset (xr.Dataset):  The xarray dataset
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        print(self.transpiled_circuits)
         for key, circuit in zip(
             ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
         ):
@@ -627,6 +626,8 @@ class MirrorRandomizedBenchmarking(Benchmark):
                     str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
                 }
             dataset.attrs[key] = dictionary
+        print(dataset.attrs['transpiled_circuits'])
+        print(dataset.attrs['untranspiled_circuits'])
 
     def submit_single_mrb_job(
         self,
