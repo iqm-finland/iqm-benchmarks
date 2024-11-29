@@ -21,7 +21,7 @@ import copy
 from copy import deepcopy
 from dataclasses import dataclass, field
 import functools
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Union
 import uuid
 
 from matplotlib.figure import Figure
@@ -36,9 +36,18 @@ from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 
 @dataclass
 class Observation:
+    """Dataclass to store the main results of a single run of a Benchmark
+
+    Attributes:
+        name: name of the observation
+        value: value of the observation
+        identifier: identifier, which should be a string of the qubit layout
+        uncertainty: uncertainty of the observation
+    """
+
     name: str
     value: Any
-    identifier: str = ""
+    identifier: str
     uncertainty: Optional[Any] = None
 
 
