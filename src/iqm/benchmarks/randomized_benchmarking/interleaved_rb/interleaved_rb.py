@@ -184,11 +184,11 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
                 }
             )
 
-        observations.append(
+        observations.extend(
             [
                 Observation(
                     name=key,
-                    identifier=str(qubits_idx),
+                    identifier=str(qubits),
                     value=values["value"],
                     uncertainty=values["uncertainty"],
                 )
@@ -235,7 +235,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
 
         Args:
             backend_arg (IQMBackendBase | str): the backend to execute Clifford RB on
-            configuration (CliffordRBConfiguration): The Clifford RB configuration
+            configuration (InterleavedRBConfiguration): The Clifford RB configuration
         """
         super().__init__(backend_arg, configuration)
 

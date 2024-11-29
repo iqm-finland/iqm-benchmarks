@@ -261,7 +261,7 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
-                    observation_list.append(
+                    observation_list.extend(
                         [
                             Observation(name=key, identifier=qubit_layout, value=value)
                             for key, value in fidelity_ghz_randomized_measurements(
@@ -271,7 +271,7 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     )
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
-            observation_list.append(*[Observation(name="fidelity", identifier=str(qubit_layout), value=fidelity[0])])
+            observation_list.extend([Observation(name="fidelity", identifier=str(qubit_layout), value=fidelity[0])])
             if len(fidelity) > 1:
 
                 observation_list.append(
@@ -418,8 +418,8 @@ def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List
             idx_1 = key.index(".QB")
             idx_2 = key.index("__QB")
             idx_3 = key.index(".fidelity")
-            qb1 = int(key[idx_1 + 3: idx_2]) - 1
-            qb2 = int(key[idx_2 + 4: idx_3]) - 1
+            qb1 = int(key[idx_1 + 3 : idx_2]) - 1
+            qb2 = int(key[idx_2 + 4 : idx_3]) - 1
             if all([qb1 in qubit_layout, qb2 in qubit_layout]):
                 list_couplings.append([qubit_mapping[qb1], qubit_mapping[qb2]])
                 list_fids.append(float(res["metrics"][key]["value"]))

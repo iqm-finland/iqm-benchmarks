@@ -141,11 +141,11 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
         )
 
         obs_dict.update({qubits_idx: processed_results})
-        observations.append(
+        observations.extend(
             [
                 Observation(
                     name=key,
-                    identifier=str(qubits_idx),
+                    identifier=str(qubits),
                     value=values["value"],
                     uncertainty=values["uncertainty"],
                 )
