@@ -38,7 +38,7 @@ from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 class Observation:
     name: str
     value: Any
-    identifier: str = ""  # Maybe call it qubit layout? = ""
+    identifier: str = ""
     uncertainty: Optional[Any] = None
 
 

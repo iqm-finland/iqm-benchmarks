@@ -53,7 +53,7 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
     Returns:
         AnalysisResult corresponding to Clifford RB
     """
-    dataset = run.dataset
+    dataset = run.dataset.copy(deep=True)
     observations: list[Observation] = []
     obs_dict = {}
     plots = {}
