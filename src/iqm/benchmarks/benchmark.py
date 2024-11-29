@@ -54,10 +54,10 @@ class BenchmarkBase(ABC):
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
 
-        self.raw_data: dict = {}
-        self.job_meta: dict = {}
-        self.results: dict = {}
-        self.raw_results: dict = {}
+        self.raw_data: Dict = {}
+        self.job_meta: Dict = {}
+        self.results: Dict = {}
+        self.raw_results: Dict = {}
 
         self.untranspiled_circuits: Dict[str, Dict[int, list]] = {}
         self.transpiled_circuits: Dict[str, Dict[int, list]] = {}

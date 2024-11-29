@@ -201,7 +201,7 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
         backend_object = provider.get_backend()
 
     else:
-        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb, 'fakeadonis' or 'fakeapollo'.")
+        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis' or 'fakeapollo'.")
 
     return backend_object
 

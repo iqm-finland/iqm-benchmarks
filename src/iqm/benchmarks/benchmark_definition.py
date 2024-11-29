@@ -224,13 +224,16 @@ class Benchmark(ABC):
             the benchmark results.
         """
 
-    def run(self, calibration_set_id: str | uuid.UUID | None = None):
+    def run(self, calibration_set_id: str | uuid.UUID | None = None) -> RunResult:
         """
         Runs the benchmark using the given backend and calibration_set_id.
 
         Args:
             calibration_set_id:
                 CalibrationSetId used to initialize the backend or None for the latest calibration set.
+
+        Returns:
+            RunResult: The result of the benchmark run.
         """
         backend_for_execute = copy.copy(self.backend)
         backend_for_execute.run = functools.partial(self.backend.run, calibration_set_id=calibration_set_id)  # type: ignore
