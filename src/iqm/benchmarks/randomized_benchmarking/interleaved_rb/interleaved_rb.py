@@ -26,7 +26,7 @@ import xarray as xr
 
 from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Observation, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -57,7 +57,8 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
         AnalysisResult corresponding to Interleaved RB
     """
     dataset = run.dataset
-    observations: Dict[int, Any] = {}
+    obs_dict: Dict[int, Any] = {}
+    observations = []
     plots: Dict[str, Figure] = {}
 
     is_parallel_execution = dataset.attrs["parallel_execution"]
@@ -183,7 +184,18 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
                 }
             )
 
-        observations.update({qubits_idx: processed_results})
+        observations.append(
+            [
+                Observation(
+                    name=key,
+                    identifier=str(qubits_idx),
+                    value=values["value"],
+                    uncertainty=values["uncertainty"],
+                )
+                for key, values in processed_results.items()
+            ]
+        )
+        obs_dict.update({qubits_idx: processed_results})
 
         # Generate decay plots
         if interleaved_gate_parameters is None:
@@ -196,14 +208,14 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
             "irb",
             [qubits],
             dataset,
-            observations,
+            obs_dict,
             interleaved_gate=interleaved_gate_string,
         )
         plots[fig_name] = fig
 
     # Rearrange observations
     observations_refactored: Dict[int, Dict[str, Dict[str, float]]] = {}
-    for k, o in observations.items():
+    for k, o in obs_dict.items():
         observations_refactored[k] = {}
         for rb_type in o.keys():
             observations_refactored[k].update({f"{k}_{rb_type}": v for k, v in o[rb_type].items()})

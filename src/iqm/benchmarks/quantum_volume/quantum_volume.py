@@ -35,7 +35,7 @@ import xarray as xr
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
 from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Observation, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
@@ -291,7 +291,7 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
     """
 
     plots = {}
-    observations = {}
+    observations: list[Observation] = []
     dataset = run.dataset.copy(deep=True)
     backend_name = dataset.attrs["backend_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
@@ -355,7 +355,18 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
 
         # UPDATE OBSERVATIONS
-        observations.update({qubits_idx: processed_results})
+        observations.append(
+            [
+                Observation(
+                    name=key,
+                    identifier=str(qubits_idx),
+                    value=values["value"],
+                    uncertainty=values["uncertainty"],
+                )
+                for key, values in processed_results.items()
+            ]
+        )
+        # observations.update({qubits_idx: processed_results})
 
         fig_name, fig = plot_hop_threshold(
             qubits,
@@ -410,7 +421,18 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
 
         # UPDATE OBSERVATIONS
-        observations.update({qubits_idx: rem_results})
+        observations.append(
+            [
+                Observation(
+                    name=key,
+                    identifier=str(qubits_idx),
+                    value=values["value"],
+                    uncertainty=values["uncertainty"],
+                )
+                for key, values in rem_results.items()
+            ]
+        )
+        # observations.update({qubits_idx: rem_results})
 
         fig_name_rem, fig_rem = plot_hop_threshold(
             qubits,

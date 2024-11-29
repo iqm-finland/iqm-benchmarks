@@ -33,7 +33,7 @@ import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import AnalysisResult, Observation, RunResult, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
@@ -249,6 +249,7 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
     backend_name = dataset.attrs["backend_name"]
 
     result_dict: dict[str, dict[str, Any]]
+    observation_list: list[Observation] = []
     for qubit_layout in qubit_layouts:
         if routine == "randomized_measurements":
             ideal_simulator = Aer.get_backend("statevector_simulator")
@@ -262,16 +263,26 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
-                result_dict = {key: {"value": value, "uncertainty":  None} for key, value in fidelity_ghz_randomized_measurements(
-                    dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
-                ).items()}
+                    observation_list.append(
+                        [
+                            Observation(name=key, identifier=qubit_layout, value=value)
+                            for key, value in fidelity_ghz_randomized_measurements(
+                                dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
+                            ).items()
+                        ]
+                    )
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
-            result_dict = {"fidelity": {"value": fidelity[0], "uncertainty": None}}
+            observation_list.append(*[Observation(name="fidelity", identifier=str(qubit_layout), value=fidelity[0])])
+            # result_dict = {"fidelity": {"value": fidelity[0], "uncertainty": None}}
             if len(fidelity) > 1:
-                result_dict.update({"fidelity_rem": {"value": fidelity[1], "uncertainty": None}})
-        observations[str(qubit_layout)] = result_dict
-    return AnalysisResult(dataset=dataset, observations=observations)
+
+                observation_list.append(
+                    Observation(name="fidelity_rem", identifier=str(qubit_layout), value=fidelity[1])
+                )
+                # result_dict.update({"fidelity_rem": {"value": fidelity[1], "uncertainty": None}})
+        # observations[str(qubit_layout)] = result_dict
+    return AnalysisResult(dataset=dataset, observations=observation_list)
 
 
 def generate_ghz_linear(num_qubits: int) -> QuantumCircuit:
@@ -412,8 +423,8 @@ def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List
             idx_1 = key.index(".QB")
             idx_2 = key.index("__QB")
             idx_3 = key.index(".fidelity")
-            qb1 = int(key[idx_1 + 3: idx_2]) - 1
-            qb2 = int(key[idx_2 + 4: idx_3]) - 1
+            qb1 = int(key[idx_1 + 3 : idx_2]) - 1
+            qb2 = int(key[idx_2 + 4 : idx_3]) - 1
             if all([qb1 in qubit_layout, qb2 in qubit_layout]):
                 list_couplings.append([qubit_mapping[qb1], qubit_mapping[qb2]])
                 list_fids.append(float(res["metrics"][key]["value"]))
@@ -541,6 +552,7 @@ class GHZBenchmark(Benchmark):
         self.cal_url = configuration.cal_url
 
         self.timestamp = strftime("%Y%m%d-%H%M%S")
+        self.name = self.name()
 
     @staticmethod
     def name() -> str:

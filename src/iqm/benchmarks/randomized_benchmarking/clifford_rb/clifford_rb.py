@@ -25,7 +25,7 @@ import xarray as xr
 
 from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Observation, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -54,7 +54,8 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
         AnalysisResult corresponding to Clifford RB
     """
     dataset = run.dataset
-    observations = {}
+    observations: list[Observation] = []
+    obs_dict = {}
     plots = {}
 
     is_parallel_execution = dataset.attrs["parallel_execution"]
@@ -139,10 +140,21 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
             }
         )
 
-        observations.update({qubits_idx: processed_results})
+        obs_dict.update({qubits_idx: processed_results})
+        observations.append(
+            [
+                Observation(
+                    name=key,
+                    identifier=str(qubits_idx),
+                    value=values["value"],
+                    uncertainty=values["uncertainty"],
+                )
+                for key, values in processed_results.items()
+            ]
+        )
 
         # Generate individual decay plots
-        fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, observations)
+        fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, obs_dict)
         plots[fig_name] = fig
 
     return AnalysisResult(dataset=dataset, observations=observations, plots=plots)
