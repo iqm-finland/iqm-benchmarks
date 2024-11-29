@@ -564,7 +564,7 @@ class MirrorRandomizedBenchmarking(Benchmark):
 
     analysis_function = staticmethod(mrb_analysis)
 
-    name: str = "mrb"
+    name: str = "mirror_rb"
 
     def __init__(self, backend_arg: IQMBackendBase | str, configuration: "MirrorRBConfiguration"):
         """Construct the MirrorRandomizedBenchmarking class

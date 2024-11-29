@@ -56,7 +56,7 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
     Returns:
         AnalysisResult corresponding to Interleaved RB
     """
-    dataset = run.dataset
+    dataset = run.dataset.copy(deep=True)
     obs_dict: Dict[int, Any] = {}
     observations = []
     plots: Dict[str, Figure] = {}
@@ -228,7 +228,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
 
     analysis_function = staticmethod(interleaved_rb_analysis)
 
-    name: str = "clifford_rb"
+    name: str = "interleaved_clifford_rb"
 
     def __init__(self, backend_arg: IQMBackendBase | str, configuration: "InterleavedRBConfiguration"):
         """Construct the InterleavedRandomizedBenchmark class
