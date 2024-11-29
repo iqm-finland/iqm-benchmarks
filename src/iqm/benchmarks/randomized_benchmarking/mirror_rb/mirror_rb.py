@@ -626,8 +626,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
                     str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
                 }
             dataset.attrs[key] = dictionary
-        print(dataset.attrs['transpiled_circuits'])
-        print(dataset.attrs['untranspiled_circuits'])
 
     def submit_single_mrb_job(
         self,
