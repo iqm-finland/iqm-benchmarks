@@ -513,6 +513,7 @@ class GHZBenchmark(Benchmark):
     """The GHZ Benchmark estimates the quality of generated Greenberger-Horne-Zeilinger states"""
 
     analysis_function = staticmethod(fidelity_analysis)
+    name = "ghz"
 
     def __init__(self, backend: IQMBackendBase, configuration: "GHZConfiguration"):
         """Construct the GHZBenchmark class.
@@ -547,11 +548,10 @@ class GHZBenchmark(Benchmark):
         self.cal_url = configuration.cal_url
 
         self.timestamp = strftime("%Y%m%d-%H%M%S")
-        self.name = self.name()
 
-    @staticmethod
-    def name() -> str:
-        return "ghz"
+    # @staticmethod
+    # def name() -> str:
+    #     return "ghz"
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> QuantumCircuit:
         """
@@ -712,7 +712,7 @@ class GHZBenchmark(Benchmark):
 
         for key, value in self.configuration:
             if key == "benchmark":  # Avoid saving the class object
-                dataset.attrs[key] = value.name()
+                dataset.attrs[key] = value.name
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name

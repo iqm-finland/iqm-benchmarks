@@ -272,7 +272,8 @@ def apply_readout_error_mitigation(
     # M3IQM uses mthree.mitigation, which for some reason displays many INFO messages
     # Not sure if this is the best way to suppress them; MODIFY IF NECESSARY !
     warnings.warn("Suppressing INFO messages from M3IQM with logging.disable(sys.maxsize) - update if problematic!")
-    logging.disable(sys.maxsize)
+    # logging.disable()
+    # logging.disable(sys.maxsize)
 
     if isinstance(backend_arg, str):
         backend = get_iqm_backend(backend_arg)
