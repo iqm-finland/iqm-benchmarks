@@ -292,7 +292,7 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
 
     plots = {}
     observations = {}
-    dataset = run.dataset
+    dataset = run.dataset.copy(deep=True)
     backend_name = dataset.attrs["backend_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     num_circuits = dataset.attrs["num_circuits"]
@@ -509,8 +509,15 @@ class QuantumVolumeBenchmark(Benchmark):
 
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs["untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs["transpiled_circuits"] = self.transpiled_circuits
+        for key, circuit in zip(
+            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
+        ):
+            dictionary = {}
+            for outer_key, outer_value in circuit.items():
+                dictionary[str(outer_key)] = {
+                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
+                }
+            dataset.attrs[key] = dictionary
 
     # def get_mapomatic_average_qv_scores(self) -> List[List[int]]:
     #     """Estimate the average mapomatic scores for N quantum volume circuit samples
@@ -786,7 +793,9 @@ class QuantumVolumeBenchmark(Benchmark):
                         "time_submit": job_dict["time_submit"],
                         "time_retrieve": time_retrieve,
                         "all_job_metadata": all_job_metadata,
-                        "sorted_qc_list_indices": sorted_qc_list_indices[str(qubits)],
+                        "sorted_qc_list_indices": {
+                            str(key): value for key, value in sorted_qc_list_indices[str(qubits)].items()
+                        },
                         "operation_counts": all_op_counts[str(qubits)],
                     }
                 }

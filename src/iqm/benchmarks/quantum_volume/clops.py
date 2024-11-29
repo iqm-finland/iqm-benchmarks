@@ -396,8 +396,15 @@ class CLOPSBenchmark(Benchmark):
 
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs["untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs["transpiled_circuits"] = self.transpiled_circuits
+        for key, circuit in zip(
+            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
+        ):
+            dictionary = {}
+            for outer_key, outer_value in circuit.items():
+                dictionary[str(outer_key)] = {
+                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
+                }
+            dataset.attrs[key] = dictionary
 
     def append_parameterized_unitary(
         self,
@@ -614,8 +621,11 @@ class CLOPSBenchmark(Benchmark):
             # Sort circuits according to their final measurement mappings
             (sorted_transpiled_qc_list, _), self.time_sort_batches = sort_batches_by_final_layout(transpiled_qc_list)
 
-        self.untranspiled_circuits.update({tuple(self.qubits): qc_list})
-        self.transpiled_circuits.update(sorted_transpiled_qc_list)
+        self.untranspiled_circuits.update({str(self.qubits): {str(self.qubits): qc_list}})
+        self.transpiled_circuits.update(
+            {str(self.qubits): {str(key): value for key, value in sorted_transpiled_qc_list.items()}}
+        )
+        # self.transpiled_circuits[str(self.qubits)].update(sorted_transpiled_qc_list)
 
         return sorted_transpiled_qc_list
 

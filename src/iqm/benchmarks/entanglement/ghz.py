@@ -266,9 +266,9 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                 )
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
-            result_dict = {"fidelity": fidelity[0]}
+            result_dict = {"fidelity": {"value": fidelity[0], "uncertainty": None}}
             if len(fidelity) > 1:
-                result_dict.update({"fidelity_rem": fidelity[1]})
+                result_dict.update({"fidelity_rem": {"value": fidelity[1], "uncertainty": None}})
         observations[str(qubit_layout)] = result_dict
     return AnalysisResult(dataset=dataset, observations=observations)
 
