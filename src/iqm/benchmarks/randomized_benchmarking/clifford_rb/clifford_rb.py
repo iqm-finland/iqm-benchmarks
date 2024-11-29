@@ -25,7 +25,7 @@ import xarray as xr
 
 from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Observation, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -145,7 +145,7 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
             [
                 Observation(
                     name=key,
-                    identifier=str(qubits),
+                    identifier=ObservationIdentifier(qubits),
                     value=values["value"],
                     uncertainty=values["uncertainty"],
                 )

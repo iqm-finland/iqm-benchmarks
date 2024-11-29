@@ -35,7 +35,7 @@ import xarray as xr
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
 from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Observation, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
@@ -355,11 +355,11 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
 
         # UPDATE OBSERVATIONS
-        observations.append(
+        observations.extend(
             [
                 Observation(
                     name=key,
-                    identifier=str(qubits_idx),
+                    identifier=ObservationIdentifier(qubits),
                     value=values["value"],
                     uncertainty=values["uncertainty"],
                 )
@@ -421,11 +421,11 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
 
         # UPDATE OBSERVATIONS
-        observations.append(
+        observations.extend(
             [
                 Observation(
                     name=key,
-                    identifier=str(qubits_idx),
+                    identifier=ObservationIdentifier(qubits_idx),
                     value=values["value"],
                     uncertainty=values["uncertainty"],
                 )

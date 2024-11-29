@@ -26,7 +26,7 @@ import xarray as xr
 
 from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Observation, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -58,7 +58,7 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
     """
     dataset = run.dataset.copy(deep=True)
     obs_dict: Dict[int, Any] = {}
-    observations = []
+    observations: list[Observation] = []
     plots: Dict[str, Figure] = {}
 
     is_parallel_execution = dataset.attrs["parallel_execution"]
@@ -166,6 +166,18 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
                 "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
             }
 
+            observations.extend(
+                [
+                    Observation(
+                        name=f"{key}_{rb_type}",
+                        identifier=ObservationIdentifier(qubits),
+                        value=values["value"],
+                        uncertainty=values["uncertainty"],
+                    )
+                    for key, values in processed_results[rb_type].items()
+                ]
+            )
+
             dataset.attrs[qubits_idx].update(
                 {
                     rb_type: {
@@ -184,17 +196,6 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
                 }
             )
 
-        observations.extend(
-            [
-                Observation(
-                    name=key,
-                    identifier=str(qubits),
-                    value=values["value"],
-                    uncertainty=values["uncertainty"],
-                )
-                for key, values in processed_results.items()
-            ]
-        )
         obs_dict.update({qubits_idx: processed_results})
 
         # Generate decay plots
@@ -214,13 +215,13 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
         plots[fig_name] = fig
 
     # Rearrange observations
-    observations_refactored: Dict[int, Dict[str, Dict[str, float]]] = {}
-    for k, o in obs_dict.items():
-        observations_refactored[k] = {}
-        for rb_type in o.keys():
-            observations_refactored[k].update({f"{k}_{rb_type}": v for k, v in o[rb_type].items()})
+    # observations_refactored: Dict[int, Dict[str, Dict[str, float]]] = {}
+    # for k, o in obs_dict.items():
+    #     observations_refactored[k] = {}
+    #     for rb_type in o.keys():
+    #         observations_refactored[k].update({f"{k}_{rb_type}": v for k, v in o[rb_type].items()})
 
-    return AnalysisResult(dataset=dataset, observations=observations_refactored, plots=plots)
+    return AnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
 
 class InterleavedRandomizedBenchmarking(Benchmark):
