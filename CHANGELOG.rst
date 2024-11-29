@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 1.3
+===========
+
+* Further improvements to type hints, docstrings, and error messages.
+
 Version 1.2
 ===========
 
