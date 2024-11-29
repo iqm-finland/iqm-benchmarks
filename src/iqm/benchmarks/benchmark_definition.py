@@ -21,7 +21,7 @@ import copy
 from copy import deepcopy
 from dataclasses import dataclass, field
 import functools
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 import uuid
 
 from matplotlib.figure import Figure
@@ -32,6 +32,14 @@ from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
+
+
+@dataclass
+class Observation:
+    name: str
+    value: Any
+    identifier: str = ""  # Maybe call it qubit layout? = ""
+    uncertainty: Optional[Any] = None
 
 
 @dataclass
@@ -58,7 +66,7 @@ class AnalysisResult:
 
     dataset: xr.Dataset
     plots: dict[str, Figure] = field(default_factory=lambda: ({}))
-    observations: dict[str, Any] = field(default_factory=lambda: ({}))
+    observations: list[Observation] = field(default_factory=lambda: [])
 
     def plot(self, plot_name: str):
         """
@@ -236,7 +244,9 @@ class Benchmark(ABC):
             RunResult: The result of the benchmark run.
         """
         backend_for_execute = copy.copy(self.backend)
-        backend_for_execute.run = functools.partial(self.backend.run, calibration_set_id=calibration_set_id)  # type: ignore
+        backend_for_execute.run = functools.partial(
+            self.backend.run, calibration_set_id=calibration_set_id
+        )  # type: ignore
         dataset = self.execute(backend_for_execute)
         run = RunResult(dataset)
         self.runs.append(run)
