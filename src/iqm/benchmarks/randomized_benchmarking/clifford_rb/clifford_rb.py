@@ -188,7 +188,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
 
-    def add_all_meta_to_dataset(self, dataset: xr.Dataset):
+    def add_all_metadata_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
         Args:
             dataset (xr.Dataset): The xarray dataset
@@ -227,7 +227,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
         validate_rb_qubits(self.qubits_array, backend)
 
         dataset = xr.Dataset()
-        self.add_all_meta_to_dataset(dataset)
+        self.add_all_metadata_to_dataset(dataset)
 
         clifford_1q_dict, clifford_2q_dict = import_native_gate_cliffords()
 
