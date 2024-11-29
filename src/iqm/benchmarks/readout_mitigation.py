@@ -136,7 +136,9 @@ class M3IQM(mthree.M3Mitigation):
             self.rep_delay = rep_delay
 
         if method not in ["independent", "balanced", "marginal"]:
-            raise M3Error(f"Invalid calibration method: {method}. Valid methods are 'independent', 'balanced', or 'marginal'.")
+            raise M3Error(
+                f"Invalid calibration method: {method}. Valid methods are 'independent', 'balanced', or 'marginal'."
+            )
 
         if isinstance(qubits, dict):
             # Assuming passed a mapping
