@@ -18,7 +18,7 @@ IQM's Python Library Benchmarking Suite QCVV.
 
 from importlib.metadata import PackageNotFoundError, version
 
-from .benchmark_definition import AnalysisResult, Benchmark, RunResult
+from .benchmark_definition import Benchmark, BenchmarkAnalysisResult, RunResult
 from .entanglement.ghz import GHZBenchmark, GHZConfiguration
 from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration

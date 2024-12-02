@@ -33,7 +33,7 @@ import xarray as xr
 # import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
 # from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -281,7 +281,7 @@ def plot_hop_threshold(
     return fig_name, fig
 
 
-def qv_analysis(run: RunResult) -> AnalysisResult:
+def qv_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Quantum Volume experiment
 
     Args:
@@ -374,7 +374,7 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         plots[fig_name] = fig
 
     if not rem:
-        return AnalysisResult(dataset=dataset, plots=plots, observations=observations)
+        return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
     # When REM is set to True, do the post-processing with the adjusted quasi-probabilities
     mit_shots = dataset.attrs["mit_shots"]
@@ -435,7 +435,7 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
         plots[fig_name_rem] = fig_rem
 
-    return AnalysisResult(dataset=dataset, plots=plots, observations=observations)
+    return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
 
 class QuantumVolumeBenchmark(Benchmark):

@@ -23,7 +23,7 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -45,7 +45,7 @@ from iqm.benchmarks.utils import retrieve_all_counts, retrieve_all_job_metadata,
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
-def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
+def clifford_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Clifford RB experiment
 
     Args:
@@ -157,7 +157,7 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
         fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, obs_dict)
         plots[fig_name] = fig
 
-    return AnalysisResult(dataset=dataset, observations=observations, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
 
 class CliffordRandomizedBenchmarking(Benchmark):

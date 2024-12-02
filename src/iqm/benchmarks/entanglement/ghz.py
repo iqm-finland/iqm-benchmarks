@@ -34,7 +34,7 @@ import xarray as xr
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
-    AnalysisResult,
+    BenchmarkAnalysisResult,
     Observation,
     ObservationIdentifier,
     RunResult,
@@ -237,7 +237,7 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> Lis
     return [fidelity]
 
 
-def fidelity_analysis(run: RunResult) -> AnalysisResult:
+def fidelity_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     """Analyze counts and compute the state fidelity
 
     Args:
@@ -285,7 +285,7 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                 observation_list.append(
                     Observation(name="fidelity_rem", identifier=ObservationIdentifier(qubit_layout), value=fidelity[1])
                 )
-    return AnalysisResult(dataset=dataset, observations=observation_list)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list)
 
 
 def generate_ghz_linear(num_qubits: int) -> QuantumCircuit:

@@ -24,7 +24,7 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -48,7 +48,7 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
 # pylint: disable=too-many-statements, too-many-branches
-def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
+def interleaved_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     """Analysis function for an Interleaved RB experiment
 
     Args:
@@ -221,7 +221,7 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
     #     for rb_type in o.keys():
     #         observations_refactored[k].update({f"{k}_{rb_type}": v for k, v in o[rb_type].items()})
 
-    return AnalysisResult(dataset=dataset, observations=observations, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
 
 class InterleavedRandomizedBenchmarking(Benchmark):
