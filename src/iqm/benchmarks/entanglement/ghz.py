@@ -31,9 +31,9 @@ from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
     BenchmarkAnalysisResult,
     BenchmarkObservation,
     BenchmarkObservationIdentifier,

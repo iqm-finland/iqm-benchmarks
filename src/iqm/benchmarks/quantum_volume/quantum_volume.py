@@ -33,11 +33,13 @@ import xarray as xr
 # import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
 # from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
-from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, BenchmarkRunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
     BenchmarkObservation,
     BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
     add_counts_to_dataset,
 )
 from iqm.benchmarks.logging_config import qcvv_logger
