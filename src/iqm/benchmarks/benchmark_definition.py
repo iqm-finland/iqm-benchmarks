@@ -70,15 +70,6 @@ class Observation:
     identifier: ObservationIdentifier
     uncertainty: Optional[Any] = None
 
-    # @property
-    # def identifier(self) -> ObservationIdentifier:
-    #     """Generates the ObservationIdentifier from the qubit_indices
-    #
-    #     Returns:
-    #         ObservationIdentifier
-    #     """
-    #     return ObservationIdentifier(qubit_indices=self.qubit_indices)
-
 
 @dataclass
 class RunResult:
