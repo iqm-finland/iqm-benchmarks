@@ -33,12 +33,12 @@ from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.qcvv_suite import Benchmark
-from iqm.qcvv_suite.benchmark import BenchmarkConfigurationBase
-from iqm.qcvv_suite.benchmark_definition import AnalysisResult, RunResult, add_counts_to_dataset
-from iqm.qcvv_suite.logging_config import qcvv_logger
-from iqm.qcvv_suite.readout_mitigation import apply_readout_error_mitigation
-from iqm.qcvv_suite.utils import (
+from iqm.benchmarks import Benchmark
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult, add_counts_to_dataset
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
+from iqm.benchmarks.utils import (
     perform_backend_transpilation,
     reduce_to_active_qubits,
     retrieve_all_counts,

@@ -30,7 +30,7 @@ class TestGHZ:
         for gen_routine in [f"tree", f"naive", "log_depth"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=gen_routine,
-                custom_qubits_array=[np.arange(4)],
+                custom_qubits_array=[[0,1,2,3]],
                 shots=3,
                 qiskit_optim_level=3,
                 optimize_sqg=True,
@@ -47,7 +47,7 @@ class TestGHZ:
         for fidelity_routine in [f"coherences", f"randomized_measurements"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=f"tree",
-                custom_qubits_array=[np.arange(4)],
+                custom_qubits_array=[[0,1,2,3]],
                 shots=3,
                 qiskit_optim_level=3,
                 optimize_sqg=True,

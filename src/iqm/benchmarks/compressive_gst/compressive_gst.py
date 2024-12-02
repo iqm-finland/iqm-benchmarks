@@ -34,12 +34,12 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
 
-from iqm.qcvv_suite import Benchmark
-from iqm.qcvv_suite.benchmark import BenchmarkConfigurationBase
-from iqm.qcvv_suite.benchmark_definition import add_counts_to_dataset
-from iqm.qcvv_suite.compressive_gst.gst_analysis import mgst_analysis
-from iqm.qcvv_suite.logging_config import qcvv_logger
-from iqm.qcvv_suite.utils import (
+from iqm.benchmarks import Benchmark
+from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.compressive_gst.gst_analysis import mgst_analysis
+from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.utils import (
     perform_backend_transpilation,
     retrieve_all_counts,
     set_coupling_map,

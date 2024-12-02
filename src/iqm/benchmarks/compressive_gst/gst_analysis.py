@@ -15,7 +15,7 @@ from pygsti.models.model import Model
 from pygsti.tools import change_basis
 import xarray as xr
 
-from iqm.qcvv_suite.benchmark_definition import AnalysisResult, RunResult
+from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult
 from mGST import additional_fns, algorithm, compatibility
 from mGST.low_level_jit import contract
 from mGST.qiskit_interface import qiskit_gate_to_operator
