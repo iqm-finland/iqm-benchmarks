@@ -1,11 +1,7 @@
 """Tests for compressive GST benchmark"""
 
+from iqm.benchmarks.compressive_gst.compressive_gst import GSTConfiguration, CompressiveGST
 from unittest.mock import patch
-
-# General BenchmarkExperiment
-from iqm.benchmarks.benchmark_experiment import BenchmarkExperiment
-from iqm.benchmarks.compressive_gst.compressive_gst import GSTConfiguration
-
 
 backend = "iqmfakeapollo"
 
@@ -13,24 +9,32 @@ backend = "iqmfakeapollo"
 class TestGST:
     @patch('matplotlib.pyplot.figure')
     def test_1q(self, mock_fig):
-        Minimal_1Q_GST = GSTConfiguration(
-            qubits=[5], gate_set="1QXYI", num_circuits=10, shots=10, rank=4, bootstrap_samples=0, max_iterations=[1, 1]
+        minimal_1Q_config = GSTConfiguration(
+            qubit_layouts=[[5], [0]],
+            gate_set="1QXYI",
+            num_circuits=10,
+            shots=10,
+            rank=4,
+            bootstrap_samples=0,
+            max_iterations=[1, 1]
         )
-        EXAMPLE_EXPERIMENT = BenchmarkExperiment(backend, [Minimal_1Q_GST])
-        EXAMPLE_EXPERIMENT.run_experiment()
+        benchmark = CompressiveGST(backend, minimal_1Q_config)
+        benchmark.run()
+        result = benchmark.analyze()
         mock_fig.assert_called()
 
     @patch('matplotlib.pyplot.figure')
     def test_2q(self, mock_fig):
-        Minimal_2Q_GST = GSTConfiguration(
-            qubits=[0, 3],
+        minimal_2Q_GST = GSTConfiguration(
+            qubit_layouts=[[0, 1]],
             gate_set="2QXYCZ_extended",
-            num_circuits=10,
+            num_circuits=4,
             shots=10,
             rank=1,
             bootstrap_samples=0,
-            max_iterations=[1, 1],
+            max_iterations=[1, 1]
         )
-        EXAMPLE_EXPERIMENT = BenchmarkExperiment(backend, [Minimal_2Q_GST])
-        EXAMPLE_EXPERIMENT.run_experiment()
+        benchmark = CompressiveGST(backend, minimal_2Q_GST)
+        benchmark.run()
+        result = benchmark.analyze()
         mock_fig.assert_called()
