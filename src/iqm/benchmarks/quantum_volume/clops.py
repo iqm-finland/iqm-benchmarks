@@ -252,7 +252,8 @@ def clops_analysis(run: RunResult) -> AnalysisResult:
 
     transpiled_qc_list = []
     for _, value in dataset.attrs["transpiled_circuits"].items():
-        transpiled_qc_list.extend(value)
+        for _, transpiled_circuit in value.items():
+            transpiled_qc_list.extend(transpiled_circuit)
 
     # CLOPS_V
     clops_v: float = num_circuits * num_updates * num_shots * depth / clops_time

@@ -267,14 +267,14 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
-                    observation_list.extend(
-                        [
-                            Observation(name=key, identifier=ObservationIdentifier(qubit_layout), value=value)
-                            for key, value in fidelity_ghz_randomized_measurements(
-                                dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
-                            ).items()
-                        ]
-                    )
+                observation_list.extend(
+                    [
+                        Observation(name=key, identifier=ObservationIdentifier(qubit_layout), value=value)
+                        for key, value in fidelity_ghz_randomized_measurements(
+                            dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
+                        ).items()
+                    ]
+                )
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
             observation_list.extend(
