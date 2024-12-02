@@ -24,9 +24,15 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -48,7 +54,7 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
 # pylint: disable=too-many-statements, too-many-branches
-def interleaved_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
+def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for an Interleaved RB experiment
 
     Args:
@@ -58,7 +64,7 @@ def interleaved_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     """
     dataset = run.dataset.copy(deep=True)
     obs_dict: Dict[int, Any] = {}
-    observations: list[Observation] = []
+    observations: list[BenchmarkObservation] = []
     plots: Dict[str, Figure] = {}
 
     is_parallel_execution = dataset.attrs["parallel_execution"]
@@ -168,9 +174,9 @@ def interleaved_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
 
             observations.extend(
                 [
-                    Observation(
+                    BenchmarkObservation(
                         name=f"{key}_{rb_type}",
-                        identifier=ObservationIdentifier(qubits),
+                        identifier=BenchmarkObservationIdentifier(qubits),
                         value=values["value"],
                         uncertainty=values["uncertainty"],
                     )

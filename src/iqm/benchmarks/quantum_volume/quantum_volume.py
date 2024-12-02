@@ -33,9 +33,13 @@ import xarray as xr
 # import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
 # from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
-from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, RunResult
+from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, BenchmarkRunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
@@ -281,7 +285,7 @@ def plot_hop_threshold(
     return fig_name, fig
 
 
-def qv_analysis(run: RunResult) -> BenchmarkAnalysisResult:
+def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Quantum Volume experiment
 
     Args:
@@ -291,7 +295,7 @@ def qv_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     """
 
     plots = {}
-    observations: list[Observation] = []
+    observations: list[BenchmarkObservation] = []
     dataset = run.dataset.copy(deep=True)
     backend_name = dataset.attrs["backend_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
@@ -334,21 +338,21 @@ def qv_analysis(run: RunResult) -> BenchmarkAnalysisResult:
         qv_result = compute_heavy_output_probabilities(execution_results[str(qubits)], ideal_heavy_outputs[str(qubits)])
 
         observations = [
-            Observation(
+            BenchmarkObservation(
                 name="average_heavy_output_probability",
                 value=cumulative_hop(qv_result)[-1],
                 uncertainty=cumulative_std(qv_result)[-1],
-                identifier=ObservationIdentifier(qubits),
+                identifier=BenchmarkObservationIdentifier(qubits),
             ),
-            Observation(
+            BenchmarkObservation(
                 name="is_succesful",
-                value=str(is_successful(qv_result, num_sigmas)),
-                identifier=ObservationIdentifier(qubits),
+                value=is_successful(qv_result, num_sigmas),
+                identifier=BenchmarkObservationIdentifier(qubits),
             ),
-            Observation(
+            BenchmarkObservation(
                 name="QV_result",
                 value=2 ** len(qubits) if is_successful(qv_result) else 1,
-                identifier=ObservationIdentifier(qubits),
+                identifier=BenchmarkObservationIdentifier(qubits),
             ),
         ]
 
@@ -404,21 +408,21 @@ def qv_analysis(run: RunResult) -> BenchmarkAnalysisResult:
         # UPDATE OBSERVATIONS
         observations.extend(
             [
-                Observation(
+                BenchmarkObservation(
                     name="REM_average_heavy_output_probability",
                     value=cumulative_hop(qv_result_rem)[-1],
                     uncertainty=cumulative_std(qv_result_rem)[-1],
-                    identifier=ObservationIdentifier(qubits),
+                    identifier=BenchmarkObservationIdentifier(qubits),
                 ),
-                Observation(
+                BenchmarkObservation(
                     name="REM_is_succesful",
-                    value=str(is_successful(qv_result_rem, num_sigmas)),
-                    identifier=ObservationIdentifier(qubits),
+                    value=is_successful(qv_result_rem, num_sigmas),
+                    identifier=BenchmarkObservationIdentifier(qubits),
                 ),
-                Observation(
+                BenchmarkObservation(
                     name="REM_QV_result",
                     value=2 ** len(qubits) if is_successful(qv_result_rem) else 1,
-                    identifier=ObservationIdentifier(qubits),
+                    identifier=BenchmarkObservationIdentifier(qubits),
                 ),
             ]
         )

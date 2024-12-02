@@ -31,7 +31,7 @@ import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, RunResult
+from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkRunResult
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (
     count_2q_layers,
@@ -222,7 +222,7 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
     return overall_elapsed
 
 
-def clops_analysis(run: RunResult) -> BenchmarkAnalysisResult:
+def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a CLOPS (v or h) experiment
 
     Args:

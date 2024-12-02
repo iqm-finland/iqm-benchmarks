@@ -23,9 +23,15 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks import Benchmark, BenchmarkAnalysisResult, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Observation, ObservationIdentifier, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -45,7 +51,7 @@ from iqm.benchmarks.utils import retrieve_all_counts, retrieve_all_job_metadata,
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
-def clifford_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
+def clifford_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Clifford RB experiment
 
     Args:
@@ -54,7 +60,7 @@ def clifford_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
         AnalysisResult corresponding to Clifford RB
     """
     dataset = run.dataset.copy(deep=True)
-    observations: list[Observation] = []
+    observations: list[BenchmarkObservation] = []
     obs_dict = {}
     plots = {}
 
@@ -143,9 +149,9 @@ def clifford_rb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
         obs_dict.update({qubits_idx: processed_results})
         observations.extend(
             [
-                Observation(
+                BenchmarkObservation(
                     name=key,
-                    identifier=ObservationIdentifier(qubits),
+                    identifier=BenchmarkObservationIdentifier(qubits),
                     value=values["value"],
                     uncertainty=values["uncertainty"],
                 )

@@ -35,9 +35,9 @@ from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
     BenchmarkAnalysisResult,
-    Observation,
-    ObservationIdentifier,
-    RunResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
     add_counts_to_dataset,
 )
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -237,7 +237,7 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> Lis
     return [fidelity]
 
 
-def fidelity_analysis(run: RunResult) -> BenchmarkAnalysisResult:
+def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analyze counts and compute the state fidelity
 
     Args:
@@ -253,7 +253,7 @@ def fidelity_analysis(run: RunResult) -> BenchmarkAnalysisResult:
     qubit_layouts = dataset.attrs["custom_qubits_array"]
     backend_name = dataset.attrs["backend_name"]
 
-    observation_list: list[Observation] = []
+    observation_list: list[BenchmarkObservation] = []
     for qubit_layout in qubit_layouts:
         if routine == "randomized_measurements":
             ideal_simulator = Aer.get_backend("statevector_simulator")
@@ -269,7 +269,9 @@ def fidelity_analysis(run: RunResult) -> BenchmarkAnalysisResult:
                     )
                 observation_list.extend(
                     [
-                        Observation(name=key, identifier=ObservationIdentifier(qubit_layout), value=value)
+                        BenchmarkObservation(
+                            name=key, identifier=BenchmarkObservationIdentifier(qubit_layout), value=value
+                        )
                         for key, value in fidelity_ghz_randomized_measurements(
                             dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
                         ).items()
@@ -278,12 +280,18 @@ def fidelity_analysis(run: RunResult) -> BenchmarkAnalysisResult:
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
             observation_list.extend(
-                [Observation(name="fidelity", identifier=ObservationIdentifier(qubit_layout), value=fidelity[0])]
+                [
+                    BenchmarkObservation(
+                        name="fidelity", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[0]
+                    )
+                ]
             )
             if len(fidelity) > 1:
 
                 observation_list.append(
-                    Observation(name="fidelity_rem", identifier=ObservationIdentifier(qubit_layout), value=fidelity[1])
+                    BenchmarkObservation(
+                        name="fidelity_rem", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[1]
+                    )
                 )
     return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list)
 

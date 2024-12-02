@@ -15,7 +15,7 @@ from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmarks import BenchmarkAnalysisResult, RunResult
+from iqm.benchmarks import BenchmarkAnalysisResult, BenchmarkRunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -404,7 +404,7 @@ def list_to_numcircuit_times_numpauli_matrix(
 
 
 # pylint: disable=too-many-statements
-def mrb_analysis(run: RunResult) -> BenchmarkAnalysisResult:
+def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a MRB experiment
 
     Args:
