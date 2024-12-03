@@ -18,8 +18,32 @@ IQM's Python Library Benchmarking Suite QCVV.
 
 from importlib.metadata import PackageNotFoundError, version
 
-from .benchmark_definition import AnalysisResult, Benchmark, RunResult
+from .benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
+from .entanglement.ghz import GHZBenchmark, GHZConfiguration
+from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
+from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
+from .randomized_benchmarking.clifford_rb.clifford_rb import CliffordRandomizedBenchmarking, CliffordRBConfiguration
+from .randomized_benchmarking.interleaved_rb.interleaved_rb import (
+    InterleavedRandomizedBenchmarking,
+    InterleavedRBConfiguration,
+)
+from .randomized_benchmarking.mirror_rb.mirror_rb import MirrorRandomizedBenchmarking, MirrorRBConfiguration
 
+
+AVAILABLE_BENCHMARKS = {
+    GHZBenchmark.name: GHZBenchmark,
+    CLOPSBenchmark.name: CLOPSBenchmark,
+    QuantumVolumeBenchmark.name: QuantumVolumeBenchmark,
+    CliffordRandomizedBenchmarking.name: CliffordRandomizedBenchmarking,
+    InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
+    MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
+}
 
 try:
     # Change here if project is renamed and does not equal the package name

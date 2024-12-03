@@ -2,6 +2,20 @@
 Changelog
 =========
 
+Version 1.4
+===========
+
+* Renames:
+  * AnalysisResult -> BenchmarkAnalysisResult
+  * RunResult -> BenchmarkRunResult
+* Adds BenchmarkObservation class, and modifies BenchmarkAnalysisResult so observations now accepts a list[BenchmarkObservation].
+* Adds BenchmarkObservationIdentifier class.
+* Rebases RandomizedBenchmarking benchmarks, QuantumVolume, GHZ and CLOPS to use the new Observation class.
+* Fixes serialization of some circuits.
+* Adds AVAILABLE_BENCHMARKS to map a benchmark name to its class in __init__.
+* Adds benchmarks and configurations to __init__ for public import.
+* Other fixes.
+
 Version 1.3
 ===========
 

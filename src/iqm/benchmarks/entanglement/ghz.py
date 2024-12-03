@@ -31,9 +31,15 @@ from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
@@ -231,7 +237,7 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> Lis
     return [fidelity]
 
 
-def fidelity_analysis(run: RunResult) -> AnalysisResult:
+def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analyze counts and compute the state fidelity
 
     Args:
@@ -242,12 +248,12 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
         AnalysisResult
             An object containing the dataset, plots, and observations
     """
-    observations = {}
     dataset = run.dataset
     routine = dataset.attrs["fidelity_routine"]
     qubit_layouts = dataset.attrs["custom_qubits_array"]
     backend_name = dataset.attrs["backend_name"]
 
+    observation_list: list[BenchmarkObservation] = []
     for qubit_layout in qubit_layouts:
         if routine == "randomized_measurements":
             ideal_simulator = Aer.get_backend("statevector_simulator")
@@ -261,16 +267,33 @@ def fidelity_analysis(run: RunResult) -> AnalysisResult:
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
-                result_dict = fidelity_ghz_randomized_measurements(
-                    dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
+                observation_list.extend(
+                    [
+                        BenchmarkObservation(
+                            name=key, identifier=BenchmarkObservationIdentifier(qubit_layout), value=value
+                        )
+                        for key, value in fidelity_ghz_randomized_measurements(
+                            dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
+                        ).items()
+                    ]
                 )
         else:  # default routine == "coherences":
             fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
-            result_dict = {"fidelity": fidelity[0]}
+            observation_list.extend(
+                [
+                    BenchmarkObservation(
+                        name="fidelity", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[0]
+                    )
+                ]
+            )
             if len(fidelity) > 1:
-                result_dict.update({"fidelity_rem": fidelity[1]})
-        observations[str(qubit_layout)] = result_dict
-    return AnalysisResult(dataset=dataset, observations=observations)
+
+                observation_list.append(
+                    BenchmarkObservation(
+                        name="fidelity_rem", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[1]
+                    )
+                )
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list)
 
 
 def generate_ghz_linear(num_qubits: int) -> QuantumCircuit:
@@ -506,6 +529,7 @@ class GHZBenchmark(Benchmark):
     """The GHZ Benchmark estimates the quality of generated Greenberger-Horne-Zeilinger states"""
 
     analysis_function = staticmethod(fidelity_analysis)
+    name = "ghz"
 
     def __init__(self, backend: IQMBackendBase, configuration: "GHZConfiguration"):
         """Construct the GHZBenchmark class.
@@ -541,9 +565,9 @@ class GHZBenchmark(Benchmark):
 
         self.timestamp = strftime("%Y%m%d-%H%M%S")
 
-    @staticmethod
-    def name() -> str:
-        return "ghz"
+    # @staticmethod
+    # def name() -> str:
+    #     return "ghz"
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> QuantumCircuit:
         """
@@ -704,7 +728,7 @@ class GHZBenchmark(Benchmark):
 
         for key, value in self.configuration:
             if key == "benchmark":  # Avoid saving the class object
-                dataset.attrs[key] = value.name()
+                dataset.attrs[key] = value.name
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name

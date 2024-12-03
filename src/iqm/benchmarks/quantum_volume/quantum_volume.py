@@ -33,9 +33,15 @@ import xarray as xr
 # import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
 # from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
 # from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
@@ -281,7 +287,7 @@ def plot_hop_threshold(
     return fig_name, fig
 
 
-def qv_analysis(run: RunResult) -> AnalysisResult:
+def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Quantum Volume experiment
 
     Args:
@@ -291,8 +297,8 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
     """
 
     plots = {}
-    observations = {}
-    dataset = run.dataset
+    observations: list[BenchmarkObservation] = []
+    dataset = run.dataset.copy(deep=True)
     backend_name = dataset.attrs["backend_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     num_circuits = dataset.attrs["num_circuits"]
@@ -333,17 +339,24 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         # Compute the HO probabilities
         qv_result = compute_heavy_output_probabilities(execution_results[str(qubits)], ideal_heavy_outputs[str(qubits)])
 
-        processed_results = {
-            "average_heavy_output_probability": {
-                "value": cumulative_hop(qv_result)[-1],
-                "uncertainty": cumulative_std(qv_result)[-1],
-            },
-            "is_successful": {"value": str(is_successful(qv_result, num_sigmas)), "uncertainty": np.NaN},
-            "QV_result": {
-                "value": 2 ** len(qubits) if is_successful(qv_result, num_sigmas) else 1,
-                "uncertainty": np.NaN,
-            },
-        }
+        observations = [
+            BenchmarkObservation(
+                name="average_heavy_output_probability",
+                value=cumulative_hop(qv_result)[-1],
+                uncertainty=cumulative_std(qv_result)[-1],
+                identifier=BenchmarkObservationIdentifier(qubits),
+            ),
+            BenchmarkObservation(
+                name="is_succesful",
+                value=is_successful(qv_result, num_sigmas),
+                identifier=BenchmarkObservationIdentifier(qubits),
+            ),
+            BenchmarkObservation(
+                name="QV_result",
+                value=2 ** len(qubits) if is_successful(qv_result) else 1,
+                identifier=BenchmarkObservationIdentifier(qubits),
+            ),
+        ]
 
         dataset.attrs[qubits_idx].update(
             {
@@ -353,9 +366,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
                 "heavy_output_probabilities": qv_result,
             }
         )
-
-        # UPDATE OBSERVATIONS
-        observations.update({qubits_idx: processed_results})
 
         fig_name, fig = plot_hop_threshold(
             qubits,
@@ -370,7 +380,7 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         plots[fig_name] = fig
 
     if not rem:
-        return AnalysisResult(dataset=dataset, plots=plots, observations=observations)
+        return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
     # When REM is set to True, do the post-processing with the adjusted quasi-probabilities
     mit_shots = dataset.attrs["mit_shots"]
@@ -388,18 +398,6 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
             ideal_heavy_outputs[str(qubits)],
         )
 
-        rem_results = {
-            "REM_average_heavy_output_probability": {
-                "value": cumulative_hop(qv_result_rem)[-1],
-                "uncertainty": cumulative_std(qv_result_rem)[-1],
-            },
-            "REM_is_successful": {"value": str(is_successful(qv_result_rem)), "uncertainty": np.NaN},
-            "REM_QV_result": {
-                "value": 2 ** len(qubits) if is_successful(qv_result_rem, num_sigmas) else 1,
-                "uncertainty": np.NaN,
-            },
-        }
-
         dataset.attrs[qubits_idx].update(
             {
                 "sorted_qc_list_indices": (sorted_qc_list_indices if physical_layout == "batching" else None),
@@ -410,7 +408,26 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
 
         # UPDATE OBSERVATIONS
-        observations.update({qubits_idx: rem_results})
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name="REM_average_heavy_output_probability",
+                    value=cumulative_hop(qv_result_rem)[-1],
+                    uncertainty=cumulative_std(qv_result_rem)[-1],
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                ),
+                BenchmarkObservation(
+                    name="REM_is_succesful",
+                    value=is_successful(qv_result_rem, num_sigmas),
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                ),
+                BenchmarkObservation(
+                    name="REM_QV_result",
+                    value=2 ** len(qubits) if is_successful(qv_result_rem) else 1,
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                ),
+            ]
+        )
 
         fig_name_rem, fig_rem = plot_hop_threshold(
             qubits,
@@ -424,7 +441,7 @@ def qv_analysis(run: RunResult) -> AnalysisResult:
         )
         plots[fig_name_rem] = fig_rem
 
-    return AnalysisResult(dataset=dataset, plots=plots, observations=observations)
+    return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
 
 class QuantumVolumeBenchmark(Benchmark):
@@ -509,8 +526,15 @@ class QuantumVolumeBenchmark(Benchmark):
 
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs["untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs["transpiled_circuits"] = self.transpiled_circuits
+        for key, circuit in zip(
+            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
+        ):
+            dictionary = {}
+            for outer_key, outer_value in circuit.items():
+                dictionary[str(outer_key)] = {
+                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
+                }
+            dataset.attrs[key] = dictionary
 
     # def get_mapomatic_average_qv_scores(self) -> List[List[int]]:
     #     """Estimate the average mapomatic scores for N quantum volume circuit samples
@@ -786,7 +810,9 @@ class QuantumVolumeBenchmark(Benchmark):
                         "time_submit": job_dict["time_submit"],
                         "time_retrieve": time_retrieve,
                         "all_job_metadata": all_job_metadata,
-                        "sorted_qc_list_indices": sorted_qc_list_indices[str(qubits)],
+                        "sorted_qc_list_indices": {
+                            str(key): value for key, value in sorted_qc_list_indices[str(qubits)].items()
+                        },
                         "operation_counts": all_op_counts[str(qubits)],
                     }
                 }
