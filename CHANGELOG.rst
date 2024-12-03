@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 1.6
+===========
+* Minor change in dependencies for compatibility.
+
 Version 1.5
 ===========
 * fit results are no longer `BenchmarkObservation`, and instead are moved into the datasets.
