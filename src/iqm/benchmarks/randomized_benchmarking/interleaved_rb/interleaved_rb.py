@@ -168,8 +168,6 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             processed_results[rb_type] = {
                 "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
                 "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
-                "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
-                "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
             }
 
             observations.extend(
@@ -187,6 +185,8 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             dataset.attrs[qubits_idx].update(
                 {
                     rb_type: {
+                        "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
+                        "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                         "fidelities": fidelities[str(qubits)][rb_type],
                         "avg_fidelities_nominal_values": average_fidelities,
                         "avg_fidelities_stderr": stddevs_from_mean,
