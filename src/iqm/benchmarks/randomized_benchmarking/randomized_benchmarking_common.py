@@ -614,7 +614,7 @@ def plot_rb_decay(
             str(q): observations[q_idx]["avg_gate_fidelity"]["uncertainty"] for q_idx, q in enumerate(qubits_array)
         }
         decay_rate[identifier] = {
-            str(q): observations[q_idx]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
         }
         offset[identifier] = {
             str(q): dataset.attrs[q_idx]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
@@ -648,7 +648,7 @@ def plot_rb_decay(
                 for q_idx, q in enumerate(qubits_array)
             }
             decay_rate[rb_type] = {
-                str(q): observations[q_idx][rb_type]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
             }
             print(dataset.attrs)
             offset[rb_type] = {

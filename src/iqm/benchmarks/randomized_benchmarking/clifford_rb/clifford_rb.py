@@ -125,11 +125,11 @@ def clifford_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         processed_results = {
             "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
-            "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
         }
 
         dataset.attrs[qubits_idx].update(
             {
+                "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
                 "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
                 "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                 "fidelities": fidelities[str(qubits)],
