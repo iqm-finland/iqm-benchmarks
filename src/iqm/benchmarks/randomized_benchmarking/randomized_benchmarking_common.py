@@ -614,13 +614,13 @@ def plot_rb_decay(
             str(q): observations[q_idx]["avg_gate_fidelity"]["uncertainty"] for q_idx, q in enumerate(qubits_array)
         }
         decay_rate[identifier] = {
-            str(q): observations[q_idx]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
         }
         offset[identifier] = {
-            str(q): observations[q_idx]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
         }
         amplitude[identifier] = {
-            str(q): observations[q_idx]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array)
         }
     else:
         rb_type_keys = list(observations[0].keys())
@@ -648,13 +648,14 @@ def plot_rb_decay(
                 for q_idx, q in enumerate(qubits_array)
             }
             decay_rate[rb_type] = {
-                str(q): observations[q_idx][rb_type]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
             }
+            print(dataset.attrs)
             offset[rb_type] = {
-                str(q): observations[q_idx][rb_type]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
             }
             amplitude[rb_type] = {
-                str(q): observations[q_idx][rb_type]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array)
             }
 
     for index_irb, key in enumerate(rb_type_keys):
