@@ -28,7 +28,7 @@ classifiers = [
 requires-python = ">=3.11"
 dependencies = [
     "lmfit >= 1.2",
-    "matplotlib >= 3.6",
+    "matplotlib >= 3.6.3, < 4",
     "more-itertools == 10.1.0",
     "mthree == 2.6.3",
     "networkx==3.3",
