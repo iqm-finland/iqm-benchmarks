@@ -15,7 +15,12 @@ from pygsti.models.model import Model
 from pygsti.tools import change_basis
 import xarray as xr
 
-from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult
+from iqm.benchmarks.benchmark_definition import (
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
 from mGST import additional_fns, algorithm, compatibility
 from mGST.low_level_jit import contract
 from mGST.qiskit_interface import qiskit_gate_to_operator
@@ -737,15 +742,15 @@ def run_mGST(
     return K, X, E, rho, K_target, X_target, E_target, rho_target
 
 
-def mgst_analysis(run: RunResult) -> AnalysisResult:
+def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for compressive GST
 
     Args:
-        run: RunResult
-            A RunResult instance storing the dataset
+        run: BenchmarkRunResult
+            A BenchmarkRunResult instance storing the dataset
     Returns:
-        result: AnalysisResult
-            An AnalysisResult instance with the updated dataset, as well as plots and observations
+        result: BenchmarkAnalysisResult
+            An BenchmarkAnalysisResult instance with the updated dataset, as well as plots and observations
     """
     dataset = run.dataset
     pdim = dataset.attrs["pdim"]
@@ -863,4 +868,4 @@ def mgst_analysis(run: RunResult) -> AnalysisResult:
         )
         plt.close("all")
 
-    return AnalysisResult(dataset=dataset, observations=observations, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)

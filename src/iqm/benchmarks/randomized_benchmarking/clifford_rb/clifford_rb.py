@@ -23,9 +23,15 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -45,7 +51,7 @@ from iqm.benchmarks.utils import retrieve_all_counts, retrieve_all_job_metadata,
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
-def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
+def clifford_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Clifford RB experiment
 
     Args:
@@ -53,8 +59,9 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
     Returns:
         AnalysisResult corresponding to Clifford RB
     """
-    dataset = run.dataset
-    observations = {}
+    dataset = run.dataset.copy(deep=True)
+    observations: list[BenchmarkObservation] = []
+    obs_dict = {}
     plots = {}
 
     is_parallel_execution = dataset.attrs["parallel_execution"]
@@ -118,13 +125,13 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
 
         processed_results = {
             "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
-            "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
-            "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
-            "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
         }
 
         dataset.attrs[qubits_idx].update(
             {
+                "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
+                "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
+                "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                 "fidelities": fidelities[str(qubits)],
                 "avg_fidelities_nominal_values": average_fidelities,
                 "avg_fidelities_stderr": stddevs_from_mean,
@@ -139,13 +146,24 @@ def clifford_rb_analysis(run: RunResult) -> AnalysisResult:
             }
         )
 
-        observations.update({qubits_idx: processed_results})
+        obs_dict.update({qubits_idx: processed_results})
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name=key,
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                    value=values["value"],
+                    uncertainty=values["uncertainty"],
+                )
+                for key, values in processed_results.items()
+            ]
+        )
 
         # Generate individual decay plots
-        fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, observations)
+        fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, obs_dict)
         plots[fig_name] = fig
 
-    return AnalysisResult(dataset=dataset, observations=observations, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
 
 class CliffordRandomizedBenchmarking(Benchmark):
@@ -176,7 +194,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
 
-    def add_all_meta_to_dataset(self, dataset: xr.Dataset):
+    def add_all_metadata_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
         Args:
             dataset (xr.Dataset): The xarray dataset
@@ -215,7 +233,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
         validate_rb_qubits(self.qubits_array, backend)
 
         dataset = xr.Dataset()
-        self.add_all_meta_to_dataset(dataset)
+        self.add_all_metadata_to_dataset(dataset)
 
         clifford_1q_dict, clifford_2q_dict = import_native_gate_cliffords()
 

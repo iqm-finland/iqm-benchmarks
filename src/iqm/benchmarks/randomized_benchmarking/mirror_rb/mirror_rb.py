@@ -15,9 +15,9 @@ from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
+from iqm.benchmarks import BenchmarkAnalysisResult, BenchmarkRunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -404,7 +404,7 @@ def list_to_numcircuit_times_numpauli_matrix(
 
 
 # pylint: disable=too-many-statements
-def mrb_analysis(run: RunResult) -> AnalysisResult:
+def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a MRB experiment
 
     Args:
@@ -414,7 +414,7 @@ def mrb_analysis(run: RunResult) -> AnalysisResult:
     """
     plots = {}
     observations = {}
-    dataset = run.dataset
+    dataset = run.dataset.copy(deep=True)
 
     shots = dataset.attrs["shots"]
     num_circuit_samples = dataset.attrs["num_circuit_samples"]
@@ -468,7 +468,7 @@ def mrb_analysis(run: RunResult) -> AnalysisResult:
             # Execute the quantum circuits on the simulated, ideal backend
             # pylint: disable=unbalanced-tuple-unpacking
             all_noiseless_jobs, _ = submit_execute(
-                {tuple(qubits): transpiled_circuits[str(qubits)][depth]},
+                {tuple(qubits): transpiled_circuits[str(qubits)][str(depth)]},
                 simulator,
                 shots,
                 calset_id=None,
@@ -508,13 +508,13 @@ def mrb_analysis(run: RunResult) -> AnalysisResult:
 
         processed_results = {
             "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
-            "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
-            "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
-            "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
         }
 
         dataset.attrs[qubits_idx].update(
             {
+                "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
+                "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
+                "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                 "polarizations": polarizations,
                 "avg_polarization_nominal_values": average_polarizations,
                 "avg_polatization_stderr": stddevs_from_mean,
@@ -554,7 +554,7 @@ def mrb_analysis(run: RunResult) -> AnalysisResult:
     )
     plots[fig_name] = fig
 
-    return AnalysisResult(dataset=dataset, plots=plots, observations=observations)
+    return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
 
 class MirrorRandomizedBenchmarking(Benchmark):
@@ -564,7 +564,7 @@ class MirrorRandomizedBenchmarking(Benchmark):
 
     analysis_function = staticmethod(mrb_analysis)
 
-    name: str = "mrb"
+    name: str = "mirror_rb"
 
     def __init__(self, backend_arg: IQMBackendBase | str, configuration: "MirrorRBConfiguration"):
         """Construct the MirrorRandomizedBenchmarking class
@@ -617,8 +617,15 @@ class MirrorRandomizedBenchmarking(Benchmark):
             dataset (xr.Dataset):  The xarray dataset
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs["untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs["transpiled_circuits"] = self.transpiled_circuits
+        for key, circuit in zip(
+            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
+        ):
+            dictionary = {}
+            for outer_key, outer_value in circuit.items():
+                dictionary[str(outer_key)] = {
+                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
+                }
+            dataset.attrs[key] = dictionary
 
     def submit_single_mrb_job(
         self,
@@ -733,10 +740,10 @@ class MirrorRandomizedBenchmarking(Benchmark):
                 qcvv_logger.info(f"Job for layout {qubits} & depth {depth} submitted successfully!")
 
             self.untranspiled_circuits[str(qubits)] = {
-                d: mrb_untranspiled_circuits_lists[d] for d in assigned_mrb_depths[str(qubits)]
+                str(d): mrb_untranspiled_circuits_lists[d] for d in assigned_mrb_depths[str(qubits)]
             }
             self.transpiled_circuits[str(qubits)] = {
-                d: mrb_transpiled_circuits_lists[d] for d in assigned_mrb_depths[str(qubits)]
+                str(d): mrb_transpiled_circuits_lists[d] for d in assigned_mrb_depths[str(qubits)]
             }
 
             dataset.attrs[qubits_idx] = {"qubits": qubits}

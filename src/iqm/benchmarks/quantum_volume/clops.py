@@ -31,7 +31,7 @@ import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import AnalysisResult, RunResult
+from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkRunResult
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (
     count_2q_layers,
@@ -222,7 +222,7 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
     return overall_elapsed
 
 
-def clops_analysis(run: RunResult) -> AnalysisResult:
+def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a CLOPS (v or h) experiment
 
     Args:
@@ -252,7 +252,8 @@ def clops_analysis(run: RunResult) -> AnalysisResult:
 
     transpiled_qc_list = []
     for _, value in dataset.attrs["transpiled_circuits"].items():
-        transpiled_qc_list.extend(value)
+        for _, transpiled_circuit in value.items():
+            transpiled_qc_list.extend(transpiled_circuit)
 
     # CLOPS_V
     clops_v: float = num_circuits * num_updates * num_shots * depth / clops_time
@@ -310,7 +311,7 @@ def clops_analysis(run: RunResult) -> AnalysisResult:
     # Sort the final dataset
     dataset.attrs = dict(sorted(dataset.attrs.items()))
 
-    return AnalysisResult(dataset=dataset, plots=plots, observations=observations)
+    return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
 
 class CLOPSBenchmark(Benchmark):
@@ -396,8 +397,15 @@ class CLOPSBenchmark(Benchmark):
 
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs["untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs["transpiled_circuits"] = self.transpiled_circuits
+        for key, circuit in zip(
+            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
+        ):
+            dictionary = {}
+            for outer_key, outer_value in circuit.items():
+                dictionary[str(outer_key)] = {
+                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
+                }
+            dataset.attrs[key] = dictionary
 
     def append_parameterized_unitary(
         self,
@@ -614,8 +622,11 @@ class CLOPSBenchmark(Benchmark):
             # Sort circuits according to their final measurement mappings
             (sorted_transpiled_qc_list, _), self.time_sort_batches = sort_batches_by_final_layout(transpiled_qc_list)
 
-        self.untranspiled_circuits.update({tuple(self.qubits): qc_list})
-        self.transpiled_circuits.update(sorted_transpiled_qc_list)
+        self.untranspiled_circuits.update({str(self.qubits): {str(self.qubits): qc_list}})
+        self.transpiled_circuits.update(
+            {str(self.qubits): {str(key): value for key, value in sorted_transpiled_qc_list.items()}}
+        )
+        # self.transpiled_circuits[str(self.qubits)].update(sorted_transpiled_qc_list)
 
         return sorted_transpiled_qc_list
 

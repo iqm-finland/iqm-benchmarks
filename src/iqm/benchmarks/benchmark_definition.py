@@ -21,7 +21,7 @@ import copy
 from copy import deepcopy
 from dataclasses import dataclass, field
 import functools
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 import uuid
 
 from matplotlib.figure import Figure
@@ -35,7 +35,44 @@ from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 
 
 @dataclass
-class RunResult:
+class BenchmarkObservationIdentifier:
+    """Identifier for observations for ease of use
+
+    Attributes:
+        qubit_indices: list containing the indices of the qubits the observation was executed on.
+    """
+
+    qubit_indices: list[int]
+
+    @property
+    def string_identifier(self) -> str:
+        """String version of the qubit indices for ease of use
+
+        Returns:
+            A string of the qubit indices
+        """
+        return str(self.qubit_indices)
+
+
+@dataclass
+class BenchmarkObservation:
+    """Dataclass to store the main results of a single run of a Benchmark
+
+    Attributes:
+        name: name of the observation
+        value: value of the observation
+        identifier: identifier, which should be a string of the qubit layout
+        uncertainty: uncertainty of the observation
+    """
+
+    name: str
+    value: Any
+    identifier: BenchmarkObservationIdentifier
+    uncertainty: Optional[Any] = None
+
+
+@dataclass
+class BenchmarkRunResult:
     """
     A dataclass that stores the results of a single run of a Benchmark.
 
@@ -47,7 +84,7 @@ class RunResult:
 
 
 @dataclass
-class AnalysisResult:
+class BenchmarkAnalysisResult:
     """
     A dataclass storing the results of the analysis.
 
@@ -58,7 +95,7 @@ class AnalysisResult:
 
     dataset: xr.Dataset
     plots: dict[str, Figure] = field(default_factory=lambda: ({}))
-    observations: dict[str, Any] = field(default_factory=lambda: ({}))
+    observations: list[BenchmarkObservation] = field(default_factory=lambda: [])
 
     def plot(self, plot_name: str):
         """
@@ -78,7 +115,7 @@ class AnalysisResult:
             plt.show()
 
     @classmethod
-    def from_run_result(cls, run: RunResult):
+    def from_run_result(cls, run: BenchmarkRunResult):
         """
         Creates a new ``AnalysisResult`` from a ``RunResult``.
 
@@ -88,7 +125,7 @@ class AnalysisResult:
         return cls(dataset=run.dataset)
 
 
-def default_analysis_function(result: AnalysisResult) -> AnalysisResult:
+def default_analysis_function(result: BenchmarkAnalysisResult) -> BenchmarkAnalysisResult:
     """
     The default analysis that only pass the result through.
     """
@@ -201,7 +238,7 @@ class Benchmark(ABC):
         # From exa_support MR
         self.options = copy.copy(self.default_options) if self.default_options else {}
         self.options.update(kwargs)
-        self.runs: list[RunResult] = []
+        self.runs: list[BenchmarkRunResult] = []
 
     @classmethod
     @abstractmethod
@@ -224,7 +261,7 @@ class Benchmark(ABC):
             the benchmark results.
         """
 
-    def run(self, calibration_set_id: str | uuid.UUID | None = None) -> RunResult:
+    def run(self, calibration_set_id: str | uuid.UUID | None = None) -> BenchmarkRunResult:
         """
         Runs the benchmark using the given backend and calibration_set_id.
 
@@ -236,13 +273,15 @@ class Benchmark(ABC):
             RunResult: The result of the benchmark run.
         """
         backend_for_execute = copy.copy(self.backend)
-        backend_for_execute.run = functools.partial(self.backend.run, calibration_set_id=calibration_set_id)  # type: ignore
+        backend_for_execute.run = functools.partial(
+            self.backend.run, calibration_set_id=calibration_set_id
+        )  # type: ignore
         dataset = self.execute(backend_for_execute)
-        run = RunResult(dataset)
+        run = BenchmarkRunResult(dataset)
         self.runs.append(run)
         return run
 
-    def analyze(self, run_index=-1) -> AnalysisResult:
+    def analyze(self, run_index=-1) -> BenchmarkAnalysisResult:
         """
         The default analysis for the benchmark.
 
@@ -259,6 +298,6 @@ class Benchmark(ABC):
             the ``analysis_function`` field.
         """
         run = self.runs[run_index]
-        result = AnalysisResult.from_run_result(run)
+        result = BenchmarkAnalysisResult.from_run_result(run)
         updated_result = self.analysis_function(result)
         return updated_result

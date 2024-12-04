@@ -24,9 +24,15 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks import AnalysisResult, Benchmark, RunResult
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -48,7 +54,7 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
 # pylint: disable=too-many-statements, too-many-branches
-def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
+def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for an Interleaved RB experiment
 
     Args:
@@ -56,8 +62,9 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
     Returns:
         AnalysisResult corresponding to Interleaved RB
     """
-    dataset = run.dataset
-    observations: Dict[int, Any] = {}
+    dataset = run.dataset.copy(deep=True)
+    obs_dict: Dict[int, Any] = {}
+    observations: list[BenchmarkObservation] = []
     plots: Dict[str, Figure] = {}
 
     is_parallel_execution = dataset.attrs["parallel_execution"]
@@ -160,14 +167,26 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
 
             processed_results[rb_type] = {
                 "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
-                "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
-                "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
-                "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
             }
+
+            observations.extend(
+                [
+                    BenchmarkObservation(
+                        name=f"{key}_{rb_type}",
+                        identifier=BenchmarkObservationIdentifier(qubits),
+                        value=values["value"],
+                        uncertainty=values["uncertainty"],
+                    )
+                    for key, values in processed_results[rb_type].items()
+                ]
+            )
 
             dataset.attrs[qubits_idx].update(
                 {
                     rb_type: {
+                        "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
+                        "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
+                        "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                         "fidelities": fidelities[str(qubits)][rb_type],
                         "avg_fidelities_nominal_values": average_fidelities,
                         "avg_fidelities_stderr": stddevs_from_mean,
@@ -183,7 +202,7 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
                 }
             )
 
-        observations.update({qubits_idx: processed_results})
+        obs_dict.update({qubits_idx: processed_results})
 
         # Generate decay plots
         if interleaved_gate_parameters is None:
@@ -196,19 +215,19 @@ def interleaved_rb_analysis(run: RunResult) -> AnalysisResult:
             "irb",
             [qubits],
             dataset,
-            observations,
+            obs_dict,
             interleaved_gate=interleaved_gate_string,
         )
         plots[fig_name] = fig
 
     # Rearrange observations
-    observations_refactored: Dict[int, Dict[str, Dict[str, float]]] = {}
-    for k, o in observations.items():
-        observations_refactored[k] = {}
-        for rb_type in o.keys():
-            observations_refactored[k].update({f"{k}_{rb_type}": v for k, v in o[rb_type].items()})
+    # observations_refactored: Dict[int, Dict[str, Dict[str, float]]] = {}
+    # for k, o in obs_dict.items():
+    #     observations_refactored[k] = {}
+    #     for rb_type in o.keys():
+    #         observations_refactored[k].update({f"{k}_{rb_type}": v for k, v in o[rb_type].items()})
 
-    return AnalysisResult(dataset=dataset, observations=observations_refactored, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
 
 class InterleavedRandomizedBenchmarking(Benchmark):
@@ -216,14 +235,14 @@ class InterleavedRandomizedBenchmarking(Benchmark):
 
     analysis_function = staticmethod(interleaved_rb_analysis)
 
-    name: str = "clifford_rb"
+    name: str = "interleaved_clifford_rb"
 
     def __init__(self, backend_arg: IQMBackendBase | str, configuration: "InterleavedRBConfiguration"):
         """Construct the InterleavedRandomizedBenchmark class
 
         Args:
             backend_arg (IQMBackendBase | str): the backend to execute Clifford RB on
-            configuration (CliffordRBConfiguration): The Clifford RB configuration
+            configuration (InterleavedRBConfiguration): The Clifford RB configuration
         """
         super().__init__(backend_arg, configuration)
 

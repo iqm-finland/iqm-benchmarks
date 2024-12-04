@@ -26,7 +26,7 @@ class TestGHZ:
         benchmark.run()
         benchmark.analyze()
 
-    def test_coherences_state_routine(self):
+    def test_state_routine(self):
         for gen_routine in [f"tree", f"naive", "log_depth"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=gen_routine,
@@ -58,4 +58,5 @@ class TestGHZ:
             )
             benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
             benchmark.run()
-            benchmark.analyze()
+            result = benchmark.analyze()
+            print(result.observations)
