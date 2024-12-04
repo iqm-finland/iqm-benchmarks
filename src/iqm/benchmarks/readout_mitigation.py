@@ -202,7 +202,7 @@ class M3IQM(mthree.M3Mitigation):
         if not isinstance(self.system, Backend):
             for circs in circs_list:
                 transpiled_circuit = transpile(circs, self.system, optimization_level=0)
-                _job = self.system.run(transpile, shots=shots, rep_delay=self.rep_delay)
+                _job = self.system.run(transpiled_circuit, shots=shots, rep_delay=self.rep_delay)
                 jobs.append(_job)
 
         # *****************************************
