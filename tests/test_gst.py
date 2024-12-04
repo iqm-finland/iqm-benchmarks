@@ -15,7 +15,7 @@ class TestGST:
             num_circuits=10,
             shots=10,
             rank=4,
-            bootstrap_samples=0,
+            bootstrap_samples=2,
             max_iterations=[1, 1]
         )
         benchmark = CompressiveGST(backend, minimal_1Q_config)

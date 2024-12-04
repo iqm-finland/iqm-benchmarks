@@ -137,6 +137,7 @@ def count_native_gates(
 
     return avg_native_operations
 
+
 # pylint: disable=too-many-branches
 def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     """Get the IQM backend object from a backend name (str).

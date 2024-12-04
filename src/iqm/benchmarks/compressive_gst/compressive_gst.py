@@ -34,11 +34,8 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
 
-from iqm.benchmarks.benchmark_definition import (
-    Benchmark,
-    add_counts_to_dataset,
-)
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
 from iqm.benchmarks.compressive_gst.gst_analysis import mgst_analysis
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (

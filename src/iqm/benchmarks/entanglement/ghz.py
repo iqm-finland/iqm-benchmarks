@@ -101,7 +101,7 @@ def append_rms(
 
 def fidelity_ghz_randomized_measurements(
     dataset: xr.Dataset, qubit_layout, ideal_probabilities: List[Dict[str, int]], num_qubits: int
-) -> dict[str, dict[str, Any]]:
+) -> tuple[dict[str, Any], dict[str, Any]]:
     """
     Estimates GHZ state fidelity through cross-correlations of RMs.
     Implementation of Eq. (34) in https://arxiv.org/abs/1812.02624
@@ -112,7 +112,10 @@ def fidelity_ghz_randomized_measurements(
         ideal_probabilities (List[Dict[str, int]]):
         num_qubits (int):
     Returns:
-        dict[str, dict[str, Any]]
+        values: dict[str, Any]
+            The fidelities
+        uncertainties: dict[str, Any]
+            The uncertainties for the fidelities
     """
     idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     # List for each RM contribution to the fidelity
@@ -162,7 +165,7 @@ def fidelity_ghz_randomized_measurements(
     return values, uncertainties
 
 
-def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> dict[str, dict[str, Any]]:
+def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> list[Any]:
     """
     Estimates the GHZ state fidelity based on the multiple quantum coherences method based on [Mooney, 2021]
 
@@ -247,23 +250,22 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         if routine == "randomized_measurements":
             ideal_simulator = Aer.get_backend("statevector_simulator")
             ideal_probabilities = []
-            Id = BenchmarkObservationIdentifier(qubit_layout)
-            idx = Id.string_identifier
+            idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
             all_circuits = run.dataset.attrs["transpiled_circuits"][idx]
             for qc in all_circuits:
                 qc_copy = qc.copy()
                 qc_copy.remove_final_measurements()
                 deflated_qc = reduce_to_active_qubits(qc_copy, backend_name)
-                ideal_probabilities.append(
-                    dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
-                )
+                ideal_probabilities.append(dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items())))
             values, uncertainties = fidelity_ghz_randomized_measurements(
-                        dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
-                    )
+                dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
+            )
             observation_list.extend(
                 [
                     BenchmarkObservation(
-                        name=key, identifier=BenchmarkObservationIdentifier(qubit_layout), value=value,
+                        name=key,
+                        identifier=BenchmarkObservationIdentifier(qubit_layout),
+                        value=value,
                         uncertainty=uncertainties[key],
                     )
                     for key, value in values.items()

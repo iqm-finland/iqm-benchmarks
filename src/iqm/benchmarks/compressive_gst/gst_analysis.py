@@ -4,7 +4,7 @@ Data analysis code for compressive gate set tomography
 
 from itertools import product
 from time import perf_counter
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -207,8 +207,9 @@ def generate_non_gate_results(
         df_o_final: Pandas DataFrame
             The final formated results
     """
+    identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     if dataset.attrs["bootstrap_samples"] > 0:
-        _, _, _, _, df_o_array = dataset.attrs["results_layout_" + str(qubit_layout)]["bootstrap_data"]
+        _, _, _, _, df_o_array = dataset.attrs["results_layout_" + identifier]["bootstrap_data"]
         df_o_array[df_o_array == -1] = np.nan
         percentiles_o_low, percentiles_o_high = np.nanpercentile(df_o_array, [2.5, 97.5], axis=0)
         df_o_final = DataFrame(
@@ -276,11 +277,10 @@ def generate_unit_rank_gate_results(
 
 
     """
+    identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     pauli_labels = generate_basis_labels(dataset.attrs["pdim"], basis="Pauli")
     if dataset.attrs["bootstrap_samples"] > 0:
-        X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + str(qubit_layout)][
-            "bootstrap_data"
-        ]
+        X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + identifier]["bootstrap_data"]
         df_g_array[df_g_array == -1] = np.nan
         percentiles_g_low, percentiles_g_high = np.nanpercentile(df_g_array, [2.5, 97.5], axis=0)
 
@@ -399,14 +399,13 @@ def generate_gate_results(
             A table in Figure format of eigenvalues of the Choi matrices of all gates
 
     """
+    identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     n_evals = np.min([max_evals, dataset.attrs["pdim"] ** 2])
     X_opt_pp, _, _ = compatibility.std2pp(X_opt, E_opt, rho_opt)
     df_g_evals = reporting.generate_Choi_EV_table(X_opt, n_evals, dataset.attrs["gate_labels"])
 
     if dataset.attrs["bootstrap_samples"] > 0:
-        X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + str(qubit_layout)][
-            "bootstrap_data"
-        ]
+        X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + identifier]["bootstrap_data"]
         df_g_array[df_g_array == -1] = np.nan
         percentiles_g_low, percentiles_g_high = np.nanpercentile(df_g_array, [2.5, 97.5], axis=0)
         bootstrap_unitarities = np.array(
@@ -547,7 +546,9 @@ def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
     return float(result_str), np.NaN
 
 
-def pandas_results_to_observations(dataset: xr.Dataset, df_g: DataFrame, df_o: DataFrame) -> Tuple[Dict, Dict]:
+def pandas_results_to_observations(
+    dataset: xr.Dataset, df_g: DataFrame, df_o: DataFrame, identifier
+) -> List[BenchmarkObservation]:
     """Converts high level GST results from a pandas Dataframe to a simple observation dictionary
 
     Args:
@@ -559,59 +560,39 @@ def pandas_results_to_observations(dataset: xr.Dataset, df_g: DataFrame, df_o: D
         The dataframe with properly formated gate results
     df_o: Pandas DataFrame
         The dataframe with properly formated non-gate results like SPAM error measures or fit quality.
+    identifier: BenchmarkObservationIdentifier
+        An identifier object for the current GST run
 
     Returns:
-    obs: Dict
-        Dictionary of gate observations
-    obs_non_gate: Dict
-        Dictionary of non-gate observations
+    observation_list: List[BenchmarkObservation]
+        List of observations converted from the pandas dataframes
     """
-    obs = {}
+    observation_list: list[BenchmarkObservation] = []
     err = dataset.attrs["bootstrap_samples"] > 0
     for idx, gate_label in enumerate(dataset.attrs["gate_labels"].values()):
-        obs.update(
-            {
-                "average_gate_fidelity_"
-                + gate_label: {
-                    "value": result_str_to_floats(df_g["Avg. gate fidelity"].iloc[idx], err)[0],
-                    "uncertainty": result_str_to_floats(df_g["Avg. gate fidelity"].iloc[idx], err)[1],
-                },
-                "diamond_distance_"
-                + gate_label: {
-                    "value": result_str_to_floats(df_g["Diamond distance"].iloc[idx], err)[0],
-                    "uncertainty": result_str_to_floats(df_g["Diamond distance"].iloc[idx], err)[1],
-                },
-            }
+        observation_list.extend(
+            [
+                BenchmarkObservation(
+                    name=f"{name} - {gate_label}",
+                    identifier=identifier,
+                    value=result_str_to_floats(df_g[name].iloc[idx], err)[0],
+                    uncertainty=result_str_to_floats(df_g[name].iloc[idx], err)[1],
+                )
+                for name in df_g.columns.tolist()
+            ]
         )
-        if "Unitarity" in df_g.columns.tolist():
-            obs.update(
-                {
-                    "unitarity_"
-                    + gate_label: {
-                        "value": result_str_to_floats(df_g["Unitarity"].iloc[idx], err)[0],
-                        "uncertainty": result_str_to_floats(df_g["Unitarity"].iloc[idx], err)[1],
-                    },
-                }
+    observation_list.extend(
+        [
+            BenchmarkObservation(
+                name=f"{name}",
+                identifier=identifier,
+                value=result_str_to_floats(df_o[name].iloc[0], err)[0],
+                uncertainty=result_str_to_floats(df_o[name].iloc[0], err)[1],
             )
-    obs_non_gate = {
-        "mean_tvd_estimate_data": {
-            "value": result_str_to_floats(df_o["Mean TVD: estimate - data"].iloc[0], err)[0],
-            "uncertainty": result_str_to_floats(df_o["Mean TVD: estimate - data"].iloc[0], err)[1],
-        },
-        "mean_tvd_target_data": {
-            "value": result_str_to_floats(df_o["Mean TVD: target - data"].iloc[0], err)[0],
-            "uncertainty": result_str_to_floats(df_o["Mean TVD: target - data"].iloc[0], err)[1],
-        },
-        "povm_dimaond_distance": {
-            "value": result_str_to_floats(df_o["POVM - diamond dist."].iloc[0], err)[0],
-            "uncertainty": result_str_to_floats(df_o["POVM - diamond dist."].iloc[0], err)[1],
-        },
-        "state_trace_distance": {
-            "value": result_str_to_floats(df_o["State - trace dist."].iloc[0], err)[0],
-            "uncertainty": result_str_to_floats(df_o["State - trace dist."].iloc[0], err)[1],
-        },
-    }
-    return obs, obs_non_gate
+            for name in df_o.columns.tolist()
+        ]
+    )
+    return observation_list
 
 
 def dataset_counts_to_mgst_format(dataset: xr.Dataset, qubit_layout: List[int]) -> ndarray:
@@ -754,9 +735,9 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """
     dataset = run.dataset
     pdim = dataset.attrs["pdim"]
-    observations: Dict[str, Dict] = {str(qubit_layout): {} for qubit_layout in dataset.attrs["qubit_layouts"]}
     plots = {}
     for i, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
+        identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
         # Computing circuit outcome probabilities from counts
         y = dataset_counts_to_mgst_format(dataset, qubit_layout)
@@ -782,7 +763,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         X_target_pp, _, _ = compatibility.std2pp(X_target, E_target, rho_target)
 
         # Saving
-        dataset.attrs["results_layout_" + str(qubit_layout)] = {
+        dataset.attrs["results_layout_" + identifier] = {
             "raw_Kraus_operators": K,
             "raw_gates": X,
             "raw_POVM": E.reshape((dataset.attrs["num_povm"], pdim, pdim)),
@@ -798,7 +779,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         ### Bootstrap
         if dataset.attrs["bootstrap_samples"] > 0:
             bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl)
-            dataset.attrs["results_layout_" + str(qubit_layout)].update({"bootstrap_data": bootstrap_results})
+            dataset.attrs["results_layout_" + identifier].update({"bootstrap_data": bootstrap_results})
 
         _, df_o_full = reporting.report(
             X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"]
@@ -810,24 +791,20 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             df_g_final, df_g_rotation, fig_g, fig_rotation = generate_unit_rank_gate_results(
                 dataset, qubit_layout, df_g, X_opt, K_target
             )
-            dataset.attrs["results_layout_" + str(qubit_layout)].update(
-                {"hamiltonian_parameters": df_g_rotation.to_dict()}
-            )
+            dataset.attrs["results_layout_" + identifier].update({"hamiltonian_parameters": df_g_rotation.to_dict()})
             plots[f"layout_{qubit_layout}_hamiltonian_parameters"] = fig_rotation
         else:
             df_g_final, df_g_evals, fig_g, fig_choi = generate_gate_results(
                 dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt
             )
-            dataset.attrs["results_layout_" + str(qubit_layout)].update({"choi_evals": df_g_evals.to_dict()})
+            dataset.attrs["results_layout_" + identifier].update({"choi_evals": df_g_evals.to_dict()})
             plots[f"layout_{qubit_layout}_choi_eigenvalues"] = fig_choi
         plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
         plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
 
-        obs, obs_non_gate = pandas_results_to_observations(dataset, df_g_final, df_o_final)
-        observations[str(qubit_layout)].update(obs)
-        observations[str(qubit_layout)].update(obs_non_gate)
+        observation_list = pandas_results_to_observations(dataset, df_g_final, df_o_final, identifier)
 
-        dataset.attrs["results_layout_" + str(qubit_layout)].update(
+        dataset.attrs["results_layout_" + identifier].update(
             {"full_metrics": {"Gates": df_g_final.to_dict(), "Outcomes and SPAM": df_o_final.to_dict()}}
         )
 
@@ -868,4 +845,4 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
         plt.close("all")
 
-    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list, plots=plots)
