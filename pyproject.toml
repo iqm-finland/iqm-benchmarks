@@ -30,7 +30,7 @@ dependencies = [
     "lmfit >= 1.2",
     "matplotlib >= 3.6.3, < 4",
     "more-itertools == 10.1.0",
-    "mthree == 2.6.3",
+    "mthree >= 2.6, < 2.7",
     "networkx==3.3",
     "numpy >= 1.25.2, < 2.0",
     "qiskit >= 1.0",
