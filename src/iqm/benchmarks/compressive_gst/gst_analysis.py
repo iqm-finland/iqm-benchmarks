@@ -547,7 +547,7 @@ def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
 
 
 def pandas_results_to_observations(
-    dataset: xr.Dataset, df_g: DataFrame, df_o: DataFrame, identifier
+    dataset: xr.Dataset, df_g: DataFrame, df_o: DataFrame, identifier: BenchmarkObservationIdentifier
 ) -> List[BenchmarkObservation]:
     """Converts high level GST results from a pandas Dataframe to a simple observation dictionary
 
@@ -802,7 +802,9 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
         plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
 
-        observation_list = pandas_results_to_observations(dataset, df_g_final, df_o_final, identifier)
+        observation_list = pandas_results_to_observations(
+            dataset, df_g_final, df_o_final, BenchmarkObservationIdentifier(qubit_layout)
+        )
 
         dataset.attrs["results_layout_" + identifier].update(
             {"full_metrics": {"Gates": df_g_final.to_dict(), "Outcomes and SPAM": df_o_final.to_dict()}}

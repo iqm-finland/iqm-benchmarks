@@ -22,6 +22,8 @@ import json
 from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
 
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import networkx
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
@@ -286,7 +288,8 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                         name="fidelity_rem", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[1]
                     )
                 )
-    return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list)
+    plots = {"All layout fidelities": plot_fidelities(observation_list, qubit_layouts)}
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list, plots=plots)
 
 
 def generate_ghz_linear(num_qubits: int) -> QuantumCircuit:
@@ -523,6 +526,53 @@ def get_cx_map(qubit_layout: List[int], graph: networkx.Graph) -> list[list[int]
             cx_map.append([rev_mapping[qubit_path[i - 1]], rev_mapping[new_qubit]])
             already_entangled.append(new_qubit)
     return cx_map
+
+
+def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: List[List[int]]) -> Figure:
+    """Plots all the fidelities stored in the observations into a single plot of fidelity vs. number of qubits
+
+    Parameters
+    ----------
+    observations: List[BenchmarkObservation]
+        A list of Observations, each assumed to be a fidelity
+    qubit_layouts
+        The list of qubit layouts as given by the user. This is used to name the layouts in order for identification
+        in the plot.
+    Returns
+    -------
+    fig :Figure
+        The figure object with the fidelity plot.
+    """
+    fig, ax = plt.subplots()
+    layout_short = {str(qubit_layout): f" L{i}" for i, qubit_layout in enumerate(qubit_layouts)}
+    recorded_labels = []
+    for i, obs in enumerate(observations):
+        label = "With REM" if "rem" in obs.name else "Unmitigated"
+        if label in recorded_labels:
+            label = "_nolegend_"
+        else:
+            recorded_labels.append(label)
+        x = sum(c.isdigit() for c in obs.identifier.string_identifier)
+        y = obs.value
+        ax.errorbar(
+            x,
+            y,
+            yerr=obs.uncertainty,
+            capsize=4,
+            color="orange" if "rem" in obs.name else "cornflowerblue",
+            label=label,
+            fmt="o",
+            alpha=1,
+            markersize=5,
+        )
+        ax.annotate(layout_short[obs.identifier.string_identifier], (x, y))
+    ax.axhline(0.5, linestyle="--", color="black", label="GME threshold")
+    # ax.set_ylim([0,1])
+    ax.set_title("GHZ fidelities of all qubit layouts")
+    ax.set_xlabel("Number of qubits")
+    ax.set_ylabel("Fidelity")
+    ax.legend(framealpha=0.5)
+    return fig
 
 
 class GHZBenchmark(Benchmark):

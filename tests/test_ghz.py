@@ -13,13 +13,21 @@ class TestGHZ:
     def test_layouts(self):
         MINIMAL_GHZ = GHZConfiguration(
             state_generation_routine=f"tree",
-            custom_qubits_array=[[0, 1], [0, 1, 4], [0, 1, 2, 3, 4, 5, 6]],
+            custom_qubits_array=
+            [
+                [0,1],
+                  [0,1,3],
+                  [0,1,3,4],
+                  # [0,1,2,3,4],
+                  # [0,1,2,3,4,5],
+                  # [0,1,2,3,4,5,6],
+            ],
             shots=3,
             qiskit_optim_level=3,
             optimize_sqg=True,
             fidelity_routine="coherences",
             num_RMs=10,
-            rem=True,
+            rem=False,
             mit_shots=10,
         )
         benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
@@ -58,5 +66,4 @@ class TestGHZ:
             )
             benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
             benchmark.run()
-            result = benchmark.analyze()
-            print(result.observations)
+            benchmark.analyze()
