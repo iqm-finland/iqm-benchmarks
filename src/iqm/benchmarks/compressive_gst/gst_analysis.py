@@ -8,6 +8,7 @@ from typing import Any, List, Tuple, Union
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 from numpy import ndarray
 import numpy as np
 from pandas import DataFrame
@@ -69,7 +70,7 @@ def dataframe_to_figure(
         rowLabels=row_labels,
         cellLoc="center",
         colColours=["#7FA1C3" for _ in range(n_cols)],
-        bbox=[0, 0, 1, 1],
+        bbox=Bbox([[0, 0], [1, 1]]),
     )
     table.set_fontsize(fontsize)
     table.set_figure(fig)

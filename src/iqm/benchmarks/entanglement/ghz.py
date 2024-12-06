@@ -573,6 +573,7 @@ def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: Lis
     ax.set_xlabel("Number of qubits")
     ax.set_ylabel("Fidelity")
     ax.legend(framealpha=0.5)
+    plt.close()
     return fig
 
 
