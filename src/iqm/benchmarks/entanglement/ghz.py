@@ -74,16 +74,17 @@ def append_rms(
     Returns:
         List[QuantumCircuit] of the original circuit with 1Q Clifford gates appended to it
     """
-    rm_circuits = []
+    rm_circuits: list[QuantumCircuit] = []
     for _ in range(num_rms):
         rm_circ = circuit.copy()
         # It shouldn't matter if measurement bits get scrambled
         rm_circ.remove_final_measurements()
 
         active_qubits = set()
-        for instruction in rm_circ.data:
+        data = rm_circ.data
+        for instruction in data:
             for qubit in instruction[1]:
-                active_qubits.add(qubit.index)
+                active_qubits.add(rm_circ.find_bit(qubit)[0])
 
         for q in active_qubits:
             if backend is not None:
