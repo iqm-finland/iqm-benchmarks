@@ -15,4 +15,4 @@
 GHZ verifies the generation of Greenberger-Horne-Zeilinger states
 """
 
-from . import ghz
+from . import ghz, graph_states
