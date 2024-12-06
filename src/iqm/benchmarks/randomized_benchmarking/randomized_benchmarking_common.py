@@ -650,7 +650,6 @@ def plot_rb_decay(
             decay_rate[rb_type] = {
                 str(q): dataset.attrs[q_idx][rb_type]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
             }
-            print(dataset.attrs)
             offset[rb_type] = {
                 str(q): dataset.attrs[q_idx][rb_type]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
             }
@@ -770,11 +769,14 @@ def plot_rb_decay(
                 fidelity_stderr[key][str(qubits)] = np.nan
 
             if identifier == "mrb":
-                plot_label = fr"$\overline{{F}}_\text{{MRB}} (n={len(qubits)})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
+                plot_label = fr"$\overline{{F}}_{{MRB}} (n={len(qubits)})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             elif key == "interleaved":
-                plot_label = fr"$\overline{{F}}_\text{{{interleaved_gate}}} ({qubits})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
+                plot_label = fr"$\overline{{F}}_{{interleaved_gate}} ({qubits})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             else:
-                plot_label = fr"$\overline{{F}}_\text{{Clifford}} ({qubits})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
+                print(fidelity_value)
+                print(qubits)
+                print(key)
+                plot_label = fr"$\overline{{F}}_{{CRB}}$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
 
             ax.plot(
                 x_linspace,

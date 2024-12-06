@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 1.7
+===========
+* Remove explicit dependency on qiskit, instead taking it from qiskit-on-iqm.
+
 Version 1.6
 ===========
 * Minor change in dependencies for compatibility.

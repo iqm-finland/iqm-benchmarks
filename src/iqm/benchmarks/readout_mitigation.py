@@ -25,7 +25,7 @@ from mthree.classes import QuasiCollection
 from mthree.exceptions import M3Error
 from mthree.mitigation import _job_thread
 from mthree.utils import final_measurement_mapping
-from qiskit import QuantumCircuit, execute  # pylint: disable = no-name-in-module
+from qiskit import QuantumCircuit, transpile  # pylint: disable = no-name-in-module
 from qiskit.providers import Backend, BackendV1, BackendV2
 
 from iqm.benchmarks.utils import get_iqm_backend, timeit
@@ -201,13 +201,8 @@ class M3IQM(mthree.M3Mitigation):
         jobs = []
         if not isinstance(self.system, Backend):
             for circs in circs_list:
-                _job = execute(
-                    circs,
-                    self.system,
-                    optimization_level=0,
-                    shots=shots,
-                    rep_delay=self.rep_delay,
-                )
+                transpiled_circuit = transpile(circs, self.system, optimization_level=0)
+                _job = self.system.run(transpiled_circuit, shots=shots, rep_delay=self.rep_delay)
                 jobs.append(_job)
 
         # *****************************************

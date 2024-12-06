@@ -1,14 +1,21 @@
 # IQM Benchmarks
 
-The IQM Benchmarks is a suite of quantum characterization, verification, and validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
+IQM Benchmarks is a suite of Quantum Characterization, Verification, and Validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
 
 
 Below is a list of the benchmarks currently available in the suite:
-* Randomized Benchmarking: A suite of randomized benchmarking protocols for characterizing the performance of quantum gates (Clifford Randomized Benchmarking, Mirror Randomized Benchmarking, Interleaved Randomized Benchmarking).
-* Quantum Volume: A benchmark for characterizing the performance of quantum computers.
-* Q-Score: A benchmark that estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
-* GHZ State Benchmarking: A benchmark for characterizing the performance of multi-qubit entangled states.
-
+* Gates / Layers: 
+  - Standard Clifford Randomized Benchmarking [[Phys. Rev. A 85, 042311](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.85.042311) (2012)]
+  - Interleaved Randomized Benchmarking [[Phys. Rev. Lett. 109, 080505](https://doi.org/10.1103/PhysRevLett.109.080505) (2012)]
+  - Compressive Gate Set Tomography [[PRX Quantum 4, 010325](https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.4.010325) (2023)]
+  - Mirror Randomized Benchmarking [[Phys. Rev. Lett. 129, 150502](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.129.150502) (2022)]
+* Holistic:
+  - Quantum Volume [[Phys. Rev. A 100, 032328](https://doi.org/10.1103/PhysRevA.100.032328) (2019)]
+  - CLOPS [[arXiv:2110.14108 [quant-ph]](https://arxiv.org/abs/2110.14108) (2021)]
+* Entanglement: 
+  - GHZ State Fidelity [[arXiv:0712.0921 [quant-ph]](https://arxiv.org/abs/0712.0921) (2007)]
+* Optimization: 
+  - Q-Score [[IEEE Trans. Quantum Eng., 2](https://doi.org/10.1109/TQE.2021.3090207) (2021)]
 
 The project is split into different benchmarks, all sharing the `Benchmark` class or the legacy `BenchmarkBase` class. Each individual benchmark takes as an argument their own `BenchmarkConfigurationBase` class. All the (legacy) benchmarks executed at once are wrapped by the `BenchmarkExperiment` class, which handles dependencies among the benchmarks, storing the results, producing the plots...
 
