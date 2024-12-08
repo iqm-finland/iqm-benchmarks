@@ -20,7 +20,7 @@ from collections import defaultdict
 from functools import wraps
 from math import floor
 from time import time
-from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple, Union, cast
+from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
 
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
@@ -136,6 +136,52 @@ def count_native_gates(
     )
 
     return avg_native_operations
+
+
+def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int]]]:
+    """Sorts the edges of a coupling map, arranging them in a dictionary
+        with values being subsets of the coupling map with no overlapping nodes.
+    Each item will correspond to a layer of pairs of qubits in which parallel 2Q gates can be applied.
+
+    Args:
+         cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
+
+    Returns:
+        Dict[int, List[List[int]]]: A dictionary with values being subsets of the coupling map with no overlapping nodes.
+    """
+    # Build a conflict graph - Treat the input list as a graph
+    # where each sublist is a node, and an edge exists between nodes if they share any integers
+    undirect_cp_map_list = remove_directed_duplicates_to_list(cp_map)
+
+    n = len(undirect_cp_map_list)
+    graph: Dict[int, Set] = {i: set() for i in range(n)}
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            if set(undirect_cp_map_list[i]) & set(undirect_cp_map_list[j]):  # Check for shared integers
+                graph[i].add(j)
+                graph[j].add(i)
+
+    # Reduce to a graph coloring problem;
+    # each color represents a group in the dictionary
+    colors: Dict[int, int] = {}
+    for node in range(n):
+        # Find all used colors among neighbors
+        neighbor_colors = {colors[neighbor] for neighbor in graph[node] if neighbor in colors}
+        # Assign the smallest unused color
+        color = 0
+        while color in neighbor_colors:
+            color += 1
+        colors[node] = color
+
+    # Group by colors - minimize the number of groups
+    groups: Dict[int, List[List[int]]] = {}
+    for idx, color in colors.items():
+        if color not in groups:
+            groups[color] = []
+        groups[color].append(undirect_cp_map_list[idx])
+
+    return groups
 
 
 # pylint: disable=too-many-branches
@@ -305,6 +351,18 @@ def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str]
         reduced_circuit.append(instruction.operation, new_qubits, new_clbits)
 
     return reduced_circuit
+
+
+def remove_directed_duplicates_to_list(cp_map: CouplingMap) -> List[List[int]]:
+    """Remove duplicate edges from a coupling map and returns as a list of edges (as a list of pairs of vertices).
+
+    Args:
+        cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
+    Returns:
+        List[List[int]]: the edges of the coupling map.
+    """
+    sorted_cp = [sorted(x) for x in list(cp_map)]
+    return [list(x) for x in set(map(tuple, sorted_cp))]
 
 
 @timeit

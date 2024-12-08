@@ -16,72 +16,15 @@
 Graph states benchmark
 """
 
-from typing import Dict, List, Sequence, Type
+from typing import Sequence, Type
 
 from qiskit import QuantumCircuit, transpile
-from qiskit.transpiler import CouplingMap
 import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.utils import set_coupling_map
+from iqm.benchmarks.utils import generate_minimal_edge_layers, set_coupling_map
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
-
-
-def remove_directed_duplicates(cp_map: Type[CouplingMap]) -> List[List[int]]:
-    """Remove duplicate edges from a coupling map.
-
-    Args:
-        cp_map (CouplingMap):
-    Returns:
-        List[List[int]]: the edges of the coupling map.
-    """
-    sorted_cp = [sorted(x) for x in list(cp_map)]
-    return [list(x) for x in set(map(tuple, sorted_cp))]
-
-
-def create_minimal_graph_layers(undirect_cp_map: Sequence[Sequence[int]]) -> Dict[int, List[List[int]]]:
-    """Sorts the edges of an undirected coupling map (Sequence[Sequence[int]]),
-    arranging them in a dictionary with values being subsets of the coupling map with no overlapping nodes.
-    Each item will correspond to a layer of pairs of qubits in which parallel 2Q gates can be applied.
-
-    Args:
-         undirect_cp_map (Sequence[Sequnece[int]]): A list of lists of pairs of integers, representing an undirected coupling map (without duplicates).
-
-    Returns:
-        Dict[int, List[List[int]]]: A dictionary with values being subsets of the coupling map with no overlapping nodes.
-    """
-    # Build a conflict graph - Treat the input list as a graph
-    # where each sublist is a node, and an edge exists between nodes if they share any integers
-    n = len(undirect_cp_map)
-    graph = {i: set() for i in range(n)}
-
-    for i in range(n):
-        for j in range(i + 1, n):
-            if set(undirect_cp_map[i]) & set(undirect_cp_map[j]):  # Check for shared integers
-                graph[i].add(j)
-                graph[j].add(i)
-
-    # Reduce to a graph coloring problem;
-    # each color represents a group in the dictionary
-    colors = {}
-    for node in range(n):
-        # Find all used colors among neighbors
-        neighbor_colors = {colors[neighbor] for neighbor in graph[node] if neighbor in colors}
-        # Assign the smallest unused color
-        color = 0
-        while color in neighbor_colors:
-            color += 1
-        colors[node] = color
-
-    # Group by colors - minimize the number of groups
-    groups = {}
-    for idx, color in colors.items():
-        if color not in groups:
-            groups[color] = []
-        groups[color].append(undirect_cp_map[idx])
-
-    return groups
 
 
 def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -> QuantumCircuit:
@@ -94,26 +37,22 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     """
     num_qubits = len(qubits)
     qc = QuantumCircuit(num_qubits)
-    undirect_coupling_map = remove_directed_duplicates(set_coupling_map(qubits, backend, physical_layout="fixed"))
-
+    coupling_map = set_coupling_map(qubits, backend, physical_layout="fixed")
+    layers = generate_minimal_edge_layers(coupling_map)
     # Add all H
     for q in range(num_qubits):
         qc.h(q)
-
-    layers = create_minimal_graph_layers(undirect_coupling_map)
-
     # Add all CZ
     for layer in layers.values():
         for edge in layer:
             qc.cz(edge[0], edge[1])
-
-    qc_t = transpile(qc, basis_gates=backend.operation_names, optimization_level=3)
-
+    # Transpile
+    qc_t = transpile(qc, backend=backend, optimization_level=3)
     return qc_t
 
 
 class GraphStatesBenchmark(Benchmark):
-    """"""
+    """The Graph States benchmark estimates the bipartite entangelement negativity of native graph states."""
 
     # analysis_function = staticmethod(negativity_analysis)
     name = "graph_states"
@@ -131,6 +70,8 @@ class GraphStatesBenchmark(Benchmark):
         """
         Executes the benchmark.
         """
+        dataset = xr.Dataset()
+        return dataset
 
 
 class GraphStatesConfiguration(BenchmarkConfigurationBase):
