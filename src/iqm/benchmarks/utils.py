@@ -138,37 +138,6 @@ def count_native_gates(
     return avg_native_operations
 
 
-# DD code to be adapted to Pulla version once released
-# @timeit
-# def execute_with_dd(
-#     backend: IQMBackendBase, transpiled_circuits: List[QuantumCircuit], shots: int, dd_strategy: DDStrategy
-# ) -> List[Dict[str, int]]:
-#     """Executes a list of transpiled quantum circuits with dynamical decoupling according to a specified strategy
-#     Args:
-#         backend (IQMBackendBase):
-#         transpiled_circuits (List[QuantumCircuit]):
-#         shots (int):
-#         dd_strategy (DDStrategy):
-#
-#     Returns:
-#         List[Dict[str, int]]: The counts of the execution with dynamical decoupling
-#     """
-#     warnings.warn("Suppressing INFO messages from Pulla with logging.disable(sys.maxsize) - update if problematic!")
-#     logging.disable(sys.maxsize)
-#
-#     pulla_obj = Pulla(cocos_url=iqm_url)
-#
-#     execution_results = dd.execute_with_dd(
-#         pulla_obj,
-#         backend=backend,
-#         circuits=transpiled_circuits,
-#         shots=shots,
-#         dd_strategy=dd_strategy,
-#     )
-#
-#     return execution_results
-
-
 # pylint: disable=too-many-branches
 def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     """Get the IQM backend object from a backend name (str).
