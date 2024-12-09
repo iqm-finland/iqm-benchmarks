@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 1.8
+===========
+* Changed compressive GST to operate under the new base class and added multiple qubit layouts.
+* Added plot to GHZ benchmark and applied small fixes.
+* Added tutorial notebook for the GHZ benchmark.
+
 Version 1.7
 ===========
 * Remove explicit dependency on qiskit, instead taking it from qiskit-on-iqm.
