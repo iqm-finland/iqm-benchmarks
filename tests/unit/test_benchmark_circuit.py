@@ -7,44 +7,31 @@ from iqm.qiskit_iqm.iqm_circuit import IQMCircuit
 
 
 def test_circuit_group():
-    qreg = QuantumRegister(
-        size=1,
-        name='test_register'
-    )
+    qreg = QuantumRegister(size=1, name='test_register')
     qc = IQMCircuit(
         qreg,
         name='test_circuit',
     )
-    circuit_group = CircuitGroup(
-        circuits=[qc]
-    )
+    circuit_group = CircuitGroup(circuits=[qc])
     circuit_group.add_circuit(qc)
     assert circuit_group.circuits == [qc, qc]
     assert circuit_group.qubits == set([Qubit(QuantumRegister(1, 'test_register'), 0)])
-    assert circuit_group.qubit_layouts == tuple([[Qubit(QuantumRegister(1, 'test_register'), 0)], [
-        Qubit(QuantumRegister(1, 'test_register'), 0)]])
+    assert circuit_group.qubit_layouts == tuple(
+        [[Qubit(QuantumRegister(1, 'test_register'), 0)], [Qubit(QuantumRegister(1, 'test_register'), 0)]]
+    )
     assert circuit_group.qubit_layouts_by_index == ([0], [0])
     assert circuit_group.circuit_names == ['test_circuit', 'test_circuit']
 
 
 def test_benchmark_circuit():
-    qreg = QuantumRegister(
-        size=1,
-        name='test_register'
-    )
+    qreg = QuantumRegister(size=1, name='test_register')
     qc = IQMCircuit(
         qreg,
         name='test_circuit',
     )
-    circuit_group = CircuitGroup(
-        name='circuit_group',
-        circuits=[qc]
-    )
+    circuit_group = CircuitGroup(name='circuit_group', circuits=[qc])
 
-    benchmark_circuit = BenchmarkCircuit(
-        name='test',
-        circuit_groups=[circuit_group]
-    )
+    benchmark_circuit = BenchmarkCircuit(name='test', circuit_groups=[circuit_group])
 
     # print(benchmark_circuit['circuit_group'].name)
     assert benchmark_circuit.circuit_groups == [circuit_group]
@@ -53,23 +40,15 @@ def test_benchmark_circuit():
     assert benchmark_circuit.qubit_layouts_by_index == {(0,)}
     assert benchmark_circuit.qubit_layouts == {(Qubit(QuantumRegister(1, name='test_register'), 0),)}
 
+
 def test_circuits():
-    qreg = QuantumRegister(
-        size=1,
-        name='test_register'
-    )
+    qreg = QuantumRegister(size=1, name='test_register')
     qc = IQMCircuit(
         qreg,
         name='test_circuit',
     )
-    circuit_group = CircuitGroup(
-        name='circuit_group',
-        circuits=[qc]
-    )
+    circuit_group = CircuitGroup(name='circuit_group', circuits=[qc])
 
-    benchmark_circuit = BenchmarkCircuit(
-        name='test',
-        circuit_groups=[circuit_group]
-    )
+    benchmark_circuit = BenchmarkCircuit(name='test', circuit_groups=[circuit_group])
     circuits = Circuits([benchmark_circuit])
     assert circuits['test'] == benchmark_circuit
