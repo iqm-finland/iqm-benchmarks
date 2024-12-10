@@ -5,6 +5,7 @@ Changelog
 Version 1.9
 ===========
 * Fixed bug (overwriting observations) in Quantum Volume.
+* Fixed small bug in CLOPS when calling plots in simulator execution.
 
 Version 1.8
 ===========
