@@ -127,7 +127,7 @@ def fidelity_ghz_randomized_measurements(
     fid_rm = []
 
     # Loop through RMs and add each contribution
-    num_rms = len(dataset.attrs["transpiled_circuits"][f"{idx}"])
+    num_rms = len(dataset.attrs["transpiled_circuits"][f"{idx}_native_ghz"].circuits)
     for u in range(num_rms):
         # Probability estimates for noisy measurements
         probabilities_sample = {}
@@ -187,9 +187,9 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> lis
     num_qubits = len(qubit_layout)
     phases = [np.pi * i / (num_qubits + 1) for i in range(2 * num_qubits + 2)]
     idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-    transpiled_circuits = dataset.attrs["transpiled_circuits"][idx]
+    transpiled_circuits = dataset.attrs["transpiled_circuits"]
     num_shots = dataset.attrs["shots"]
-    num_circuits = len(transpiled_circuits)
+    num_circuits = len(transpiled_circuits[f"{qubit_layout}_native_ghz"].circuits)
 
     # Computing the phase acquired by the |11...1> component for each interval
     complex_coefficients = np.exp(1j * num_qubits * np.array(phases))
@@ -256,7 +256,8 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             ideal_simulator = Aer.get_backend("statevector_simulator")
             ideal_probabilities = []
             idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-            all_circuits = run.dataset.attrs["transpiled_circuits"][idx]
+            transpiled_circuits = run.dataset.attrs["transpiled_circuits"]
+            all_circuits = run.dataset.attrs["transpiled_circuits"][f"{idx}_native_ghz"].circuits
             for qc in all_circuits:
                 qc_copy = qc.copy()
                 qc_copy.remove_final_measurements()
@@ -645,11 +646,7 @@ class GHZBenchmark(Benchmark):
             QuantumCircuit implementing GHZ native state
         """
         # num_qubits = len(qubit_layout)
-        register = QuantumRegister(
-            len(qubit_layout),
-            name="native_ghz_register",
-        )
-        circuit_group = CircuitGroup(name=register.name)
+        circuit_group = CircuitGroup(name=f"{qubit_layout}_native_ghz")
         fixed_coupling_map = set_coupling_map(qubit_layout, self.backend, "fixed")
         # idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
         ghz_native_transpiled: List[QuantumCircuit]
@@ -707,10 +704,9 @@ class GHZBenchmark(Benchmark):
                 final_ghz = ghz_native_transpiled[index_min_depth]
                 circuit_group.add_circuit([ghz_log[index_min_depth]])
                 # self.untranspiled_circuits[idx].update({qubit_count: ghz_log[index_min_depth]})
-        print(self.circuits['untranspiled_circuits'])
         self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
         return CircuitGroup(
-            name=register.name,
+            name=f"{qubit_layout}_native_ghz",
             circuits=[final_ghz[0]])
 
     def generate_coherence_meas_circuits(self, qubit_layout: List[int], qubit_count: int) -> List[QuantumCircuit]:
@@ -729,9 +725,9 @@ class GHZBenchmark(Benchmark):
         """
 
         idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        qc = self.circuits['untranspiled_circuits']['native_ghz_register'].circuits[0]
-        qc_list = [qc.copy()]
+        qc_list = self.circuits['untranspiled_circuits'][f"{qubit_layout}_native_ghz"].circuits
 
+        qc = qc_list[0].copy()
         qc.remove_final_measurements()
         qc_inv = qc.inverse()
         phases = [np.pi * i / (qubit_count + 1) for i in range(2 * qubit_count + 2)]
@@ -754,8 +750,9 @@ class GHZBenchmark(Benchmark):
             qiskit_optim_level=self.qiskit_optim_level,
             optimize_sqg=self.optimize_sqg,
         )
+        circuit_group = CircuitGroup(name=idx, circuits=qc_list)
         self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
-        self.untranspiled_circuits[idx].update({qubit_count: qc_list})
+        # self.untranspiled_circuits[idx].update({qubit_count: qc_list})
         return qc_list_transpiled
 
     def generate_readout_circuit(self, qubit_layout: List[int], qubit_count: int) -> CircuitGroup:
@@ -778,16 +775,18 @@ class GHZBenchmark(Benchmark):
         # self.untranspiled_circuits[idx] = {}
         # self.transpiled_circuits[idx] = {}
 
+        
         qcvv_logger.info(f"Now generating a {len(qubit_layout)}-qubit GHZ state on qubits {qubit_layout}")
         transpiled_ghz_group: CircuitGroup = self.generate_native_ghz(
             qubit_layout, qubit_count, self.state_generation_routine)
 
-        if self.fidelity_routine == "randomized_measurements":
-            all_circuits_list, _ = append_rms(transpiled_ghz_group.circuits[0], cast(int, self.num_RMs), self.backend)
-            transpiled_ghz_group.circuits = all_circuits_list
-        elif self.fidelity_routine == "coherences":
-            all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)
-            transpiled_ghz_group.circuits = all_circuits_list
+        match self.fidelity_routine:
+            case "randomized_measurements":
+                all_circuits_list, _ = append_rms(transpiled_ghz_group.circuits[0], cast(int, self.num_RMs), self.backend)
+                transpiled_ghz_group.circuits = all_circuits_list
+            case "coherences":
+                all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)
+                transpiled_ghz_group.circuits = all_circuits_list
         # else:
         #     all_circuits_list = transpiled_ghz_group
 
@@ -801,6 +800,7 @@ class GHZBenchmark(Benchmark):
         # )
 
         # self.transpiled_circuits.update({idx: all_circuits_list})
+        self.circuits['transpiled_circuits'].circuit_groups.append(transpiled_ghz_group)
         return transpiled_ghz_group
 
     def add_configuration_to_dataset(self, dataset: xr.Dataset):  # CHECK
@@ -819,8 +819,8 @@ class GHZBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
-        dataset.attrs[f"untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs[f"transpiled_circuits"] = self.transpiled_circuits
+        dataset.attrs[f"untranspiled_circuits"] = self.circuits['untranspiled_circuits']
+        dataset.attrs[f"transpiled_circuits"] = self.circuits['transpiled_circuits']
 
     def execute(self, backend) -> xr.Dataset:
         """
@@ -849,6 +849,7 @@ class GHZBenchmark(Benchmark):
                 self.calset_id,
                 max_gates_per_batch=self.max_gates_per_batch,
             )
+
         # Retrieve all
         qcvv_logger.info(f"Retrieving counts and adding counts to dataset...")
         for qubit_layout in aux_custom_qubits_array:
@@ -860,7 +861,7 @@ class GHZBenchmark(Benchmark):
             dataset, _ = add_counts_to_dataset(counts, idx, dataset)
             if self.rem:
                 qcvv_logger.info(f"Applying readout error mitigation")
-                circuit_group = self.transpiled_circuits[idx]
+                circuit_group = self.circuits['transpiled_circuits'][f"{idx}_native_ghz"]
                 rem_results, _ = apply_readout_error_mitigation(backend, circuit_group.circuits, counts, self.mit_shots)
                 rem_results_dist = [counts_mit.nearest_probability_distribution() for counts_mit in rem_results]
                 dataset, _ = add_counts_to_dataset(rem_results_dist, f"{idx}_rem", dataset)
