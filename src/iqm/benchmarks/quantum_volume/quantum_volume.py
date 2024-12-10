@@ -339,7 +339,7 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Compute the HO probabilities
         qv_result = compute_heavy_output_probabilities(execution_results[str(qubits)], ideal_heavy_outputs[str(qubits)])
 
-        observations = [
+        observations.extend([
             BenchmarkObservation(
                 name="average_heavy_output_probability",
                 value=cumulative_hop(qv_result)[-1],
@@ -356,7 +356,7 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 value=2 ** len(qubits) if is_successful(qv_result) else 1,
                 identifier=BenchmarkObservationIdentifier(qubits),
             ),
-        ]
+        ])
 
         dataset.attrs[qubits_idx].update(
             {
