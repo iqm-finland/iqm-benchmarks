@@ -35,17 +35,6 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 
 
-# THINGS TO FIGURE OUT! What is the generic case here?
-# For example, thinking about Parallel 2QBRB,
-# is the first key an identifier for the circuit and the second one an identifier for the qubits?
-# Since we are not using python 3.12+, we need to use TypeAlias instead of the type declaration
-
-# CircuitIdentifier: TypeAlias = str
-# QuantumRegisterIdentifier: TypeAlias = str
-# BenchmarkCircuit: TypeAlias = Dict[CircuitIdentifier, Dict[QuantumRegisterIdentifier, IQMCircuit]]
-
-
-
 @dataclass
 class BenchmarkObservationIdentifier:
     """Identifier for observations for ease of use
@@ -165,7 +154,6 @@ def merge_datasets_dac(datasets: List[xr.Dataset]) -> xr.Dataset:
     return merge_datasets_dac(datasets_new)
 
 
-# TODO: Change the way of storage to the one developed in Pulla adapter
 @timeit
 def add_counts_to_dataset(counts: List[Dict[str, int]], identifier: str, dataset: xr.Dataset):
     """Adds the counts from a cortex job result to the given dataset.
