@@ -240,16 +240,6 @@ class Benchmark(ABC):
         self.options.update(kwargs)
         self.runs: list[BenchmarkRunResult] = []
 
-    # @property
-    # @abstractmethod
-    # def untranspiled_circuits(self) -> BenchmarkCircuit:
-    #     pass
-    #
-    # @property
-    # @abstractmethod
-    # def transpiled_circuits(self) -> BenchmarkCircuit:
-    #     pass
-
     @classmethod
     @abstractmethod
     def name(cls):
