@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 1.9
+===========
+* Fixed bug (overwriting observations) in Quantum Volume.
+
 Version 1.8
 ===========
 * Changed compressive GST to operate under the new base class and added multiple qubit layouts.
