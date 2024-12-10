@@ -339,24 +339,26 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Compute the HO probabilities
         qv_result = compute_heavy_output_probabilities(execution_results[str(qubits)], ideal_heavy_outputs[str(qubits)])
 
-        observations.extend([
-            BenchmarkObservation(
-                name="average_heavy_output_probability",
-                value=cumulative_hop(qv_result)[-1],
-                uncertainty=cumulative_std(qv_result)[-1],
-                identifier=BenchmarkObservationIdentifier(qubits),
-            ),
-            BenchmarkObservation(
-                name="is_succesful",
-                value=is_successful(qv_result, num_sigmas),
-                identifier=BenchmarkObservationIdentifier(qubits),
-            ),
-            BenchmarkObservation(
-                name="QV_result",
-                value=2 ** len(qubits) if is_successful(qv_result) else 1,
-                identifier=BenchmarkObservationIdentifier(qubits),
-            ),
-        ])
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name="average_heavy_output_probability",
+                    value=cumulative_hop(qv_result)[-1],
+                    uncertainty=cumulative_std(qv_result)[-1],
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                ),
+                BenchmarkObservation(
+                    name="is_succesful",
+                    value=is_successful(qv_result, num_sigmas),
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                ),
+                BenchmarkObservation(
+                    name="QV_result",
+                    value=2 ** len(qubits) if is_successful(qv_result) else 1,
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                ),
+            ]
+        )
 
         dataset.attrs[qubits_idx].update(
             {
