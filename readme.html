@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>IQM Benchmarks &#8212; IQM Benchmarks 1.8.post1.dev4+gdd197b7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="_static/documentation_options.js?v=205ae03e"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'readme';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="API.html" />
+    <link rel="prev" title="IQM Benchmarks" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.8.post1.dev4+gdd197b7" />
+    <meta name="docbuild:last-update" content="2024-12-10"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">IQM Benchmarks 1.8.post1.dev4+gdd197b7 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">IQM Benchmarks</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="API.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/iqm.benchmarks.html">iqm.benchmarks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.benchmark.html">iqm.benchmarks.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark.BenchmarkBase.html">iqm.benchmarks.benchmark.BenchmarkBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html">iqm.benchmarks.benchmark.BenchmarkConfigurationBase</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.html">iqm.benchmarks.benchmark_definition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.add_counts_to_dataset.html">iqm.benchmarks.benchmark_definition.add_counts_to_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.default_analysis_function.html">iqm.benchmarks.benchmark_definition.default_analysis_function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.merge_datasets_dac.html">iqm.benchmarks.benchmark_definition.merge_datasets_dac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.show_figure.html">iqm.benchmarks.benchmark_definition.show_figure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.Benchmark.html">iqm.benchmarks.benchmark_definition.Benchmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html">iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.benchmark_experiment.html">iqm.benchmarks.benchmark_experiment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.benchmark_experiment.BenchmarkExperiment.html">iqm.benchmarks.benchmark_experiment.BenchmarkExperiment</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="api/iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.optimization.html">iqm.benchmarks.optimization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.optimization.qscore.html">iqm.benchmarks.optimization.qscore</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.quantum_volume.html">iqm.benchmarks.quantum_volume</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.quantum_volume.clops.html">iqm.benchmarks.quantum_volume.clops</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.quantum_volume.quantum_volume.html">iqm.benchmarks.quantum_volume.quantum_volume</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.readout_mitigation.html">iqm.benchmarks.readout_mitigation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation.html">iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.readout_mitigation.readout_error_m3.html">iqm.benchmarks.readout_mitigation.readout_error_m3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/readme.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>IQM Benchmarks</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-latest-release">Installation <em>(latest release)</em></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-mode-latest-changes-recommended">Development mode <em>(latest changes: recommended)</em></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#characterize-physical-hardware">Characterize Physical Hardware</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-jupyter-notebook-or-python-script">Using a Jupyter notebook or Python script</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scheduled-benchmarks-using-a-ci-cd-pipeline">Scheduled benchmarks using a CI/CD Pipeline</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="iqm-benchmarks">
+<h1>IQM Benchmarks<a class="headerlink" href="#iqm-benchmarks" title="Link to this heading">#</a></h1>
+<p>IQM Benchmarks is a suite of Quantum Characterization, Verification, and Validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.</p>
+<p>Below is a list of the benchmarks currently available in the suite:</p>
+<ul class="simple">
+<li><p>Gates / Layers:</p>
+<ul>
+<li><p>Standard Clifford Randomized Benchmarking [<a class="reference external" href="https://journals.aps.org/pra/abstract/10.1103/PhysRevA.85.042311">Phys. Rev. A 85, 042311</a> (2012)]</p></li>
+<li><p>Interleaved Randomized Benchmarking [<a class="reference external" href="https://doi.org/10.1103/PhysRevLett.109.080505">Phys. Rev. Lett. 109, 080505</a> (2012)]</p></li>
+<li><p>Compressive Gate Set Tomography [<a class="reference external" href="https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.4.010325">PRX Quantum 4, 010325</a> (2023)]</p></li>
+<li><p>Mirror Randomized Benchmarking [<a class="reference external" href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.129.150502">Phys. Rev. Lett. 129, 150502</a> (2022)]</p></li>
+</ul>
+</li>
+<li><p>Holistic:</p>
+<ul>
+<li><p>Quantum Volume [<a class="reference external" href="https://doi.org/10.1103/PhysRevA.100.032328">Phys. Rev. A 100, 032328</a> (2019)]</p></li>
+<li><p>CLOPS [<a class="reference external" href="https://arxiv.org/abs/2110.14108">arXiv:2110.14108 [quant-ph]</a> (2021)]</p></li>
+</ul>
+</li>
+<li><p>Entanglement:</p>
+<ul>
+<li><p>GHZ State Fidelity [<a class="reference external" href="https://arxiv.org/abs/0712.0921">arXiv:0712.0921 [quant-ph]</a> (2007)]</p></li>
+</ul>
+</li>
+<li><p>Optimization:</p>
+<ul>
+<li><p>Q-Score [<a class="reference external" href="https://doi.org/10.1109/TQE.2021.3090207">IEEE Trans. Quantum Eng., 2</a> (2021)]</p></li>
+</ul>
+</li>
+</ul>
+<p>The project is split into different benchmarks, all sharing the <code class="docutils literal notranslate"><span class="pre">Benchmark</span></code> class or the legacy <code class="docutils literal notranslate"><span class="pre">BenchmarkBase</span></code> class. Each individual benchmark takes as an argument their own <code class="docutils literal notranslate"><span class="pre">BenchmarkConfigurationBase</span></code> class. All the (legacy) benchmarks executed at once are wrapped by the <code class="docutils literal notranslate"><span class="pre">BenchmarkExperiment</span></code> class, which handles dependencies among the benchmarks, storing the results, producing the plots…</p>
+<section id="installation-latest-release">
+<h2>Installation <em>(latest release)</em><a class="headerlink" href="#installation-latest-release" title="Link to this heading">#</a></h2>
+<p>Usually it makes sense to use a new Conda environment (e.g. <code class="docutils literal notranslate"><span class="pre">iqm-benchmarks</span></code>) to isolate your setup from the global Python installation. That way, you can play around without messing the rest of your system.</p>
+<p>Start a terminal in your machine, and type</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">iqm</span><span class="o">-</span><span class="n">benchmarks</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.11.2</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">iqm</span><span class="o">-</span><span class="n">benchmarks</span>
+</pre></div>
+</div>
+<p>Then, you can install the latest release of the IQM Benchmarks by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>iqm-benchmarks
+</pre></div>
+</div>
+<p>If you have already installed <code class="docutils literal notranslate"><span class="pre">iqm-benchmarks</span></code> and want to get the latest release you can add the –upgrade flag:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>iqm-benchmarks<span class="w"> </span>--upgrade
+</pre></div>
+</div>
+</section>
+<section id="development-mode-latest-changes-recommended">
+<h2>Development mode <em>(latest changes: recommended)</em><a class="headerlink" href="#development-mode-latest-changes-recommended" title="Link to this heading">#</a></h2>
+<p>To install in development mode with all required dependencies, you can instead clone the <a class="reference external" href="https://www.github.com/iqm-finland/iqm-benchmarks">repository</a> and from the project directory run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[develop,test]&quot;</span><span class="w"> </span>--upgrade<span class="w"> </span>--upgrade-strategy<span class="o">=</span>eager
+</pre></div>
+</div>
+<p>To run the tests, you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p>To build the API documentation as HTML:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs
+</pre></div>
+</div>
+</section>
+<section id="characterize-physical-hardware">
+<h2>Characterize Physical Hardware<a class="headerlink" href="#characterize-physical-hardware" title="Link to this heading">#</a></h2>
+<p>The IQM Benchmarks suite is designed to be used with real quantum hardware. To use the suite, you will need to have access to a quantum computer. The suite is designed to work with both IQM Resonance (IQM’s quantum cloud service) and on-prem devices, but can be easily adapted to work with other quantum computing platforms.</p>
+<p>To use the suite with IQM Resonance, you will need to set up an account and obtain an API token. You can then set the <code class="docutils literal notranslate"><span class="pre">IQM_TOKEN</span></code> environment variable to your API token. The suite will automatically use this token to authenticate with IQM Resonance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;your_token&quot;</span>
+</pre></div>
+</div>
+<section id="using-a-jupyter-notebook-or-python-script">
+<h3>Using a Jupyter notebook or Python script<a class="headerlink" href="#using-a-jupyter-notebook-or-python-script" title="Link to this heading">#</a></h3>
+<p>You can easily set up one or more benchmarks by defining a configuration for them. For example, for Randomized, Interleaved and Mirror Benchmarking, or Quantum Volume:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb</span> <span class="kn">import</span> <span class="n">InterleavedRBConfiguration</span>
+<span class="kn">from</span> <span class="nn">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb</span> <span class="kn">import</span> <span class="n">MirrorRBConfiguration</span>
+<span class="kn">from</span> <span class="nn">iqm.benchmarks.quantum_volume.quantum_volume</span> <span class="kn">import</span> <span class="n">QuantumVolumeConfiguration</span>
+
+<span class="n">EXAMPLE_IRB</span> <span class="o">=</span> <span class="n">InterleavedRBConfiguration</span><span class="p">(</span>
+    <span class="n">qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]],</span>
+    <span class="n">sequence_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)],</span>
+    <span class="n">num_circuit_samples</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">parallel_execution</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">interleaved_gate</span> <span class="o">=</span> <span class="s2">&quot;iSwapGate&quot;</span><span class="p">,</span>
+    <span class="n">interleaved_gate_params</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">simultaneous_fit</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="s2">&quot;offset&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">EXAMPLE_MRB</span> <span class="o">=</span> <span class="n">MirrorRBConfiguration</span><span class="p">(</span>
+    <span class="n">qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">]],</span>
+    <span class="n">depths_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">2</span><span class="o">**</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]],</span>
+    <span class="n">num_circuit_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">num_pauli_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">two_qubit_gate_ensemble</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;CZGate&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;iSwapGate&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span> <span class="c1"># {GATE: PROBABILITY}</span>
+    <span class="n">density_2q_gates</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">EXAMPLE_QV</span> <span class="o">=</span> <span class="n">QuantumVolumeConfiguration</span><span class="p">(</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">num_sigmas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">choose_qubits_routine</span><span class="o">=</span><span class="s2">&quot;custom&quot;</span><span class="p">,</span>
+    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span>
+    <span class="n">qiskit_optim_level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">optimize_sqg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">routing_method</span><span class="o">=</span><span class="s2">&quot;sabre&quot;</span><span class="p">,</span>
+    <span class="n">physical_layout</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">60_000</span><span class="p">,</span>
+    <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to execute them, you must specify a backend.</p>
+<ul class="simple">
+<li><p>for IQM Resonance this can be given as a simple string, such as “garnet” (together with your IQM Token environment variable)</p></li>
+<li><p>and for an on-prem device and IQM Resonance this can be defined using the URL of the quantum computer.</p></li>
+</ul>
+<p>Also, you need to reference the benchmark configuration you want to run:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="c1"># import os</span>
+<span class="c1"># os.environ[&quot;IQM_TOKEN&quot;] = &quot;your_token&quot;</span>
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="s2">&quot;https://example-station.qc.iqm.fi/cocos/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
+
+<span class="n">EXAMPLE_EXPERIMENT</span> <span class="o">=</span> <span class="n">MirrorRandomizedBenchmarking</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">EXAMPLE_MRB</span><span class="p">)</span>
+<span class="n">EXAMPLE_EXPERIMENT</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Full examples on how to run benchmarks and analyze the results can be found in the <code class="docutils literal notranslate"><span class="pre">examples</span></code> folder.</p>
+</section>
+<section id="scheduled-benchmarks-using-a-ci-cd-pipeline">
+<h3>Scheduled benchmarks using a CI/CD Pipeline<a class="headerlink" href="#scheduled-benchmarks-using-a-ci-cd-pipeline" title="Link to this heading">#</a></h3>
+<p>This repository can be setup to perform a scheduled (weekly, daily…) benchmark from a Gitlab/Github pipeline, executed on a real device. An example configuration is given in the <code class="docutils literal notranslate"><span class="pre">scheduled_experiments</span></code> folder.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">IQM Benchmarks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="API.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-latest-release">Installation <em>(latest release)</em></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-mode-latest-changes-recommended">Development mode <em>(latest changes: recommended)</em></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#characterize-physical-hardware">Characterize Physical Hardware</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-jupyter-notebook-or-python-script">Using a Jupyter notebook or Python script</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scheduled-benchmarks-using-a-ci-cd-pipeline">Scheduled benchmarks using a CI/CD Pipeline</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By IQM Benchmarks developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, IQM.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2024-12-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
