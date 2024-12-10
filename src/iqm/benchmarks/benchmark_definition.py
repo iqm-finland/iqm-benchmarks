@@ -29,9 +29,21 @@ import matplotlib.pyplot as plt
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.circuit_containers import Circuits
 from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
+
+
+# THINGS TO FIGURE OUT! What is the generic case here?
+# For example, thinking about Parallel 2QBRB,
+# is the first key an identifier for the circuit and the second one an identifier for the qubits?
+# Since we are not using python 3.12+, we need to use TypeAlias instead of the type declaration
+
+# CircuitIdentifier: TypeAlias = str
+# QuantumRegisterIdentifier: TypeAlias = str
+# BenchmarkCircuit: TypeAlias = Dict[CircuitIdentifier, Dict[QuantumRegisterIdentifier, IQMCircuit]]
+
 
 
 @dataclass
@@ -149,10 +161,11 @@ def merge_datasets_dac(datasets: List[xr.Dataset]) -> xr.Dataset:
         if i == (len(datasets) - 1):
             datasets_new.append(datasets[i])
         else:
-            datasets_new.append(xr.merge(datasets[i : i + 2]))
+            datasets_new.append(xr.merge(datasets[i: i + 2]))
     return merge_datasets_dac(datasets_new)
 
 
+# TODO: Change the way of storage to the one developed in Pulla adapter
 @timeit
 def add_counts_to_dataset(counts: List[Dict[str, int]], identifier: str, dataset: xr.Dataset):
     """Adds the counts from a cortex job result to the given dataset.
@@ -213,12 +226,14 @@ class Benchmark(ABC):
     options: dict[str, Any] | None = None
     # name: str = "unnamed_benchmark"
 
-    def __init__(self, backend: Union[str, IQMBackendBase], configuration: "BenchmarkConfigurationBase", **kwargs):
+    def __init__(self, backend: Union[str, IQMBackendBase], configuration: BenchmarkConfigurationBase, **kwargs):
 
         # Ported from BenchmarkBase   # CHECK
         self.configuration = configuration
         self.serializable_configuration = deepcopy(self.configuration)
         self.serializable_configuration.benchmark = self.name
+
+        self.circuits = Circuits()
 
         if isinstance(backend, str):
             self.backend = get_iqm_backend(backend)
@@ -233,13 +248,20 @@ class Benchmark(ABC):
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
 
-        self.untranspiled_circuits: Dict[str, Dict[int, list]] = {}
-        self.transpiled_circuits: Dict[str, Dict[int, list]] = {}
-
         # From exa_support MR
         self.options = copy.copy(self.default_options) if self.default_options else {}
         self.options.update(kwargs)
         self.runs: list[BenchmarkRunResult] = []
+
+    # @property
+    # @abstractmethod
+    # def untranspiled_circuits(self) -> BenchmarkCircuit:
+    #     pass
+    #
+    # @property
+    # @abstractmethod
+    # def transpiled_circuits(self) -> BenchmarkCircuit:
+    #     pass
 
     @classmethod
     @abstractmethod
