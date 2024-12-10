@@ -16,7 +16,7 @@ class TestGST:
             shots=10,
             rank=4,
             bootstrap_samples=2,
-            max_iterations=[1, 1]
+            max_iterations=[1, 1],
         )
         benchmark = CompressiveGST(backend, minimal_1Q_config)
         benchmark.run()
@@ -33,7 +33,7 @@ class TestGST:
             shots=10,
             rank=1,
             bootstrap_samples=0,
-            max_iterations=[1, 1]
+            max_iterations=[1, 1],
         )
         benchmark = CompressiveGST(backend, minimal_2Q_GST)
         benchmark.run()

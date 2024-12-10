@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.circuit_containers import Circuits
 from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
@@ -212,12 +213,14 @@ class Benchmark(ABC):
     options: dict[str, Any] | None = None
     # name: str = "unnamed_benchmark"
 
-    def __init__(self, backend: Union[str, IQMBackendBase], configuration: "BenchmarkConfigurationBase", **kwargs):
+    def __init__(self, backend: Union[str, IQMBackendBase], configuration: BenchmarkConfigurationBase, **kwargs):
 
         # Ported from BenchmarkBase   # CHECK
         self.configuration = configuration
         self.serializable_configuration = deepcopy(self.configuration)
         self.serializable_configuration.benchmark = self.name
+
+        self.circuits = Circuits()
 
         if isinstance(backend, str):
             self.backend = get_iqm_backend(backend)
@@ -231,9 +234,6 @@ class Benchmark(ABC):
 
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
-
-        self.untranspiled_circuits: Dict[str, Dict[int, list]] = {}
-        self.transpiled_circuits: Dict[str, Dict[int, list]] = {}
 
         # From exa_support MR
         self.options = copy.copy(self.default_options) if self.default_options else {}
