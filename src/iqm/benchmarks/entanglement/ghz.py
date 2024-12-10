@@ -439,8 +439,8 @@ def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List
             idx_1 = key.index(".QB")
             idx_2 = key.index("__QB")
             idx_3 = key.index(".fidelity")
-            qb1 = int(key[idx_1 + 3: idx_2]) - 1
-            qb2 = int(key[idx_2 + 4: idx_3]) - 1
+            qb1 = int(key[idx_1 + 3 : idx_2]) - 1
+            qb2 = int(key[idx_2 + 4 : idx_3]) - 1
             if all([qb1 in qubit_layout, qb2 in qubit_layout]):
                 list_couplings.append([qubit_mapping[qb1], qubit_mapping[qb2]])
                 list_fids.append(float(res["metrics"][key]["value"]))
@@ -700,9 +700,7 @@ class GHZBenchmark(Benchmark):
                 final_ghz = ghz_native_transpiled[index_min_depth]
                 circuit_group.add_circuit([ghz_log[index_min_depth]])
         self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
-        return CircuitGroup(
-            name=f"{qubit_layout}_native_ghz",
-            circuits=[final_ghz[0]])
+        return CircuitGroup(name=f"{qubit_layout}_native_ghz", circuits=[final_ghz[0]])
 
     def generate_coherence_meas_circuits(self, qubit_layout: List[int], qubit_count: int) -> List[QuantumCircuit]:
         """
@@ -767,14 +765,16 @@ class GHZBenchmark(Benchmark):
         # Generate the list of circuits
         idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
-        
         qcvv_logger.info(f"Now generating a {len(qubit_layout)}-qubit GHZ state on qubits {qubit_layout}")
         transpiled_ghz_group: CircuitGroup = self.generate_native_ghz(
-            qubit_layout, qubit_count, self.state_generation_routine)
+            qubit_layout, qubit_count, self.state_generation_routine
+        )
 
         match self.fidelity_routine:
             case "randomized_measurements":
-                all_circuits_list, _ = append_rms(transpiled_ghz_group.circuits[0], cast(int, self.num_RMs), self.backend)
+                all_circuits_list, _ = append_rms(
+                    transpiled_ghz_group.circuits[0], cast(int, self.num_RMs), self.backend
+                )
                 transpiled_ghz_group.circuits = all_circuits_list
             case "coherences":
                 all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)

@@ -150,7 +150,7 @@ def merge_datasets_dac(datasets: List[xr.Dataset]) -> xr.Dataset:
         if i == (len(datasets) - 1):
             datasets_new.append(datasets[i])
         else:
-            datasets_new.append(xr.merge(datasets[i: i + 2]))
+            datasets_new.append(xr.merge(datasets[i : i + 2]))
     return merge_datasets_dac(datasets_new)
 
 
