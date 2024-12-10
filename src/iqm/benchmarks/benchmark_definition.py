@@ -135,6 +135,7 @@ def default_analysis_function(result: BenchmarkAnalysisResult) -> BenchmarkAnaly
 def merge_datasets_dac(datasets: List[xr.Dataset]) -> xr.Dataset:
     """
     Merges a list of datasets recursively to minimize dataset sizes during merge
+
     Args:
         datasets: List[xr.Dateset]
             A list of xarray datasets

@@ -75,6 +75,11 @@ test = [
     "pytest-pylint == 0.21.0",
 ]
 
+docs = [
+    "sphinx == 7.2.6",
+    "sphinx-book-theme == 1.1.2",
+    "myst-parser >= 4.0.0, < 5",
+]
 
 [tool.black]
 line-length = 120
