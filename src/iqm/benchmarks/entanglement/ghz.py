@@ -654,8 +654,6 @@ class GHZBenchmark(Benchmark):
         if routine == "naive":
             ghz: QuantumCircuit = generate_ghz_linear(qubit_count)
             circuit_group.add_circuit(ghz)
-            # self.untranspiled_circuits.circuit_group.append([ghz])
-            # self.untranspiled_circuits[idx].update({qubit_count: ghz})
             ghz_native_transpiled, _ = perform_backend_transpilation(
                 [ghz],
                 self.backend,
@@ -673,7 +671,6 @@ class GHZBenchmark(Benchmark):
                 graph = get_edges(self.backend.coupling_map, qubit_layout)
             ghz, _ = generate_ghz_spanning_tree(graph, qubit_layout, qubit_count)
             circuit_group.add_circuit(ghz)
-            # self.untranspiled_circuits[idx].update({qubit_count: ghz})
             ghz_native_transpiled, _ = perform_backend_transpilation(
                 [ghz],
                 self.backend,
@@ -698,12 +695,10 @@ class GHZBenchmark(Benchmark):
                 index_min_2q = np.argmin([c.count_ops()["cz"] for c in ghz_native_transpiled])
                 final_ghz = ghz_native_transpiled[index_min_2q]
                 circuit_group.add_circuit(ghz_log[index_min_2q])
-                # self.untranspiled_circuits[idx].update({qubit_count: ghz_log[index_min_2q]})
             else:
                 index_min_depth = np.argmin([c.depth() for c in ghz_native_transpiled])
                 final_ghz = ghz_native_transpiled[index_min_depth]
                 circuit_group.add_circuit([ghz_log[index_min_depth]])
-                # self.untranspiled_circuits[idx].update({qubit_count: ghz_log[index_min_depth]})
         self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
         return CircuitGroup(
             name=f"{qubit_layout}_native_ghz",
@@ -752,7 +747,6 @@ class GHZBenchmark(Benchmark):
         )
         circuit_group = CircuitGroup(name=idx, circuits=qc_list)
         self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
-        # self.untranspiled_circuits[idx].update({qubit_count: qc_list})
         return qc_list_transpiled
 
     def generate_readout_circuit(self, qubit_layout: List[int], qubit_count: int) -> CircuitGroup:
@@ -772,8 +766,6 @@ class GHZBenchmark(Benchmark):
         """
         # Generate the list of circuits
         idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        # self.untranspiled_circuits[idx] = {}
-        # self.transpiled_circuits[idx] = {}
 
         
         qcvv_logger.info(f"Now generating a {len(qubit_layout)}-qubit GHZ state on qubits {qubit_layout}")
@@ -787,19 +779,6 @@ class GHZBenchmark(Benchmark):
             case "coherences":
                 all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)
                 transpiled_ghz_group.circuits = all_circuits_list
-        # else:
-        #     all_circuits_list = transpiled_ghz_group
-
-        # self.transpiled_circuits.circuits = all_circuits_list
-        # self.transpiled_circuits = BenchmarkCircuit(
-        #     circuit_identifier=idx
-        # ):vsplit
-
-        # self.untranspiled_circuits = BenchmarkCircuit(
-        #     circuit_identifier=idx
-        # )
-
-        # self.transpiled_circuits.update({idx: all_circuits_list})
         self.circuits['transpiled_circuits'].circuit_groups.append(transpiled_ghz_group)
         return transpiled_ghz_group
 
