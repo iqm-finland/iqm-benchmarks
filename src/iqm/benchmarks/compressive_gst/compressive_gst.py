@@ -369,6 +369,7 @@ def create_predefined_gate_set(gate_set, num_qubits) -> Tuple[List[QuantumCircui
 
     The circuits are assigned to the specified qubit_layouts on the backend only during transipilation, so the qubit labels
     at this stage may not represent the actual qubit labels on the backend.
+
     Args:
         gate_set: str
             The name of the gate set
