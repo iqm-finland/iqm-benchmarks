@@ -25,6 +25,7 @@ from .benchmark_definition import (
     BenchmarkObservationIdentifier,
     BenchmarkRunResult,
 )
+from .circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from .entanglement.ghz import GHZBenchmark, GHZConfiguration
 from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
