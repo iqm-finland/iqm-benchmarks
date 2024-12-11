@@ -53,7 +53,7 @@ class BenchmarkExperiment:
         """
         self.timestamp = strftime("%Y%m%d-%H%M%S")
 
-        self.device_id = device_id if device_id is not None else backend
+        self.device_id = device_id if device_id is not None else backend.name
 
         if isinstance(backend, str):
             self.backend = get_iqm_backend(backend)
