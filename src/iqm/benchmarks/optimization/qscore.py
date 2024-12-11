@@ -619,7 +619,7 @@ class QScoreBenchmark(BenchmarkBase):
             if graph.number_of_edges() == 0:
                 cut_sizes.append(0)
                 seed += 1
-                qcvv_logger.info(f"Graph {i+1}/{self.num_instances} had no edges: cut size = 0.")
+                qcvv_logger.debug(f"Graph {i+1}/{self.num_instances} had no edges: cut size = 0.")
                 continue
 
             # Choose the qubit layout
@@ -634,7 +634,7 @@ class QScoreBenchmark(BenchmarkBase):
             # Solve the maximum cut size with QAOA
             cut_sizes.append(self.run_QAOA(graph, qubit_set))
             seed += 1
-            qcvv_logger.info(f"Solved the MaxCut on graph {i+1}/{self.num_instances}.")
+            qcvv_logger.debug(f"Solved the MaxCut on graph {i+1}/{self.num_instances}.")
 
         average_cut_size = np.mean(cut_sizes) - num_nodes * (num_nodes - 1) / 8
         average_best_cut_size = 0.178 * pow(num_nodes, 3 / 2)
@@ -677,7 +677,7 @@ class QScoreBenchmark(BenchmarkBase):
         list_of_cut_sizes = []
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
-            qcvv_logger.info(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
+            qcvv_logger.debug(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
             is_successful, approximation_ratio, cut_sizes = self.execute_single_benchmark(num_nodes)[0:3]
             approximation_ratios.append(approximation_ratio)
 
