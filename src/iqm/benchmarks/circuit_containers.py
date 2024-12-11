@@ -16,13 +16,10 @@
 This module contains classes to easily interact with quantum circuits
 """
 
-import copy
 from dataclasses import dataclass, field
 from typing import List, Optional, TypeAlias
-import warnings
 
 from qiskit.circuit import Qubit
-from qiskit.circuit.quantumregister import QuantumRegister
 
 from iqm.qiskit_iqm.iqm_circuit import IQMCircuit
 
@@ -52,6 +49,10 @@ class CircuitGroup:
             qubit_set.add(*circuit.qubits)
         return qubit_set
 
+    def __setitem__(self, key: str, value: IQMCircuit) -> None:
+        value.name = key
+        return self.add_circuit(value)
+
     def add_circuit(self, circuit: IQMCircuit):
         self.circuits.append(circuit)
 
@@ -77,6 +78,14 @@ class BenchmarkCircuit:
         benchmark_circuit_names = filter(lambda x: x.name == name, self.circuit_groups)
         next_value = next(benchmark_circuit_names, None)
         return next_value
+
+    @property
+    def groups(self) -> List[CircuitGroup]:
+        return self.circuit_groups
+
+    @property
+    def group_names(self) -> List[str]:
+        return list(map(lambda x: x.name, self.circuit_groups))
 
     @property
     def qubit_indices(self) -> set[int]:
@@ -107,6 +116,10 @@ class BenchmarkCircuit:
             layout_set.add(*circuit.qubit_layouts)
         return layout_set
 
+    def __setitem__(self, key: str, value: CircuitGroup) -> None:
+        value.name = key
+        return self.circuit_groups.append(value)
+
     def __getitem__(self, key: str) -> List[CircuitGroup]:
         return self.get_circuit_group_by_name(key)
 
@@ -114,6 +127,10 @@ class BenchmarkCircuit:
 @dataclass
 class Circuits:
     benchmark_circuits: List[BenchmarkCircuit] = field(default_factory=list)
+
+    def __setitem__(self, key: str, value: BenchmarkCircuit) -> None:
+        value.name = key
+        return self.benchmark_circuits.append(value)
 
     def __getitem__(self, key: str) -> List[BenchmarkCircuit]:
         return self.get_benchmark_circuits_by_name(key)
