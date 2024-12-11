@@ -17,8 +17,9 @@ Q-score benchmark
 """
 
 import itertools
+import logging
 from time import strftime
-from typing import Callable, Dict, List, Optional, Tuple, Type
+from typing import Callable, Dict, List, Optional, Tuple, Type, Literal
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -209,6 +210,7 @@ class QScoreBenchmark(BenchmarkBase):
 
             else:
                 coupling_map = self.backend.coupling_map.reduce(qubit_set)
+                qcvv_logger.setLevel(logging.WARNING)
                 transpiled_qc_list, _ = perform_backend_transpilation(
                     [qc],
                     backend=self.backend,
@@ -230,6 +232,7 @@ class QScoreBenchmark(BenchmarkBase):
                 )
 
                 counts = retrieve_all_counts(jobs)[0][0]
+                qcvv_logger.setLevel(logging.INFO)
 
             return self.compute_expectation_value(counts, graph)
 
@@ -595,7 +598,7 @@ class QScoreBenchmark(BenchmarkBase):
 
         for i in range(self.num_instances):
             graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
-            print(f"graph: {graph}")
+            qcvv_logger.debug(f"graph: {graph}")
             self.graph_physical = graph.copy()
             self.virtual_nodes = []
             if self.use_virtual_node:
@@ -626,7 +629,7 @@ class QScoreBenchmark(BenchmarkBase):
             qubit_set = []
             if self.choose_qubits_routine.lower() == "naive":
                 qubit_set = self.choose_qubits_naive(num_nodes)
-            elif self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic":
+            elif self.choose_qubits_routine.lower() == "custom":
                 qubit_set = self.choose_qubits_custom(num_nodes)
             else:
                 raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
@@ -711,7 +714,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     max_num_nodes: Optional[int] = None
     use_virtual_node: bool = True
     use_classically_optimized_angles: bool = True
-    choose_qubits_routine: str = "naive"
+    choose_qubits_routine: Literal["naive", "custom"] = "naive"
     min_num_qubits: int = 2  # If choose_qubits_routine is "naive"
     custom_qubits_array: Optional[list[list[int]]] = None
     qiskit_optim_level: int = 3
