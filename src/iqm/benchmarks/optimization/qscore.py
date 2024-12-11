@@ -19,7 +19,7 @@ Q-score benchmark
 import itertools
 import logging
 from time import strftime
-from typing import Callable, Dict, List, Optional, Tuple, Type, Literal
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Type
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
