@@ -256,7 +256,6 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             ideal_simulator = Aer.get_backend("statevector_simulator")
             ideal_probabilities = []
             idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-            transpiled_circuits = run.dataset.attrs["transpiled_circuits"]
             all_circuits = run.dataset.attrs["transpiled_circuits"][f"{idx}_native_ghz"].circuits
             for qc in all_circuits:
                 qc_copy = qc.copy()
@@ -699,7 +698,7 @@ class GHZBenchmark(Benchmark):
                 index_min_depth = np.argmin([c.depth() for c in ghz_native_transpiled])
                 final_ghz = ghz_native_transpiled[index_min_depth]
                 circuit_group.add_circuit([ghz_log[index_min_depth]])
-        self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
+        self.circuits["untranspiled_circuits"].circuit_groups.append(circuit_group)
         return CircuitGroup(name=f"{qubit_layout}_native_ghz", circuits=[final_ghz[0]])
 
     def generate_coherence_meas_circuits(self, qubit_layout: List[int], qubit_count: int) -> List[QuantumCircuit]:
@@ -718,7 +717,7 @@ class GHZBenchmark(Benchmark):
         """
 
         idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        qc_list = self.circuits['untranspiled_circuits'][f"{qubit_layout}_native_ghz"].circuits
+        qc_list = self.circuits["untranspiled_circuits"][f"{qubit_layout}_native_ghz"].circuits
 
         qc = qc_list[0].copy()
         qc.remove_final_measurements()
@@ -744,7 +743,7 @@ class GHZBenchmark(Benchmark):
             optimize_sqg=self.optimize_sqg,
         )
         circuit_group = CircuitGroup(name=idx, circuits=qc_list)
-        self.circuits['untranspiled_circuits'].circuit_groups.append(circuit_group)
+        self.circuits["untranspiled_circuits"].circuit_groups.append(circuit_group)
         return qc_list_transpiled
 
     def generate_readout_circuit(self, qubit_layout: List[int], qubit_count: int) -> CircuitGroup:
@@ -763,7 +762,6 @@ class GHZBenchmark(Benchmark):
                 A list of transpiled quantum circuits to be measured
         """
         # Generate the list of circuits
-        idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
         qcvv_logger.info(f"Now generating a {len(qubit_layout)}-qubit GHZ state on qubits {qubit_layout}")
         transpiled_ghz_group: CircuitGroup = self.generate_native_ghz(
@@ -779,7 +777,7 @@ class GHZBenchmark(Benchmark):
             case "coherences":
                 all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)
                 transpiled_ghz_group.circuits = all_circuits_list
-        self.circuits['transpiled_circuits'].circuit_groups.append(transpiled_ghz_group)
+        self.circuits["transpiled_circuits"].circuit_groups.append(transpiled_ghz_group)
         return transpiled_ghz_group
 
     def add_configuration_to_dataset(self, dataset: xr.Dataset):  # CHECK
@@ -798,8 +796,8 @@ class GHZBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
-        dataset.attrs[f"untranspiled_circuits"] = self.circuits['untranspiled_circuits']
-        dataset.attrs[f"transpiled_circuits"] = self.circuits['transpiled_circuits']
+        dataset.attrs[f"untranspiled_circuits"] = self.circuits["untranspiled_circuits"]
+        dataset.attrs[f"transpiled_circuits"] = self.circuits["transpiled_circuits"]
 
     def execute(self, backend) -> xr.Dataset:
         """
@@ -840,7 +838,7 @@ class GHZBenchmark(Benchmark):
             dataset, _ = add_counts_to_dataset(counts, idx, dataset)
             if self.rem:
                 qcvv_logger.info(f"Applying readout error mitigation")
-                circuit_group = self.circuits['transpiled_circuits'][f"{idx}_native_ghz"]
+                circuit_group = self.circuits["transpiled_circuits"][f"{idx}_native_ghz"]
                 rem_results, _ = apply_readout_error_mitigation(backend, circuit_group.circuits, counts, self.mit_shots)
                 rem_results_dist = [counts_mit.nearest_probability_distribution() for counts_mit in rem_results]
                 dataset, _ = add_counts_to_dataset(rem_results_dist, f"{idx}_rem", dataset)

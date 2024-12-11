@@ -236,6 +236,9 @@ class Benchmark(ABC):
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
 
+        self.transpiled_circuits = {}
+        self.untranspiled_circuits = {}
+
         # From exa_support MR
         self.options = copy.copy(self.default_options) if self.default_options else {}
         self.options.update(kwargs)
