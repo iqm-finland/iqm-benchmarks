@@ -306,7 +306,7 @@ def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         fig_name, fig = plot_times(dataset, observations)
         plots[fig_name] = fig
     else:
-        plots["no_backend_elapsed"] = "There is no elapsed-time data associated to jobs (e.g., execution on simulator)"
+        qcvv_logger.info("There is no elapsed-time data associated to jobs (e.g., execution on simulator)")
 
     # Sort the final dataset
     dataset.attrs = dict(sorted(dataset.attrs.items()))
