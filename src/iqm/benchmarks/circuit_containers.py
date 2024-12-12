@@ -46,7 +46,8 @@ class CircuitGroup:
     def qubits(self) -> set[int]:
         qubit_set = set()
         for circuit in self.circuits:
-            qubit_set.add(*circuit.qubits)
+            for qubit in circuit.qubits:
+                qubit_set.add(qubit)
         return qubit_set
 
     def __setitem__(self, key: str, value: IQMCircuit) -> None:
@@ -98,22 +99,22 @@ class BenchmarkCircuit:
     @property
     def qubits(self) -> set[Qubit]:
         qubit_set = set()
-        for circuit in self.circuit_groups:
-            qubit_set.add(*circuit.qubits)
+        for qubit in map(lambda x: x.qubits, self.circuit_groups):
+            qubit_set = qubit_set.union(qubit)
         return qubit_set
 
     @property
     def qubit_layouts_by_index(self) -> set[QubitLayoutIndices]:
         layout_set = set()
-        for circuit in self.circuit_groups:
-            layout_set.add(*circuit.qubit_layouts_by_index)
+        for layout in map(lambda x: x.qubit_layouts_by_index, self.circuit_groups):
+            layout_set.add(layout)
         return layout_set
 
     @property
     def qubit_layouts(self) -> set[QubitLayout]:
         layout_set = set()
-        for circuit in self.circuit_groups:
-            layout_set.add(*circuit.qubit_layouts)
+        for layout in map(lambda x: x.qubit_layouts, self.circuit_groups):
+            layout_set.add(layout)
         return layout_set
 
     def __setitem__(self, key: str, value: CircuitGroup) -> None:

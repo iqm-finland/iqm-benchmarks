@@ -17,9 +17,9 @@ def test_circuit_group():
     assert circuit_group.circuits == [qc, qc]
     assert circuit_group.qubits == set([Qubit(QuantumRegister(1, 'test_register'), 0)])
     assert circuit_group.qubit_layouts == tuple(
-        [[Qubit(QuantumRegister(1, 'test_register'), 0)], [Qubit(QuantumRegister(1, 'test_register'), 0)]]
+        [(Qubit(QuantumRegister(1, 'test_register'), 0),), (Qubit(QuantumRegister(1, 'test_register'), 0),)]
     )
-    assert circuit_group.qubit_layouts_by_index == ([0], [0])
+    assert circuit_group.qubit_layouts_by_index == ((0,), (0,))
     assert circuit_group.circuit_names == ['test_circuit', 'test_circuit']
 
 
@@ -37,8 +37,8 @@ def test_benchmark_circuit():
     assert benchmark_circuit.circuit_groups == [circuit_group]
     assert benchmark_circuit['circuit_group'] == circuit_group
     assert benchmark_circuit.qubit_indices == set([0])
-    assert benchmark_circuit.qubit_layouts_by_index == {(0,)}
-    assert benchmark_circuit.qubit_layouts == {(Qubit(QuantumRegister(1, name='test_register'), 0),)}
+    assert benchmark_circuit.qubit_layouts_by_index == {((0,),)}
+    assert benchmark_circuit.qubit_layouts == {((Qubit(QuantumRegister(1, name='test_register'), 0),),)}
 
 
 def test_circuits():

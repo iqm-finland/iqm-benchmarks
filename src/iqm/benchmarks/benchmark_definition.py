@@ -82,6 +82,7 @@ class BenchmarkRunResult:
     """
 
     dataset: xr.Dataset
+    circuits: Circuits
 
 
 @dataclass
@@ -281,7 +282,7 @@ class Benchmark(ABC):
             self.backend.run, calibration_set_id=calibration_set_id
         )  # type: ignore
         dataset = self.execute(backend_for_execute)
-        run = BenchmarkRunResult(dataset)
+        run = BenchmarkRunResult(dataset, self.circuits)
         self.runs.append(run)
         return run
 
@@ -302,6 +303,6 @@ class Benchmark(ABC):
             the ``analysis_function`` field.
         """
         run = self.runs[run_index]
-        result = BenchmarkAnalysisResult.from_run_result(run)
-        updated_result = self.analysis_function(result)
+        # result = BenchmarkAnalysisResult.from_run_result(run)
+        updated_result = self.analysis_function(run)
         return updated_result

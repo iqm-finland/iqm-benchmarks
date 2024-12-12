@@ -24,6 +24,7 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
+from iqm.benchmarks.circuit_containers import CircuitGroup, Circuits, BenchmarkCircuit
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
     Benchmark,
@@ -310,9 +311,11 @@ class InterleavedRandomizedBenchmarking(Benchmark):
         time_circuit_generation: Dict[str, float] = {}
 
         # Initialize the variable to contain the circuits for each layout
-        self.untranspiled_circuits: Dict[str, Dict[int, List[QuantumCircuit]]] = {}
-        self.transpiled_circuits: Dict[str, Dict[int, List[QuantumCircuit]]] = {}
+        # self.untranspiled_circuits: Dict[str, Dict[int, List[QuantumCircuit]]] = {}
+        # self.transpiled_circuits: Dict[str, Dict[int, List[QuantumCircuit]]] = {}
 
+        self.untranspiled_circuits = BenchmarkCircuit("untranspiled_circuits")
+        self.transpiled_circuits = BenchmarkCircuit("transpiled_circuits")
         # Validate and get interleaved gate as a QC
         interleaved_gate_qc = validate_irb_gate(
             self.interleaved_gate, backend, gate_params=self.interleaved_gate_params
@@ -407,18 +410,42 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 )
                 qcvv_logger.info(f"Both jobs for sequence length {seq_length} submitted successfully!")
 
-            self.untranspiled_circuits[str(self.qubits_array)] = {
-                m: parallel_untranspiled_rb_circuits[m] for m in self.sequence_lengths
-            }
-            self.transpiled_circuits[str(self.qubits_array)] = {
-                m: parallel_transpiled_rb_circuits[m] for m in self.sequence_lengths
-            }
-            self.untranspiled_circuits[str(self.qubits_array) + "_interleaved"] = {
-                m: parallel_untranspiled_interleaved_rb_circuits[m] for m in self.sequence_lengths
-            }
-            self.transpiled_circuits[str(self.qubits_array) + "_interleaved"] = {
-                m: parallel_transpiled_interleaved_rb_circuits[m] for m in self.sequence_lengths
-            }
+            self.untranspiled_circuits.circuit_groups.append(
+                CircuitGroup(
+                    name=str(self.qubits_array),
+                    circuits=[parallel_untranspiled_rb_circuits[m] for m in self.sequence_lengths]
+                )
+            )
+            self.transpiled_circuits.circuit_groups.append(
+                CircuitGroup(
+                    name=str(self.qubits_array),
+                    circuits=[parallel_transpiled_rb_circuits[m] for m in self.sequence_lengths]
+                )
+            )
+            # self.untranspiled_circuits[str(self.qubits_array)] = {
+            #     m: parallel_untranspiled_rb_circuits[m] for m in self.sequence_lengths
+            # }
+            # self.transpiled_circuits[str(self.qubits_array)] = {
+            #     m: parallel_transpiled_rb_circuits[m] for m in self.sequence_lengths
+            # }
+            self.untranspiled_circuits.circuit_groups.append(
+                CircuitGroup(
+                    name=f"{str(self.qubits_array)}_interleaved",
+                    circuits=[parallel_untranspiled_interleaved_rb_circuits[m] for m in self.sequence_lengths]
+                )
+            )
+            self.transpiled_circuits.circuit_groups.append(
+                CircuitGroup(
+                    name=f"{str(self.qubits_array)}_interleaved",
+                    circuits=[parallel_transpiled_interleaved_rb_circuits[m] for m in self.sequence_lengths]
+                )
+            )
+            # self.untranspiled_circuits[str(self.qubits_array) + "_interleaved"] = {
+            #     m: parallel_untranspiled_interleaved_rb_circuits[m] for m in self.sequence_lengths
+            # }
+            # self.transpiled_circuits[str(self.qubits_array) + "_interleaved"] = {
+            #     m: parallel_transpiled_interleaved_rb_circuits[m] for m in self.sequence_lengths
+            # }
 
             qubit_idx = {str(self.qubits_array): "parallel_all"}
             dataset.attrs["parallel_all"] = {"qubits": self.qubits_array}
@@ -502,12 +529,38 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                     f"All jobs for qubits {qubits} and sequence lengths {self.sequence_lengths} submitted successfully!"
                 )
 
-                self.untranspiled_circuits[str(qubits)] = rb_untranspiled_circuits[str(qubits)]
-                self.transpiled_circuits[str(qubits)] = rb_transpiled_circuits[str(qubits)]
-                self.untranspiled_circuits[str(qubits) + "_interleaved"] = rb_untranspiled_interleaved_circuits[
-                    str(qubits)
-                ]
-                self.transpiled_circuits[str(qubits) + "_interleaved"] = rb_transpiled_interleaved_circuits[str(qubits)]
+                self.untranspiled_circuits.circuit_groups.append(
+                    CircuitGroup(
+                        name=str(qubits),
+                        circuits=[rb_untranspiled_circuits[str(qubits)]]
+                    )
+                )
+                self.transpiled_circuits.circuit_groups.append(
+                    CircuitGroup(
+                        name=str(qubits),
+                        circuits=[rb_transpiled_circuits[str(qubits)]]
+                    )
+                )
+
+                self.untranspiled_circuits.circuit_groups.append(
+                    CircuitGroup(
+                        name=f"{str(qubits)}_interleaved",
+                        circuits=[rb_untranspiled_interleaved_circuits[str(qubits)]]
+                    )
+                )
+                self.transpiled_circuits.circuit_groups.append(
+                    CircuitGroup(
+                        name=f"{str(qubits)}_interleaved",
+                        # name=str(qubits),
+                        circuits=[rb_transpiled_interleaved_circuits[str(qubits)]]
+                    )
+                )
+                # self.untranspiled_circuits[str(qubits)] = rb_untranspiled_circuits[str(qubits)]
+                # self.transpiled_circuits[str(qubits)] = rb_transpiled_circuits[str(qubits)]
+                # self.untranspiled_circuits[str(qubits) + "_interleaved"] = rb_untranspiled_interleaved_circuits[
+                #     str(qubits)
+                # ]
+                # self.transpiled_circuits[str(qubits) + "_interleaved"] = rb_transpiled_interleaved_circuits[str(qubits)]
 
                 dataset.attrs[qubits_idx] = {"qubits": qubits}
 
@@ -539,9 +592,10 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
                 dataset, _ = add_counts_to_dataset(execution_results, identifier, dataset)
 
-        self.add_all_circuits_to_dataset(dataset)
+        # self.add_all_circuits_to_dataset(dataset)
 
         qcvv_logger.info(f"Interleaved RB experiment concluded !")
+        self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         return dataset
 

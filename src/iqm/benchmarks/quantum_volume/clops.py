@@ -29,6 +29,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit import ParameterVector
 import xarray as xr
 
+from iqm.benchmarks.circuit_containers import Circuits, CircuitGroup, BenchmarkCircuit
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkRunResult
@@ -251,9 +252,10 @@ def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     all_times_retrieve = dataset.attrs["all_times_retrieve"]
 
     transpiled_qc_list = []
-    for _, value in dataset.attrs["transpiled_circuits"].items():
-        for _, transpiled_circuit in value.items():
-            transpiled_qc_list.extend(transpiled_circuit)
+    for group in run.circuits["transpiled_circuits"].circuit_groups:
+        transpiled_qc_list.extend(group.circuits)
+    # for _, value in dataset.attrs["transpiled_circuits"].items():
+    #     for _, transpiled_circuit in value.items():
 
     # CLOPS_V
     clops_v: float = num_circuits * num_updates * num_shots * depth / clops_time
@@ -593,8 +595,8 @@ class CLOPSBenchmark(Benchmark):
             Dict[str, QuantumCircuit]: a dictionary of quantum circuits with keys being str(qubit layout)
         """
         # Generate the list of QV circuits
-        self.untranspiled_circuits = {}
-        self.transpiled_circuits = {}
+        # self.untranspiled_circuits = {}
+        # self.transpiled_circuits = {}
 
         qc_list, self.time_circuit_generate = self.generate_circuit_list()
 
@@ -622,10 +624,22 @@ class CLOPSBenchmark(Benchmark):
             # Sort circuits according to their final measurement mappings
             (sorted_transpiled_qc_list, _), self.time_sort_batches = sort_batches_by_final_layout(transpiled_qc_list)
 
-        self.untranspiled_circuits.update({str(self.qubits): {str(self.qubits): qc_list}})
-        self.transpiled_circuits.update(
-            {str(self.qubits): {str(key): value for key, value in sorted_transpiled_qc_list.items()}}
-        )
+        self.untranspiled_circuits.circuit_groups.append(
+            CircuitGroup(
+                    name=self.qubits,
+                    circuits=qc_list
+                ))
+        for key in sorted_transpiled_qc_list.keys():
+            self.transpiled_circuits.circuit_groups.append(
+                CircuitGroup(
+                        name=f"{self.qubits}_key",
+                        circuits=qc_list
+                    ))
+
+            # {str(self.qubits): {str(self.qubits): qc_list}})
+        # self.transpiled_circuits.update(
+        #     {str(self.qubits): {str(key): value for key, value in sorted_transpiled_qc_list.items()}}
+        # )
         # self.transpiled_circuits[str(self.qubits)].update(sorted_transpiled_qc_list)
 
         return sorted_transpiled_qc_list
@@ -635,6 +649,9 @@ class CLOPSBenchmark(Benchmark):
 
         self.execution_timestamp = strftime("%Y-%m-%d_%H:%M:%S")
 
+        self.circuits = Circuits()
+        self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
+        self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
@@ -691,7 +708,8 @@ class CLOPSBenchmark(Benchmark):
             }
         )
 
-        self.add_all_circuits_to_dataset(dataset)
+        # self.add_all_circuits_to_dataset(dataset)
+        self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         return dataset
 

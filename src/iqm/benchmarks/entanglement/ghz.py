@@ -105,7 +105,7 @@ def append_rms(
 
 
 def fidelity_ghz_randomized_measurements(
-    dataset: xr.Dataset, qubit_layout, ideal_probabilities: List[Dict[str, int]], num_qubits: int
+    dataset: xr.Dataset, qubit_layout, ideal_probabilities: List[Dict[str, int]], num_qubits: int, circuits: Circuits
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """
     Estimates GHZ state fidelity through cross-correlations of RMs.
@@ -127,7 +127,7 @@ def fidelity_ghz_randomized_measurements(
     fid_rm = []
 
     # Loop through RMs and add each contribution
-    num_rms = len(dataset.attrs["transpiled_circuits"][f"{idx}_native_ghz"].circuits)
+    num_rms = len(circuits["transpiled_circuits"][f"{idx}_native_ghz"].circuits)
     for u in range(num_rms):
         # Probability estimates for noisy measurements
         probabilities_sample = {}
@@ -170,7 +170,7 @@ def fidelity_ghz_randomized_measurements(
     return values, uncertainties
 
 
-def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> list[Any]:
+def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circuits: Circuits) -> list[Any]:
     """
     Estimates the GHZ state fidelity based on the multiple quantum coherences method based on [Mooney, 2021]
 
@@ -187,7 +187,8 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int]) -> lis
     num_qubits = len(qubit_layout)
     phases = [np.pi * i / (num_qubits + 1) for i in range(2 * num_qubits + 2)]
     idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-    transpiled_circuits = dataset.attrs["transpiled_circuits"]
+    transpiled_circuits = circuits["transpiled_circuits"]
+    # dataset.attrs["transpiled_circuits"]
     num_shots = dataset.attrs["shots"]
     num_circuits = len(transpiled_circuits[f"{qubit_layout}_native_ghz"].circuits)
 
@@ -256,14 +257,14 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             ideal_simulator = Aer.get_backend("statevector_simulator")
             ideal_probabilities = []
             idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-            all_circuits = run.dataset.attrs["transpiled_circuits"][f"{idx}_native_ghz"].circuits
+            all_circuits = run.circuits["transpiled_circuits"][f"{idx}_native_ghz"].circuits
             for qc in all_circuits:
                 qc_copy = qc.copy()
                 qc_copy.remove_final_measurements()
                 deflated_qc = reduce_to_active_qubits(qc_copy, backend_name)
                 ideal_probabilities.append(dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items())))
             values, uncertainties = fidelity_ghz_randomized_measurements(
-                dataset, qubit_layout, ideal_probabilities, len(qubit_layout)
+                dataset, qubit_layout, ideal_probabilities, len(qubit_layout), run.circuits
             )
             observation_list.extend(
                 [
@@ -277,7 +278,7 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 ]
             )
         else:  # default routine == "coherences":
-            fidelity = fidelity_ghz_coherences(dataset, qubit_layout)
+            fidelity = fidelity_ghz_coherences(dataset, qubit_layout, run.circuits)
             observation_list.extend(
                 [
                     BenchmarkObservation(
@@ -796,8 +797,9 @@ class GHZBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
-        dataset.attrs[f"untranspiled_circuits"] = self.circuits["untranspiled_circuits"]
-        dataset.attrs[f"transpiled_circuits"] = self.circuits["transpiled_circuits"]
+        dataset.attrs["fidelity_routine"] = self.fidelity_routine
+        # dataset.attrs[f"untranspiled_circuits"] = self.circuits["untranspiled_circuits"]
+        # dataset.attrs[f"transpiled_circuits"] = self.circuits["transpiled_circuits"]
 
     def execute(self, backend) -> xr.Dataset:
         """
@@ -844,6 +846,7 @@ class GHZBenchmark(Benchmark):
                 dataset, _ = add_counts_to_dataset(rem_results_dist, f"{idx}_rem", dataset)
 
         self.add_configuration_to_dataset(dataset)
+        # self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
         return dataset
 
 
