@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 1.11
+===========
+* Relaxes dependencies to allow for ranges.
+
 Version 1.10
 ===========
 * Added API docs building and publishing.
