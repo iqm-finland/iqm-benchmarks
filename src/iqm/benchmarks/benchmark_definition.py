@@ -96,6 +96,7 @@ class BenchmarkAnalysisResult:
     """
 
     dataset: xr.Dataset
+    circuits: Optional[Circuits] = field(default=None)
     plots: dict[str, Figure] = field(default_factory=lambda: ({}))
     observations: list[BenchmarkObservation] = field(default_factory=lambda: [])
 
@@ -124,14 +125,14 @@ class BenchmarkAnalysisResult:
         Args:
             run: A run for which analysis result is created.
         """
-        return cls(dataset=run.dataset)
+        return cls(dataset=run.dataset, circuits=Circuits)
 
 
 def default_analysis_function(result: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """
     The default analysis that only pass the result through.
     """
-    return result
+    return BenchmarkAnalysisResult.from_run_result(result)
 
 
 def merge_datasets_dac(datasets: List[xr.Dataset]) -> xr.Dataset:
@@ -210,7 +211,7 @@ class Benchmark(ABC):
     accept ``AnalysisResult`` as its input and return the final result.
     """
 
-    analysis_function: Callable[BenchmarkRunResult, BenchmarkAnalysisResult] = staticmethod(default_analysis_function)
+    analysis_function: Callable[[BenchmarkRunResult], BenchmarkAnalysisResult] = staticmethod(default_analysis_function)
     default_options: dict[str, Any] | None = None
     options: dict[str, Any] | None = None
 
