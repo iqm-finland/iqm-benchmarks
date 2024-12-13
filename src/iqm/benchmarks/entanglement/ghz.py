@@ -365,7 +365,8 @@ def generate_ghz_spanning_tree(
     n_state: int | None = None,
 ) -> Tuple[QuantumCircuit, List[int]]:
     """
-    Generates a GHZ state in log-depth by computing a minimal spanning tree for a given coupling map
+    Generates a GHZ state in log-depth by computing a minimal spanning tree for a given coupling map.
+
     Args:
         graph: networkx.Graph
             A graph of the backend coupling map
@@ -622,8 +623,9 @@ class GHZBenchmark(Benchmark):
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> QuantumCircuit:
         """
-            Generate a circuit preparing a GHZ state,
-            according to a given routine and transpiled to the native gate set and topology
+        Generate a circuit preparing a GHZ state,
+        according to a given routine and transpiled to the native gate set and topology.
+
         Args:
             qubit_layout: List[int]
                 The subset of system-qubits used in the protocol, indexed from 0

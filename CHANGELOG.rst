@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 1.11
+===========
+* Relaxes dependencies to allow for ranges.
+
+Version 1.10
+===========
+* Added API docs building and publishing.
+
 Version 1.9
 ===========
 * Fixed bug (overwriting observations) in Quantum Volume.

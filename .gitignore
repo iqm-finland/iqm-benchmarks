@@ -20,6 +20,8 @@ __pycache__/
 # Build and docs folder/files
 /build/
 /dist/
+/sdist/
+/docs/api/
 version.txt
 
 # OS generated files
