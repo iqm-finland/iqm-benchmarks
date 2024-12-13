@@ -24,6 +24,7 @@ from time import strftime
 from typing import List, Optional, OrderedDict, Union
 
 from iqm.benchmarks.benchmark import BenchmarkBase, BenchmarkConfigurationBase
+from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import get_iqm_backend
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -52,14 +53,13 @@ class BenchmarkExperiment:
         """
         self.timestamp = strftime("%Y%m%d-%H%M%S")
 
-        self.device_id = device_id if device_id is not None else backend
-
         if isinstance(backend, str):
             self.backend = get_iqm_backend(backend)
-
         else:
             assert isinstance(backend, IQMBackendBase)
             self.backend = backend
+
+        self.device_id = device_id if device_id is not None else self.backend.name
 
         benchmarks: OrderedDict[str, BenchmarkBase] = OrderedDict(
             (config.benchmark.name(), config.benchmark(self.backend, config)) for config in benchmark_configurations
@@ -74,7 +74,7 @@ class BenchmarkExperiment:
         """Run the Benchmark experiment, and store the configuration, raw data, results and figures."""
 
         for name, benchmark in self.benchmarks.items():
-            print("\nNow executing " + name)
+            qcvv_logger.info("\nNow executing " + name)
             # Create the directory for results
             results_dir = f"Outputs/{self.device_id}/{self.timestamp}/{name}/"
             Path(results_dir).mkdir(parents=True, exist_ok=True)

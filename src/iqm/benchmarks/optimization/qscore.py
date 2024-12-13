@@ -17,8 +17,9 @@ Q-score benchmark
 """
 
 import itertools
+import logging
 from time import strftime
-from typing import Callable, Dict, List, Optional, Tuple, Type
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Type
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -209,6 +210,7 @@ class QScoreBenchmark(BenchmarkBase):
 
             else:
                 coupling_map = self.backend.coupling_map.reduce(qubit_set)
+                qcvv_logger.setLevel(logging.WARNING)
                 transpiled_qc_list, _ = perform_backend_transpilation(
                     [qc],
                     backend=self.backend,
@@ -230,6 +232,7 @@ class QScoreBenchmark(BenchmarkBase):
                 )
 
                 counts = retrieve_all_counts(jobs)[0][0]
+                qcvv_logger.setLevel(logging.INFO)
 
             return self.compute_expectation_value(counts, graph)
 
@@ -595,7 +598,7 @@ class QScoreBenchmark(BenchmarkBase):
 
         for i in range(self.num_instances):
             graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
-            print(f"graph: {graph}")
+            qcvv_logger.debug(f"graph: {graph}")
             self.graph_physical = graph.copy()
             self.virtual_nodes = []
             if self.use_virtual_node:
@@ -619,14 +622,14 @@ class QScoreBenchmark(BenchmarkBase):
             if graph.number_of_edges() == 0:
                 cut_sizes.append(0)
                 seed += 1
-                qcvv_logger.info(f"Graph {i+1}/{self.num_instances} had no edges: cut size = 0.")
+                qcvv_logger.debug(f"Graph {i+1}/{self.num_instances} had no edges: cut size = 0.")
                 continue
 
             # Choose the qubit layout
             qubit_set = []
             if self.choose_qubits_routine.lower() == "naive":
                 qubit_set = self.choose_qubits_naive(num_nodes)
-            elif self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic":
+            elif self.choose_qubits_routine.lower() == "custom":
                 qubit_set = self.choose_qubits_custom(num_nodes)
             else:
                 raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
@@ -634,7 +637,7 @@ class QScoreBenchmark(BenchmarkBase):
             # Solve the maximum cut size with QAOA
             cut_sizes.append(self.run_QAOA(graph, qubit_set))
             seed += 1
-            qcvv_logger.info(f"Solved the MaxCut on graph {i+1}/{self.num_instances}.")
+            qcvv_logger.debug(f"Solved the MaxCut on graph {i+1}/{self.num_instances}.")
 
         average_cut_size = np.mean(cut_sizes) - num_nodes * (num_nodes - 1) / 8
         average_best_cut_size = 0.178 * pow(num_nodes, 3 / 2)
@@ -677,7 +680,7 @@ class QScoreBenchmark(BenchmarkBase):
         list_of_cut_sizes = []
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
-            qcvv_logger.info(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
+            qcvv_logger.debug(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
             is_successful, approximation_ratio, cut_sizes = self.execute_single_benchmark(num_nodes)[0:3]
             approximation_ratios.append(approximation_ratio)
 
@@ -711,7 +714,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     max_num_nodes: Optional[int] = None
     use_virtual_node: bool = True
     use_classically_optimized_angles: bool = True
-    choose_qubits_routine: str = "naive"
+    choose_qubits_routine: Literal["naive", "custom"] = "naive"
     min_num_qubits: int = 2  # If choose_qubits_routine is "naive"
     custom_qubits_array: Optional[list[list[int]]] = None
     qiskit_optim_level: int = 3
