@@ -324,7 +324,7 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Retrieve other dataset values
         dataset_dictionary = dataset.attrs[qubits_idx]
         sorted_qc_list_indices = dataset_dictionary["sorted_qc_list_indices"]
-        qc_list = run.circuits["untranspiled_circuits"][str(qubits)].circuits
+        qc_list = run.circuits["transpiled_circuits"][str(qubits)].circuits
 
         qv_results_type[str(qubits)] = dataset_dictionary["qv_results_type"]
         depth[str(qubits)] = len(qubits)
@@ -777,8 +777,8 @@ class QuantumVolumeBenchmark(Benchmark):
             else:
                 raise ValueError("physical_layout must either be \"fixed\" or \"batching\"")
 
-            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=qc_list))
-            self.untranspiled_circuits.circuit_groups.append(
+            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=qc_list))
+            self.transpiled_circuits.circuit_groups.append(
                 CircuitGroup(name=str(qubits), circuits=sorted_transpiled_qc_list[tuple(qubits)])
             )
 
