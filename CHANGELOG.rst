@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 1.12
+===========
+* Miscellaneous small bugs fixed.
+
 Version 1.11
 ===========
 * Relaxes dependencies to allow for ranges.
