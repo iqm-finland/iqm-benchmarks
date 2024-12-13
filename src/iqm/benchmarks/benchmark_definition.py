@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.circuit_containers import Circuits
+from iqm.benchmarks.circuit_containers import BenchmarkCircuit, Circuits
 from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
@@ -237,8 +237,8 @@ class Benchmark(ABC):
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
 
-        self.transpiled_circuits = {}
-        self.untranspiled_circuits = {}
+        self.transpiled_circuits: BenchmarkCircuit
+        self.untranspiled_circuits: BenchmarkCircuit
 
         # From exa_support MR
         self.options = copy.copy(self.default_options) if self.default_options else {}

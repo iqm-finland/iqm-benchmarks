@@ -24,9 +24,9 @@ from qiskit.circuit import Qubit
 from iqm.qiskit_iqm.iqm_circuit import IQMCircuit
 
 
-QubitLayout: TypeAlias = tuple[Qubit]
-QubitLayouts: TypeAlias = tuple[QubitLayout]
-QubitLayoutIndices: TypeAlias = tuple[tuple[int]]
+QubitLayout: TypeAlias = tuple[Qubit, ...]
+QubitLayouts: TypeAlias = tuple[QubitLayout, ...]
+QubitLayoutIndices: TypeAlias = tuple[tuple[int, ...], ...]
 
 
 # pylint: disable=protected-access
@@ -49,7 +49,7 @@ class CircuitGroup:
         Returns:
             All qubit layouts.
         """
-        return tuple(tuple(qubit._index for qubit in layout) for layout in self.qubit_layouts)
+        return tuple(tuple(int(qubit._index) for qubit in layout) for layout in self.qubit_layouts)
 
     @property
     def qubit_layouts(self) -> QubitLayouts:
@@ -108,7 +108,7 @@ class CircuitGroup:
         benchmark_circuit_names = filter(lambda x: x.name == name, self.circuits)
         return next(benchmark_circuit_names, None)
 
-    def __getitem__(self, key: str) -> IQMCircuit:
+    def __getitem__(self, key: str) -> Optional[IQMCircuit]:
         return self.get_circuits_by_name(key)
 
 
@@ -146,9 +146,9 @@ class BenchmarkCircuit:
         return self.circuit_groups
 
     @property
-    def group_names(self) -> List[str]:
+    def group_names(self) -> List[str | None]:
         """Names of all the contained `CircuitGroup`."""
-        return list(map(lambda x: x.name, self.circuit_groups))
+        return list(map(lambda x: x.name, self.circuit_groups)) if len(self.circuit_groups) > 0 else []
 
     @property
     def qubit_indices(self) -> set[int]:
@@ -162,7 +162,7 @@ class BenchmarkCircuit:
     @property
     def qubits(self) -> set[Qubit]:
         """Set of all the qubits used in all the `CircuitGroup`, represented as an instance of `Qubit`."""
-        qubit_set = set()
+        qubit_set: set[Qubit] = set()
         for qubit in map(lambda x: x.qubits, self.circuit_groups):
             qubit_set = qubit_set.union(qubit)
         return qubit_set
@@ -187,7 +187,7 @@ class BenchmarkCircuit:
         value.name = key
         return self.circuit_groups.append(value)
 
-    def __getitem__(self, key: str) -> List[CircuitGroup]:
+    def __getitem__(self, key: str) -> CircuitGroup | None:
         return self.get_circuit_group_by_name(key)
 
 
@@ -205,7 +205,7 @@ class Circuits:
         value.name = key
         return self.benchmark_circuits.append(value)
 
-    def __getitem__(self, key: str) -> List[BenchmarkCircuit]:
+    def __getitem__(self, key: str) -> BenchmarkCircuit | None:
         return self.get_benchmark_circuits_by_name(key)
 
     def get_benchmark_circuits_by_name(self, name: str) -> Optional[BenchmarkCircuit]:
