@@ -124,7 +124,7 @@ class BenchmarkAnalysisResult:
         Args:
             run: A run for which analysis result is created.
         """
-        return cls(dataset=run.dataset, circuits=run.circuits)
+        return cls(dataset=run.dataset)
 
 
 def default_analysis_function(result: BenchmarkRunResult) -> BenchmarkAnalysisResult:
