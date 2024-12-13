@@ -35,18 +35,18 @@ class CircuitGroup:
 
     @property
     def qubit_layouts_by_index(self) -> QubitLayoutIndices:
-        return tuple(map(lambda x: tuple(q._index for q in x.qubits), self.circuits))
+        return tuple(tuple(qubit._index for qubit in layout) for layout in self.qubit_layouts)
 
     @property
     def qubit_layouts(self, by_index: bool = True) -> QubitLayout:
-        qubit_layouts = tuple(map(lambda x: tuple(x.qubits), self.circuits))
+        qubit_layouts = tuple(map(lambda x: tuple(x._data.active_bits()[0]), self.circuits))
         return qubit_layouts
 
     @property
     def qubits(self) -> set[int]:
         qubit_set = set()
         for circuit in self.circuits:
-            for qubit in circuit.qubits:
+            for qubit in circuit._data.active_bits()[0]:
                 qubit_set.add(qubit)
         return qubit_set
 
