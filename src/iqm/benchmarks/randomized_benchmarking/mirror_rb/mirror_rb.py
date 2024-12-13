@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
 import warnings
 
 import numpy as np
-from qiskit import QuantumCircuit, transpile
+from qiskit import transpile
 from qiskit.quantum_info import random_clifford, random_pauli
 from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
@@ -35,6 +35,7 @@ from iqm.benchmarks.utils import (
     timeit,
     xrvariable_to_counts,
 )
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

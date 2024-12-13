@@ -21,7 +21,6 @@ from typing import Any, Dict, List, Literal, Optional, Sequence, Type
 
 from matplotlib.figure import Figure
 import numpy as np
-from qiskit import QuantumCircuit
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
@@ -51,6 +50,7 @@ from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common impor
     validate_rb_qubits,
 )
 from iqm.benchmarks.utils import retrieve_all_counts, retrieve_all_job_metadata, timeit, xrvariable_to_counts
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
