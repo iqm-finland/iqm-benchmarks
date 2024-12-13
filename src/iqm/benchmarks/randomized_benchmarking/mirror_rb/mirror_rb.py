@@ -611,25 +611,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
                 dataset.attrs[key] = value
         # Defined outside configuration - if any
 
-    @timeit
-    def add_all_circuits_to_dataset(self, dataset: xr.Dataset):
-        """Adds all generated circuits during execution to the dataset variable
-        Args:
-            dataset (xr.Dataset):  The xarray dataset
-        """
-        qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs['transpiled_circuits'] = self.transpiled_circuits
-        dataset.attrs['untranspiled_circuits'] = self.untranspiled_circuits
-        # for key, circuit in zip(
-        #     ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
-        # ):
-        #     dictionary = {}
-        #     for outer_key, outer_value in circuit.items():
-        #         dictionary[str(outer_key)] = {
-        #             str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
-        #         }
-        #     dataset.attrs[key] = dictionary
-
     def submit_single_mrb_job(
         self,
         backend_arg: IQMBackendBase,
@@ -679,8 +660,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
         # Initialize the variable to contain the circuits for each layout
         self.untranspiled_circuits = BenchmarkCircuit("untranspiled_circuits")
         self.transpiled_circuits = BenchmarkCircuit("transpiled_circuits")
-        # self.untranspiled_circuits: Dict[str, Dict[int | str, List[QuantumCircuit]]] = {}
-        # self.transpiled_circuits: Dict[str, Dict[int | str, List[QuantumCircuit]]] = {}
 
         # The depths should be assigned to each set of qubits!
         # The real final MRB depths are twice the originally specified, must be taken into account here!
@@ -704,8 +683,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
         qubit_idx: Dict[str, Any] = {}
         for qubits_idx, qubits in enumerate(self.qubits_array):
             qubit_idx[str(qubits)] = qubits_idx
-            # self.untranspiled_circuits[str(qubits)] = {}
-            # self.transpiled_circuits[str(qubits)] = {}
 
             qcvv_logger.info(
                 f"Executing MRB on qubits {qubits}."
@@ -745,27 +722,11 @@ class MirrorRandomizedBenchmarking(Benchmark):
                 qcvv_logger.info(f"Job for layout {qubits} & depth {depth} submitted successfully!")
 
                 self.untranspiled_circuits.circuit_groups.append(
-                    CircuitGroup(
-                        name = f"{str(qubits)}_depth_{depth}",
-                        circuits=mrb_untranspiled_circuits_lists[depth]
-
-                    )
-
+                    CircuitGroup(name=f"{str(qubits)}_depth_{depth}", circuits=mrb_untranspiled_circuits_lists[depth])
                 )
                 self.transpiled_circuits.circuit_groups.append(
-                    CircuitGroup(
-                        name = f"{str(qubits)}_depth_{depth}",
-                        circuits=mrb_transpiled_circuits_lists[depth]
-
-                    )
-
-            )
-            # self.untranspiled_circuits[str(qubits)] = {
-            #     str(d): mrb_untranspiled_circuits_lists[d] for d in assigned_mrb_depths[str(qubits)]
-            # }
-            # self.transpiled_circuits[str(qubits)] = {
-            #     str(d): mrb_transpiled_circuits_lists[d] for d in assigned_mrb_depths[str(qubits)]
-            # }
+                    CircuitGroup(name=f"{str(qubits)}_depth_{depth}", circuits=mrb_transpiled_circuits_lists[depth])
+                )
 
             dataset.attrs[qubits_idx] = {"qubits": qubits}
 
@@ -795,7 +756,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
             qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, f"qubits_{str(qubits)}_depth_{str(depth)}", dataset)
 
-        # self.add_all_circuits_to_dataset(dataset)
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         qcvv_logger.info(f"MRB experiment execution concluded !")

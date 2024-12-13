@@ -23,7 +23,6 @@ import numpy as np
 from qiskit import QuantumCircuit
 import xarray as xr
 
-from iqm.benchmarks.circuit_containers import Circuits, CircuitGroup, BenchmarkCircuit
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
     Benchmark,
@@ -33,6 +32,7 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkRunResult,
     add_counts_to_dataset,
 )
+from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -297,12 +297,13 @@ class CliffordRandomizedBenchmarking(Benchmark):
                 self.untranspiled_circuits.circuit_groups.append(
                     CircuitGroup(
                         name=f"{str(self.qubits_array)}_length_{seq_length}",
-                        circuits=parallel_untranspiled_rb_circuits[seq_length]
-                ))
+                        circuits=parallel_untranspiled_rb_circuits[seq_length],
+                    )
+                )
                 self.transpiled_circuits.circuit_groups.append(
                     CircuitGroup(
                         name=f"{str(self.qubits_array)}_length_{seq_length}",
-                        circuits=parallel_transpiled_rb_circuits[seq_length]
+                        circuits=parallel_transpiled_rb_circuits[seq_length],
                     )
                 )
             # self.untranspiled_circuits[str(self.qubits_array)] = {
@@ -362,32 +363,26 @@ class CliffordRandomizedBenchmarking(Benchmark):
                 )
 
                 self.untranspiled_circuits.circuit_groups.append(
-                    CircuitGroup(
-                        name=str(qubits),
-                        circuits=rb_untranspiled_circuits[str(qubits)]
-                    )
+                    CircuitGroup(name=str(qubits), circuits=rb_untranspiled_circuits[str(qubits)])
                 )
                 self.transpiled_circuits.circuit_groups.append(
-                    CircuitGroup(
-                        name=str(qubits),
-                        circuits=rb_transpiled_circuits[str(qubits)]
-                    )
+                    CircuitGroup(name=str(qubits), circuits=rb_transpiled_circuits[str(qubits)])
                 )
                 # self.untranspiled_circuits[str(qubits)]=rb_untranspiled_circuits[str(qubits)]
                 # self.transpiled_circuits[str(qubits)]=rb_transpiled_circuits[str(qubits)]
 
-                dataset.attrs[qubits_idx]={"qubits": qubits}
+                dataset.attrs[qubits_idx] = {"qubits": qubits}
 
         # Retrieve counts of jobs for all qubit layouts
-        all_job_metadata={}
+        all_job_metadata = {}
         for job_dict in all_rb_jobs:
-            qubits=job_dict["qubits"]
-            depth=job_dict["depth"]
+            qubits = job_dict["qubits"]
+            depth = job_dict["depth"]
             # Retrieve counts
-            identifier=f"qubits_{str(qubits)}_depth_{str(depth)}"
-            execution_results, time_retrieve=retrieve_all_counts(job_dict["jobs"], identifier)
+            identifier = f"qubits_{str(qubits)}_depth_{str(depth)}"
+            execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier)
             # Retrieve all job meta data
-            all_job_metadata=retrieve_all_job_metadata(job_dict["jobs"])
+            all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
             # Export all to dataset
             dataset.attrs[qubit_idx[str(qubits)]].update(
                 {
@@ -401,7 +396,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
             )
 
             qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
-            dataset, _=add_counts_to_dataset(execution_results, identifier, dataset)
+            dataset, _ = add_counts_to_dataset(execution_results, identifier, dataset)
 
         # self.add_all_circuits_to_dataset(dataset)
 
@@ -424,8 +419,8 @@ class CliffordRBConfiguration(BenchmarkConfigurationBase):
                             * Default is False.
     """
 
-    benchmark: Type[Benchmark]=CliffordRandomizedBenchmarking
+    benchmark: Type[Benchmark] = CliffordRandomizedBenchmarking
     qubits_array: Sequence[Sequence[int]]
     sequence_lengths: Sequence[int]
     num_circuit_samples: int
-    parallel_execution: bool=False
+    parallel_execution: bool = False

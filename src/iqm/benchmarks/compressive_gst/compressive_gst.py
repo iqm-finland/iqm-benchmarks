@@ -157,17 +157,9 @@ class CompressiveGST(Benchmark):
                 drop_final_rz=False,
             )
             # Saving raw and transpiled circuits in a consistent format with other benchmarks
-            self.transpiled_circuits.circuit_groups.append(
-                CircuitGroup(
-                    name=str(qubits),
-                    circuits=raw_qc_list
-                )
-            )
+            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
             self.untranspiled_circuits.circuit_groups.append(
-                CircuitGroup(
-                    name=str(qubits),
-                    circuits=transpiled_qc_list
-                )
+                CircuitGroup(name=str(qubits), circuits=transpiled_qc_list)
             )
             # self.untranspiled_circuits.update({str(qubits): raw_qc_list})
             # self.transpiled_circuits.update({str(qubits): transpiled_qc_list})

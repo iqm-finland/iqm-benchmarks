@@ -25,7 +25,6 @@ import matplotlib.pyplot as plt
 from mthree.classes import QuasiCollection
 from mthree.utils import expval
 import numpy as np
-from qiskit import QuantumCircuit
 from qiskit.circuit.library import QuantumVolume
 from qiskit_aer import Aer
 import xarray as xr
@@ -57,6 +56,7 @@ from iqm.benchmarks.utils import (  # execute_with_dd,
     timeit,
     xrvariable_to_counts,
 )
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -324,15 +324,7 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Retrieve other dataset values
         dataset_dictionary = dataset.attrs[qubits_idx]
         sorted_qc_list_indices = dataset_dictionary["sorted_qc_list_indices"]
-        transpiled_qc_list = run.circuits["transpiled_circuits"][str(qubits)].circuits
         qc_list = run.circuits["untranspiled_circuits"][str(qubits)].circuits
-        # qc_list = []
-        # transpiled_circ_dataset = dataset.attrs["transpiled_circuits"][str(qubits)]
-        # transpiled_qc_list = []
-        # untranspiled_circ_dataset = dataset.attrs["untranspiled_circuits"][str(qubits)]
-        # for key in transpiled_circ_dataset:  # Keys (final layouts) are the same for transp/untransp
-        #     transpiled_qc_list.extend(transpiled_circ_dataset[key])
-        #     qc_list.extend(untranspiled_circ_dataset[key])
 
         qv_results_type[str(qubits)] = dataset_dictionary["qv_results_type"]
         depth[str(qubits)] = len(qubits)
@@ -749,8 +741,6 @@ class QuantumVolumeBenchmark(Benchmark):
 
         for qubits in self.custom_qubits_array:  # NB: jobs will be submitted for qubit layouts in the specified order
 
-            # self.untranspiled_circuits[str(qubits)] = {}
-            # self.transpiled_circuits[str(qubits)] = {}
             num_qubits = len(qubits)
             depth = num_qubits
             qcvv_logger.info(f"Executing QV on qubits {qubits}")
@@ -787,21 +777,9 @@ class QuantumVolumeBenchmark(Benchmark):
             else:
                 raise ValueError("physical_layout must either be \"fixed\" or \"batching\"")
 
-            # self.untranspiled_circuits[str(qubits)].update({tuple(qubits): qc_list})
-            # self.transpiled_circuits[str(qubits)].update(sorted_transpiled_qc_list)
-            self.transpiled_circuits.circuit_groups.append(
-                CircuitGroup(
-                    name = str(qubits),
-                    circuits = qc_list
-                )
-
-            )
+            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=qc_list))
             self.untranspiled_circuits.circuit_groups.append(
-                CircuitGroup(
-                    name = str(qubits),
-                    circuits = sorted_transpiled_qc_list[tuple(qubits)]
-                )
-
+                CircuitGroup(name=str(qubits), circuits=sorted_transpiled_qc_list[tuple(qubits)])
             )
 
             # Count operations
