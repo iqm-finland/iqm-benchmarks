@@ -96,9 +96,6 @@ def append_rms(
             rm_circ.compose(rand_clifford, qubits=[q], inplace=True)
 
         rm_circ.measure_active()
-        # if backend is not None and backend.name != "IQMNdonisBackend" and optimize_sqg:
-        #     rm_circuits.append(optimize_single_qubit_gates(rm_circ))
-        # else:
         rm_circuits.append(transpile(rm_circ, basis_gates=backend.operation_names))
 
     return rm_circuits
@@ -115,7 +112,8 @@ def fidelity_ghz_randomized_measurements(
         dataset (xr.Dataset):
         qubit_layout: List[int]: The subset of system-qubits used in the protocol
         ideal_probabilities (List[Dict[str, int]]):
-        num_qubits (int):
+        num_qubits (int): Number of qubits
+        circuits (Circuits): Instance of `Circuits` containing transpiled circuits
     Returns:
         values: dict[str, Any]
             The fidelities
@@ -179,6 +177,8 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circui
             An xarray dataset containing the measurement data
         qubit_layout: List[int]
             The subset of system-qubits used in the protocol
+        circuits: Circuits
+            Instance of `Circuits` containing transpiled circuits
 
     Returns:
         dict[str, dict[str, Any]]: The ghz fidelity or, if rem=True, fidelity and readout error mitigated fidelity
@@ -188,7 +188,6 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circui
     phases = [np.pi * i / (num_qubits + 1) for i in range(2 * num_qubits + 2)]
     idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     transpiled_circuits = circuits["transpiled_circuits"]
-    # dataset.attrs["transpiled_circuits"]
     num_shots = dataset.attrs["shots"]
     num_circuits = len(transpiled_circuits[f"{qubit_layout}_native_ghz"].circuits)
 
@@ -253,45 +252,50 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     observation_list: list[BenchmarkObservation] = []
     for qubit_layout in qubit_layouts:
-        if routine == "randomized_measurements":
-            ideal_simulator = Aer.get_backend("statevector_simulator")
-            ideal_probabilities = []
-            idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-            all_circuits = run.circuits["transpiled_circuits"][f"{idx}_native_ghz"].circuits
-            for qc in all_circuits:
-                qc_copy = qc.copy()
-                qc_copy.remove_final_measurements()
-                deflated_qc = reduce_to_active_qubits(qc_copy, backend_name)
-                ideal_probabilities.append(dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items())))
-            values, uncertainties = fidelity_ghz_randomized_measurements(
-                dataset, qubit_layout, ideal_probabilities, len(qubit_layout), run.circuits
-            )
-            observation_list.extend(
-                [
-                    BenchmarkObservation(
-                        name=key,
-                        identifier=BenchmarkObservationIdentifier(qubit_layout),
-                        value=value,
-                        uncertainty=uncertainties[key],
+        match routine:
+            case "randomized_measurements":
+                ideal_simulator = Aer.get_backend("statevector_simulator")
+                ideal_probabilities = []
+                idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+                all_circuits = run.circuits["transpiled_circuits"][f"{idx}_native_ghz"].circuits
+                for qc in all_circuits:
+                    qc_copy = qc.copy()
+                    qc_copy.remove_final_measurements()
+                    deflated_qc = reduce_to_active_qubits(qc_copy, backend_name)
+                    ideal_probabilities.append(
+                        dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
-                    for key, value in values.items()
-                ]
-            )
-        else:  # default routine == "coherences":
-            fidelity = fidelity_ghz_coherences(dataset, qubit_layout, run.circuits)
-            observation_list.extend(
-                [
-                    BenchmarkObservation(
-                        name="fidelity", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[0]
-                    )
-                ]
-            )
-            if len(fidelity) > 1:
-                observation_list.append(
-                    BenchmarkObservation(
-                        name="fidelity_rem", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[1]
-                    )
+                values, uncertainties = fidelity_ghz_randomized_measurements(
+                    dataset, qubit_layout, ideal_probabilities, len(qubit_layout), run.circuits
                 )
+                observation_list.extend(
+                    [
+                        BenchmarkObservation(
+                            name=key,
+                            identifier=BenchmarkObservationIdentifier(qubit_layout),
+                            value=value,
+                            uncertainty=uncertainties[key],
+                        )
+                        for key, value in values.items()
+                    ]
+                )
+            case "coherences":
+                fidelity = fidelity_ghz_coherences(dataset, qubit_layout, run.circuits)
+                observation_list.extend(
+                    [
+                        BenchmarkObservation(
+                            name="fidelity", identifier=BenchmarkObservationIdentifier(qubit_layout), value=fidelity[0]
+                        )
+                    ]
+                )
+                if len(fidelity) > 1:
+                    observation_list.append(
+                        BenchmarkObservation(
+                            name="fidelity_rem",
+                            identifier=BenchmarkObservationIdentifier(qubit_layout),
+                            value=fidelity[1],
+                        )
+                    )
     plots = {"All layout fidelities": plot_fidelities(observation_list, qubit_layouts)}
     return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list, plots=plots)
 
@@ -601,7 +605,6 @@ class GHZBenchmark(Benchmark):
         super().__init__(backend, configuration)
 
         self.state_generation_routine = configuration.state_generation_routine
-        # self.choose_qubits_routine = configuration.choose_qubits_routine
         if configuration.custom_qubits_array:
             self.custom_qubits_array = configuration.custom_qubits_array
         else:
@@ -613,7 +616,6 @@ class GHZBenchmark(Benchmark):
             if any(np.max(configuration.qubit_counts) > [len(layout) for layout in self.custom_qubits_array]):
                 raise ValueError("The maximum given qubit count is larger than the size of the smallest qubit layout.")
             self.qubit_counts = configuration.qubit_counts
-        # self.layout_idx_mapping = {str(qubit_layout): idx for idx, qubit_layout in enumerate(self.custom_qubits_array)}
 
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.optimize_sqg = configuration.optimize_sqg
@@ -623,10 +625,6 @@ class GHZBenchmark(Benchmark):
         self.mit_shots = configuration.mit_shots
         self.cal_url = configuration.cal_url
         self.timestamp = strftime("%Y%m%d-%H%M%S")
-
-    # @staticmethod
-    # def name() -> str:
-    #     return "ghz"
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> CircuitGroup:
         """
@@ -645,10 +643,8 @@ class GHZBenchmark(Benchmark):
         Returns:
             QuantumCircuit implementing GHZ native state
         """
-        # num_qubits = len(qubit_layout)
         circuit_group = CircuitGroup(name=f"{qubit_layout}_native_ghz")
         fixed_coupling_map = set_coupling_map(qubit_layout, self.backend, "fixed")
-        # idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
         ghz_native_transpiled: List[QuantumCircuit]
 
         if routine == "naive":
@@ -798,8 +794,6 @@ class GHZBenchmark(Benchmark):
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
         dataset.attrs["fidelity_routine"] = self.fidelity_routine
-        # dataset.attrs[f"untranspiled_circuits"] = self.circuits["untranspiled_circuits"]
-        # dataset.attrs[f"transpiled_circuits"] = self.circuits["transpiled_circuits"]
 
     def execute(self, backend) -> xr.Dataset:
         """
@@ -846,7 +840,6 @@ class GHZBenchmark(Benchmark):
                 dataset, _ = add_counts_to_dataset(rem_results_dist, f"{idx}_rem", dataset)
 
         self.add_configuration_to_dataset(dataset)
-        # self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
         return dataset
 
 

@@ -5,10 +5,10 @@ Bridge between mGST and Qiskit
 import random
 
 import numpy as np
-from qiskit import QuantumCircuit
 from qiskit.circuit.library import IGate
 from qiskit.quantum_info import Operator
 
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from mGST import additional_fns, algorithm, low_level_jit
 from mGST.compatibility import arrays_to_pygsti_model
 from mGST.reporting.reporting import gauge_opt, quick_report

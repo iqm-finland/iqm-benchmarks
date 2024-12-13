@@ -30,7 +30,6 @@ The full benchmark executes the following steps:
 from typing import Any, Dict, List, Tuple, Type, Union
 
 import numpy as np
-from qiskit import QuantumCircuit
 from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
 
@@ -46,6 +45,7 @@ from iqm.benchmarks.utils import (
     submit_execute,
     timeit,
 )
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from mGST import additional_fns, qiskit_interface
 from mGST.qiskit_interface import add_idle_gates, remove_idle_wires
@@ -161,8 +161,6 @@ class CompressiveGST(Benchmark):
             self.untranspiled_circuits.circuit_groups.append(
                 CircuitGroup(name=str(qubits), circuits=transpiled_qc_list)
             )
-            # self.untranspiled_circuits.update({str(qubits): raw_qc_list})
-            # self.transpiled_circuits.update({str(qubits): transpiled_qc_list})
 
     def add_configuration_to_dataset(self, dataset):  # CHECK
         """

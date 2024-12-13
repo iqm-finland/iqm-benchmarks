@@ -821,7 +821,6 @@ class QuantumVolumeBenchmark(Benchmark):
             qcvv_logger.info(f"Adding counts of {qubits} run to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(qubits), dataset)
 
-        # self.add_all_circuits_to_dataset(dataset)
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         if self.rem:

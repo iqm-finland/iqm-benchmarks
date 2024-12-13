@@ -21,7 +21,7 @@ import copy
 from copy import deepcopy
 from dataclasses import dataclass, field
 import functools
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 import uuid
 
 from matplotlib.figure import Figure
@@ -124,10 +124,10 @@ class BenchmarkAnalysisResult:
         Args:
             run: A run for which analysis result is created.
         """
-        return cls(dataset=run.dataset)
+        return cls(dataset=run.dataset, circuits=run.circuits)
 
 
-def default_analysis_function(result: BenchmarkAnalysisResult) -> BenchmarkAnalysisResult:
+def default_analysis_function(result: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """
     The default analysis that only pass the result through.
     """
@@ -210,10 +210,9 @@ class Benchmark(ABC):
     accept ``AnalysisResult`` as its input and return the final result.
     """
 
-    analysis_function = staticmethod(default_analysis_function)
+    analysis_function: Callable[BenchmarkRunResult, BenchmarkAnalysisResult] = staticmethod(default_analysis_function)
     default_options: dict[str, Any] | None = None
     options: dict[str, Any] | None = None
-    # name: str = "unnamed_benchmark"
 
     def __init__(self, backend: Union[str, IQMBackendBase], configuration: BenchmarkConfigurationBase, **kwargs):
 
@@ -303,6 +302,5 @@ class Benchmark(ABC):
             the ``analysis_function`` field.
         """
         run = self.runs[run_index]
-        # result = BenchmarkAnalysisResult.from_run_result(run)
         updated_result = self.analysis_function(run)
         return updated_result
