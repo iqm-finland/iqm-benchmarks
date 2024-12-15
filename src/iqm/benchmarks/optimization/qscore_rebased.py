@@ -29,6 +29,7 @@ from iqm.benchmarks.utils import (  # execute_with_dd,
     perform_backend_transpilation,
     retrieve_all_counts,
     submit_execute,
+    timeit,
     xrvariable_to_counts,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
@@ -134,8 +135,6 @@ class QScoreBenchmark(Benchmark):
             for i in range(0, num_qubits):
                 qaoa_qc.rx(2 * beta[layer], i)
         qaoa_qc.measure_all()
-        print(qaoa_qc.count_ops())
-        print('num_qubits:', num_qubits)
         return qaoa_qc
 
     @staticmethod
@@ -460,6 +459,7 @@ class QScoreBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
 
+    @timeit
     def add_all_circuits_to_dataset(self, dataset: xr.Dataset):
         """Adds all generated circuits during execution to the dataset variable
 
@@ -470,8 +470,15 @@ class QScoreBenchmark(Benchmark):
 
         """
         qcvv_logger.info(f"Adding all circuits to the dataset")
-        dataset.attrs["untranspiled_circuits"] = self.untranspiled_circuits
-        dataset.attrs["transpiled_circuits"] = self.transpiled_circuits
+        for key, circuit in zip(
+            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
+        ):
+            dictionary = {}
+            for outer_key, outer_value in circuit.items():
+                dictionary[str(outer_key)] = {
+                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
+                }
+            dataset.attrs[key] = dictionary
 
     @staticmethod
     def is_successful(
@@ -727,7 +734,7 @@ class QScoreBenchmark(Benchmark):
         plots = {}
         observations: list[BenchmarkObservation] = []
         execution_results = {}
-        dataset = run.dataset
+        dataset = run.dataset.copy(deep=True)
 
         if self.max_num_nodes is None:
             if self.use_virtual_node:
@@ -747,8 +754,6 @@ class QScoreBenchmark(Benchmark):
 
             # Retrieve other dataset values
             dataset_dictionary = dataset.attrs[num_nodes]
-            # transpiled_circ_dataset = dataset.attrs["transpiled_circuits"][str(num_nodes)]
-            # untranspiled_circ_dataset = dataset.attrs["untranspiled_circuits"][str(num_nodes)]
 
             node_set_list = dataset_dictionary["qubit_set"]
             graph_list = dataset_dictionary["graph"]
@@ -846,8 +851,8 @@ class QScoreBenchmark(Benchmark):
         self.add_all_meta_to_dataset(dataset)
 
         # Initialize the variable to contain the QScore circuits of each node
-        self.untranspiled_circuits: Dict[str, Dict[Tuple, List[QuantumCircuit]]] = {}
-        self.transpiled_circuits: Dict[str, Dict[Tuple, List[QuantumCircuit]]] = {}
+        self.untranspiled_circuits: Dict[str, List[QuantumCircuit]] = {}
+        self.transpiled_circuits: Dict[str, List[QuantumCircuit]] = {}
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
             qc_list = []
@@ -911,12 +916,14 @@ class QScoreBenchmark(Benchmark):
 
                 if len(qc.count_ops()) == 0:
                     counts = {"": 1.0}  # to handle the case of physical graph with no edges
+                    sorted_transpiled_qc_list = {tuple(qubit_set): []}
+                    qc_transpiled_list.append(sorted_transpiled_qc_list)
                     execution_results.append(counts)
 
                 else:
                     # execute for a given num_node and a given instance
                     coupling_map = self.backend.coupling_map.reduce(qubit_set)
-                    transpiled_qc_list, _ = perform_backend_transpilation(
+                    transpiled_qc, _ = perform_backend_transpilation(
                         [qc],
                         backend=self.backend,
                         qubits=qubit_set,
@@ -925,20 +932,18 @@ class QScoreBenchmark(Benchmark):
                         optimize_sqg=self.optimize_sqg,
                         routing_method=self.routing_method,
                     )
-                    qc_transpiled_list.append(transpiled_qc_list[0])
 
-                    transpiled_qc_list.draw('mpl')
-
+                    sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
                     # Execute on the backend
                     jobs, _ = submit_execute(
-                        transpiled_qc_list,
+                        sorted_transpiled_qc_list,
                         self.backend,
                         self.shots,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
                     )
-
-                    execution_results.append(retrieve_all_counts(jobs))
+                    qc_transpiled_list.append(sorted_transpiled_qc_list)
+                    execution_results.append(retrieve_all_counts(jobs)[0][0])
 
                 seed += 1
                 qcvv_logger.info(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
@@ -953,11 +958,10 @@ class QScoreBenchmark(Benchmark):
                 }
             )
 
-            qcvv_logger.info(f"Adding counts for the random graph with {num_nodes} nodes to the dataset")
+            qcvv_logger.info(f"Adding counts for the random graph for {num_nodes} nodes to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(num_nodes), dataset)
-
-            self.untranspiled_circuits[str(num_nodes)].update(qc_list)
-            self.transpiled_circuits[str(num_nodes)].update(qc_transpiled_list)
+            self.untranspiled_circuits[str(num_nodes)].update({tuple(qubit_set): qc_list})
+            self.transpiled_circuits[str(num_nodes)].update(sorted_transpiled_qc_list)
 
         self.add_all_circuits_to_dataset(dataset)
 
