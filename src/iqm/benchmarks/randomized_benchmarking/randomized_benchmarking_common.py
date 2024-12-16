@@ -29,13 +29,14 @@ from matplotlib.collections import PolyCollection
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
-from qiskit import QuantumCircuit, transpile
+from qiskit import transpile
 from qiskit.quantum_info import Clifford
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.multi_lmfit import create_multi_dataset_params, multi_dataset_residual
 from iqm.benchmarks.utils import get_iqm_backend, marginal_distribution, submit_execute, timeit
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import optimize_single_qubit_gates
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
