@@ -435,8 +435,7 @@ class QScoreBenchmark(Benchmark):
 
     @staticmethod
     def calculate_optimal_angles_for_QAOA_p1(graph: Graph) -> List[float]:
-        """
-        Calculates the optimal angles for single layer QAOA MaxCut ansatz.
+        """Calculates the optimal angles for single layer QAOA MaxCut ansatz.
 
         Args:
             graph (networkx graph): the MaxCut problem graph.
