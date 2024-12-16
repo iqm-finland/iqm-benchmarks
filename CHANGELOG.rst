@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 1.13
+===========
+* Fixed bug in RB plots for individual decays.
+
 Version 1.12
 ===========
 * Miscellaneous small bugs fixed.
