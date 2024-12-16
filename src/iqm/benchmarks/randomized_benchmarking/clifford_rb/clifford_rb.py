@@ -20,7 +20,6 @@ from time import strftime
 from typing import Any, Dict, List, Sequence, Type
 
 import numpy as np
-from qiskit import QuantumCircuit
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
@@ -32,6 +31,7 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkRunResult,
     add_counts_to_dataset,
 )
+from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     exponential_rb,
@@ -48,6 +48,7 @@ from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common impor
     validate_rb_qubits,
 )
 from iqm.benchmarks.utils import retrieve_all_counts, retrieve_all_job_metadata, timeit, xrvariable_to_counts
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -242,8 +243,8 @@ class CliffordRandomizedBenchmarking(Benchmark):
         time_circuit_generation: Dict[str, float] = {}
 
         # Initialize the variable to contain the circuits for each layout
-        self.untranspiled_circuits: Dict[str, Dict[int, List[QuantumCircuit]]] = {}
-        self.transpiled_circuits: Dict[str, Dict[int, List[QuantumCircuit]]] = {}
+        self.untranspiled_circuits = BenchmarkCircuit("untranspiled_circuits")
+        self.transpiled_circuits = BenchmarkCircuit("transpiled_circuits")
 
         # Auxiliary dict from str(qubits) to indices
         qubit_idx: Dict[str, Any] = {}
@@ -291,13 +292,18 @@ class CliffordRandomizedBenchmarking(Benchmark):
                 )
                 qcvv_logger.info(f"Job for sequence length {seq_length} submitted successfully!")
 
-            self.untranspiled_circuits[str(self.qubits_array)] = {
-                m: parallel_untranspiled_rb_circuits[m] for m in self.sequence_lengths
-            }
-            self.transpiled_circuits[str(self.qubits_array)] = {
-                m: parallel_transpiled_rb_circuits[m] for m in self.sequence_lengths
-            }
-
+                self.untranspiled_circuits.circuit_groups.append(
+                    CircuitGroup(
+                        name=f"{str(self.qubits_array)}_length_{seq_length}",
+                        circuits=parallel_untranspiled_rb_circuits[seq_length],
+                    )
+                )
+                self.transpiled_circuits.circuit_groups.append(
+                    CircuitGroup(
+                        name=f"{str(self.qubits_array)}_length_{seq_length}",
+                        circuits=parallel_transpiled_rb_circuits[seq_length],
+                    )
+                )
             qubit_idx = {str(self.qubits_array): "parallel_all"}
             dataset.attrs["parallel_all"] = {"qubits": self.qubits_array}
             dataset.attrs.update({q_idx: {"qubits": q} for q_idx, q in enumerate(self.qubits_array)})
@@ -347,8 +353,12 @@ class CliffordRandomizedBenchmarking(Benchmark):
                     f"All jobs for qubits {qubits} and sequence lengths {self.sequence_lengths} submitted successfully!"
                 )
 
-                self.untranspiled_circuits[str(qubits)] = rb_untranspiled_circuits[str(qubits)]
-                self.transpiled_circuits[str(qubits)] = rb_transpiled_circuits[str(qubits)]
+                self.untranspiled_circuits.circuit_groups.append(
+                    CircuitGroup(name=str(qubits), circuits=rb_untranspiled_circuits[str(qubits)])
+                )
+                self.transpiled_circuits.circuit_groups.append(
+                    CircuitGroup(name=str(qubits), circuits=rb_transpiled_circuits[str(qubits)])
+                )
 
                 dataset.attrs[qubits_idx] = {"qubits": qubits}
 
@@ -377,9 +387,8 @@ class CliffordRandomizedBenchmarking(Benchmark):
             qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, identifier, dataset)
 
-        self.add_all_circuits_to_dataset(dataset)
-
         qcvv_logger.info(f"RB experiment concluded !")
+        self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         return dataset
 

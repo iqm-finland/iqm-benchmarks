@@ -25,10 +25,11 @@ from mthree.classes import QuasiCollection
 from mthree.exceptions import M3Error
 from mthree.mitigation import _job_thread
 from mthree.utils import final_measurement_mapping
-from qiskit import QuantumCircuit, transpile  # pylint: disable = no-name-in-module
+from qiskit import transpile  # pylint: disable = no-name-in-module
 from qiskit.providers import Backend, BackendV1, BackendV2
 
 from iqm.benchmarks.utils import get_iqm_backend, timeit
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

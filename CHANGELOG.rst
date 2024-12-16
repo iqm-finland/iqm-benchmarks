@@ -2,6 +2,17 @@
 Changelog
 =========
 
+Version 2.0
+===========
+* Adds `Circuits`, `BenchmarkCircuit` and `CircuitGroup` as a way to easily store and interact with multiple quantum circuits.
+* `BenchmarkRunResult` now takes a `circuits` argument, expecting an instance of `Circuits`. `QuantumCircuit` instances can now exist there instead of inside xarray Datasets. All analysis methods should also expect to use an instance of `BenchmarkRunResult`.
+* Ported all of the benchmarks subclassing from `Benchmark` to use the new containers.
+* Updates the usage of `qiskit.QuantumCircuit` to `iqm.qiskit_iqm.IQMCircuit` in many places.
+
+Version 1.12
+===========
+* Miscellaneous small bugs fixed.
+
 Version 1.11
 ===========
 * Relaxes dependencies to allow for ranges.

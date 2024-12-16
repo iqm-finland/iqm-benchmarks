@@ -29,13 +29,14 @@ from matplotlib.collections import PolyCollection
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
-from qiskit import QuantumCircuit, transpile
+from qiskit import transpile
 from qiskit.quantum_info import Clifford
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.multi_lmfit import create_multi_dataset_params, multi_dataset_residual
 from iqm.benchmarks.utils import get_iqm_backend, marginal_distribution, submit_execute, timeit
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import optimize_single_qubit_gates
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -550,7 +551,7 @@ def plot_rb_decay(
         shade_stdev (bool, optional): Whether standard deviations are shaded or not. Defaults to False
         shade_meanerror (bool, optional): Whether to shade standard deviations. Defaults to False
         logscale (bool, optional): Whether x-axis uses logscale. Defaults to True
-        interleaved_gate (Optional[str]):
+        interleaved_gate (Optional[str]): The label or the interleaved gate. Defaults to None
         mrb_2q_density (Optional[float], optional): Density of MRB 2Q gates. Defaults to None.
         mrb_2q_ensemble (Optional[Dict[str, float]], optional): MRB ensemble of 2Q gates. Defaults to None.
 
@@ -771,7 +772,7 @@ def plot_rb_decay(
             if identifier == "mrb":
                 plot_label = fr"$\overline{{F}}_{{MRB}} (n={len(qubits)})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             elif key == "interleaved":
-                plot_label = fr"$\overline{{F}}_{{interleaved_gate}} ({qubits})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
+                plot_label = fr"$\overline{{F}}_{{{interleaved_gate}}} ({qubits})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             else:
                 print(fidelity_value)
                 print(qubits)
