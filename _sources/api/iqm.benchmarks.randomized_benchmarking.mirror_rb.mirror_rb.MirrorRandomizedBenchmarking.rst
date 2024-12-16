@@ -24,7 +24,6 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb.MirrorRandomizedBe
 
    .. autosummary::
    
-      ~MirrorRandomizedBenchmarking.add_all_circuits_to_dataset
       ~MirrorRandomizedBenchmarking.add_all_meta_to_dataset
       ~MirrorRandomizedBenchmarking.analysis_function
       ~MirrorRandomizedBenchmarking.execute

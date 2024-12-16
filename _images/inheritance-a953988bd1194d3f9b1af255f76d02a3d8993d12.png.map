@@ -1,0 +1,5 @@
+<map id="inheritancead05634910" name="inheritancead05634910">
+<area shape="rect" id="node1" href="iqm.benchmarks.circuit_containers.BenchmarkCircuit.html#iqm.benchmarks.circuit_containers.BenchmarkCircuit" target="_top" title="A class grouping a list of `CircuitGroup` into a single purpose. This can typically represent, for example," alt="" coords="5,104,144,129"/>
+<area shape="rect" id="node2" href="iqm.benchmarks.circuit_containers.CircuitGroup.html#iqm.benchmarks.circuit_containers.CircuitGroup" target="_top" title="Group of `IQMCircuits`. It represents a list of circuits with a common purpose, typically executed in a batch." alt="" coords="23,55,126,80"/>
+<area shape="rect" id="node3" href="iqm.benchmarks.circuit_containers.Circuits.html#iqm.benchmarks.circuit_containers.Circuits" target="_top" title="Container for all the `BenchmarkCircuit` that are generated in a single benchmark execution." alt="" coords="39,5,111,31"/>
+</map>

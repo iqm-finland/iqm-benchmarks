@@ -24,7 +24,6 @@ iqm.benchmarks.quantum\_volume.clops.CLOPSBenchmark
 
    .. autosummary::
    
-      ~CLOPSBenchmark.add_all_circuits_to_dataset
       ~CLOPSBenchmark.add_all_meta_to_dataset
       ~CLOPSBenchmark.analysis_function
       ~CLOPSBenchmark.append_parameterized_unitary

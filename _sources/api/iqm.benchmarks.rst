@@ -31,6 +31,7 @@
    ~iqm.benchmarks.benchmark
    ~iqm.benchmarks.benchmark_definition
    ~iqm.benchmarks.benchmark_experiment
+   ~iqm.benchmarks.circuit_containers
    ~iqm.benchmarks.compressive_gst
    ~iqm.benchmarks.entanglement
    ~iqm.benchmarks.logging_config

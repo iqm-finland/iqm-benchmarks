@@ -13,6 +13,7 @@ iqm.benchmarks.benchmark\_definition.BenchmarkAnalysisResult
 
    .. autosummary::
    
+      ~BenchmarkAnalysisResult.circuits
       ~BenchmarkAnalysisResult.dataset
       ~BenchmarkAnalysisResult.plots
       ~BenchmarkAnalysisResult.observations

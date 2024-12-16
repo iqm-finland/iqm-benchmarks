@@ -14,6 +14,7 @@ iqm.benchmarks.benchmark\_definition.BenchmarkRunResult
    .. autosummary::
    
       ~BenchmarkRunResult.dataset
+      ~BenchmarkRunResult.circuits
    
    
 
