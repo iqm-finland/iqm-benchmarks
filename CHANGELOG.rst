@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.1
+===========
+* Fixed bug in RB plots for individual decays.
+
 Version 2.0
 ===========
 * Adds `Circuits`, `BenchmarkCircuit` and `CircuitGroup` as a way to easily store and interact with multiple quantum circuits.
