@@ -18,3 +18,4 @@ Low rank compression of the process matrix is used to reduce measurement and pos
 """
 
 from . import compressive_gst
+from . import gst_analysis

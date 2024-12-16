@@ -33,6 +33,10 @@ from .randomized_benchmarking.interleaved_rb.interleaved_rb import (
     InterleavedRandomizedBenchmarking,
     InterleavedRBConfiguration,
 )
+from .compressive_gst.compressive_gst import (
+    CompressiveGST,
+    GSTConfiguration,
+)
 from .randomized_benchmarking.mirror_rb.mirror_rb import MirrorRandomizedBenchmarking, MirrorRBConfiguration
 
 

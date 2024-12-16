@@ -95,10 +95,8 @@ class CompressiveGST(Benchmark):
         else:
             self.batch_size = configuration.batch_size
 
-        self.y, self.J = (
-            np.empty((self.num_povm, self.configuration.num_circuits)),
-            np.empty((self.configuration.num_circuits, self.num_povm)),
-        )  # format used by mGST
+        # Circuit format used by mGST
+        self.J = np.empty((self.configuration.num_circuits, self.num_povm))
         self.bootstrap_results = List[Tuple[np.ndarray]]  # List of GST outcomes from bootstrapping
 
     @staticmethod
@@ -280,6 +278,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     convergence_criteria: Union[str, List[float]] = [4, 1e-4]
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
+    testing: bool = False
 
 
 def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List[int]]:
@@ -453,5 +452,7 @@ def create_predefined_gate_set(gate_set, num_qubits) -> Tuple[List[QuantumCircui
     gates = [remove_idle_wires(qc) for qc in gates]
 
     gate_label_dict = dict(enumerate(gate_labels))
+    for key, value in gate_label_dict.items():
+        gate_label_dict[key] = value + f":{gate_qubits[key]}"
 
     return gates, gate_label_dict, len(gates)

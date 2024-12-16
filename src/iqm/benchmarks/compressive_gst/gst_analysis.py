@@ -358,6 +358,7 @@ def generate_unit_rank_gate_results(
             ).T
         )
         df_g_rotation.columns = [f"h_%s" % label for label in pauli_labels]
+        df_g_rotation.rename(index=dataset.attrs["gate_labels"], inplace=True)
         df_g_final.rename(index=dataset.attrs["gate_labels"], inplace=True)
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"])
@@ -639,7 +640,7 @@ def dataset_counts_to_mgst_format(dataset: xr.Dataset, qubit_layout: List[int]) 
     return y
 
 
-def run_mGST(
+def run_mGST_wrapper(
     dataset: xr.Dataset, y: ndarray
 ) -> tuple[ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
     """Wrapper function for mGST algorithm execution which prepares an initialization and sets the alg. parameters
@@ -718,7 +719,7 @@ def run_mGST(
         threshold_multiplier=dataset.attrs["convergence_criteria"][0],
         target_rel_prec=dataset.attrs["convergence_criteria"][1],
         init=init_params,
-        testing=False,
+        testing=dataset.attrs["testing"],
     )
 
     return K, X, E, rho, K_target, X_target, E_target, rho_target
@@ -745,7 +746,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         # Main GST reconstruction
         start_timer = perf_counter()
-        K, X, E, rho, K_target, X_target, E_target, rho_target = run_mGST(dataset, y)
+        K, X, E, rho, K_target, X_target, E_target, rho_target = run_mGST_wrapper(dataset, y)
         main_gst_time = perf_counter() - start_timer
 
         # Gauge optimization
