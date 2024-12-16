@@ -25,14 +25,10 @@ import matplotlib.pyplot as plt
 from mthree.classes import QuasiCollection
 from mthree.utils import expval
 import numpy as np
-from qiskit import QuantumCircuit
 from qiskit.circuit.library import QuantumVolume
 from qiskit_aer import Aer
 import xarray as xr
 
-# import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
-# from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
-# from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
     Benchmark,
@@ -42,6 +38,11 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkRunResult,
     add_counts_to_dataset,
 )
+
+# import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
+# from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
+# from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
+from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
@@ -55,6 +56,7 @@ from iqm.benchmarks.utils import (  # execute_with_dd,
     timeit,
     xrvariable_to_counts,
 )
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -322,13 +324,7 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Retrieve other dataset values
         dataset_dictionary = dataset.attrs[qubits_idx]
         sorted_qc_list_indices = dataset_dictionary["sorted_qc_list_indices"]
-        transpiled_circ_dataset = dataset.attrs["transpiled_circuits"][str(qubits)]
-        transpiled_qc_list = []
-        untranspiled_circ_dataset = dataset.attrs["untranspiled_circuits"][str(qubits)]
-        qc_list = []
-        for key in transpiled_circ_dataset:  # Keys (final layouts) are the same for transp/untransp
-            transpiled_qc_list.extend(transpiled_circ_dataset[key])
-            qc_list.extend(untranspiled_circ_dataset[key])
+        qc_list = run.circuits["transpiled_circuits"][str(qubits)].circuits
 
         qv_results_type[str(qubits)] = dataset_dictionary["qv_results_type"]
         depth[str(qubits)] = len(qubits)
@@ -738,13 +734,13 @@ class QuantumVolumeBenchmark(Benchmark):
         sorted_qc_list_indices = {}
 
         # Initialize the variable to contain the QV circuits of each layout
-        self.untranspiled_circuits: Dict[str, Dict[Tuple, List[QuantumCircuit]]] = {}
-        self.transpiled_circuits: Dict[str, Dict[Tuple, List[QuantumCircuit]]] = {}
+        self.circuits = Circuits()
+        self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
+        self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
         all_op_counts = {}
 
         for qubits in self.custom_qubits_array:  # NB: jobs will be submitted for qubit layouts in the specified order
-            self.untranspiled_circuits[str(qubits)] = {}
-            self.transpiled_circuits[str(qubits)] = {}
+
             num_qubits = len(qubits)
             depth = num_qubits
             qcvv_logger.info(f"Executing QV on qubits {qubits}")
@@ -781,8 +777,10 @@ class QuantumVolumeBenchmark(Benchmark):
             else:
                 raise ValueError("physical_layout must either be \"fixed\" or \"batching\"")
 
-            self.untranspiled_circuits[str(qubits)].update({tuple(qubits): qc_list})
-            self.transpiled_circuits[str(qubits)].update(sorted_transpiled_qc_list)
+            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=qc_list))
+            self.transpiled_circuits.circuit_groups.append(
+                CircuitGroup(name=str(qubits), circuits=sorted_transpiled_qc_list[tuple(qubits)])
+            )
 
             # Count operations
             all_op_counts[str(qubits)] = count_native_gates(backend, transpiled_qc_list)
@@ -823,14 +821,15 @@ class QuantumVolumeBenchmark(Benchmark):
             qcvv_logger.info(f"Adding counts of {qubits} run to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(qubits), dataset)
 
-        self.add_all_circuits_to_dataset(dataset)
+        self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         if self.rem:
             rem_quasidistros = {}
             for qubits in self.custom_qubits_array:
                 exec_counts = xrvariable_to_counts(dataset, str(qubits), self.num_circuits)
                 rem_quasidistros[f"REM_quasidist_{str(qubits)}"] = self.get_rem_quasidistro(
-                    self.transpiled_circuits[str(qubits)],
+                    {tuple(qubits): self.transpiled_circuits[str(qubits)].circuits},
+                    # self.transpiled_circuits[str(qubits)],
                     sorted_qc_list_indices[str(qubits)],
                     exec_counts,
                     self.mit_shots,

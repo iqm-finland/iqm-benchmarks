@@ -21,7 +21,7 @@ import copy
 from copy import deepcopy
 from dataclasses import dataclass, field
 import functools
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 import uuid
 
 from matplotlib.figure import Figure
@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
+from iqm.benchmarks.circuit_containers import BenchmarkCircuit, Circuits
 from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
@@ -81,6 +82,7 @@ class BenchmarkRunResult:
     """
 
     dataset: xr.Dataset
+    circuits: Circuits
 
 
 @dataclass
@@ -94,6 +96,7 @@ class BenchmarkAnalysisResult:
     """
 
     dataset: xr.Dataset
+    circuits: Optional[Circuits] = field(default=None)
     plots: dict[str, Figure] = field(default_factory=lambda: ({}))
     observations: list[BenchmarkObservation] = field(default_factory=lambda: [])
 
@@ -122,14 +125,14 @@ class BenchmarkAnalysisResult:
         Args:
             run: A run for which analysis result is created.
         """
-        return cls(dataset=run.dataset)
+        return cls(dataset=run.dataset, circuits=Circuits)
 
 
-def default_analysis_function(result: BenchmarkAnalysisResult) -> BenchmarkAnalysisResult:
+def default_analysis_function(result: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """
     The default analysis that only pass the result through.
     """
-    return result
+    return BenchmarkAnalysisResult.from_run_result(result)
 
 
 def merge_datasets_dac(datasets: List[xr.Dataset]) -> xr.Dataset:
@@ -208,17 +211,18 @@ class Benchmark(ABC):
     accept ``AnalysisResult`` as its input and return the final result.
     """
 
-    analysis_function = staticmethod(default_analysis_function)
+    analysis_function: Callable[[BenchmarkRunResult], BenchmarkAnalysisResult] = staticmethod(default_analysis_function)
     default_options: dict[str, Any] | None = None
     options: dict[str, Any] | None = None
-    # name: str = "unnamed_benchmark"
 
-    def __init__(self, backend: Union[str, IQMBackendBase], configuration: "BenchmarkConfigurationBase", **kwargs):
+    def __init__(self, backend: Union[str, IQMBackendBase], configuration: BenchmarkConfigurationBase, **kwargs):
 
         # Ported from BenchmarkBase   # CHECK
         self.configuration = configuration
         self.serializable_configuration = deepcopy(self.configuration)
         self.serializable_configuration.benchmark = self.name
+
+        self.circuits = Circuits()
 
         if isinstance(backend, str):
             self.backend = get_iqm_backend(backend)
@@ -233,8 +237,8 @@ class Benchmark(ABC):
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
 
-        self.untranspiled_circuits: Dict[str, Dict[int, list]] = {}
-        self.transpiled_circuits: Dict[str, Dict[int, list]] = {}
+        self.transpiled_circuits: BenchmarkCircuit
+        self.untranspiled_circuits: BenchmarkCircuit
 
         # From exa_support MR
         self.options = copy.copy(self.default_options) if self.default_options else {}
@@ -278,7 +282,7 @@ class Benchmark(ABC):
             self.backend.run, calibration_set_id=calibration_set_id
         )  # type: ignore
         dataset = self.execute(backend_for_execute)
-        run = BenchmarkRunResult(dataset)
+        run = BenchmarkRunResult(dataset, self.circuits)
         self.runs.append(run)
         return run
 
@@ -299,6 +303,5 @@ class Benchmark(ABC):
             the ``analysis_function`` field.
         """
         run = self.runs[run_index]
-        result = BenchmarkAnalysisResult.from_run_result(run)
-        updated_result = self.analysis_function(result)
+        updated_result = self.analysis_function(run)
         return updated_result
