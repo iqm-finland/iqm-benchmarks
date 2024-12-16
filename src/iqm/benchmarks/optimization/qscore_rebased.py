@@ -35,16 +35,236 @@ from iqm.benchmarks.utils import (  # execute_with_dd,
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
+def cut_cost_function(x: str, graph: Graph) -> int:
+    """Returns the number of cut edges in a graph (with minus sign).
+
+    Args:
+        x (str): solution bitstring.
+        graph (networkx graph): the MaxCut problem graph.
+
+    Returns:
+        obj (float): number of cut edges multiplied by -1.
+    """
+    obj = 0
+    for i, j in graph.edges():
+        if x[i] != x[j]:
+            obj += 1
+    return -1 * obj
+
+
+def is_successful(
+    approximation_ratio: float,) -> bool:
+    """Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.
+
+    This condition checks that the mean approximation ratio is above the beta* = 0.2 threshold.
+
+    Args:
+        approximation_ratio (float): the mean approximation ratio of all problem graphs
+
+    Returns:
+        bool: whether the Q-score benchmark was successful
+    """
+    return bool(approximation_ratio > 0.2)
+
+
+def plot_approximation_ratios(
+    nodes: list[int],
+    beta_ratio: list[float],
+    beta_std: list[float],
+    use_virtual_node: Optional[bool],
+    use_classically_optimized_angles: Optional[bool],
+    num_instances: int,
+    backend_name: str,
+    timestamp: str,
+) -> tuple[str, Figure]:
+    """Generate the figure of approximation ratios vs number of nodes,
+        including standard deviation and the acceptance threshold.
+
+    Args:
+        nodes (list[int]): list nodes for the problem graph sizes.
+        beta_ratio (list[float]): Beta ratio calculated for each graph size.
+        beta_std (list[float]): Standard deviation for beta ratio of each graph size.
+        use_virtual_node (Optional[bool]): whether to use virtual nodes or not.
+        use_classically_optimized_angles (Optional[bool]): whether to use classically optimized angles or not.
+        num_instances (int): the number of instances.
+        backend_name (str): the name of the backend.
+        timestamp (str): the timestamp of the execution of the experiment.
+
+    Returns:
+        str: the name of the figure.
+        Figure: the figure.
+    """
+
+    fig = plt.figure()
+    ax = plt.axes()
+
+    plt.axhline(0.2, color="red", linestyle="dashed", label="Threshold")
+    plt.errorbar(
+        nodes,
+        beta_ratio,
+        yerr=beta_std,
+        fmt="-o",
+        capsize=10,
+        markersize=8,
+        color="#759DEB",
+        label="Approximation ratio",
+    )
+
+    ax.set_ylabel(r"Q-score ratio $\beta(n)$")
+    ax.set_xlabel("Number of nodes $(n)$")
+    plt.xticks(range(min(nodes), max(nodes) + 1))
+    plt.legend(loc="lower right")
+    plt.grid(True)
+
+    if use_virtual_node and use_classically_optimized_angles:
+        title = f"Q-score, {num_instances} instances, with virtual node and classically optimized angles\nBackend: {backend_name} / {timestamp}"
+    elif use_virtual_node and not use_classically_optimized_angles:
+        title = f"Q-score, {num_instances} instances, with virtual node \nBackend: {backend_name} / {timestamp}"
+    elif not use_virtual_node and use_classically_optimized_angles:
+        title = f"Q-score, {num_instances} instances, with classically optimized angles\nBackend: {backend_name} / {timestamp}"
+    else:
+        title = f"Q-score, {num_instances} instances \nBackend: {backend_name} / {timestamp}"
+
+    plt.title(
+        title,
+        fontsize=9,
+    )
+    fig_name = f"{max(nodes)}_nodes_{num_instances}_instances.png"
+
+    # Show plot if verbose is True
+    plt.gcf().set_dpi(250)
+    plt.show()
+
+    plt.close()
+
+    return fig_name, fig
+
+
+def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
+    """Analysis function for a QScore experiment
+
+    Args:
+        run (RunResult): A QScore experiment run for which analysis result is created
+    Returns:
+        AnalysisResult corresponding to QScore
+    """
+
+    plots = {}
+    observations: list[BenchmarkObservation] = []
+    execution_results = {}
+    dataset = run.dataset.copy(deep=True)
+
+    backend_name = dataset.attrs["backend_name"]
+    timestamp = dataset.attrs["execution_timestamp"]
+
+    max_num_nodes = dataset.attrs["max_num_nodes"]
+    min_num_nodes = dataset.attrs["min_num_nodes"]
+    num_instances: int = dataset.attrs["num_instances"]
+
+    use_virtual_node: bool = dataset.attrs["use_virtual_node"]
+    use_classically_optimized_angles = dataset["use_classically_optimized_angles"]
+
+    qscore = 0
+    nodes_list = list(range(min_num_nodes, max_num_nodes + 1))
+    beta_ratio_list = []
+    beta_ratio_std_list = []
+    for num_nodes in nodes_list:
+        # Retrieve counts for all the instances within each executed node size.
+        execution_results[str(num_nodes)] = xrvariable_to_counts(dataset, str(num_nodes), num_instances)
+
+        # Retrieve other dataset values
+        dataset_dictionary = dataset.attrs[num_nodes]
+
+        node_set_list = dataset_dictionary["qubit_set"]
+        graph_list = dataset_dictionary["graph"]
+
+        cut_sizes_list = []
+        for inst_idx in range(num_instances):
+            objective_fun = self.compute_expectation_value(graph_list[inst_idx], node_set_list[inst_idx])
+            cut_sizes = self.run_QAOA(objective_fun)
+            cut_sizes_list.append(cut_sizes)
+
+        ## compute the approximation ratio beta
+        LAMBDA = 0.178
+
+        average_cut_size = np.mean(cut_sizes_list) - num_nodes * (num_nodes - 1) / 8
+        average_best_cut_size = 0.178 * pow(num_nodes, 3 / 2)
+        approximation_ratio = float(average_cut_size / average_best_cut_size)
+
+        approximation_ratio_list = [
+            (np.array(cut_sizes) - num_nodes * (num_nodes - 1) / 8) / (LAMBDA * num_nodes ** (3 / 2))
+            for cut_sizes in cut_sizes_list
+        ]
+        beta_ratio_list.append(np.mean(approximation_ratio_list))
+        success = is_successful(approximation_ratio)
+        std_of_approximation_ratio = np.std(np.array(approximation_ratio_list)) / np.sqrt(
+            len(approximation_ratio_list) - 1
+        )
+        beta_ratio_std_list.append(std_of_approximation_ratio)
+
+        if success:
+            qcvv_logger.info(
+                f"Q-Score = {num_nodes} passed with:\nApproximation ratio (Beta): {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+            )
+            qscore = num_nodes
+            continue
+
+        qcvv_logger.info(
+            f"Q-Score = {num_nodes} failed with \napproximation ratio (Beta): {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+        )
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name="approximation_ratio",
+                    value=approximation_ratio,
+                    uncertainty=std_of_approximation_ratio,
+                    identifier=BenchmarkObservationIdentifier(num_nodes),
+                ),
+                BenchmarkObservation(
+                    name="is_succesful",
+                    value=str(success),
+                    identifier=BenchmarkObservationIdentifier(num_nodes),
+                ),
+                BenchmarkObservation(
+                    name="Qscore_result",
+                    value=qscore if success else 1,
+                    identifier=BenchmarkObservationIdentifier(num_nodes),
+                ),
+            ]
+        )
+
+        dataset.attrs[num_nodes].update(
+            {
+                "approximate_ratio_list": approximation_ratio_list,
+            }
+        )
+
+    fig_name, fig = plot_approximation_ratios(nodes_list,
+                                              beta_ratio_list,
+                                              beta_ratio_std_list,
+                                              use_virtual_node,
+                                              use_classically_optimized_angles,
+                                              num_instances,
+                                              backend_name,
+                                              timestamp)
+    plots[fig_name] = fig
+
+    return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
+
 class QScoreBenchmark(Benchmark):
     """
     Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
     """
 
+    analysis_function = staticmethod(qscore_analysis)
+
+    name: str = "qscore"
+
     def __init__(self, backend_arg: IQMBackendBase, configuration: "QScoreConfiguration"):
         """Construct the QScoreBenchmark class.
 
         Args:
-            backend (IQMBackendBase): the backend to execute the benchmark on
+            backend_arg (IQMBackendBase): the backend to execute the benchmark on
             configuration (QScoreConfiguration): the configuration of the benchmark
         """
         super().__init__(backend_arg, configuration)
@@ -61,6 +281,7 @@ class QScoreBenchmark(Benchmark):
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.optimize_sqg = configuration.optimize_sqg
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
+        self.execution_timestamp = ''
         self.seed = configuration.seed
 
         self.graph_physical: Graph
@@ -76,10 +297,6 @@ class QScoreBenchmark(Benchmark):
 
         if self.choose_qubits_routine == "custom":
             self.custom_qubits_array = configuration.custom_qubits_array
-
-    @staticmethod
-    def name() -> str:
-        return "qscore"
 
     def generate_maxcut_ansatz(  # pylint: disable=too-many-branches
         self,
@@ -137,24 +354,6 @@ class QScoreBenchmark(Benchmark):
         qaoa_qc.measure_all()
         return qaoa_qc
 
-    @staticmethod
-    def cost_function(x: str, graph: Graph) -> int:
-        """Returns the number of cut edges in a graph (with minus sign).
-
-        Args:
-            x (str): solution bitstring.
-            graph (networkx graph): the MaxCut problem graph.
-
-        Returns:
-            obj (float): number of cut edges multiplied by -1.
-        """
-
-        obj = 0
-        for i, j in graph.edges():
-            if x[i] != x[j]:
-                obj += 1
-
-        return -1 * obj
 
     def compute_expectation_value(self, counts: Dict[str, int], graph: Graph) -> float:
         """Computes expectation value based on measurement results.
@@ -182,7 +381,7 @@ class QScoreBenchmark(Benchmark):
                 if virtual_node[0] is not None:
                     bitstring[virtual_node[0]] = str(virtual_node[1])
 
-            obj = self.cost_function("".join(bitstring), graph)
+            obj = cut_cost_function("".join(bitstring), graph)
             avg += obj * count
             sum_count += count
 
@@ -450,6 +649,7 @@ class QScoreBenchmark(Benchmark):
             dataset (xr.Dataset): The xarray dataset
         """
         dataset.attrs["session_timestamp"] = self.session_timestamp
+        dataset.attrs["execution_timestamp"] = self.execution_timestamp
         dataset.attrs["backend_configuration_name"] = self.backend_configuration_name
         dataset.attrs["backend_name"] = self.backend.name
 
@@ -480,21 +680,6 @@ class QScoreBenchmark(Benchmark):
                 }
             dataset.attrs[key] = dictionary
 
-    @staticmethod
-    def is_successful(
-        approximation_ratio: float,
-    ) -> bool:
-        """Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.
-
-        This condition checks that the mean approximation ratio is above the beta* = 0.2 threshold.
-
-        Args:
-            approximation_ratio (float): the mean approximation ratio of all problem graphs
-
-        Returns:
-            bool: whether the Q-score benchmark was successful
-        """
-        return bool(approximation_ratio > 0.2)
 
     @staticmethod
     def choose_qubits_naive(num_qubits: int) -> list[int]:
@@ -533,67 +718,6 @@ class QScoreBenchmark(Benchmark):
         else:
             chosen_qubits = selected_qubits[0]
         return chosen_qubits
-
-    def plot_approximation_ratios(
-        self, nodes: list[int], beta_ratio=list[float], beta_std=list[float]
-    ) -> tuple[str, Figure]:
-        """Generate the figure of approximation ratios vs number of nodes,
-            including standard deviation and the acceptance threshold.
-
-        Args:
-            nodes (list[int]): list nodes for the problem graph sizes.
-            beta_ratio (list[float]): Beta ratio calculated for each graph size.
-            beta_std (list[float]): Standard deviation for beta ratio of each graph size.
-
-
-        Returns:
-            str: the name of the figure.
-            Figure: the figure.
-        """
-
-        fig = plt.figure()
-        ax = plt.axes()
-
-        plt.axhline(0.2, color="red", linestyle="dashed", label="Threshold")
-        plt.errorbar(
-            nodes,
-            beta_ratio,
-            yerr=beta_std,
-            fmt="-o",
-            capsize=10,
-            markersize=8,
-            color="#759DEB",
-            label="Approximation ratio",
-        )
-
-        ax.set_ylabel(r"Q-score ratio $\beta(n)$")
-        ax.set_xlabel("Number of nodes $(n)$")
-        plt.xticks(range(min(nodes), max(nodes) + 1))
-        plt.legend(loc="lower right")
-        plt.grid(True)
-
-        if self.use_virtual_node and self.use_classically_optimized_angles:
-            title = f"Q-score, {self.num_instances} instances, with virtual node and classically optimized angles\nBackend: {self.backend.name} / {self.timestamp}"
-        elif self.use_virtual_node and not self.use_classically_optimized_angles:
-            title = f"Q-score, {self.num_instances} instances, with virtual node \nBackend: {self.backend.name} / {self.timestamp}"
-        elif not self.use_virtual_node and self.use_classically_optimized_angles:
-            title = f"Q-score, {self.num_instances} instances, with classically optimized angles\nBackend: {self.backend.name} / {self.timestamp}"
-        else:
-            title = f"Q-score, {self.num_instances} instances \nBackend: {self.backend.name} / {self.timestamp}"
-
-        plt.title(
-            title,
-            fontsize=9,
-        )
-        fig_name = f"{max(nodes)}_nodes_{self.num_instances}_instances.png"
-
-        # Show plot if verbose is True
-        plt.gcf().set_dpi(250)
-        plt.show()
-
-        plt.close()
-
-        return fig_name, fig
 
     # def execute_single_benchmark(
     #     self,
@@ -722,133 +846,20 @@ class QScoreBenchmark(Benchmark):
     #     return num_nodes, approximation_ratios, list_of_cut_sizes
     #
 
-    def qscore_analysis(self, run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
-        """Analysis function for a QScore experiment
-
-        Args:
-            run (RunResult): A QScore experiment run for which analysis result is created
-        Returns:
-            AnalysisResult corresponding to QScore
-        """
-
-        plots = {}
-        observations: list[BenchmarkObservation] = []
-        execution_results = {}
-        dataset = run.dataset.copy(deep=True)
-
-        if self.max_num_nodes is None:
-            if self.use_virtual_node:
-                max_num_nodes = self.backend.num_qubits + 1
-            else:
-                max_num_nodes = self.backend.num_qubits
-        else:
-            max_num_nodes = self.max_num_nodes
-
-        qscore = 0
-        nodes_list = list(range(self.min_num_nodes, max_num_nodes + 1))
-        beta_ratio_list = []
-        beta_ratio_std_list = []
-        for num_nodes in nodes_list:
-            # Retrieve counts for all the instances within each executed node size.
-            execution_results[str(num_nodes)] = xrvariable_to_counts(dataset, str(num_nodes), self.num_instances)
-
-            # Retrieve other dataset values
-            dataset_dictionary = dataset.attrs[num_nodes]
-
-            node_set_list = dataset_dictionary["qubit_set"]
-            graph_list = dataset_dictionary["graph"]
-
-            cut_sizes_list = []
-            for inst_idx in range(self.num_instances):
-                objective_fun = self.compute_expectation_value(graph_list[inst_idx], node_set_list[inst_idx])
-                cut_sizes = self.run_QAOA(objective_fun)
-                cut_sizes_list.append(cut_sizes)
-
-            ## compute the approximation ratio beta
-            LAMBDA = 0.178
-
-            average_cut_size = np.mean(cut_sizes_list) - num_nodes * (num_nodes - 1) / 8
-            average_best_cut_size = 0.178 * pow(num_nodes, 3 / 2)
-            approximation_ratio = float(average_cut_size / average_best_cut_size)
-
-            approximation_ratio_list = [
-                (np.array(cut_sizes) - num_nodes * (num_nodes - 1) / 8) / (LAMBDA * num_nodes ** (3 / 2))
-                for cut_sizes in cut_sizes_list
-            ]
-            beta_ratio_list.append(np.mean(approximation_ratio_list))
-            success = self.is_successful(approximation_ratio)
-            std_of_approximation_ratio = np.std(np.array(approximation_ratio_list)) / np.sqrt(
-                len(approximation_ratio_list) - 1
-            )
-            beta_ratio_std_list.append(std_of_approximation_ratio)
-
-            if success:
-                qcvv_logger.info(
-                    f"Q-Score = {num_nodes} passed with:\nApproximation ratio (Beta): {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
-                )
-                qscore = num_nodes
-                continue
-
-            qcvv_logger.info(
-                f"Q-Score = {num_nodes} failed with \napproximation ratio (Beta): {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
-            )
-            observations.extend(
-                [
-                    BenchmarkObservation(
-                        name="approximation_ratio",
-                        value=approximation_ratio,
-                        uncertainty=std_of_approximation_ratio,
-                        identifier=BenchmarkObservationIdentifier(num_nodes),
-                    ),
-                    BenchmarkObservation(
-                        name="is_succesful",
-                        value=str(success),
-                        identifier=BenchmarkObservationIdentifier(num_nodes),
-                    ),
-                    BenchmarkObservation(
-                        name="Qscore_result",
-                        value=qscore if success else 1,
-                        identifier=BenchmarkObservationIdentifier(num_nodes),
-                    ),
-                ]
-            )
-
-            dataset.attrs[num_nodes].update(
-                {
-                    "approximate_ratio_list": approximation_ratio_list,
-                }
-            )
-
-        fig_name, fig = self.plot_approximation_ratios(
-            self,
-            nodes_list,
-            beta_ratio_list,
-            beta_ratio_std_list,
-        )
-        plots[fig_name] = fig
-
-        return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
-
-    analysis_function = staticmethod(qscore_analysis)
 
     def execute(self, backend: IQMBackendBase) -> xr.Dataset:
         """Executes the benchmark."""
-
-        if self.max_num_nodes is None:
-            if self.use_virtual_node:
-                max_num_nodes = self.backend.num_qubits + 1
-            else:
-                max_num_nodes = self.backend.num_qubits
-        else:
-            max_num_nodes = self.max_num_nodes
-
-        approximation_ratios = []
-        list_of_cut_sizes = []
-
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
+
+        if self.max_num_nodes is None:
+            if self.use_virtual_node:
+                max_num_nodes = self.backend.num_qubits + 1
+            else:
+                max_num_nodes = self.backend.num_qubits
+        dataset.attrs.update({"max_num_nodes": max_num_nodes})
 
         # Initialize the variable to contain the QScore circuits of each node
         self.untranspiled_circuits: Dict[str, List[QuantumCircuit]] = {}
