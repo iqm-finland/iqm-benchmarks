@@ -34,7 +34,7 @@ from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset, BenchmarkObservationIdentifier
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.compressive_gst.gst_analysis import mgst_analysis
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -72,7 +72,7 @@ class CompressiveGST(Benchmark):
         self.pdim = 2**self.num_qubits
         self.num_povm = self.pdim
 
-        self.gate_set, self.gate_labels, self.num_gates = parse_gate_set(configuration, self.num_qubits)
+        self.gate_set, self.gate_labels, self.num_gates = parse_gate_set(configuration, self.num_qubits, self.qubit_layouts)
 
         if configuration.opt_method not in ["GD", "SFN", "auto"]:
             raise ValueError("Invalid optimization method, valid options are: GD, SFN, auto")
@@ -155,9 +155,9 @@ class CompressiveGST(Benchmark):
                 drop_final_rz=False,
             )
             # Saving raw and transpiled circuits in a consistent format with other benchmarks
-            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
             self.untranspiled_circuits.circuit_groups.append(
-                CircuitGroup(name=str(qubits), circuits=transpiled_qc_list)
+                CircuitGroup(name=str(qubits), circuits=raw_qc_list)
             )
 
     def add_configuration_to_dataset(self, dataset):  # CHECK
@@ -296,7 +296,7 @@ def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List
             The qubit_layouts on the backend where the gates are defined on
 
     Returns:
-        qubit_layouts: List[List[[int]]
+        qubit_layouts: List[List[int]]
             A properly typed qubit_layout if no Error was raised
     """
     if all(isinstance(qubits, int) for qubits in qubit_layouts):
@@ -315,7 +315,7 @@ def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List
 
 
 def parse_gate_set(
-    configuration: GSTConfiguration, num_qubits
+    configuration: GSTConfiguration, num_qubits, qubit_layouts: List[List[int]]
 ) -> Tuple[List[QuantumCircuit], Dict[str, Dict[int, str]], int]:
     """
     Handles different gate set inputs and produces a valid gate set
@@ -325,6 +325,8 @@ def parse_gate_set(
             Configuration class containing variables
         num_qubits: int
             The number of qubits on which the gate set is defined
+        qubit_layouts: List[List[int]]
+            A properly typed qubit_layout if no Error was raised
 
     Returns:
         gate_set: List[QuantumCircuit]
@@ -346,7 +348,7 @@ def parse_gate_set(
             "1QXYI, 2QXYCZ, 2QXYCZ_extended, 3QXYCZ."
         )
     if configuration.gate_set in ["1QXYI", "2QXYCZ", "2QXYCZ_extended", "3QXYCZ"]:
-        gate_set, gate_labels, num_gates = create_predefined_gate_set(configuration.gate_set, num_qubits)
+        gate_set, gate_labels, num_gates = create_predefined_gate_set(configuration.gate_set, num_qubits, qubit_layouts)
         return gate_set, gate_labels, num_gates
 
     if isinstance(configuration.gate_set, list):
@@ -370,7 +372,7 @@ def parse_gate_set(
     )
 
 
-def create_predefined_gate_set(gate_set, num_qubits) -> Tuple[List[QuantumCircuit], Dict, int]:
+def create_predefined_gate_set(gate_set: Union[str, List[Any]], num_qubits: int , qubit_layouts: List[List[int]]) -> Tuple[List[QuantumCircuit], Dict, int]:
     """Create a list of quantum circuits corresponding to a predefined gate set.
 
     The circuits are assigned to the specified qubit_layouts on the backend only during transipilation, so the qubit labels
@@ -382,7 +384,7 @@ def create_predefined_gate_set(gate_set, num_qubits) -> Tuple[List[QuantumCircui
     Returns:
         gates: List[QuantumCircuit]
             The gate set as a list of circuits
-        gate_labels_dict: Dict[int, str]
+        gate_labels_dict: Dict[str, Dict[int, str]]
             The names of gates, i.e. "Rx(pi/2)" for a pi/2 rotation around the x-axis.
         num_gates: int
             The number of gates in the gate set
@@ -427,10 +429,10 @@ def create_predefined_gate_set(gate_set, num_qubits) -> Tuple[List[QuantumCircui
             "Rx(pi/2)",
             "Ry(pi/2)",
             "Ry(pi/2)",
-            "Rx(pi/2)--Rx(pi/2)",
-            "Rx(pi/2)--Ry(pi/2)",
-            "Ry(pi/2)--Rx(pi/2)",
-            "Ry(pi/2)--Ry(pi/2)",
+            "Rx(pi/2)-Rx(pi/2)",
+            "Rx(pi/2)-Ry(pi/2)",
+            "Ry(pi/2)-Rx(pi/2)",
+            "Ry(pi/2)-Ry(pi/2)",
             "CZ",
         ]
     elif gate_set == "3QXYCZ":
@@ -458,8 +460,13 @@ def create_predefined_gate_set(gate_set, num_qubits) -> Tuple[List[QuantumCircui
     gates = add_idle_gates(gates, unmapped_qubits, gate_qubits)
     gates = [remove_idle_wires(qc) for qc in gates]
 
-    gate_label_dict = dict(enumerate(gate_labels))
-    for key, value in gate_label_dict.items():
-        gate_label_dict[key] = value + f":{gate_qubits[key]}"
-
+    gate_label_dict = {}
+    for qubit_layout in qubit_layouts:
+        identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+        layout_label_dict = dict(enumerate(gate_labels))
+        iqm_qubits = [f"QB{q + 1}" for q in qubit_layout]
+        gate_qubits_iqm = [(iqm_qubits[q] for q in qubits) for qubits in gate_qubits]
+        for key, value in layout_label_dict.items():
+            layout_label_dict[key] = value + ":" + "-".join(gate_qubits_iqm[key])
+        gate_label_dict.update({identifier: layout_label_dict})
     return gates, gate_label_dict, len(gates)
