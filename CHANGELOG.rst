@@ -4,7 +4,7 @@ Changelog
 
 Version 2.2
 ===========
-* Added Clifford RB example notebook to docs. `#20 <https://github.com/iqm-finland/iqm-benchmarks/pull/20>`
+* Added Clifford RB example notebook to docs. `#20 <https://github.com/iqm-finland/iqm-benchmarks/pull/20>`_
 
 Version 2.1
 ===========
