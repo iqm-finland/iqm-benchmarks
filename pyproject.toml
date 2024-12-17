@@ -41,6 +41,7 @@ dependencies = [
     "pycurl >= 7.45.3, < 8.0",
     "xarray >= 2024.6.0, < 2025.0.0",
     "types-pycurl",
+    "myst-nb == 1.1.0",
 ]
 
 [project.urls]
