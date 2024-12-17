@@ -2,6 +2,6 @@ Examples
 ########
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    example_clifford_rb
