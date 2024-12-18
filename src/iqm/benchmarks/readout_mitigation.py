@@ -14,7 +14,6 @@
 """M3 modification for readout mitigation at IQM QPU's."""
 import logging
 from math import ceil
-import sys
 import threading
 from typing import Any, Dict, Iterable, List
 import warnings
@@ -28,6 +27,7 @@ from mthree.utils import final_measurement_mapping
 from qiskit import transpile  # pylint: disable = no-name-in-module
 from qiskit.providers import Backend, BackendV1, BackendV2
 
+from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import get_iqm_backend, timeit
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
@@ -220,7 +220,7 @@ class M3IQM(mthree.M3Mitigation):
                         calibration_set_id=cal_id,
                     )
                 jobs.append(_job)
-                print(f"{len(circs)} calibration circuits ready to be executed!")
+                qcvv_logger.info(f"REM: {len(circs)} calibration circuits to be executed!")
 
         # Execute job and cal building in new thread.
         self._job_error = None
@@ -265,11 +265,8 @@ def apply_readout_error_mitigation(
     Returns:
         tuple[Any, Any] | tuple[QuasiCollection, list] | QuasiCollection: a list of dictionaries with REM-corrected quasiprobabilities for each outcome.
     """
-    # M3IQM uses mthree.mitigation, which for some reason displays many INFO messages
-    # Not sure if this is the best way to suppress them; MODIFY IF NECESSARY !
-    warnings.warn("Suppressing INFO messages from M3IQM with logging.disable(sys.maxsize) - update if problematic!")
-    logging.disable(sys.maxsize)
-
+    # M3IQM uses mthree.mitigation, which for some reason displays way too many INFO messages
+    logging.getLogger().setLevel(logging.WARN)
     if isinstance(backend_arg, str):
         backend = get_iqm_backend(backend_arg)
     else:
@@ -282,5 +279,6 @@ def apply_readout_error_mitigation(
     mit.cals_from_system(qubits_rem, shots=mit_shots)
     # Apply the REM correction to the given measured counts
     rem_quasidistro = [mit.apply_correction(c, q) for c, q in zip(counts, qubits_rem)]
+    logging.getLogger().setLevel(logging.INFO)
 
     return rem_quasidistro
