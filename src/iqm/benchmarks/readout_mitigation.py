@@ -14,7 +14,6 @@
 """M3 modification for readout mitigation at IQM QPU's."""
 import logging
 from math import ceil
-import sys
 import threading
 from typing import Any, Dict, Iterable, List
 import warnings
