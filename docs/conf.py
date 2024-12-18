@@ -49,7 +49,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
-    'myst_parser'
+    "myst_nb",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -161,6 +161,9 @@ extlinks = {
     'issue': ('https://github.com/iqm-finland/iqm-benchmarks/issues/%s', 'issue '),
     'mr': ('https://github.com/iqm-finland/iqm-benchmarks/pull/%s', 'MR '),
 }
+
+# -- Options for MyST-NB ---------------------------------------------------------
+nb_execution_mode = 'off'
 
 
 # -- Options for sphinxcontrib.bibtex -------------------------------------------------

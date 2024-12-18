@@ -565,6 +565,11 @@ def plot_rb_decay(
     num_circuit_samples = dataset.attrs["num_circuit_samples"]
     timestamp = dataset.attrs["execution_timestamp"]
     backend_name = dataset.attrs["backend_name"]
+    # If only one layout is passed, the index to retrieve results must be shifted!
+    qubits_index = 0
+    if len(qubits_array) == 1:
+        config_qubits_array = dataset.attrs["qubits_array"]
+        qubits_index = config_qubits_array.index(qubits_array[0])
 
     # Fetch the relevant observations indexed by qubit layouts
     depths = {}
@@ -583,79 +588,93 @@ def plot_rb_decay(
         colors = [cmap(i) for i in np.linspace(start=1, stop=0, num=len(qubits_array)).tolist()]
         if identifier == "mrb":
             depths[identifier] = {
-                str(q): list(dataset.attrs[q_idx]["polarizations"].keys()) for q_idx, q in enumerate(qubits_array)
+                str(q): list(dataset.attrs[q_idx]["polarizations"].keys())
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             polarizations[identifier] = {
-                str(q): dataset.attrs[q_idx]["polarizations"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx]["polarizations"] for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_polarization_nominal_values"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx]["avg_polarization_nominal_values"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_polatization_stderr"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx]["avg_polatization_stderr"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
-        else:
+        else:  # identifier == "clifford"
             depths[identifier] = {
-                str(q): list(dataset.attrs[q_idx]["fidelities"].keys()) for q_idx, q in enumerate(qubits_array)
+                str(q): list(dataset.attrs[q_idx]["fidelities"].keys())
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             polarizations[identifier] = {
-                str(q): dataset.attrs[q_idx]["fidelities"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx]["fidelities"] for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_fidelities_nominal_values"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx]["avg_fidelities_nominal_values"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_fidelities_stderr"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx]["avg_fidelities_stderr"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
         # These are common to both MRB and standard Clifford
         fidelity_value[identifier] = {
-            str(q): observations[q_idx]["avg_gate_fidelity"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): observations[q_idx]["avg_gate_fidelity"]["value"]
+            for q_idx, q in enumerate(qubits_array, qubits_index)
         }
         fidelity_stderr[identifier] = {
-            str(q): observations[q_idx]["avg_gate_fidelity"]["uncertainty"] for q_idx, q in enumerate(qubits_array)
+            str(q): observations[q_idx]["avg_gate_fidelity"]["uncertainty"]
+            for q_idx, q in enumerate(qubits_array, qubits_index)
         }
         decay_rate[identifier] = {
-            str(q): dataset.attrs[q_idx]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array, qubits_index)
         }
         offset[identifier] = {
-            str(q): dataset.attrs[q_idx]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array, qubits_index)
         }
         amplitude[identifier] = {
-            str(q): dataset.attrs[q_idx]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array)
+            str(q): dataset.attrs[q_idx]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array, qubits_index)
         }
-    else:
+    else:  # id MRB
         rb_type_keys = list(observations[0].keys())
         colors = [cmap(i) for i in np.linspace(start=1, stop=0, num=len(rb_type_keys)).tolist()]
         for rb_type in rb_type_keys:
             depths[rb_type] = {
-                str(q): list(dataset.attrs[q_idx][rb_type]["fidelities"].keys()) for q_idx, q in enumerate(qubits_array)
+                str(q): list(dataset.attrs[q_idx][rb_type]["fidelities"].keys())
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             polarizations[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["fidelities"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["fidelities"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[rb_type] = {
                 str(q): dataset.attrs[q_idx][rb_type]["avg_fidelities_nominal_values"]
-                for q_idx, q in enumerate(qubits_array)
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["avg_fidelities_stderr"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["avg_fidelities_stderr"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_value[rb_type] = {
                 str(q): observations[q_idx][rb_type]["avg_gate_fidelity"]["value"]
-                for q_idx, q in enumerate(qubits_array)
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_stderr[rb_type] = {
                 str(q): observations[q_idx][rb_type]["avg_gate_fidelity"]["uncertainty"]
-                for q_idx, q in enumerate(qubits_array)
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             decay_rate[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["decay_rate"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["decay_rate"]["value"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             offset[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["fit_offset"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["fit_offset"]["value"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             amplitude[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array)
+                str(q): dataset.attrs[q_idx][rb_type]["fit_amplitude"]["value"]
+                for q_idx, q in enumerate(qubits_array, qubits_index)
             }
 
     for index_irb, key in enumerate(rb_type_keys):
