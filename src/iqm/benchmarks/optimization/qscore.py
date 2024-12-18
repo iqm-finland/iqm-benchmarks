@@ -26,12 +26,12 @@ import matplotlib.pyplot as plt
 from networkx import Graph
 import networkx as nx
 import numpy as np
-from qiskit import QuantumCircuit
 from scipy.optimize import basinhopping, minimize
 
 from iqm.benchmarks.benchmark import BenchmarkBase, BenchmarkConfigurationBase
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import perform_backend_transpilation, retrieve_all_counts, submit_execute, timeit
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 

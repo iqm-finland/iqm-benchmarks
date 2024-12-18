@@ -25,12 +25,13 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, 
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
 import numpy as np
-from qiskit import ClassicalRegister, QuantumCircuit, transpile
+from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
