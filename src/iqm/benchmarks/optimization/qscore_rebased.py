@@ -4,7 +4,7 @@ Q-score benchmark
 
 import itertools
 from time import strftime
-from typing import Dict, List, Optional, Tuple, Type
+from typing import Callable, Dict, List, Optional, Tuple, Type
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -35,6 +35,57 @@ from iqm.benchmarks.utils import (  # execute_with_dd,
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
+@staticmethod
+def calculate_optimal_angles_for_QAOA_p1(graph: Graph) -> List[float]:
+    """Calculates the optimal angles for single layer QAOA MaxCut ansatz.
+
+    Args:
+        graph (networkx graph): the MaxCut problem graph.
+
+    Returns:
+        List[float]: optimal angles gamma and beta.
+
+    """
+
+    def get_Zij_maxcut_p1(edge_ij, gamma, beta):
+        """
+        Calculates <p1_QAOA | Z_i Z_j | p1_QAOA>, assuming ij is edge of G.
+        """
+        i, j = edge_ij
+        di = graph.degree[i]
+        dj = graph.degree[j]
+
+        first = np.cos(2 * gamma) ** (di - 1) + np.cos(2 * gamma) ** (dj - 1)
+        first *= 0.5 * np.sin(4 * beta) * np.sin(2 * gamma)
+
+        node_list = list(graph.nodes).copy()
+        node_list.remove(i)
+        node_list.remove(j)
+        f1 = 1
+        f2 = 1
+        for k in node_list:
+            if graph.has_edge(i, k) and graph.has_edge(j, k):  # ijk is triangle
+                f1 *= np.cos(4 * gamma)
+            elif graph.has_edge(i, k) or graph.has_edge(j, k):  # ijk is no triangle
+                f1 *= np.cos(2 * gamma)
+                f2 *= np.cos(2 * gamma)
+        second = 0.5 * np.sin(2 * beta) ** 2 * (f1 - f2)
+        return first - second
+
+    def get_expected_zz_edgedensity(x):
+        gamma = x[0]
+        beta = x[1]
+        # pylint: disable=consider-using-generator
+        return sum([get_Zij_maxcut_p1(edge, gamma, beta) for edge in graph.edges]) / graph.number_of_edges()
+
+    bounds = [(0.0, np.pi / 2), (-np.pi / 4, 0.0)]
+    x_init = [0.15, -0.28]
+
+    minimizer_kwargs = {"method": "L-BFGS-B", "bounds": bounds}
+    res = basinhopping(get_expected_zz_edgedensity, x_init, minimizer_kwargs=minimizer_kwargs, niter=10, T=2)
+
+    return res.x
+
 def cut_cost_function(x: str, graph: Graph) -> int:
     """Returns the number of cut edges in a graph (with minus sign).
 
@@ -51,6 +102,55 @@ def cut_cost_function(x: str, graph: Graph) -> int:
             obj += 1
     return -1 * obj
 
+def compute_expectation_value(counts: Dict[str, int], graph: Graph, qubit_to_node: Dict[int, int], virtual_nodes: List[Tuple[int, int]]) -> float:
+    """Computes expectation value based on measurement results.
+
+    Args:
+        counts (Dict[str, int]): key as bitstring, val as count
+        graph (networkx) graph: the MaxCut problem graph
+
+    Returns:
+        avg (float): expectation value of the cut edges for number of counts
+    """
+
+    avg = 0
+    sum_count = 0
+    for bitstring_aux, count in counts.items():
+        bitstring_aux_list = list(bitstring_aux)[::-1]  # go from qiskit endianness to networkx endianness
+
+        # map the qubits back to nodes
+        bitstring = [""] * (len(bitstring_aux_list) + len(virtual_nodes))
+        for qubit, node in qubit_to_node.items():
+            bitstring[node] = bitstring_aux_list[qubit]
+
+        # insert virtual node(s) to bitstring
+        for virtual_node in virtual_nodes:
+            if virtual_node[0] is not None:
+                bitstring[virtual_node[0]] = str(virtual_node[1])
+
+        obj = cut_cost_function("".join(bitstring), graph)
+        avg += obj * count
+        sum_count += count
+
+    return avg / sum_count
+
+def create_objective_function(counts: Dict[str, int], graph: Graph, qubit_to_node: Dict[int, int], virtual_nodes: List[Tuple[int, int]]) -> Callable:
+    """
+    Creates a function that maps the parameters to the parametrized circuit,
+    runs it and computes the expectation value.
+
+    Args:
+        graph (networkx graph): the MaxCut problem graph.
+        qubit_set (List[int]): indeces of the used qubits.
+    Returns:
+        callable: function that gives expectation value of the cut edges from counts sampled from the ansatz
+    """
+
+    def objective_function(temp):
+        temp = np.array(temp)
+        return compute_expectation_value(counts, graph, qubit_to_node, virtual_nodes)
+
+    return objective_function
 
 def is_successful(
     approximation_ratio: float,) -> bool:
@@ -162,7 +262,9 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_instances: int = dataset.attrs["num_instances"]
 
     use_virtual_node: bool = dataset.attrs["use_virtual_node"]
-    use_classically_optimized_angles = dataset["use_classically_optimized_angles"]
+    use_classically_optimized_angles = dataset.attrs["use_classically_optimized_angles"]
+    num_qaoa_layers = dataset.attrs["num_qaoa_layers"]
+
 
     qscore = 0
     nodes_list = list(range(min_num_nodes, max_num_nodes + 1))
@@ -170,18 +272,28 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     beta_ratio_std_list = []
     for num_nodes in nodes_list:
         # Retrieve counts for all the instances within each executed node size.
-        execution_results[str(num_nodes)] = xrvariable_to_counts(dataset, str(num_nodes), num_instances)
+        execution_results = xrvariable_to_counts(dataset, num_nodes, num_instances)
 
         # Retrieve other dataset values
         dataset_dictionary = dataset.attrs[num_nodes]
 
         node_set_list = dataset_dictionary["qubit_set"]
         graph_list = dataset_dictionary["graph"]
+        qubit_to_node_list = dataset_dictionary["qubit_to_node"]
+        virtual_node_list = dataset_dictionary["virtual_nodes"]
+        no_edge_instances = dataset_dictionary["no_edge_instances"]
 
-        cut_sizes_list = []
-        for inst_idx in range(num_instances):
-            objective_fun = self.compute_expectation_value(graph_list[inst_idx], node_set_list[inst_idx])
-            cut_sizes = self.run_QAOA(objective_fun)
+        cut_sizes_list = [0.0]*len(no_edge_instances)
+        instances_with_edges = set(range(num_instances)) - set(no_edge_instances)
+
+        for inst_idx in list(instances_with_edges):
+            cut_sizes = run_QAOA(execution_results[inst_idx],
+                                 graph_list[inst_idx],
+                                 qubit_to_node_list[inst_idx],
+                                 use_classically_optimized_angles,
+                                 num_qaoa_layers,
+                                 virtual_node_list[inst_idx]
+                                 )
             cut_sizes_list.append(cut_sizes)
 
         ## compute the approximation ratio beta
@@ -251,6 +363,175 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
+def run_QAOA(counts: Dict[str, int],
+             graph_physical: Graph,
+             qubit_node: Dict[int, int],
+             use_classical_angles: bool,
+             qaoa_layers: int,
+             virtual_nodes: List[Tuple[int, int]]
+             ) -> float:
+    """
+    Solves the cut size of MaxCut for a graph using QAOA.
+    The result is average value sampled from the optimized ansatz.
+
+    Args:
+        objective_function (float): the objective function to be minimized using the graph and qubit_set
+        graph_physical (Graph): the graph to be optimized
+        qubit_node (Dict[int, int]): the qubit to be optimized
+        use_classical_angles (bool): whether or not to use classical angles
+        qaoa_layers (int): the number of QAOA layers
+        virtual_nodes (List[Tuple[int, int]]): the presence of virtual nodes or not
+
+    Returns:
+        float: the expectation value of the maximum cut size.
+
+    """
+
+    objective_function = create_objective_function(counts, graph_physical, qubit_node, virtual_nodes)
+    if use_classical_angles:
+        if graph_physical.number_of_edges() != 0:
+            opt_angles = calculate_optimal_angles_for_QAOA_p1(graph_physical)
+        else:
+            opt_angles = [1.0, 1.0]
+        res = minimize(objective_function, opt_angles, method="COBYLA", tol=1e-5, options={"maxiter": 0})
+    else:
+        # Good initial angles from from Wurtz et.al. "The fixed angle conjecture for QAOA on regular MaxCut graphs." arXiv preprint arXiv:2107.00677 (2021).
+        OPTIMAL_INITIAL_ANGLES = {
+            "1": [-0.616, 0.393 / 2],
+            "2": [-0.488, 0.898 / 2, 0.555 / 2, 0.293 / 2],
+            "3": [-0.422, 0.798 / 2, 0.937 / 2, 0.609 / 2, 0.459 / 2, 0.235 / 2],
+            "4": [-0.409, 0.781 / 2, 0.988 / 2, 1.156 / 2, 0.600 / 2, 0.434 / 2, 0.297 / 2, 0.159 / 2],
+            "5": [-0.36, -0.707, -0.823, -1.005, -1.154, 0.632 / 2, 0.523 / 2, 0.390 / 2, 0.275 / 2, 0.149 / 2],
+            "6": [
+                -0.331,
+                -0.645,
+                -0.731,
+                -0.837,
+                -1.009,
+                -1.126,
+                0.636 / 2,
+                0.535 / 2,
+                0.463 / 2,
+                0.360 / 2,
+                0.259 / 2,
+                0.139 / 2,
+            ],
+            "7": [
+                -0.310,
+                -0.618,
+                -0.690,
+                -0.751,
+                -0.859,
+                -1.020,
+                -1.122,
+                0.648 / 2,
+                0.554 / 2,
+                0.490 / 2,
+                0.445 / 2,
+                0.341 / 2,
+                0.244 / 2,
+                0.131 / 2,
+            ],
+            "8": [
+                -0.295,
+                -0.587,
+                -0.654,
+                -0.708,
+                -0.765,
+                -0.864,
+                -1.026,
+                -1.116,
+                0.649 / 2,
+                0.555 / 2,
+                0.500 / 2,
+                0.469 / 2,
+                0.420 / 2,
+                0.319 / 2,
+                0.231 / 2,
+                0.123 / 2,
+            ],
+            "9": [
+                -0.279,
+                -0.566,
+                -0.631,
+                -0.679,
+                -0.726,
+                -0.768,
+                -0.875,
+                -1.037,
+                -1.118,
+                0.654 / 2,
+                0.562 / 2,
+                0.509 / 2,
+                0.487 / 2,
+                0.451 / 2,
+                0.403 / 2,
+                0.305 / 2,
+                0.220 / 2,
+                0.117 / 2,
+            ],
+            "10": [
+                -0.267,
+                -0.545,
+                -0.610,
+                -0.656,
+                -0.696,
+                -0.729,
+                -0.774,
+                -0.882,
+                -1.044,
+                -1.115,
+                0.656 / 2,
+                0.563 / 2,
+                0.514 / 2,
+                0.496 / 2,
+                0.496 / 2,
+                0.436 / 2,
+                0.388 / 2,
+                0.291 / 2,
+                0.211 / 2,
+                0.112 / 2,
+            ],
+            "11": [
+                -0.257,
+                -0.528,
+                -0.592,
+                -0.640,
+                -0.677,
+                -0.702,
+                -0.737,
+                -0.775,
+                -0.884,
+                -1.047,
+                -1.115,
+                0.656 / 2,
+                0.563 / 2,
+                0.516 / 2,
+                0.504 / 2,
+                0.482 / 2,
+                0.456 / 2,
+                0.421 / 2,
+                0.371 / 2,
+                0.276 / 2,
+                0.201 / 2,
+                0.107 / 2,
+            ],
+        }
+
+        theta = OPTIMAL_INITIAL_ANGLES[str(qaoa_layers)]
+        bounds = [(-np.pi, np.pi)] * qaoa_layers + [(0.0, np.pi)] * qaoa_layers
+
+        res = minimize(
+            objective_function,
+            theta,
+            bounds=bounds,
+            method="COBYLA",
+            tol=1e-5,
+            options={"maxiter": 300},
+        )
+
+    return -res.fun
+
 class QScoreBenchmark(Benchmark):
     """
     Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
@@ -302,7 +583,7 @@ class QScoreBenchmark(Benchmark):
         self,
         graph: Graph,
         theta: list[float],
-    ) -> QuantumCircuit:
+    ) -> QuantumCircuit :
         """Generate an ansatz circuit for QAOA MaxCut, with measurements at the end.
 
         Args:
@@ -325,6 +606,7 @@ class QScoreBenchmark(Benchmark):
             self.node_to_qubit = {node: node for node in list(self.graph_physical.nodes)}  # no relabeling
             self.qubit_to_node = self.node_to_qubit
 
+        qubit_to_node_local = self.qubit_to_node.copy()
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
             return QuantumCircuit(1)
@@ -354,292 +636,6 @@ class QScoreBenchmark(Benchmark):
         qaoa_qc.measure_all()
         return qaoa_qc
 
-
-    def compute_expectation_value(self, counts: Dict[str, int], graph: Graph) -> float:
-        """Computes expectation value based on measurement results.
-
-        Args:
-            counts (Dict[str, int]): key as bitstring, val as count
-            graph (networkx) graph: the MaxCut problem graph
-
-        Returns:
-            avg (float): expectation value of the cut edges for number of counts
-        """
-
-        avg = 0
-        sum_count = 0
-        for bitstring_aux, count in counts.items():
-            bitstring_aux_list = list(bitstring_aux)[::-1]  # go from qiskit endianness to networkx endianness
-
-            # map the qubits back to nodes
-            bitstring = [""] * (len(bitstring_aux_list) + len(self.virtual_nodes))
-            for qubit, node in self.qubit_to_node.items():
-                bitstring[node] = bitstring_aux_list[qubit]
-
-            # insert virtual node(s) to bitstring
-            for virtual_node in self.virtual_nodes:
-                if virtual_node[0] is not None:
-                    bitstring[virtual_node[0]] = str(virtual_node[1])
-
-            obj = cut_cost_function("".join(bitstring), graph)
-            avg += obj * count
-            sum_count += count
-
-        return avg / sum_count
-
-    # def create_objective_function(self, graph: Graph, qubit_set: List[int]) -> Callable:
-    #     """
-    #     Creates a function that maps the parameters to the parametrized circuit,
-    #     runs it and computes the expectation value.
-
-    #     Args:
-    #         graph (networkx graph): the MaxCut problem graph.
-    #         qubit_set (List[int]): indeces of the used qubits.
-    #     Returns:
-    #         callable: function that gives expectation value of the cut edges from counts sampled from the ansatz
-    #     """
-
-    #     def objective_function(theta):
-    #         qc = self.generate_maxcut_ansatz(graph, theta)
-
-    #         if len(qc.count_ops()) == 0:
-    #             counts = {"": 1.0}  # to handle the case of physical graph with no edges
-
-    #         else:
-    #             coupling_map = self.backend.coupling_map.reduce(qubit_set)
-    #             transpiled_qc_list, _ = perform_backend_transpilation(
-    #                 [qc],
-    #                 backend=self.backend,
-    #                 qubits=qubit_set,
-    #                 coupling_map=coupling_map,
-    #                 qiskit_optim_level=self.qiskit_optim_level,
-    #                 optimize_sqg=self.optimize_sqg,
-    #                 routing_method=self.routing_method,
-    #             )
-
-    #             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc_list}
-    #             # Execute on the backend
-    #             jobs, _ = submit_execute(
-    #                 sorted_transpiled_qc_list,
-    #                 self.backend,
-    #                 self.shots,
-    #                 self.calset_id,
-    #                 max_gates_per_batch=self.max_gates_per_batch,
-    #             )
-
-    #             counts = retrieve_all_counts(jobs)[0][0]
-
-    #         return self.compute_expectation_value(counts, graph)
-
-    #     return objective_function
-
-    @staticmethod
-    def calculate_optimal_angles_for_QAOA_p1(graph: Graph) -> List[float]:
-        """Calculates the optimal angles for single layer QAOA MaxCut ansatz.
-
-        Args:
-            graph (networkx graph): the MaxCut problem graph.
-
-        Returns:
-            List[float]: optimal angles gamma and beta.
-
-        """
-
-        def get_Zij_maxcut_p1(edge_ij, gamma, beta):
-            """
-            Calculates <p1_QAOA | Z_i Z_j | p1_QAOA>, assuming ij is edge of G.
-            """
-            i, j = edge_ij
-            di = graph.degree[i]
-            dj = graph.degree[j]
-
-            first = np.cos(2 * gamma) ** (di - 1) + np.cos(2 * gamma) ** (dj - 1)
-            first *= 0.5 * np.sin(4 * beta) * np.sin(2 * gamma)
-
-            node_list = list(graph.nodes).copy()
-            node_list.remove(i)
-            node_list.remove(j)
-            f1 = 1
-            f2 = 1
-            for k in node_list:
-                if graph.has_edge(i, k) and graph.has_edge(j, k):  # ijk is triangle
-                    f1 *= np.cos(4 * gamma)
-                elif graph.has_edge(i, k) or graph.has_edge(j, k):  # ijk is no triangle
-                    f1 *= np.cos(2 * gamma)
-                    f2 *= np.cos(2 * gamma)
-            second = 0.5 * np.sin(2 * beta) ** 2 * (f1 - f2)
-            return first - second
-
-        def get_expected_zz_edgedensity(x):
-            gamma = x[0]
-            beta = x[1]
-            # pylint: disable=consider-using-generator
-            return sum([get_Zij_maxcut_p1(edge, gamma, beta) for edge in graph.edges]) / graph.number_of_edges()
-
-        bounds = [(0.0, np.pi / 2), (-np.pi / 4, 0.0)]
-        x_init = [0.15, -0.28]
-
-        minimizer_kwargs = {"method": "L-BFGS-B", "bounds": bounds}
-        res = basinhopping(get_expected_zz_edgedensity, x_init, minimizer_kwargs=minimizer_kwargs, niter=10, T=2)
-
-        return res.x
-
-    def run_QAOA(self, objective_function: float) -> float:
-        """
-        Solves the cut size of MaxCut for a graph using QAOA.
-        The result is average value sampled from the optimized ansatz.
-
-        Args:
-            objective_function (float): the objective function to be minimized using the graph and qubit_set
-
-        Returns:
-            float: the expectation value of the maximum cut size.
-
-        """
-
-        if self.use_classically_optimized_angles:
-            if self.graph_physical.number_of_edges() != 0:
-                opt_angles = self.calculate_optimal_angles_for_QAOA_p1(self.graph_physical)
-            else:
-                opt_angles = [1.0, 1.0]
-            res = minimize(objective_function, opt_angles, method="COBYLA", tol=1e-5, options={"maxiter": 0})
-        else:
-            # Good initial angles from from Wurtz et.al. "The fixed angle conjecture for QAOA on regular MaxCut graphs." arXiv preprint arXiv:2107.00677 (2021).
-            OPTIMAL_INITIAL_ANGLES = {
-                "1": [-0.616, 0.393 / 2],
-                "2": [-0.488, 0.898 / 2, 0.555 / 2, 0.293 / 2],
-                "3": [-0.422, 0.798 / 2, 0.937 / 2, 0.609 / 2, 0.459 / 2, 0.235 / 2],
-                "4": [-0.409, 0.781 / 2, 0.988 / 2, 1.156 / 2, 0.600 / 2, 0.434 / 2, 0.297 / 2, 0.159 / 2],
-                "5": [-0.36, -0.707, -0.823, -1.005, -1.154, 0.632 / 2, 0.523 / 2, 0.390 / 2, 0.275 / 2, 0.149 / 2],
-                "6": [
-                    -0.331,
-                    -0.645,
-                    -0.731,
-                    -0.837,
-                    -1.009,
-                    -1.126,
-                    0.636 / 2,
-                    0.535 / 2,
-                    0.463 / 2,
-                    0.360 / 2,
-                    0.259 / 2,
-                    0.139 / 2,
-                ],
-                "7": [
-                    -0.310,
-                    -0.618,
-                    -0.690,
-                    -0.751,
-                    -0.859,
-                    -1.020,
-                    -1.122,
-                    0.648 / 2,
-                    0.554 / 2,
-                    0.490 / 2,
-                    0.445 / 2,
-                    0.341 / 2,
-                    0.244 / 2,
-                    0.131 / 2,
-                ],
-                "8": [
-                    -0.295,
-                    -0.587,
-                    -0.654,
-                    -0.708,
-                    -0.765,
-                    -0.864,
-                    -1.026,
-                    -1.116,
-                    0.649 / 2,
-                    0.555 / 2,
-                    0.500 / 2,
-                    0.469 / 2,
-                    0.420 / 2,
-                    0.319 / 2,
-                    0.231 / 2,
-                    0.123 / 2,
-                ],
-                "9": [
-                    -0.279,
-                    -0.566,
-                    -0.631,
-                    -0.679,
-                    -0.726,
-                    -0.768,
-                    -0.875,
-                    -1.037,
-                    -1.118,
-                    0.654 / 2,
-                    0.562 / 2,
-                    0.509 / 2,
-                    0.487 / 2,
-                    0.451 / 2,
-                    0.403 / 2,
-                    0.305 / 2,
-                    0.220 / 2,
-                    0.117 / 2,
-                ],
-                "10": [
-                    -0.267,
-                    -0.545,
-                    -0.610,
-                    -0.656,
-                    -0.696,
-                    -0.729,
-                    -0.774,
-                    -0.882,
-                    -1.044,
-                    -1.115,
-                    0.656 / 2,
-                    0.563 / 2,
-                    0.514 / 2,
-                    0.496 / 2,
-                    0.496 / 2,
-                    0.436 / 2,
-                    0.388 / 2,
-                    0.291 / 2,
-                    0.211 / 2,
-                    0.112 / 2,
-                ],
-                "11": [
-                    -0.257,
-                    -0.528,
-                    -0.592,
-                    -0.640,
-                    -0.677,
-                    -0.702,
-                    -0.737,
-                    -0.775,
-                    -0.884,
-                    -1.047,
-                    -1.115,
-                    0.656 / 2,
-                    0.563 / 2,
-                    0.516 / 2,
-                    0.504 / 2,
-                    0.482 / 2,
-                    0.456 / 2,
-                    0.421 / 2,
-                    0.371 / 2,
-                    0.276 / 2,
-                    0.201 / 2,
-                    0.107 / 2,
-                ],
-            }
-
-            theta = OPTIMAL_INITIAL_ANGLES[str(self.num_qaoa_layers)]
-            bounds = [(-np.pi, np.pi)] * self.num_qaoa_layers + [(0.0, np.pi)] * self.num_qaoa_layers
-
-            res = minimize(
-                objective_function,
-                theta,
-                bounds=bounds,
-                method="COBYLA",
-                tol=1e-5,
-                options={"maxiter": 300},
-            )
-
-        return -res.fun
 
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
@@ -718,134 +714,6 @@ class QScoreBenchmark(Benchmark):
             chosen_qubits = selected_qubits[0]
         return chosen_qubits
 
-    # def execute_single_benchmark(
-    #     self,
-    #     num_nodes: int,
-    # ) -> tuple[bool, float, list[float], list[int]]:
-    #     """Execute a single benchmark, for a given number of qubits.
-    #
-    #     Args:
-    #         num_nodes (int): number of nodes in the MaxCut problem graphs.
-    #
-    #     Returns:
-    #         bool: whether the benchmark was successful.
-    #         float: approximation_ratio.
-    #         list[float]: the list of maximum average cut sizes of problem graph instances.
-    #         list[int]: the set of qubits the Q-score benchmark was executed on.
-    #     """
-    #
-    #     cut_sizes: list[float] = []
-    #     seed = self.seed
-    #
-    #     for i in range(self.num_instances):
-    #         graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
-    #         print(f"graph: {graph}")
-    #         self.graph_physical = graph.copy()
-    #         self.virtual_nodes = []
-    #         if self.use_virtual_node:
-    #             virtual_node, _ = max(
-    #                 graph.degree(), key=lambda x: x[1]
-    #             )  # choose the virtual node as the most connected node
-    #             self.virtual_nodes.append(
-    #                 (virtual_node, 1)
-    #             )  # the second element of the tuple is the value assigned to the virtual node
-    #             self.graph_physical.remove_node(self.virtual_nodes[0][0])
-    #         # See if there are any non-connected nodes if so, remove them also
-    #         # and set them to be opposite value to the possible original virtual node
-    #         for node in self.graph_physical.nodes():
-    #             if self.graph_physical.degree(node) == 0:
-    #                 self.virtual_nodes.append((node, 0))
-    #         for vn in self.virtual_nodes:
-    #             if self.graph_physical.has_node(vn[0]):
-    #                 self.graph_physical.remove_node(vn[0])
-    #
-    #         # Graph with no edges has cut size = 0
-    #         if graph.number_of_edges() == 0:
-    #             cut_sizes.append(0)
-    #             seed += 1
-    #             qcvv_logger.info(f"Graph {i+1}/{self.num_instances} had no edges: cut size = 0.")
-    #             continue
-    #
-    #         # Choose the qubit layout
-    #         qubit_set = []
-    #         if self.choose_qubits_routine.lower() == "naive":
-    #             qubit_set = self.choose_qubits_naive(num_nodes)
-    #         elif self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic":
-    #             qubit_set = self.choose_qubits_custom(num_nodes)
-    #         else:
-    #             raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
-    #
-    #         # Solve the maximum cut size with QAOA
-    #         cut_sizes.append(self.run_QAOA(graph, qubit_set))
-    #         seed += 1
-    #         qcvv_logger.info(f"Solved the MaxCut on graph {i+1}/{self.num_instances}.")
-    #
-    #     average_cut_size = np.mean(cut_sizes) - num_nodes * (num_nodes - 1) / 8
-    #     average_best_cut_size = 0.178 * pow(num_nodes, 3 / 2)
-    #     approximation_ratio = float(average_cut_size / average_best_cut_size)
-    #
-    #     self.raw_data[num_nodes] = {
-    #         "qubit_set": qubit_set,
-    #         "cut_sizes": cut_sizes,
-    #     }
-    #     self.results[num_nodes] = {
-    #         "qubit_set": qubit_set,
-    #         "is_successful": str(self.is_successful(approximation_ratio)),
-    #         "approximation_ratio": approximation_ratio,
-    #     }
-    #
-    #     # Return whether the single Q-score Benchmark was successful and its mean approximation ratio
-    #     # and cut sizes for all instances.
-    #     return self.is_successful(approximation_ratio), approximation_ratio, cut_sizes, qubit_set
-    #
-    # @timeit
-    # def execute_full_benchmark(self) -> tuple[int, list[float], list[list[float]]]:
-    #     """Execute the full benchmark, starting with self.min_num_nodes nodes up to failure.
-    #
-    #     Returns:
-    #         int: the Q-score of the device.
-    #         list[float]: the list of approximation rations over problem graph instances for each problem size.
-    #         list[list[float]]: the list of lists of maximum average cut sizes of problem graph instances for each problem size.
-    #     """
-    #     qscore = 0
-    #
-    #     if self.max_num_nodes is None:
-    #         if self.use_virtual_node:
-    #             max_num_nodes = self.backend.num_qubits + 1
-    #         else:
-    #             max_num_nodes = self.backend.num_qubits
-    #     else:
-    #         max_num_nodes = self.max_num_nodes
-    #
-    #     approximation_ratios = []
-    #     list_of_cut_sizes = []
-    #
-    #     for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
-    #         qcvv_logger.info(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
-    #         is_succesful, approximation_ratio, cut_sizes = self.execute_single_benchmark(num_nodes)[0:3]
-    #         approximation_ratios.append(approximation_ratio)
-    #
-    #         list_of_cut_sizes.append(cut_sizes)
-    #         if is_succesful:
-    #             qcvv_logger.info(
-    #                 f"Q-Score = {num_nodes} passed with:\nApproximation ratio (Beta): {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes):.4f}"
-    #             )
-    #             qscore = num_nodes
-    #             continue
-    #
-    #         qcvv_logger.info(
-    #             f"Q-Score = {num_nodes} failed with \napproximation ratio (Beta): {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes):.4f}"
-    #         )
-    #
-    #     self.results["qscore"] = qscore
-    #     fig_name, fig = self.plot_approximation_ratios(
-    #         list(range(self.min_num_nodes, max_num_nodes + 1)), list_of_cut_sizes
-    #     )
-    #     self.figures[fig_name] = fig
-    #     return num_nodes, approximation_ratios, list_of_cut_sizes
-    #
-
-
     def execute(self, backend: IQMBackendBase) -> xr.Dataset:
         """Executes the benchmark."""
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
@@ -858,7 +726,10 @@ class QScoreBenchmark(Benchmark):
                 max_num_nodes = self.backend.num_qubits + 1
             else:
                 max_num_nodes = self.backend.num_qubits
-        dataset.attrs.update({"max_num_nodes": max_num_nodes})
+        else:
+            max_num_nodes = self.max_num_nodes
+
+        dataset.attrs.update({"max_num_nodes": self.max_num_nodes})
 
         # Initialize the variable to contain the QScore circuits of each node
         self.untranspiled_circuits: Dict[str, List[QuantumCircuit]] = {}
@@ -872,12 +743,14 @@ class QScoreBenchmark(Benchmark):
             qubit_set_list = []
 
             qcvv_logger.info(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
+
             self.untranspiled_circuits[str(num_nodes)] = {}
             self.transpiled_circuits[str(num_nodes)] = {}
 
             seed = self.seed
-            cut_sizes: list[float] = []
-
+            virtual_node_list = []
+            qubit_to_node_list = []
+            no_edge_instances = []
             for instance in range(self.num_instances):
                 qcvv_logger.info(f"Executing graph {instance} with {num_nodes} nodes.")
                 graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
@@ -901,16 +774,15 @@ class QScoreBenchmark(Benchmark):
                 for vn in self.virtual_nodes:
                     if self.graph_physical.has_node(vn[0]):
                         self.graph_physical.remove_node(vn[0])
-
+                virtual_node_list.append(self.virtual_nodes)
                 # Graph with no edges has cut size = 0
                 if graph.number_of_edges() == 0:
-                    cut_sizes.append(0)
-                    seed += 1
+                    no_edge_instances.append(instance)
                     qcvv_logger.info(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
-                    continue
+
 
                 # Choose the qubit layout
-                qubit_set = []
+                # qubit_set = []
                 if self.choose_qubits_routine.lower() == "naive":
                     qubit_set = self.choose_qubits_naive(num_nodes)
                 elif (
@@ -923,13 +795,16 @@ class QScoreBenchmark(Benchmark):
 
                 qc = self.generate_maxcut_ansatz(graph, theta=qubit_set)
                 qc_list.append(qc)
+                qubit_to_node_copy = self.qubit_to_node.copy()
+                qubit_to_node_list.append(qubit_to_node_copy)
 
                 if len(qc.count_ops()) == 0:
                     counts = {"": 1.0}  # to handle the case of physical graph with no edges
                     sorted_transpiled_qc_list = {tuple(qubit_set): []}
                     qc_transpiled_list.append(sorted_transpiled_qc_list)
                     execution_results.append(counts)
-
+                    qc_list.append([])
+                    qcvv_logger.info(f"This graph instance has no edges.")
                 else:
                     # execute for a given num_node and a given instance
                     coupling_map = self.backend.coupling_map.reduce(qubit_set)
@@ -964,6 +839,9 @@ class QScoreBenchmark(Benchmark):
                         "qubit_set": qubit_set_list,
                         "seed_start": seed,
                         "graph": graph_list,
+                        "virtual_nodes": virtual_node_list,
+                        "qubit_to_node": qubit_to_node_list,
+                        "no_edge_instances": no_edge_instances,
                     }
                 }
             )
