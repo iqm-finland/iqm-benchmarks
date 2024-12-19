@@ -15,4 +15,4 @@
 Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
 """
 
-from . import qscore
+from . import qscore, qscore_rebased
