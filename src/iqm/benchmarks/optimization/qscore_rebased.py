@@ -4,7 +4,7 @@ Q-score benchmark
 
 import itertools
 from time import strftime
-from typing import Callable, Dict, List, Optional, Tuple, Type, Literal, Sequence, cast
+from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -285,7 +285,7 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Retrieve other dataset values
         dataset_dictionary = dataset.attrs[num_nodes]
 
-        #node_set_list = dataset_dictionary["qubit_set"]
+        # node_set_list = dataset_dictionary["qubit_set"]
         graph_list = dataset_dictionary["graph"]
         qubit_to_node_list = dataset_dictionary["qubit_to_node"]
         virtual_node_list = dataset_dictionary["virtual_nodes"]
@@ -596,7 +596,9 @@ class QScoreBenchmark(Benchmark):
             raise ValueError("If the `use_virtual_node` is chosen, the `num_qaoa_layers` must be 1.")
 
         if self.choose_qubits_routine == "custom":
-            self.custom_qubits_array = [list(x) for x in cast(Sequence[Sequence[int]], configuration.custom_qubits_array)]
+            self.custom_qubits_array = [
+                list(x) for x in cast(Sequence[Sequence[int]], configuration.custom_qubits_array)
+            ]
 
     def generate_maxcut_ansatz(  # pylint: disable=too-many-branches
         self,
@@ -625,7 +627,7 @@ class QScoreBenchmark(Benchmark):
             self.node_to_qubit = {node: node for node in list(self.graph_physical.nodes)}  # no relabeling
             self.qubit_to_node = self.node_to_qubit
 
-        #qubit_to_node_local = self.qubit_to_node.copy()
+        # qubit_to_node_local = self.qubit_to_node.copy()
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
             return QuantumCircuit(1)
@@ -710,7 +712,7 @@ class QScoreBenchmark(Benchmark):
             chosen_qubits = selected_qubits[0]
         return list(chosen_qubits)
 
-    def execute(self, backend: IQMBackendBase) -> xr.Dataset: # pylint: disable=too-many-branches,too-many-statements
+    def execute(self, backend: IQMBackendBase) -> xr.Dataset:  # pylint: disable=too-many-branches,too-many-statements
         """Executes the benchmark."""
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
