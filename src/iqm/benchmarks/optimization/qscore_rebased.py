@@ -4,7 +4,7 @@ Q-score benchmark
 
 import itertools
 from time import strftime
-from typing import Callable, Dict, List, Optional, Tuple, Type
+from typing import Callable, Dict, List, Optional, Tuple, Type, Literal, Sequence, cast
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -24,18 +24,17 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkRunResult,
     add_counts_to_dataset,
 )
+from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (  # execute_with_dd,
     perform_backend_transpilation,
     retrieve_all_counts,
     submit_execute,
-    timeit,
     xrvariable_to_counts,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
-@staticmethod
 def calculate_optimal_angles_for_QAOA_p1(graph: Graph) -> List[float]:
     """Calculates the optimal angles for single layer QAOA MaxCut ansatz.
 
@@ -86,6 +85,7 @@ def calculate_optimal_angles_for_QAOA_p1(graph: Graph) -> List[float]:
 
     return res.x
 
+
 def cut_cost_function(x: str, graph: Graph) -> int:
     """Returns the number of cut edges in a graph (with minus sign).
 
@@ -102,7 +102,10 @@ def cut_cost_function(x: str, graph: Graph) -> int:
             obj += 1
     return -1 * obj
 
-def compute_expectation_value(counts: Dict[str, int], graph: Graph, qubit_to_node: Dict[int, int], virtual_nodes: List[Tuple[int, int]]) -> float:
+
+def compute_expectation_value(
+    counts: Dict[str, int], graph: Graph, qubit_to_node: Dict[int, int], virtual_nodes: List[Tuple[int, int]]
+) -> float:
     """Computes expectation value based on measurement results.
 
     Args:
@@ -134,14 +137,19 @@ def compute_expectation_value(counts: Dict[str, int], graph: Graph, qubit_to_nod
 
     return avg / sum_count
 
-def create_objective_function(counts: Dict[str, int], graph: Graph, qubit_to_node: Dict[int, int], virtual_nodes: List[Tuple[int, int]]) -> Callable:
+
+def create_objective_function(
+    counts: Dict[str, int], graph: Graph, qubit_to_node: Dict[int, int], virtual_nodes: List[Tuple[int, int]]
+) -> Callable:
     """
     Creates a function that maps the parameters to the parametrized circuit,
     runs it and computes the expectation value.
 
     Args:
+        counts (Dict[str, int]): The dictionary of bitstring counts.
         graph (networkx graph): the MaxCut problem graph.
-        qubit_set (List[int]): indeces of the used qubits.
+        qubit_to_node (Dict[int, int]):
+        virtual_nodes (List[Tuple[int, int]]):
     Returns:
         callable: function that gives expectation value of the cut edges from counts sampled from the ansatz
     """
@@ -152,8 +160,10 @@ def create_objective_function(counts: Dict[str, int], graph: Graph, qubit_to_nod
 
     return objective_function
 
+
 def is_successful(
-    approximation_ratio: float,) -> bool:
+    approximation_ratio: float,
+) -> bool:
     """Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.
 
     This condition checks that the mean approximation ratio is above the beta* = 0.2 threshold.
@@ -251,7 +261,6 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     plots = {}
     observations: list[BenchmarkObservation] = []
-    execution_results = {}
     dataset = run.dataset.copy(deep=True)
 
     backend_name = dataset.attrs["backend_name"]
@@ -265,7 +274,6 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     use_classically_optimized_angles = dataset.attrs["use_classically_optimized_angles"]
     num_qaoa_layers = dataset.attrs["num_qaoa_layers"]
 
-
     qscore = 0
     nodes_list = list(range(min_num_nodes, max_num_nodes + 1))
     beta_ratio_list = []
@@ -277,23 +285,24 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         # Retrieve other dataset values
         dataset_dictionary = dataset.attrs[num_nodes]
 
-        node_set_list = dataset_dictionary["qubit_set"]
+        #node_set_list = dataset_dictionary["qubit_set"]
         graph_list = dataset_dictionary["graph"]
         qubit_to_node_list = dataset_dictionary["qubit_to_node"]
         virtual_node_list = dataset_dictionary["virtual_nodes"]
         no_edge_instances = dataset_dictionary["no_edge_instances"]
 
-        cut_sizes_list = [0.0]*len(no_edge_instances)
+        cut_sizes_list = [0.0] * len(no_edge_instances)
         instances_with_edges = set(range(num_instances)) - set(no_edge_instances)
 
         for inst_idx in list(instances_with_edges):
-            cut_sizes = run_QAOA(execution_results[inst_idx],
-                                 graph_list[inst_idx],
-                                 qubit_to_node_list[inst_idx],
-                                 use_classically_optimized_angles,
-                                 num_qaoa_layers,
-                                 virtual_node_list[inst_idx]
-                                 )
+            cut_sizes = run_QAOA(
+                execution_results[inst_idx],
+                graph_list[inst_idx],
+                qubit_to_node_list[inst_idx],
+                use_classically_optimized_angles,
+                num_qaoa_layers,
+                virtual_node_list[inst_idx],
+            )
             cut_sizes_list.append(cut_sizes)
 
         ## compute the approximation ratio beta
@@ -351,34 +360,38 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             }
         )
 
-    fig_name, fig = plot_approximation_ratios(nodes_list,
-                                              beta_ratio_list,
-                                              beta_ratio_std_list,
-                                              use_virtual_node,
-                                              use_classically_optimized_angles,
-                                              num_instances,
-                                              backend_name,
-                                              timestamp)
+    fig_name, fig = plot_approximation_ratios(
+        nodes_list,
+        beta_ratio_list,
+        beta_ratio_std_list,
+        use_virtual_node,
+        use_classically_optimized_angles,
+        num_instances,
+        backend_name,
+        timestamp,
+    )
     plots[fig_name] = fig
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
-def run_QAOA(counts: Dict[str, int],
-             graph_physical: Graph,
-             qubit_node: Dict[int, int],
-             use_classical_angles: bool,
-             qaoa_layers: int,
-             virtual_nodes: List[Tuple[int, int]]
-             ) -> float:
+
+def run_QAOA(
+    counts: Dict[str, int],
+    graph_physical: Graph,
+    qubit_node: Dict[int, int],
+    use_classical_angles: bool,
+    qaoa_layers: int,
+    virtual_nodes: List[Tuple[int, int]],
+) -> float:
     """
     Solves the cut size of MaxCut for a graph using QAOA.
     The result is average value sampled from the optimized ansatz.
 
     Args:
-        objective_function (float): the objective function to be minimized using the graph and qubit_set
+        counts (Dict[str, int]):
         graph_physical (Graph): the graph to be optimized
         qubit_node (Dict[int, int]): the qubit to be optimized
-        use_classical_angles (bool): whether or not to use classical angles
+        use_classical_angles (bool): whether to use classical angles
         qaoa_layers (int): the number of QAOA layers
         virtual_nodes (List[Tuple[int, int]]): the presence of virtual nodes or not
 
@@ -532,6 +545,7 @@ def run_QAOA(counts: Dict[str, int],
 
     return -res.fun
 
+
 class QScoreBenchmark(Benchmark):
     """
     Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
@@ -562,13 +576,18 @@ class QScoreBenchmark(Benchmark):
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.optimize_sqg = configuration.optimize_sqg
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
-        self.execution_timestamp = ''
+        self.execution_timestamp = ""
         self.seed = configuration.seed
 
         self.graph_physical: Graph
         self.virtual_nodes: List[Tuple[int, int]]
         self.node_to_qubit: Dict[int, int]
         self.qubit_to_node: Dict[int, int]
+
+        # Initialize the variable to contain all QScore circuits
+        self.circuits = Circuits()
+        self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
+        self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
 
         if self.use_classically_optimized_angles and self.num_qaoa_layers > 1:
             raise ValueError("If the `use_classically_optimized_angles` is chosen, the `num_qaoa_layers` must be 1.")
@@ -577,13 +596,13 @@ class QScoreBenchmark(Benchmark):
             raise ValueError("If the `use_virtual_node` is chosen, the `num_qaoa_layers` must be 1.")
 
         if self.choose_qubits_routine == "custom":
-            self.custom_qubits_array = configuration.custom_qubits_array
+            self.custom_qubits_array = [list(x) for x in cast(Sequence[Sequence[int]], configuration.custom_qubits_array)]
 
     def generate_maxcut_ansatz(  # pylint: disable=too-many-branches
         self,
         graph: Graph,
         theta: list[float],
-    ) -> QuantumCircuit :
+    ) -> QuantumCircuit:
         """Generate an ansatz circuit for QAOA MaxCut, with measurements at the end.
 
         Args:
@@ -606,7 +625,7 @@ class QScoreBenchmark(Benchmark):
             self.node_to_qubit = {node: node for node in list(self.graph_physical.nodes)}  # no relabeling
             self.qubit_to_node = self.node_to_qubit
 
-        qubit_to_node_local = self.qubit_to_node.copy()
+        #qubit_to_node_local = self.qubit_to_node.copy()
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
             return QuantumCircuit(1)
@@ -636,7 +655,6 @@ class QScoreBenchmark(Benchmark):
         qaoa_qc.measure_all()
         return qaoa_qc
 
-
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
 
@@ -653,28 +671,6 @@ class QScoreBenchmark(Benchmark):
                 dataset.attrs[key] = value.name
             else:
                 dataset.attrs[key] = value
-
-    @timeit
-    def add_all_circuits_to_dataset(self, dataset: xr.Dataset):
-        """Adds all generated circuits during execution to the dataset variable
-
-        Args:
-            dataset (xr.Dataset):  The xarray dataset
-
-        Returns:
-
-        """
-        qcvv_logger.info(f"Adding all circuits to the dataset")
-        for key, circuit in zip(
-            ["transpiled_circuits", "untranspiled_circuits"], [self.transpiled_circuits, self.untranspiled_circuits]
-        ):
-            dictionary = {}
-            for outer_key, outer_value in circuit.items():
-                dictionary[str(outer_key)] = {
-                    str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
-                }
-            dataset.attrs[key] = dictionary
-
 
     @staticmethod
     def choose_qubits_naive(num_qubits: int) -> list[int]:
@@ -712,9 +708,9 @@ class QScoreBenchmark(Benchmark):
             # The execute_single_benchmark call must be looped through a COPY of custom_qubits_array
         else:
             chosen_qubits = selected_qubits[0]
-        return chosen_qubits
+        return list(chosen_qubits)
 
-    def execute(self, backend: IQMBackendBase) -> xr.Dataset:
+    def execute(self, backend: IQMBackendBase) -> xr.Dataset: # pylint: disable=too-many-branches,too-many-statements
         """Executes the benchmark."""
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
@@ -731,21 +727,17 @@ class QScoreBenchmark(Benchmark):
 
         dataset.attrs.update({"max_num_nodes": self.max_num_nodes})
 
-        # Initialize the variable to contain the QScore circuits of each node
-        self.untranspiled_circuits: Dict[str, List[QuantumCircuit]] = {}
-        self.transpiled_circuits: Dict[str, List[QuantumCircuit]] = {}
-
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
             qc_list = []
-            qc_transpiled_list = []
+            qc_transpiled_list: List[QuantumCircuit] = []
             execution_results = []
             graph_list = []
             qubit_set_list = []
 
-            qcvv_logger.info(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
+            qcvv_logger.debug(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
 
-            self.untranspiled_circuits[str(num_nodes)] = {}
-            self.transpiled_circuits[str(num_nodes)] = {}
+            # self.untranspiled_circuits[str(num_nodes)] = {}
+            # self.transpiled_circuits[str(num_nodes)] = {}
 
             seed = self.seed
             virtual_node_list = []
@@ -780,7 +772,6 @@ class QScoreBenchmark(Benchmark):
                     no_edge_instances.append(instance)
                     qcvv_logger.info(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
 
-
                 # Choose the qubit layout
                 # qubit_set = []
                 if self.choose_qubits_routine.lower() == "naive":
@@ -793,15 +784,14 @@ class QScoreBenchmark(Benchmark):
                     raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
                 qubit_set_list.append(qubit_set)
 
-                qc = self.generate_maxcut_ansatz(graph, theta=qubit_set)
+                qc = self.generate_maxcut_ansatz(graph, theta=[float(q) for q in qubit_set])
                 qc_list.append(qc)
                 qubit_to_node_copy = self.qubit_to_node.copy()
                 qubit_to_node_list.append(qubit_to_node_copy)
 
                 if len(qc.count_ops()) == 0:
                     counts = {"": 1.0}  # to handle the case of physical graph with no edges
-                    sorted_transpiled_qc_list = {tuple(qubit_set): []}
-                    qc_transpiled_list.append(sorted_transpiled_qc_list)
+                    qc_transpiled_list.append([])
                     execution_results.append(counts)
                     qc_list.append([])
                     qcvv_logger.info(f"This graph instance has no edges.")
@@ -827,7 +817,7 @@ class QScoreBenchmark(Benchmark):
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
                     )
-                    qc_transpiled_list.append(sorted_transpiled_qc_list)
+                    qc_transpiled_list.append(transpiled_qc)
                     execution_results.append(retrieve_all_counts(jobs)[0][0])
 
                 seed += 1
@@ -848,16 +838,42 @@ class QScoreBenchmark(Benchmark):
 
             qcvv_logger.info(f"Adding counts for the random graph for {num_nodes} nodes to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(num_nodes), dataset)
-            self.untranspiled_circuits[str(num_nodes)].update({tuple(qubit_set): qc_list})
-            self.transpiled_circuits[str(num_nodes)].update(sorted_transpiled_qc_list)
 
-        self.add_all_circuits_to_dataset(dataset)
+            # self.untranspiled_circuits[str(num_nodes)].update({tuple(qubit_set): qc_list})
+            # self.transpiled_circuits[str(num_nodes)].update(sorted_transpiled_qc_list)
+            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(num_nodes), circuits=qc_list))
+            self.transpiled_circuits.circuit_groups.append(
+                CircuitGroup(name=str(num_nodes), circuits=qc_transpiled_list)
+            )
+
+        self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         return dataset
 
 
 class QScoreConfiguration(BenchmarkConfigurationBase):
-    """Q-score configuration."""
+    """Q-score configuration.
+
+    Attributes:
+        benchmark (Type[Benchmark]): QScoreBenchmark
+        num_instances (int):
+        num_qaoa_layers (int):
+        min_num_nodes (int):
+        max_num_nodes (int):
+        use_virtual_node (bool):
+        use_classically_optimized_angles (bool):
+        choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
+                            * Default is "custom".
+        min_num_qubits (int):
+        custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
+                            * Default is None.
+        qiskit_optim_level (int): The Qiskit transpilation optimization level.
+                            * Default is 3.
+        optimize_sqg (bool): Whether Single Qubit Gate Optimization is performed upon transpilation.
+                            * Default is True.
+        seed (int): The random seed.
+                            * Default is 1.
+    """
 
     benchmark: Type[Benchmark] = QScoreBenchmark
     num_instances: int
@@ -866,9 +882,9 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     max_num_nodes: Optional[int] = None
     use_virtual_node: bool = True
     use_classically_optimized_angles: bool = True
-    choose_qubits_routine: str = "naive"
+    choose_qubits_routine: Literal["naive", "custom"] = "naive"
     min_num_qubits: int = 2  # If choose_qubits_routine is "naive"
-    custom_qubits_array: Optional[list[list[int]]] = None
+    custom_qubits_array: Optional[Sequence[Sequence[int]]] = None
     qiskit_optim_level: int = 3
     optimize_sqg: bool = True
     seed: int = 1
