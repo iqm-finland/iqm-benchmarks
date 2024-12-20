@@ -17,7 +17,7 @@ from pygsti.tools import change_basis
 from pygsti.tools.optools import compute_povm_map
 from qiskit.quantum_info import SuperOp
 from qiskit.quantum_info.operators.measures import diamond_norm
-from scipy.linalg import logm
+from scipy.linalg import logm, schur
 from scipy.optimize import linear_sum_assignment, minimize
 
 from mGST import additional_fns, algorithm, compatibility, low_level_jit
@@ -339,17 +339,20 @@ def compute_sparsest_Pauli_Hamiltonian(U_set):
     pdim = U_set.shape[1]
     pp_vecs = []
 
-    for U in U_set:
-        evals, evecs = np.linalg.eig(U)
+    for num, U in enumerate(U_set):
+        # Schur decomposition finds the unitary diagonalization of a unitary matrix, which is not always returned by np.linalg.eig
+        T, evecs = schur(U)
+        evals = np.diag(T)
         Pauli_norms = []
+        log_evals = np.log(evals)
         for i in range(2**pdim):
             bits = low_level_jit.local_basis(i, 2, pdim)
-            evals_new = 1j * np.log(evals) + 2 * np.pi * bits
+            evals_new = 1j * log_evals + 2 * np.pi * bits
             H_new = evecs @ np.diag(evals_new) @ evecs.T.conj()
             pp_vec = change_basis(H_new.reshape(-1), "std", "pp")
             Pauli_norms.append(np.linalg.norm(pp_vec, ord=1))
         opt_bits = low_level_jit.local_basis(np.argsort(Pauli_norms)[0], 2, pdim)
-        evals_opt = 1j * np.log(evals) + 2 * np.pi * opt_bits
+        evals_opt = 1j * log_evals + 2 * np.pi * opt_bits
         H_opt = evecs @ np.diag(evals_opt) @ evecs.T.conj()
         pp_vecs.append(change_basis(H_opt.reshape(-1), "std", "pp"))
     pauli_coeffs = np.array(pp_vecs) / np.sqrt(pdim) / np.pi * 2
@@ -401,7 +404,7 @@ def phase_opt(X, K_t):
     K_t = K_t.reshape(d, pdim, pdim)
     K_opt = np.zeros(K.shape).astype(complex)
     for i in range(d):
-        angle_opt = minimize(phase_err, 1e-9, args=(K[i], K_t[i]), method="COBYLA").x
+        angle_opt = minimize(phase_err, 1, bounds=[[-np.pi, np.pi]], args=(K[i], K_t[i])).x
         K_opt[i] = K[i] * np.exp(1j * angle_opt)
     return K_opt
 

@@ -42,6 +42,19 @@ If you have already installed `iqm-benchmarks` and want to get the latest releas
 pip install iqm-benchmarks --upgrade
 ```
 
+## Optional dependencies
+
+Optional dependencies like compressive gate set tomography and jupyter notebooks can be installed as follows:
+```bash
+pip install "iqm-benchmarks[mgst, examples]"
+```
+Current optional dependencies are:
+* "examples": Jupyter notebooks
+* "mgst": Compressive gate set tomography
+* "develop": Development tools
+* "test": Code testing and Linting
+* "Docs": Documentation building 
+
 ## Development mode _(latest changes: recommended)_
 
 To install in development mode with all required dependencies, you can instead clone the [repository](https://www.github.com/iqm-finland/iqm-benchmarks) and from the project directory run

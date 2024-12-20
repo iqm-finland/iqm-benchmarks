@@ -85,6 +85,7 @@ def bootstrap_errors(
     E: ndarray,
     rho: ndarray,
     target_mdl: Model,
+    identifier: str,
     parametric: bool = False,
 ) -> tuple[Any, Any, Any, Any, Any]:
     """Resamples circuit outcomes a number of times and computes GST estimates for each repetition
@@ -113,6 +114,8 @@ def bootstrap_errors(
         Current initial state estimate
     target_mdl : pygsti model object
         The target gate set
+    identifier : str
+        The string identifier of the current benchmark
     parametric : bool
         If set to True, parametric bootstrapping is used, else non-parametric bootstrapping. Default: False
 
@@ -175,7 +178,7 @@ def bootstrap_errors(
             dataset.attrs["J"],
             y_sampled,
             target_mdl,
-            dataset.attrs["gate_labels"],
+            dataset.attrs["gate_labels"][identifier],
         )
         df_g_list.append(df_g.values)
         df_o_list.append(df_o.values)
@@ -291,7 +294,7 @@ def generate_unit_rank_gate_results(
                     reporting.number_to_str(
                         df_g.values[i, 0], [percentiles_g_high[i, 0], percentiles_g_low[i, 0]], precision=5
                     )
-                    for i in range(len(dataset.attrs["gate_labels"]))
+                    for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
                 r"Diamond distance": [
                     reporting.number_to_str(
@@ -330,7 +333,7 @@ def generate_unit_rank_gate_results(
         )
 
         df_g_rotation.columns = [f"h_%s" % label for label in pauli_labels]
-        df_g_rotation.rename(index=dataset.attrs["gate_labels"], inplace=True)
+        df_g_rotation.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
 
     else:
         df_g_final = DataFrame(
@@ -358,10 +361,11 @@ def generate_unit_rank_gate_results(
             ).T
         )
         df_g_rotation.columns = [f"h_%s" % label for label in pauli_labels]
-        df_g_final.rename(index=dataset.attrs["gate_labels"], inplace=True)
+        df_g_rotation.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
+        df_g_final.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
 
-    fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"])
-    fig_rotation = dataframe_to_figure(df_g_rotation, dataset.attrs["gate_labels"])
+    fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
+    fig_rotation = dataframe_to_figure(df_g_rotation, dataset.attrs["gate_labels"][identifier])
     return df_g_final, df_g_rotation, fig_g, fig_rotation
 
 
@@ -403,7 +407,7 @@ def generate_gate_results(
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     n_evals = np.min([max_evals, dataset.attrs["pdim"] ** 2])
     X_opt_pp, _, _ = compatibility.std2pp(X_opt, E_opt, rho_opt)
-    df_g_evals = reporting.generate_Choi_EV_table(X_opt, n_evals, dataset.attrs["gate_labels"])
+    df_g_evals = reporting.generate_Choi_EV_table(X_opt, n_evals, dataset.attrs["gate_labels"][identifier])
 
     if dataset.attrs["bootstrap_samples"] > 0:
         X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + identifier]["bootstrap_data"]
@@ -419,7 +423,7 @@ def generate_gate_results(
         ]
         bootstrap_evals = np.array(
             [
-                reporting.generate_Choi_EV_table(X_array_std[i], n_evals, dataset.attrs["gate_labels"])
+                reporting.generate_Choi_EV_table(X_array_std[i], n_evals, dataset.attrs["gate_labels"][identifier])
                 for i in range(dataset.attrs["bootstrap_samples"])
             ]
         )
@@ -466,15 +470,15 @@ def generate_gate_results(
             {
                 "Avg. gate fidelity": [
                     reporting.number_to_str(df_g.values[i, 0].copy(), precision=5)
-                    for i in range(len(dataset.attrs["gate_labels"]))
+                    for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
                 "Diamond distance": [
                     reporting.number_to_str(df_g.values[i, 1].copy(), precision=5)
-                    for i in range(len(dataset.attrs["gate_labels"]))
+                    for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
                 "Unitarity": [
                     reporting.number_to_str(reporting.unitarities(X_opt_pp)[i], precision=5)
-                    for i in range(len(dataset.attrs["gate_labels"]))
+                    for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
                 # "Entanglemen fidelity to depol. channel": [reporting.number_to_str(reporting.eff_depol_params(X_opt_pp)[i], precision=5)
                 #                                            for i in range(len(gate_labels))],
@@ -490,10 +494,10 @@ def generate_gate_results(
         ]
 
     df_g_evals_final = DataFrame(eval_strs).T
-    df_g_evals_final.rename(index=dataset.attrs["gate_labels"], inplace=True)
+    df_g_evals_final.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
 
-    fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"])
-    fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"])
+    fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
+    fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
     return df_g_final, df_g_evals_final, fig_g, fig_choi
 
 
@@ -570,7 +574,7 @@ def pandas_results_to_observations(
     """
     observation_list: list[BenchmarkObservation] = []
     err = dataset.attrs["bootstrap_samples"] > 0
-    for idx, gate_label in enumerate(dataset.attrs["gate_labels"].values()):
+    for idx, gate_label in enumerate(dataset.attrs["gate_labels"][identifier.string_identifier].values()):
         observation_list.extend(
             [
                 BenchmarkObservation(
@@ -639,7 +643,7 @@ def dataset_counts_to_mgst_format(dataset: xr.Dataset, qubit_layout: List[int]) 
     return y
 
 
-def run_mGST(
+def run_mGST_wrapper(
     dataset: xr.Dataset, y: ndarray
 ) -> tuple[ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
     """Wrapper function for mGST algorithm execution which prepares an initialization and sets the alg. parameters
@@ -718,7 +722,7 @@ def run_mGST(
         threshold_multiplier=dataset.attrs["convergence_criteria"][0],
         target_rel_prec=dataset.attrs["convergence_criteria"][1],
         init=init_params,
-        testing=False,
+        testing=dataset.attrs["testing"],
     )
 
     return K, X, E, rho, K_target, X_target, E_target, rho_target
@@ -745,7 +749,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         # Main GST reconstruction
         start_timer = perf_counter()
-        K, X, E, rho, K_target, X_target, E_target, rho_target = run_mGST(dataset, y)
+        K, X, E, rho, K_target, X_target, E_target, rho_target = run_mGST_wrapper(dataset, y)
         main_gst_time = perf_counter() - start_timer
 
         # Gauge optimization
@@ -756,7 +760,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         # Quick report
         df_g, _ = reporting.quick_report(
-            X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"]
+            X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"][identifier]
         )
 
         # Gate set in the Pauli basis
@@ -779,11 +783,11 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         ### Bootstrap
         if dataset.attrs["bootstrap_samples"] > 0:
-            bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl)
+            bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl, identifier)
             dataset.attrs["results_layout_" + identifier].update({"bootstrap_data": bootstrap_results})
 
         _, df_o_full = reporting.report(
-            X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"]
+            X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"][identifier]
         )
         df_o_final, fig_o = generate_non_gate_results(dataset, qubit_layout, df_o_full)
 
@@ -820,7 +824,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             X_opt_pp,
             X_target_pp,
             basis_labels=pauli_labels,
-            gate_labels=dataset.attrs["gate_labels"],
+            gate_labels=dataset.attrs["gate_labels"][identifier],
             return_fig=True,
         )
         for i, figure in enumerate(figures):

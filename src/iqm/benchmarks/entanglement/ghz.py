@@ -565,7 +565,10 @@ def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: Lis
             label = "_nolegend_"
         else:
             recorded_labels.append(label)
-        x = sum(c.isdigit() for c in obs.identifier.string_identifier)
+        identifier = obs.identifier.string_identifier
+        x = len(
+            identifier.strip("[]").replace('"', "").replace(" ", "").split(",")
+        )  # pylint: disable=inconsistent-quotes
         y = obs.value
         ax.errorbar(
             x,
@@ -578,7 +581,7 @@ def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: Lis
             alpha=1,
             markersize=5,
         )
-        ax.annotate(layout_short[obs.identifier.string_identifier], (x, y))
+        ax.annotate(layout_short[identifier], (x, y))
     ax.axhline(0.5, linestyle="--", color="black", label="GME threshold")
     # ax.set_ylim([0,1])
     ax.set_title("GHZ fidelities of all qubit layouts")
