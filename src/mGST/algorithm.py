@@ -725,8 +725,10 @@ def run_mGST(
     if success or (res_list[-1] < delta):
         print(f"\t Convergence criterion satisfied")
     else:
-        print(f"\t Convergence criterion not satisfied,",
-              f"inspect results and consider increasing max_iter or using new initializations.")
+        print(
+            f"\t Convergence criterion not satisfied,",
+            f"inspect results and consider increasing max_iter or using new initializations.",
+        )
     print(
         f"\t Final objective {Decimal(res_list[-1]):.2e}",
         f"in time {(time.time() - t0):.2f}s",

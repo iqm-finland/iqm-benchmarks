@@ -404,7 +404,7 @@ def phase_opt(X, K_t):
     K_t = K_t.reshape(d, pdim, pdim)
     K_opt = np.zeros(K.shape).astype(complex)
     for i in range(d):
-        angle_opt = minimize(phase_err, 1, bounds = [[-np.pi, np.pi]], args=(K[i], K_t[i])).x
+        angle_opt = minimize(phase_err, 1, bounds=[[-np.pi, np.pi]], args=(K[i], K_t[i])).x
         K_opt[i] = K[i] * np.exp(1j * angle_opt)
     return K_opt
 

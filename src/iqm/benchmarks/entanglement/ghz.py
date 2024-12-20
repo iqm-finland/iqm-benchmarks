@@ -566,7 +566,9 @@ def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: Lis
         else:
             recorded_labels.append(label)
         identifier = obs.identifier.string_identifier
-        x = len(identifier.strip('[]').replace('"', '').replace(' ', '').split(','))
+        x = len(
+            identifier.strip("[]").replace('"', "").replace(" ", "").split(",")
+        )  # pylint: disable=inconsistent-quotes
         y = obs.value
         ax.errorbar(
             x,
