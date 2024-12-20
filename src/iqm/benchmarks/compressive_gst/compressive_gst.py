@@ -72,7 +72,7 @@ class CompressiveGST(Benchmark):
         self.pdim = 2**self.num_qubits
         self.num_povm = self.pdim
 
-        self.gate_set, self.gate_labels, self.num_gates = parse_gate_set(configuration, self.num_qubits, self.qubit_layouts)
+        self.gate_set, self.gate_labels, self.num_gates = parse_gate_set(configuration, self.num_qubits)
 
         if configuration.opt_method not in ["GD", "SFN", "auto"]:
             raise ValueError("Invalid optimization method, valid options are: GD, SFN, auto")
@@ -315,7 +315,7 @@ def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List
 
 
 def parse_gate_set(
-    configuration: GSTConfiguration, num_qubits, qubit_layouts: List[List[int]]
+    configuration: GSTConfiguration, num_qubits
 ) -> Tuple[List[QuantumCircuit], Dict[str, Dict[int, str]], int]:
     """
     Handles different gate set inputs and produces a valid gate set
@@ -325,8 +325,6 @@ def parse_gate_set(
             Configuration class containing variables
         num_qubits: int
             The number of qubits on which the gate set is defined
-        qubit_layouts: List[List[int]]
-            A properly typed qubit_layout if no Error was raised
 
     Returns:
         gate_set: List[QuantumCircuit]
@@ -348,7 +346,7 @@ def parse_gate_set(
             "1QXYI, 2QXYCZ, 2QXYCZ_extended, 3QXYCZ."
         )
     if configuration.gate_set in ["1QXYI", "2QXYCZ", "2QXYCZ_extended", "3QXYCZ"]:
-        gate_set, gate_labels, num_gates = create_predefined_gate_set(configuration.gate_set, num_qubits, qubit_layouts)
+        gate_set, gate_labels, num_gates = create_predefined_gate_set(configuration.gate_set, num_qubits, configuration.qubit_layouts)
         return gate_set, gate_labels, num_gates
 
     if isinstance(configuration.gate_set, list):
