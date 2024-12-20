@@ -1,7 +1,6 @@
 """
-Q-score benchmark
+Qscore benchmark
 """
-
 import itertools
 from time import strftime
 from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
@@ -111,6 +110,8 @@ def compute_expectation_value(
     Args:
         counts (Dict[str, int]): key as bitstring, val as count
         graph (networkx) graph: the MaxCut problem graph
+        qubit_to_node (Dict[int, int]): mapping of qubit to nodes of the graph
+        virtual_nodes (List[Tuple[int, int]]): list of virtual nodes in the graph
 
     Returns:
         avg (float): expectation value of the cut edges for number of counts
@@ -148,8 +149,8 @@ def create_objective_function(
     Args:
         counts (Dict[str, int]): The dictionary of bitstring counts.
         graph (networkx graph): the MaxCut problem graph.
-        qubit_to_node (Dict[int, int]):
-        virtual_nodes (List[Tuple[int, int]]):
+        qubit_to_node (Dict[int, int]): mapping of qubit to nodes of the graph
+        virtual_nodes (List[Tuple[int, int]]): list of virtual nodes in the graph
     Returns:
         callable: function that gives expectation value of the cut edges from counts sampled from the ansatz
     """
@@ -388,7 +389,7 @@ def run_QAOA(
     The result is average value sampled from the optimized ansatz.
 
     Args:
-        counts (Dict[str, int]):
+        counts (Dict[str, int]): key as bitstring, value as counts
         graph_physical (Graph): the graph to be optimized
         qubit_node (Dict[int, int]): the qubit to be optimized
         use_classical_angles (bool): whether to use classical angles
@@ -627,7 +628,6 @@ class QScoreBenchmark(Benchmark):
             self.node_to_qubit = {node: node for node in list(self.graph_physical.nodes)}  # no relabeling
             self.qubit_to_node = self.node_to_qubit
 
-        # qubit_to_node_local = self.qubit_to_node.copy()
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
             return QuantumCircuit(1)
@@ -712,7 +712,10 @@ class QScoreBenchmark(Benchmark):
             chosen_qubits = selected_qubits[0]
         return list(chosen_qubits)
 
-    def execute(self, backend: IQMBackendBase) -> xr.Dataset:  # pylint: disable=too-many-branches,too-many-statements
+    def execute(self, backend: IQMBackendBase
+                # pylint: disable=too-many-branches
+                # pylint: disable=too-many-statements
+                ) -> xr.Dataset:
         """Executes the benchmark."""
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
@@ -775,7 +778,7 @@ class QScoreBenchmark(Benchmark):
                     qcvv_logger.info(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
 
                 # Choose the qubit layout
-                # qubit_set = []
+
                 if self.choose_qubits_routine.lower() == "naive":
                     qubit_set = self.choose_qubits_naive(num_nodes)
                 elif (
