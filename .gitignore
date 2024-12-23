@@ -32,3 +32,6 @@ version.txt
 /Outputs/
 /tests/Outputs/
 /examples/Outputs/*
+
+# Exceptions
+!logo.png

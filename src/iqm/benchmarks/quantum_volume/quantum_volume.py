@@ -322,11 +322,10 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         execution_results[str(qubits)] = xrvariable_to_counts(dataset, str(qubits), num_circuits)
 
         # Retrieve other dataset values
-        dataset_dictionary = dataset.attrs[qubits_idx]
-        sorted_qc_list_indices = dataset_dictionary["sorted_qc_list_indices"]
-        qc_list = run.circuits["transpiled_circuits"][str(qubits)].circuits
+        sorted_qc_list_indices = dataset.attrs[qubits_idx]["sorted_qc_list_indices"]
+        qc_list = run.circuits["untranspiled_circuits"][str(qubits)].circuits
 
-        qv_results_type[str(qubits)] = dataset_dictionary["qv_results_type"]
+        qv_results_type[str(qubits)] = dataset.attrs[qubits_idx]["qv_results_type"]
         depth[str(qubits)] = len(qubits)
 
         # Simulate the circuits and get the ideal heavy outputs
@@ -358,12 +357,14 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         dataset.attrs[qubits_idx].update(
             {
-                "sorted_qc_list_indices": (sorted_qc_list_indices if rem or physical_layout == "batching" else None),
                 "cumulative_average_heavy_output_probability": cumulative_hop(qv_result),
                 "cumulative_stddev_heavy_output_probability": cumulative_std(qv_result),
                 "heavy_output_probabilities": qv_result,
             }
         )
+        # Remove sorted_qc_list_indices from dataset if using physical_layout = "fixed"
+        if physical_layout == "fixed" and rem is None:
+            del dataset.attrs[qubits_idx]["sorted_qc_list_indices"]
 
         fig_name, fig = plot_hop_threshold(
             qubits,
@@ -384,12 +385,11 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     mit_shots = dataset.attrs["mit_shots"]
     rem_quasidistros = dataset.attrs["REM_quasidistributions"]
     for qubits_idx, qubits in enumerate(qubit_layouts):
-        qcvv_logger.info(f"REM post-processing for layout {qubits}")
-        # Retrieve
-        dataset_dictionary = dataset.attrs[qubits_idx]
+        qcvv_logger.info(f"REM post-processing for layout {qubits} with {mit_shots} shots")
 
-        qcvv_logger.info(f"Applying REM with {mit_shots} shots")
-        sorted_qc_list_indices = dataset_dictionary["sorted_qc_list_indices"]
+        # Remove sorted_qc_list_indices from dataset if using physical_layout = "fixed"
+        if physical_layout == "fixed":
+            del dataset.attrs[qubits_idx]["sorted_qc_list_indices"]
 
         qv_result_rem = get_rem_hops(
             rem_quasidistros[f"REM_quasidist_{str(qubits)}"],
@@ -398,7 +398,6 @@ def qv_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         dataset.attrs[qubits_idx].update(
             {
-                "sorted_qc_list_indices": (sorted_qc_list_indices if physical_layout == "batching" else None),
                 "REM_cumulative_average_heavy_output_probability": cumulative_hop(qv_result_rem),
                 "REM_cumulative_stddev_heavy_output_probability": cumulative_std(qv_result_rem),
                 "REM_heavy_output_probabilities": qv_result_rem,

@@ -15,6 +15,7 @@ Contents
    :maxdepth: 2
 
    readme
+   examples
    API
    license
 

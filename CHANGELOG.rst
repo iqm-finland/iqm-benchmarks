@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 2.3
+===========
+* Reverted QV simulation circuits to untranspiled ones (fixes bug giving all HOPs equal to zero).
+
+Version 2.2
+===========
+* Added Clifford RB example notebook to docs. `#20 <https://github.com/iqm-finland/iqm-benchmarks/pull/20>`_
+
+Version 2.1
+===========
+* Fixed bug in RB plots for individual decays.
+
 Version 2.0
 ===========
 * Adds `Circuits`, `BenchmarkCircuit` and `CircuitGroup` as a way to easily store and interact with multiple quantum circuits.
