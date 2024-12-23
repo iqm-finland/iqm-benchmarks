@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.4
+===========
+* Changed Qscore to operate under the new base class.
+
 Version 2.3
 ===========
 * Reverted QV simulation circuits to untranspiled ones (fixes bug giving all HOPs equal to zero).
