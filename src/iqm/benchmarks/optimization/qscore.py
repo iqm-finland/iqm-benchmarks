@@ -330,11 +330,10 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 f"Q-Score = {num_nodes} passed with approximation ratio (Beta) {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
             )
             qscore = num_nodes
-            continue
-
-        qcvv_logger.info(
-            f"Q-Score = {num_nodes} failed with approximation ratio (Beta) {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
-        )
+        else:
+            qcvv_logger.info(
+                f"Q-Score = {num_nodes} failed with approximation ratio (Beta) {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+            )
         observations.extend(
             [
                 BenchmarkObservation(
