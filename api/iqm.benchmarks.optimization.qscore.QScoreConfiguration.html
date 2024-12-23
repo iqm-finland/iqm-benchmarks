@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.optimization.qscore.QScoreConfiguration &#8212; IQM Benchmarks 2.3 documentation</title>
+    <title>iqm.benchmarks.optimization.qscore.QScoreConfiguration &#8212; IQM Benchmarks 2.4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/documentation_options.js?v=faffb74a"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark" href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.3" />
-    <meta name="docbuild:last-update" content="2024-12-18"/>
+  <meta name="docsearch:version" content="2.4" />
+    <meta name="docbuild:last-update" content="2024-12-23"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.3 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.3 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.4 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.4 documentation - Home"/>
   
   
 </a></div>
@@ -170,10 +170,6 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
-</ul>
-</details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.benchmark_experiment.html">iqm.benchmarks.benchmark_experiment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_experiment.BenchmarkExperiment.html">iqm.benchmarks.benchmark_experiment.BenchmarkExperiment</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.circuit_containers.html">iqm.benchmarks.circuit_containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -380,6 +376,19 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.benchmark"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.benchmark</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.num_instances</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_qaoa_layers"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.num_qaoa_layers</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_nodes"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.min_num_nodes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.max_num_nodes"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.max_num_nodes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_virtual_node"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.use_virtual_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_classically_optimized_angles"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.use_classically_optimized_angles</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.choose_qubits_routine"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.choose_qubits_routine</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_qubits"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.min_num_qubits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.custom_qubits_array"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.custom_qubits_array</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.qiskit_optim_level"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.qiskit_optim_level</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.optimize_sqg"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.optimize_sqg</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.seed"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.seed</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.model_computed_fields</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_config"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.model_config</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.model_fields</span></code></a></li>
@@ -400,9 +409,174 @@
 <h1>iqm.benchmarks.optimization.qscore.QScoreConfiguration<a class="headerlink" href="#iqm-benchmarks-optimization-qscore-qscoreconfiguration" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.optimization.qscore.</span></span><span class="sig-name descname"><span class="pre">QScoreConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark.BenchmarkBase]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.optimization.qscore.QScoreBenchmark'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lookahead'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'stochastic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sabre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_instances:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qaoa_layers:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_nodes:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_nodes:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_virtual_node:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_classically_optimized_angles:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choose_qubits_routine:</span> <span class="pre">~typing.Literal['naive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'custom']</span> <span class="pre">=</span> <span class="pre">'naive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_qubits:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_qubits_array:</span> <span class="pre">list[list[int]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qiskit_optim_level:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_sqg:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.optimization.qscore.</span></span><span class="sig-name descname"><span class="pre">QScoreConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.optimization.qscore.QScoreBenchmark'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lookahead'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'stochastic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sabre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_instances:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qaoa_layers:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_nodes:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_nodes:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_virtual_node:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_classically_optimized_angles:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choose_qubits_routine:</span> <span class="pre">~typing.Literal['naive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'custom']</span> <span class="pre">=</span> <span class="pre">'naive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_qubits:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qiskit_optim_level:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_sqg:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase" title="iqm.benchmarks.benchmark.BenchmarkConfigurationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfigurationBase</span></code></a></p>
 <p>Q-score configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmark</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Type" title="(in Python v3.11)"><em>Type</em></a><em>[</em><a class="reference internal" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" title="iqm.benchmarks.benchmark_definition.Benchmark"><em>Benchmark</em></a><em>]</em>) – </p></li>
+<li><p><strong>shots</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>max_gates_per_batch</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>calset_id</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>routing_method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'basic'</em><em>, </em><em>'lookahead'</em><em>, </em><em>'stochastic'</em><em>, </em><em>'sabre'</em><em>, </em><em>'none'</em><em>]</em>) – </p></li>
+<li><p><strong>physical_layout</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'fixed'</em><em>, </em><em>'batching'</em><em>]</em>) – </p></li>
+<li><p><strong>num_instances</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>num_qaoa_layers</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>min_num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>max_num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>use_virtual_node</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+<li><p><strong>use_classically_optimized_angles</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+<li><p><strong>choose_qubits_routine</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'naive'</em><em>, </em><em>'custom'</em><em>]</em>) – </p></li>
+<li><p><strong>min_num_qubits</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>custom_qubits_array</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>qiskit_optim_level</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>optimize_sqg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.benchmark">
+<span class="sig-name descname"><span class="pre">benchmark</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.benchmark" title="Link to this definition">#</a></dt>
+<dd><p>QScoreBenchmark</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Type[<a class="reference internal" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" title="iqm.benchmarks.benchmark_definition.Benchmark">Benchmark</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances">
+<span class="sig-name descname"><span class="pre">num_instances</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_qaoa_layers">
+<span class="sig-name descname"><span class="pre">num_qaoa_layers</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_qaoa_layers" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_nodes">
+<span class="sig-name descname"><span class="pre">min_num_nodes</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_nodes" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.max_num_nodes">
+<span class="sig-name descname"><span class="pre">max_num_nodes</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.max_num_nodes" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_virtual_node">
+<span class="sig-name descname"><span class="pre">use_virtual_node</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_virtual_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_classically_optimized_angles">
+<span class="sig-name descname"><span class="pre">use_classically_optimized_angles</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_classically_optimized_angles" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.choose_qubits_routine">
+<span class="sig-name descname"><span class="pre">choose_qubits_routine</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.choose_qubits_routine" title="Link to this definition">#</a></dt>
+<dd><p>The routine to select qubit layouts.
+* Default is “custom”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Literal[“custom”]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_qubits">
+<span class="sig-name descname"><span class="pre">min_num_qubits</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_qubits" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.custom_qubits_array">
+<span class="sig-name descname"><span class="pre">custom_qubits_array</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.custom_qubits_array" title="Link to this definition">#</a></dt>
+<dd><p>The physical qubit layouts to perform the benchmark on.
+* Default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Sequence[Sequence[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.qiskit_optim_level">
+<span class="sig-name descname"><span class="pre">qiskit_optim_level</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.qiskit_optim_level" title="Link to this definition">#</a></dt>
+<dd><p>The Qiskit transpilation optimization level.
+* Default is 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.optimize_sqg">
+<span class="sig-name descname"><span class="pre">optimize_sqg</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.optimize_sqg" title="Link to this definition">#</a></dt>
+<dd><p>Whether Single Qubit Gate Optimization is performed upon transpilation.
+* Default is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.seed">
+<span class="sig-name descname"><span class="pre">seed</span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.seed" title="Link to this definition">#</a></dt>
+<dd><p>The random seed.
+* Default is 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
@@ -415,43 +589,43 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_fields</span></code></a></p></td>
 <td><p>Metadata about the fields defined on the model, mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">benchmark</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.benchmark" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">benchmark</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_instances</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_instances</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_qaoa_layers</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_qaoa_layers" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_qaoa_layers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_qaoa_layers</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_num_nodes</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_nodes" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_num_nodes</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_num_nodes</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.max_num_nodes" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.max_num_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_num_nodes</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_virtual_node</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_virtual_node" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_virtual_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_virtual_node</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_classically_optimized_angles</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_classically_optimized_angles" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_classically_optimized_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_classically_optimized_angles</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_qubits_routine</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.choose_qubits_routine" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.choose_qubits_routine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_qubits_routine</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_num_qubits</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_qubits" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_qubits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_num_qubits</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">custom_qubits_array</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.custom_qubits_array" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.custom_qubits_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">custom_qubits_array</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">qiskit_optim_level</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.qiskit_optim_level" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.qiskit_optim_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qiskit_optim_level</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_sqg</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.optimize_sqg" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.optimize_sqg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_sqg</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.seed" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration.seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shots</span></code></p></td>
@@ -478,30 +652,6 @@
 </tbody>
 </table>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>benchmark</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Type" title="(in Python v3.11)"><em>Type</em></a><em>[</em><a class="reference internal" href="iqm.benchmarks.benchmark.BenchmarkBase.html#iqm.benchmarks.benchmark.BenchmarkBase" title="iqm.benchmarks.benchmark.BenchmarkBase"><em>BenchmarkBase</em></a><em>]</em>) – </p></li>
-<li><p><strong>shots</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>max_gates_per_batch</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>calset_id</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>routing_method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'basic'</em><em>, </em><em>'lookahead'</em><em>, </em><em>'stochastic'</em><em>, </em><em>'sabre'</em><em>, </em><em>'none'</em><em>]</em>) – </p></li>
-<li><p><strong>physical_layout</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'fixed'</em><em>, </em><em>'batching'</em><em>]</em>) – </p></li>
-<li><p><strong>num_instances</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>num_qaoa_layers</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>min_num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>max_num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>use_virtual_node</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
-<li><p><strong>use_classically_optimized_angles</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
-<li><p><strong>choose_qubits_routine</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'naive'</em><em>, </em><em>'custom'</em><em>]</em>) – </p></li>
-<li><p><strong>min_num_qubits</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>custom_qubits_array</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – </p></li>
-<li><p><strong>qiskit_optim_level</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>optimize_sqg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_computed_fields">
 <span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_computed_fields" title="Link to this definition">#</a></dt>
@@ -516,7 +666,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'benchmark':</span> <span class="pre">FieldInfo(annotation=Type[BenchmarkBase],</span> <span class="pre">required=False,</span> <span class="pre">default=&lt;class</span> <span class="pre">'iqm.benchmarks.optimization.qscore.QScoreBenchmark'&gt;),</span> <span class="pre">'calset_id':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'choose_qubits_routine':</span> <span class="pre">FieldInfo(annotation=Literal['naive',</span> <span class="pre">'custom'],</span> <span class="pre">required=False,</span> <span class="pre">default='naive'),</span> <span class="pre">'custom_qubits_array':</span> <span class="pre">FieldInfo(annotation=Union[list[list[int]],</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_gates_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_num_nodes':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'min_num_nodes':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=2),</span> <span class="pre">'min_num_qubits':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=2),</span> <span class="pre">'num_instances':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'num_qaoa_layers':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=1),</span> <span class="pre">'optimize_sqg':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=True),</span> <span class="pre">'physical_layout':</span> <span class="pre">FieldInfo(annotation=Literal['fixed',</span> <span class="pre">'batching'],</span> <span class="pre">required=False,</span> <span class="pre">default='fixed'),</span> <span class="pre">'qiskit_optim_level':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=3),</span> <span class="pre">'routing_method':</span> <span class="pre">FieldInfo(annotation=Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none'],</span> <span class="pre">required=False,</span> <span class="pre">default='sabre'),</span> <span class="pre">'seed':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=1),</span> <span class="pre">'shots':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=256),</span> <span class="pre">'use_classically_optimized_angles':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=True),</span> <span class="pre">'use_virtual_node':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=True)}</span></em><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'benchmark':</span> <span class="pre">FieldInfo(annotation=Type[Benchmark],</span> <span class="pre">required=False,</span> <span class="pre">default=&lt;class</span> <span class="pre">'iqm.benchmarks.optimization.qscore.QScoreBenchmark'&gt;),</span> <span class="pre">'calset_id':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'choose_qubits_routine':</span> <span class="pre">FieldInfo(annotation=Literal['naive',</span> <span class="pre">'custom'],</span> <span class="pre">required=False,</span> <span class="pre">default='naive'),</span> <span class="pre">'custom_qubits_array':</span> <span class="pre">FieldInfo(annotation=Union[Sequence[Sequence[int]],</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_gates_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_num_nodes':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'min_num_nodes':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=2),</span> <span class="pre">'min_num_qubits':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=2),</span> <span class="pre">'num_instances':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'num_qaoa_layers':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=1),</span> <span class="pre">'optimize_sqg':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=True),</span> <span class="pre">'physical_layout':</span> <span class="pre">FieldInfo(annotation=Literal['fixed',</span> <span class="pre">'batching'],</span> <span class="pre">required=False,</span> <span class="pre">default='fixed'),</span> <span class="pre">'qiskit_optim_level':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=3),</span> <span class="pre">'routing_method':</span> <span class="pre">FieldInfo(annotation=Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none'],</span> <span class="pre">required=False,</span> <span class="pre">default='sabre'),</span> <span class="pre">'seed':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=1),</span> <span class="pre">'shots':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=256),</span> <span class="pre">'use_classically_optimized_angles':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=True),</span> <span class="pre">'use_virtual_node':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=True)}</span></em><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields" title="Link to this definition">#</a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
@@ -573,6 +723,19 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] ob
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.benchmark"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.benchmark</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.num_instances</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_qaoa_layers"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.num_qaoa_layers</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_nodes"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.min_num_nodes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.max_num_nodes"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.max_num_nodes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_virtual_node"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.use_virtual_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.use_classically_optimized_angles"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.use_classically_optimized_angles</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.choose_qubits_routine"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.choose_qubits_routine</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.min_num_qubits"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.min_num_qubits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.custom_qubits_array"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.custom_qubits_array</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.qiskit_optim_level"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.qiskit_optim_level</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.optimize_sqg"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.optimize_sqg</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.seed"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.seed</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.model_computed_fields</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_config"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.model_config</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreConfiguration.model_fields"><code class="docutils literal notranslate"><span class="pre">QScoreConfiguration.model_fields</span></code></a></li>
@@ -611,7 +774,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2024-12-18.
+  Last updated on 2024-12-23.
   <br/>
 </p>
   </div>

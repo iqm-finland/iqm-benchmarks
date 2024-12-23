@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.optimization.qscore &#8212; IQM Benchmarks 2.3 documentation</title>
+    <title>iqm.benchmarks.optimization.qscore &#8212; IQM Benchmarks 2.4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/documentation_options.js?v=faffb74a"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -49,12 +49,12 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark" href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html" />
+    <link rel="next" title="iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1" href="iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1.html" />
     <link rel="prev" title="iqm.benchmarks.optimization" href="iqm.benchmarks.optimization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.3" />
-    <meta name="docbuild:last-update" content="2024-12-18"/>
+  <meta name="docsearch:version" content="2.4" />
+    <meta name="docbuild:last-update" content="2024-12-23"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.3 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.3 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.4 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.4 documentation - Home"/>
   
   
 </a></div>
@@ -170,10 +170,6 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
-</ul>
-</details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.benchmark_experiment.html">iqm.benchmarks.benchmark_experiment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_experiment.BenchmarkExperiment.html">iqm.benchmarks.benchmark_experiment.BenchmarkExperiment</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.circuit_containers.html">iqm.benchmarks.circuit_containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -383,11 +379,41 @@
                   
   <section id="module-iqm.benchmarks.optimization.qscore">
 <span id="iqm-benchmarks-optimization-qscore"></span><h1>iqm.benchmarks.optimization.qscore<a class="headerlink" href="#module-iqm.benchmarks.optimization.qscore" title="Link to this heading">#</a></h1>
-<p>Q-score benchmark</p>
+<p>Qscore benchmark</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1.html#iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1" title="iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_optimal_angles_for_QAOA_p1</span></code></a>(graph)</p></td>
+<td><p>Calculates the optimal angles for single layer QAOA MaxCut ansatz.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.compute_expectation_value.html#iqm.benchmarks.optimization.qscore.compute_expectation_value" title="iqm.benchmarks.optimization.qscore.compute_expectation_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_expectation_value</span></code></a>(counts, graph, ...)</p></td>
+<td><p>Computes expectation value based on measurement results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.create_objective_function.html#iqm.benchmarks.optimization.qscore.create_objective_function" title="iqm.benchmarks.optimization.qscore.create_objective_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_objective_function</span></code></a>(counts, graph, ...)</p></td>
+<td><p>Creates a function that maps the parameters to the parametrized circuit, runs it and computes the expectation value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.cut_cost_function.html#iqm.benchmarks.optimization.qscore.cut_cost_function" title="iqm.benchmarks.optimization.qscore.cut_cost_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cut_cost_function</span></code></a>(x, graph)</p></td>
+<td><p>Returns the number of cut edges in a graph (with minus sign).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.is_successful.html#iqm.benchmarks.optimization.qscore.is_successful" title="iqm.benchmarks.optimization.qscore.is_successful"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_successful</span></code></a>(approximation_ratio)</p></td>
+<td><p>Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.plot_approximation_ratios.html#iqm.benchmarks.optimization.qscore.plot_approximation_ratios" title="iqm.benchmarks.optimization.qscore.plot_approximation_ratios"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_approximation_ratios</span></code></a>(nodes, beta_ratio, ...)</p></td>
+<td><p>Generate the figure of approximation ratios vs number of nodes,</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.qscore_analysis.html#iqm.benchmarks.optimization.qscore.qscore_analysis" title="iqm.benchmarks.optimization.qscore.qscore_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qscore_analysis</span></code></a>(run)</p></td>
+<td><p>Analysis function for a QScore experiment</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.run_QAOA.html#iqm.benchmarks.optimization.qscore.run_QAOA" title="iqm.benchmarks.optimization.qscore.run_QAOA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_QAOA</span></code></a>(counts, graph_physical, qubit_node, ...)</p></td>
+<td><p>Solves the cut size of MaxCut for a graph using QAOA.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html#iqm.benchmarks.optimization.qscore.QScoreBenchmark" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QScoreBenchmark</span></code></a>(backend, configuration)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html#iqm.benchmarks.optimization.qscore.QScoreBenchmark" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QScoreBenchmark</span></code></a>(backend_arg, configuration)</p></td>
 <td><p>Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QScoreConfiguration</span></code></a>(*, benchmark, shots, ...)</p></td>
@@ -397,10 +423,10 @@
 </table>
 </div>
 <p class="rubric">Inheritance</p>
-<div class="graphviz"><img src="../_images/inheritance-2e761c8fc51b6e0dc5a40e51b1d6f99fcb3a27a7.png" alt="Inheritance diagram of iqm.benchmarks.optimization.qscore" usemap="#inheritance6f8bfcae2f" class="inheritance graphviz" /></div>
+<div class="graphviz"><img src="../_images/inheritance-c2418ad7f3d5166ea1845fca61d8d5b5c151cf05.png" alt="Inheritance diagram of iqm.benchmarks.optimization.qscore" usemap="#inheritance6f8bfcae2f" class="inheritance graphviz" /></div>
 <map id="inheritance6f8bfcae2f" name="inheritance6f8bfcae2f">
 <area shape="rect" id="node1" href="https://docs.python.org/3.11/library/abc.html#abc.ABC" target="_top" title="Helper class that provides a standard way to create an ABC using" alt="" coords="17,55,89,80"/>
-<area shape="rect" id="node3" href="iqm.benchmarks.benchmark.BenchmarkBase.html#iqm.benchmarks.benchmark.BenchmarkBase" target="_top" title="The base implementation of all benchmarks, from which they inherit." alt="" coords="191,55,319,80"/>
+<area shape="rect" id="node3" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" target="_top" title="A base class for running cortex&#45;based Benchmark experiments." alt="" coords="207,55,303,80"/>
 <area shape="rect" id="node4" href="iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase" target="_top" title="Benchmark configuration base." alt="" coords="148,5,363,31"/>
 <area shape="rect" id="node5" href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html#iqm.benchmarks.optimization.qscore.QScoreBenchmark" target="_top" title="Q&#45;score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results." alt="" coords="417,55,559,80"/>
 <area shape="rect" id="node6" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration" target="_top" title="Q&#45;score configuration." alt="" coords="411,5,565,31"/>
@@ -427,11 +453,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html"
+       href="iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.optimization.qscore.QScoreBenchmark</p>
+        <p class="prev-next-title">iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -470,7 +496,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2024-12-18.
+  Last updated on 2024-12-23.
   <br/>
 </p>
   </div>

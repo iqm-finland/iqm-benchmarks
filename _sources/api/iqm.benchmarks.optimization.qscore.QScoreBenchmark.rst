@@ -9,6 +9,12 @@ iqm.benchmarks.optimization.qscore.QScoreBenchmark
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~QScoreBenchmark.name
+   
    
 
 
@@ -18,18 +24,11 @@ iqm.benchmarks.optimization.qscore.QScoreBenchmark
 
    .. autosummary::
    
-      ~QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1
+      ~QScoreBenchmark.add_all_meta_to_dataset
+      ~QScoreBenchmark.analysis_function
       ~QScoreBenchmark.choose_qubits_custom
       ~QScoreBenchmark.choose_qubits_naive
-      ~QScoreBenchmark.compute_expectation_value
-      ~QScoreBenchmark.cost_function
-      ~QScoreBenchmark.create_objective_function
-      ~QScoreBenchmark.execute_full_benchmark
-      ~QScoreBenchmark.execute_single_benchmark
+      ~QScoreBenchmark.execute
       ~QScoreBenchmark.generate_maxcut_ansatz
-      ~QScoreBenchmark.is_successful
-      ~QScoreBenchmark.name
-      ~QScoreBenchmark.plot_approximation_ratios
-      ~QScoreBenchmark.run_QAOA
    
    

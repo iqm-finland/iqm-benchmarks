@@ -9,6 +9,20 @@ iqm.benchmarks.optimization.qscore
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      calculate_optimal_angles_for_QAOA_p1
+      compute_expectation_value
+      create_objective_function
+      cut_cost_function
+      is_successful
+      plot_approximation_ratios
+      qscore_analysis
+      run_QAOA
+   
    
 
    

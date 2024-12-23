@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.optimization.qscore.QScoreBenchmark &#8212; IQM Benchmarks 2.3 documentation</title>
+    <title>iqm.benchmarks.optimization.qscore.QScoreBenchmark &#8212; IQM Benchmarks 2.4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/documentation_options.js?v=faffb74a"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -50,11 +50,11 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html" />
-    <link rel="prev" title="iqm.benchmarks.optimization.qscore" href="iqm.benchmarks.optimization.qscore.html" />
+    <link rel="prev" title="iqm.benchmarks.optimization.qscore.run_QAOA" href="iqm.benchmarks.optimization.qscore.run_QAOA.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.3" />
-    <meta name="docbuild:last-update" content="2024-12-18"/>
+  <meta name="docsearch:version" content="2.4" />
+    <meta name="docbuild:last-update" content="2024-12-23"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.3 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.3 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.4 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.4 documentation - Home"/>
   
   
 </a></div>
@@ -170,10 +170,6 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
-</ul>
-</details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.benchmark_experiment.html">iqm.benchmarks.benchmark_experiment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.benchmark_experiment.BenchmarkExperiment.html">iqm.benchmarks.benchmark_experiment.BenchmarkExperiment</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.circuit_containers.html">iqm.benchmarks.circuit_containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -380,19 +376,12 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.name"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.analysis_function"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.analysis_function()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.generate_maxcut_ansatz()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.cost_function"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.cost_function()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.compute_expectation_value"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.compute_expectation_value()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.create_objective_function"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.create_objective_function()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.run_QAOA"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.run_QAOA()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.is_successful"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.is_successful()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.add_all_meta_to_dataset"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.add_all_meta_to_dataset()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_naive"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.choose_qubits_naive()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_custom"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.choose_qubits_custom()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.plot_approximation_ratios"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.plot_approximation_ratios()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_single_benchmark"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.execute_single_benchmark()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_full_benchmark"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.execute_full_benchmark()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.execute()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -410,50 +399,38 @@
 <h1>iqm.benchmarks.optimization.qscore.QScoreBenchmark<a class="headerlink" href="#iqm-benchmarks-optimization-qscore-qscorebenchmark" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.optimization.qscore.</span></span><span class="sig-name descname"><span class="pre">QScoreBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IQMBackendBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration"><span class="pre">QScoreConfiguration</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="iqm.benchmarks.benchmark.BenchmarkBase.html#iqm.benchmarks.benchmark.BenchmarkBase" title="iqm.benchmarks.benchmark.BenchmarkBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkBase</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.optimization.qscore.</span></span><span class="sig-name descname"><span class="pre">QScoreBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IQMBackendBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration"><span class="pre">QScoreConfiguration</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" title="iqm.benchmarks.benchmark_definition.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a></p>
 <p>Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.</p>
+<p class="rubric">Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_optimal_angles_for_QAOA_p1</span></code></a>(graph)</p></td>
-<td><p>Calculates the optimal angles for single layer QAOA MaxCut ansatz.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.add_all_meta_to_dataset" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.add_all_meta_to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_all_meta_to_dataset</span></code></a>(dataset)</p></td>
+<td><p>Adds all configuration metadata and circuits to the dataset variable</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_custom" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_custom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_qubits_custom</span></code></a>(num_qubits)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.analysis_function" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.analysis_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analysis_function</span></code></a>(run)</p></td>
+<td><p>Analysis function for a QScore experiment</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_custom" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_custom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_qubits_custom</span></code></a>(num_qubits)</p></td>
 <td><p>Choose the qubits to execute the circuits on, according to elements in custom_qubits_array matching num_qubits number of qubits</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_naive" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_naive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_qubits_naive</span></code></a>(num_qubits)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_naive" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_naive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_qubits_naive</span></code></a>(num_qubits)</p></td>
 <td><p>Choose the qubits to execute the circuits on, sequentially starting at qubit 0.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.compute_expectation_value" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.compute_expectation_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_expectation_value</span></code></a>(counts, graph)</p></td>
-<td><p>Computes expectation value based on measurement results.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute</span></code></a>(backend)</p></td>
+<td><p>Executes the benchmark.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.cost_function" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.cost_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cost_function</span></code></a>(x, graph)</p></td>
-<td><p>Returns the number of cut edges in a graph (with minus sign).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.create_objective_function" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.create_objective_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_objective_function</span></code></a>(graph, qubit_set)</p></td>
-<td><p>Creates a function that maps the parameters to the parametrized circuit, runs it and computes the expectation value.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_full_benchmark" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_full_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_full_benchmark</span></code></a>()</p></td>
-<td><p>Execute the full benchmark, starting with self.min_num_nodes nodes up to failure.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_single_benchmark" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_single_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_single_benchmark</span></code></a>(num_nodes)</p></td>
-<td><p>Execute a single benchmark, for a given number of qubits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_maxcut_ansatz</span></code></a>(graph, theta)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_maxcut_ansatz</span></code></a>(graph, theta)</p></td>
 <td><p>Generate an ansatz circuit for QAOA MaxCut, with measurements at the end.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.is_successful" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.is_successful"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_successful</span></code></a>(approximation_ratio)</p></td>
-<td><p>Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.name" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a>()</p></td>
-<td><p>Return the name of the benchmark.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.plot_approximation_ratios" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.plot_approximation_ratios"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_approximation_ratios</span></code></a>(list_of_num_nodes, ...)</p></td>
-<td><p>Generate the figure of approximation ratios vs number of nodes,</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.run_QAOA" title="iqm.benchmarks.optimization.qscore.QScoreBenchmark.run_QAOA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_QAOA</span></code></a>(graph, qubit_set)</p></td>
-<td><p>Solves the cut size of MaxCut for a graph using QAOA.</p></td>
 </tr>
 </tbody>
 </table>
@@ -461,25 +438,31 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<em>IQMBackendBase</em>) – </p></li>
+<li><p><strong>backend_arg</strong> (<em>IQMBackendBase</em>) – </p></li>
 <li><p><strong>configuration</strong> (<a class="reference internal" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration" title="iqm.benchmarks.optimization.qscore.QScoreConfiguration"><em>QScoreConfiguration</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.name">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.name" title="Link to this definition">#</a></dt>
-<dd><p>Return the name of the benchmark.</p>
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.analysis_function">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">analysis_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html#iqm.benchmarks.benchmark_definition.BenchmarkRunResult" title="iqm.benchmarks.benchmark_definition.BenchmarkRunResult"><span class="pre">BenchmarkRunResult</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html#iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult" title="iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult"><span class="pre">BenchmarkAnalysisResult</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.analysis_function" title="Link to this definition">#</a></dt>
+<dd><p>Analysis function for a QScore experiment</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run</strong> (<em>RunResult</em>) – A QScore experiment run for which analysis result is created</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>AnalysisResult corresponding to QScore</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html#iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult" title="iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult"><em>BenchmarkAnalysisResult</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz">
-<span class="sig-name descname"><span class="pre">generate_maxcut_ansatz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IQMCircuit</span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">generate_maxcut_ansatz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QuantumCircuit</span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz" title="Link to this definition">#</a></dt>
 <dd><p>Generate an ansatz circuit for QAOA MaxCut, with measurements at the end.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -498,118 +481,12 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.cost_function">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cost_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.cost_function" title="Link to this definition">#</a></dt>
-<dd><p>Returns the number of cut edges in a graph (with minus sign).</p>
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.add_all_meta_to_dataset">
+<span class="sig-name descname"><span class="pre">add_all_meta_to_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.add_all_meta_to_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Adds all configuration metadata and circuits to the dataset variable</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – solution bitstring.</p></li>
-<li><p><strong>graph</strong> (<em>networkx graph</em>) – the MaxCut problem graph.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>number of cut edges multiplied by -1.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>obj (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.compute_expectation_value">
-<span class="sig-name descname"><span class="pre">compute_expectation_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.compute_expectation_value" title="Link to this definition">#</a></dt>
-<dd><p>Computes expectation value based on measurement results.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>counts</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – key as bitstring, val as count</p></li>
-<li><p><strong>graph</strong> (<em>networkx</em>) – the MaxCut problem graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>expectation value of the cut edges for number of counts</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>avg (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.create_objective_function">
-<span class="sig-name descname"><span class="pre">create_objective_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Callable" title="(in Python v3.11)"><span class="pre">Callable</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.create_objective_function" title="Link to this definition">#</a></dt>
-<dd><p>Creates a function that maps the parameters to the parametrized circuit,
-runs it and computes the expectation value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (<em>networkx graph</em>) – the MaxCut problem graph.</p></li>
-<li><p><strong>qubit_set</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – indices of the used qubits.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>function that gives expectation value of the cut edges from counts sampled from the ansatz</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>callable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_optimal_angles_for_QAOA_p1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1" title="Link to this definition">#</a></dt>
-<dd><p>Calculates the optimal angles for single layer QAOA MaxCut ansatz.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>graph</strong> (<em>networkx graph</em>) – the MaxCut problem graph.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>optimal angles gamma and beta.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.run_QAOA">
-<span class="sig-name descname"><span class="pre">run_QAOA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.run_QAOA" title="Link to this definition">#</a></dt>
-<dd><p>Solves the cut size of MaxCut for a graph using QAOA.
-The result is average value sampled from the optimized ansatz.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (<em>networkx graph</em>) – the MaxCut problem graph.</p></li>
-<li><p><strong>qubit_set</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – indices of the used qubits.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the expectation value of the maximum cut size.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.is_successful">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_successful</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">approximation_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.is_successful" title="Link to this definition">#</a></dt>
-<dd><p>Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.</p>
-<p>This condition checks that the mean approximation ratio is above the beta* = 0.2 threshold.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>approximation_ratio</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – the mean approximation ratio of all problem graphs</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>whether the Q-score benchmark was successful</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>xr.Dataset</em>) – The xarray dataset</p>
 </dd>
 </dl>
 </dd></dl>
@@ -649,61 +526,15 @@ The result is average value sampled from the optimized ansatz.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.plot_approximation_ratios">
-<span class="sig-name descname"><span class="pre">plot_approximation_ratios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_cut_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Figure</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.plot_approximation_ratios" title="Link to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>Generate the figure of approximation ratios vs number of nodes,</dt><dd><p>including standard deviation and the acceptance threshold.</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IQMBackendBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute" title="Link to this definition">#</a></dt>
+<dd><p>Executes the benchmark.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>list_of_num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – list of problem graph sizes.</p></li>
-<li><p><strong>list_of_cut_sizes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>]</em><em>]</em>) – the list of lists of maximum average cut sizes of problem graph instances for each problem size.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the name of the figure.
-Figure: the figure.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_single_benchmark">
-<span class="sig-name descname"><span class="pre">execute_single_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_single_benchmark" title="Link to this definition">#</a></dt>
-<dd><p>Execute a single benchmark, for a given number of qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – number of nodes in the MaxCut problem graphs.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>whether the benchmark was successful.
-float: approximation_ratio.
-list[float]: the list of maximum average cut sizes of problem graph instances.
-list[int]: the set of qubits the Q-score benchmark was executed on.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_full_benchmark">
-<span class="sig-name descname"><span class="pre">execute_full_benchmark</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_full_benchmark" title="Link to this definition">#</a></dt>
-<dd><p>Execute the full benchmark, starting with self.min_num_nodes nodes up to failure.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the Q-score of the device.
-list[float]: the list of approximation rations over problem graph instances for each problem size.
-list[list[float]]: the list of lists of maximum average cut sizes of problem graph instances for each problem size.</p>
+<dd class="field-odd"><p><strong>backend</strong> (<em>IQMBackendBase</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+<dd class="field-even"><p><em>Dataset</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -724,12 +555,12 @@ list[list[float]]: the list of lists of maximum average cut sizes of problem gra
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iqm.benchmarks.optimization.qscore.html"
+       href="iqm.benchmarks.optimization.qscore.run_QAOA.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">iqm.benchmarks.optimization.qscore</p>
+        <p class="prev-next-title">iqm.benchmarks.optimization.qscore.run_QAOA</p>
       </div>
     </a>
     <a class="right-next"
@@ -759,19 +590,12 @@ list[list[float]]: the list of lists of maximum average cut sizes of problem gra
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.name"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.analysis_function"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.analysis_function()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.generate_maxcut_ansatz"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.generate_maxcut_ansatz()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.cost_function"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.cost_function()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.compute_expectation_value"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.compute_expectation_value()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.create_objective_function"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.create_objective_function()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.calculate_optimal_angles_for_QAOA_p1()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.run_QAOA"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.run_QAOA()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.is_successful"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.is_successful()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.add_all_meta_to_dataset"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.add_all_meta_to_dataset()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_naive"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.choose_qubits_naive()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.choose_qubits_custom"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.choose_qubits_custom()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.plot_approximation_ratios"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.plot_approximation_ratios()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_single_benchmark"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.execute_single_benchmark()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute_full_benchmark"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.execute_full_benchmark()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.optimization.qscore.QScoreBenchmark.execute"><code class="docutils literal notranslate"><span class="pre">QScoreBenchmark.execute()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -807,7 +631,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2024-12-18.
+  Last updated on 2024-12-23.
   <br/>
 </p>
   </div>
