@@ -3,6 +3,7 @@ Qscore benchmark
 """
 
 import itertools
+import logging
 from time import strftime
 from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
@@ -245,7 +246,6 @@ def plot_approximation_ratios(
 
     # Show plot if verbose is True
     plt.gcf().set_dpi(250)
-    plt.show()
 
     plt.close()
 
@@ -327,13 +327,13 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         if success:
             qcvv_logger.info(
-                f"Q-Score = {num_nodes} passed with:\nApproximation ratio (Beta): {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+                f"Q-Score = {num_nodes} passed with approximation ratio (Beta) {approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
             )
             qscore = num_nodes
             continue
 
         qcvv_logger.info(
-            f"Q-Score = {num_nodes} failed with \napproximation ratio (Beta): {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+            f"Q-Score = {num_nodes} failed with approximation ratio (Beta) {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
         )
         observations.extend(
             [
@@ -752,10 +752,9 @@ class QScoreBenchmark(Benchmark):
             qubit_to_node_list = []
             no_edge_instances = []
             for instance in range(self.num_instances):
-                qcvv_logger.info(f"Executing graph {instance} with {num_nodes} nodes.")
+                qcvv_logger.debug(f"Executing graph {instance} with {num_nodes} nodes.")
                 graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
                 graph_list.append(graph)
-
                 self.graph_physical = graph.copy()
                 self.virtual_nodes = []
                 if self.use_virtual_node:
@@ -778,7 +777,7 @@ class QScoreBenchmark(Benchmark):
                 # Graph with no edges has cut size = 0
                 if graph.number_of_edges() == 0:
                     no_edge_instances.append(instance)
-                    qcvv_logger.info(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
+                    qcvv_logger.debug(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
 
                 # Choose the qubit layout
 
@@ -802,10 +801,11 @@ class QScoreBenchmark(Benchmark):
                     qc_transpiled_list.append([])
                     execution_results.append(counts)
                     qc_list.append([])
-                    qcvv_logger.info(f"This graph instance has no edges.")
+                    qcvv_logger.debug(f"This graph instance has no edges.")
                 else:
                     # execute for a given num_node and a given instance
                     coupling_map = self.backend.coupling_map.reduce(qubit_set)
+                    qcvv_logger.setLevel(logging.WARNING)
                     transpiled_qc, _ = perform_backend_transpilation(
                         [qc],
                         backend=self.backend,
@@ -827,9 +827,10 @@ class QScoreBenchmark(Benchmark):
                     )
                     qc_transpiled_list.append(transpiled_qc)
                     execution_results.append(retrieve_all_counts(jobs)[0][0])
+                    qcvv_logger.setLevel(logging.INFO)
 
                 seed += 1
-                qcvv_logger.info(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
+                qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
 
             dataset.attrs.update(
                 {
@@ -844,7 +845,7 @@ class QScoreBenchmark(Benchmark):
                 }
             )
 
-            qcvv_logger.info(f"Adding counts for the random graph for {num_nodes} nodes to the dataset")
+            qcvv_logger.debug(f"Adding counts for the random graph for {num_nodes} nodes to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(num_nodes), dataset)
 
             # self.untranspiled_circuits[str(num_nodes)].update({tuple(qubit_set): qc_list})
