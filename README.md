@@ -49,11 +49,11 @@ Optional dependencies like compressive gate set tomography and jupyter notebooks
 pip install "iqm-benchmarks[mgst, examples]"
 ```
 Current optional dependencies are:
-* "examples": Jupyter notebooks
-* "mgst": Compressive gate set tomography
-* "develop": Development tools
-* "test": Code testing and Linting
-* "Docs": Documentation building 
+* `examples`: Jupyter notebooks
+* `mgst`: Compressive gate set tomography
+* `develop`: Development tools
+* `test`: Code testing and Linting
+* `docs`: Documentation building 
 
 ## Development mode _(latest changes: recommended)_
 
