@@ -51,7 +51,9 @@ jobs:
       - name: Install dependencies
         run: pip install tox==4.16.0
       - name: Run benchmark
-        run: tox -e benchmark -- --backend=${{ github.event.inputs.backend || 'iqmfakeadonis' }}
+        run: tox -e benchmark -- --backend=${BACKEND}
+        env:
+          BACKEND: ${{ github.event.inputs.backend || 'iqmfakeadonis' }}
       - name: Upload benchmark results
         uses: actions/upload-artifact@v2
         with:
