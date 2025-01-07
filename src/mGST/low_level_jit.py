@@ -627,7 +627,7 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
 
 @njit(parallel=True, cache=True)
 def ddB_derivs(X, A, B, J, y, r, pdim):
-    """Calculate all nonzero terms of the second derivatives with respect to the state tensor B.
+    """Calculate all nonzero terms of the second derivative with respect to the state tensor B.
 
     Parameters
     ----------
