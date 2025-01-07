@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.5
+===========
+* Changed simulation method for MRB to 'stabilizer' and simulation circuits are compiled in circuit generation stage.
+
 Version 2.4
 ===========
 * Changed Qscore to operate under the new base class.
