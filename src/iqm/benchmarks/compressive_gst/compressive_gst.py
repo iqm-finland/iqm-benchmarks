@@ -331,8 +331,8 @@ def parse_gate_set(
     Returns:
         gate_set: List[QuantumCircuit]
             A list of gates defined as quantum circuit objects
-        gate_labels: List[Dict[int, str]]
-            A dictionary with gate names for each layout
+        gate_labels_dict: Dict[str, Dict[int, str]]
+            The names of gates, i.e. "Rx(pi/2)" for a pi/2 rotation around the x-axis.
         num_gates: int
             The number of gates in the gate set
 
@@ -348,23 +348,27 @@ def parse_gate_set(
             "1QXYI, 2QXYCZ, 2QXYCZ_extended, 3QXYCZ."
         )
     if configuration.gate_set in ["1QXYI", "2QXYCZ", "2QXYCZ_extended", "3QXYCZ"]:
-        gate_set, gate_labels, num_gates = create_predefined_gate_set(configuration.gate_set, num_qubits, qubit_layouts)
-        return gate_set, gate_labels, num_gates
+        gate_set, gate_label_dict, num_gates = create_predefined_gate_set(
+            configuration.gate_set, num_qubits, qubit_layouts
+        )
+        return gate_set, gate_label_dict, num_gates
 
     if isinstance(configuration.gate_set, list):
+        gate_label_dict = {}
         gate_set = configuration.gate_set
         num_gates = len(gate_set)
         if configuration.gate_labels is None:
             gate_labels = {i: f"Gate %i" % i for i in range(num_gates)}
         else:
-            if configuration.gate_labels:
-                if len(configuration.gate_labels) != num_gates:
-                    raise ValueError(
-                        f"The number of gate labels (%i) does not match the number of gates (%i)"
-                        % (len(configuration.gate_labels), num_gates)
-                    )
-                gate_labels = dict(enumerate(configuration.gate_labels))
-        return gate_set, gate_labels, num_gates
+            if len(configuration.gate_labels) != num_gates:
+                raise ValueError(
+                    f"The number of gate labels (%i) does not match the number of gates (%i)"
+                    % (len(configuration.gate_labels), num_gates)
+                )
+            gate_labels = dict(enumerate(configuration.gate_labels))
+        for qubit_layout in qubit_layouts:
+            gate_label_dict.update({BenchmarkObservationIdentifier(qubit_layout).string_identifier: gate_labels})
+        return gate_set, gate_label_dict, num_gates
 
     raise ValueError(
         f"Invalid gate set, choose among 1QXYI, 2QXYCZ, 2QXYCZ_extended,"
@@ -374,7 +378,7 @@ def parse_gate_set(
 
 def create_predefined_gate_set(
     gate_set: Union[str, List[Any]], num_qubits: int, qubit_layouts: List[List[int]]
-) -> Tuple[List[QuantumCircuit], Dict, int]:
+) -> Tuple[List[QuantumCircuit], Dict[str, Dict[int, str]], int]:
     """Create a list of quantum circuits corresponding to a predefined gate set.
 
     The circuits are assigned to the specified qubit_layouts on the backend only during transipilation, so the qubit labels

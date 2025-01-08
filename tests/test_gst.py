@@ -21,7 +21,6 @@ class TestGST:
         benchmark = CompressiveGST(backend, minimal_1Q_config)
         benchmark.run()
         result = benchmark.analyze()
-        print(result.observations)
         mock_fig.assert_called()
 
     @patch('matplotlib.pyplot.figure')
