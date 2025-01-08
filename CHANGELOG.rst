@@ -4,9 +4,9 @@ Changelog
 
 Version 2.6
 ===========
-* Fixed bugs including wrong GHZ plot x-Axis labels and incorrect transpiled and untranspiled circuit storage for mGST
-* Added note about optional dependency "mgst"
-* Improved display and calculation method for Hamiltonian parameter output of rank 1 compressive GST
+* Fixed bugs including wrong GHZ plot x-Axis labels and incorrect transpiled and untranspiled circuit storage for mGST.
+* Added note about optional dependency "mgst".
+* Improved display and calculation method for Hamiltonian parameter output of rank 1 compressive GST.
 
 Version 2.5
 ===========
