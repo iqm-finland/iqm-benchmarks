@@ -29,6 +29,7 @@ from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
 import xarray as xr
+from rustworkx import PyDiGraph, PyGraph
 
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
@@ -137,6 +138,70 @@ def count_native_gates(
     )
 
     return avg_native_operations
+
+
+def find_pairs_with_disjoint_neighbors(graph_in: List[Tuple[int]] | PyDiGraph | PyGraph | CouplingMap) -> List[List[Tuple[int]]]:
+    """Finds sets of edges with non-overlapping neighboring nodes.
+
+    Agrs:
+        graph_in: The input graph; can be specified either as
+                * List[Tuple[int]]: a list of edges (Tuple[int]).
+                * PyDiGraph: A rustworkx PyDiGraph object.
+                * PyGraph: A rustworkx PyGraph object.
+                * CouplingMap: A Qiskit CouplingMap object.
+    Returns:
+        List[List[Tuple[int]]]: A list of lists of edges (Tuple[int]) from the original graph with non-overlapping neighboring nodes.
+    """
+    # The type to work with is List[Tuple[int]]
+    if isinstance(graph_in, PyDiGraph):
+        graph = list(graph_in.to_undirected(multigraph=False).edge_list())
+    elif isinstance(graph_in, PyGraph):
+        graph = list(graph_in.edge_list())
+    elif isinstance(graph_in, CouplingMap):
+        graph = list(graph_in.graph.to_undirected(multigraph=False).edge_list())
+    else:
+        graph = graph_in
+
+    # Build adjacency list representation of the graph
+    adjacency = defaultdict(set)
+    for u, v in graph:
+        adjacency[u].add(v)
+        adjacency[v].add(u)
+
+    # Function to get neighboring nodes of an edge
+    def get_edge_neighbors(edge):
+        u, v = edge
+        return (adjacency[u] | adjacency[v]) - {u, v}
+
+    remaining_edges = set(graph)  # Keep track of remaining edges
+    iterations = []  # Store the edges chosen in each iteration
+
+    while remaining_edges:
+        current_iteration = set()  # Edges chosen in this iteration
+        used_nodes = set()  # Nodes already used in this iteration
+
+        for edge in list(remaining_edges):
+            u, v = edge
+            # Check if the edge is disconnected from already chosen edges
+            if u in used_nodes or v in used_nodes:
+                continue
+
+            # Get neighboring nodes of this edge
+            edge_neighbors = get_edge_neighbors(edge)
+
+            # Check if any neighbor belongs to an edge already in this iteration
+            if any(neighbor in used_nodes for neighbor in edge_neighbors):
+                continue
+
+            # Add the edge to the current iteration
+            current_iteration.add(edge)
+            used_nodes.update([u, v])
+
+        # Add the chosen edges to the result
+        iterations.append(list(current_iteration))
+        remaining_edges -= current_iteration  # Remove chosen edges from the remaining edges
+
+    return iterations
 
 
 def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int]]]:
@@ -435,6 +500,8 @@ def set_coupling_map(
                 - "fixed" sets a coupling map restricted to the input qubits -> results will be constrained to measure those qubits.
                 - "batching" sets the coupling map of the backend -> results in a benchmark will be "batched" according to final layouts.
                 * Default is "fixed".
+    Raises:
+        ValueError: if the physical layout is not "fixed" or "batching".
     Returns:
         A coupling map according to the specified physical layout.
     """
