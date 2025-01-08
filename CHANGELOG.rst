@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.7
+===========
+* Fixed bugs in Qscore and enabled benchmark execution for pyrite.
+
 Version 2.6
 ===========
 * Fixed bugs including wrong GHZ plot x-Axis labels and incorrect transpiled and untranspiled circuit storage for mGST.
