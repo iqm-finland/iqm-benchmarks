@@ -179,6 +179,143 @@ def is_successful(
     """
     return bool(approximation_ratio > 0.2)
 
+def get_optimal_angles(num_layers: int) -> List[float]:
+    """provides the optimal angles for QAOA MaxCut ansatz given the number of layers
+
+    Args:
+       num_layers (int): number of layers of the QAOA MaxCut ansatz.
+
+    Returns:
+        list[float]: optimal angles for QAOA MaxCut ansatz
+    """
+
+    # Good initial angles from from Wurtz et.al.
+    # "The fixed angle conjecture for QAOA on regular MaxCut graphs."
+    # arXiv preprint arXiv:2107.00677 (2021).
+
+    OPTIMAL_INITIAL_ANGLES = {
+        "1": [-0.616, 0.393 / 2],
+        "2": [-0.488, 0.898 / 2, 0.555 / 2, 0.293 / 2],
+        "3": [-0.422, 0.798 / 2, 0.937 / 2, 0.609 / 2, 0.459 / 2, 0.235 / 2],
+        "4": [-0.409, 0.781 / 2, 0.988 / 2, 1.156 / 2, 0.600 / 2, 0.434 / 2, 0.297 / 2, 0.159 / 2],
+        "5": [-0.36, -0.707, -0.823, -1.005, -1.154, 0.632 / 2, 0.523 / 2, 0.390 / 2, 0.275 / 2, 0.149 / 2],
+        "6": [
+            -0.331,
+            -0.645,
+            -0.731,
+            -0.837,
+            -1.009,
+            -1.126,
+            0.636 / 2,
+            0.535 / 2,
+            0.463 / 2,
+            0.360 / 2,
+            0.259 / 2,
+            0.139 / 2,
+        ],
+        "7": [
+            -0.310,
+            -0.618,
+            -0.690,
+            -0.751,
+            -0.859,
+            -1.020,
+            -1.122,
+            0.648 / 2,
+            0.554 / 2,
+            0.490 / 2,
+            0.445 / 2,
+            0.341 / 2,
+            0.244 / 2,
+            0.131 / 2,
+        ],
+        "8": [
+            -0.295,
+            -0.587,
+            -0.654,
+            -0.708,
+            -0.765,
+            -0.864,
+            -1.026,
+            -1.116,
+            0.649 / 2,
+            0.555 / 2,
+            0.500 / 2,
+            0.469 / 2,
+            0.420 / 2,
+            0.319 / 2,
+            0.231 / 2,
+            0.123 / 2,
+        ],
+        "9": [
+            -0.279,
+            -0.566,
+            -0.631,
+            -0.679,
+            -0.726,
+            -0.768,
+            -0.875,
+            -1.037,
+            -1.118,
+            0.654 / 2,
+            0.562 / 2,
+            0.509 / 2,
+            0.487 / 2,
+            0.451 / 2,
+            0.403 / 2,
+            0.305 / 2,
+            0.220 / 2,
+            0.117 / 2,
+        ],
+        "10": [
+            -0.267,
+            -0.545,
+            -0.610,
+            -0.656,
+            -0.696,
+            -0.729,
+            -0.774,
+            -0.882,
+            -1.044,
+            -1.115,
+            0.656 / 2,
+            0.563 / 2,
+            0.514 / 2,
+            0.496 / 2,
+            0.496 / 2,
+            0.436 / 2,
+            0.388 / 2,
+            0.291 / 2,
+            0.211 / 2,
+            0.112 / 2,
+        ],
+        "11": [
+            -0.257,
+            -0.528,
+            -0.592,
+            -0.640,
+            -0.677,
+            -0.702,
+            -0.737,
+            -0.775,
+            -0.884,
+            -1.047,
+            -1.115,
+            0.656 / 2,
+            0.563 / 2,
+            0.516 / 2,
+            0.504 / 2,
+            0.482 / 2,
+            0.456 / 2,
+            0.421 / 2,
+            0.371 / 2,
+            0.276 / 2,
+            0.201 / 2,
+            0.107 / 2,
+        ],
+    }
+    return OPTIMAL_INITIAL_ANGLES[str(num_layers)]
+
 
 def plot_approximation_ratios(
     nodes: list[int],
@@ -410,129 +547,7 @@ def run_QAOA(
         res = minimize(objective_function, opt_angles, method="COBYLA", tol=1e-5, options={"maxiter": 0})
     else:
         # Good initial angles from from Wurtz et.al. "The fixed angle conjecture for QAOA on regular MaxCut graphs." arXiv preprint arXiv:2107.00677 (2021).
-        OPTIMAL_INITIAL_ANGLES = {
-            "1": [-0.616, 0.393 / 2],
-            "2": [-0.488, 0.898 / 2, 0.555 / 2, 0.293 / 2],
-            "3": [-0.422, 0.798 / 2, 0.937 / 2, 0.609 / 2, 0.459 / 2, 0.235 / 2],
-            "4": [-0.409, 0.781 / 2, 0.988 / 2, 1.156 / 2, 0.600 / 2, 0.434 / 2, 0.297 / 2, 0.159 / 2],
-            "5": [-0.36, -0.707, -0.823, -1.005, -1.154, 0.632 / 2, 0.523 / 2, 0.390 / 2, 0.275 / 2, 0.149 / 2],
-            "6": [
-                -0.331,
-                -0.645,
-                -0.731,
-                -0.837,
-                -1.009,
-                -1.126,
-                0.636 / 2,
-                0.535 / 2,
-                0.463 / 2,
-                0.360 / 2,
-                0.259 / 2,
-                0.139 / 2,
-            ],
-            "7": [
-                -0.310,
-                -0.618,
-                -0.690,
-                -0.751,
-                -0.859,
-                -1.020,
-                -1.122,
-                0.648 / 2,
-                0.554 / 2,
-                0.490 / 2,
-                0.445 / 2,
-                0.341 / 2,
-                0.244 / 2,
-                0.131 / 2,
-            ],
-            "8": [
-                -0.295,
-                -0.587,
-                -0.654,
-                -0.708,
-                -0.765,
-                -0.864,
-                -1.026,
-                -1.116,
-                0.649 / 2,
-                0.555 / 2,
-                0.500 / 2,
-                0.469 / 2,
-                0.420 / 2,
-                0.319 / 2,
-                0.231 / 2,
-                0.123 / 2,
-            ],
-            "9": [
-                -0.279,
-                -0.566,
-                -0.631,
-                -0.679,
-                -0.726,
-                -0.768,
-                -0.875,
-                -1.037,
-                -1.118,
-                0.654 / 2,
-                0.562 / 2,
-                0.509 / 2,
-                0.487 / 2,
-                0.451 / 2,
-                0.403 / 2,
-                0.305 / 2,
-                0.220 / 2,
-                0.117 / 2,
-            ],
-            "10": [
-                -0.267,
-                -0.545,
-                -0.610,
-                -0.656,
-                -0.696,
-                -0.729,
-                -0.774,
-                -0.882,
-                -1.044,
-                -1.115,
-                0.656 / 2,
-                0.563 / 2,
-                0.514 / 2,
-                0.496 / 2,
-                0.496 / 2,
-                0.436 / 2,
-                0.388 / 2,
-                0.291 / 2,
-                0.211 / 2,
-                0.112 / 2,
-            ],
-            "11": [
-                -0.257,
-                -0.528,
-                -0.592,
-                -0.640,
-                -0.677,
-                -0.702,
-                -0.737,
-                -0.775,
-                -0.884,
-                -1.047,
-                -1.115,
-                0.656 / 2,
-                0.563 / 2,
-                0.516 / 2,
-                0.504 / 2,
-                0.482 / 2,
-                0.456 / 2,
-                0.421 / 2,
-                0.371 / 2,
-                0.276 / 2,
-                0.201 / 2,
-                0.107 / 2,
-            ],
-        }
-
-        theta = OPTIMAL_INITIAL_ANGLES[str(qaoa_layers)]
+        theta = get_optimal_angles(qaoa_layers)
         bounds = [(-np.pi, np.pi)] * qaoa_layers + [(0.0, np.pi)] * qaoa_layers
 
         res = minimize(
@@ -740,6 +755,7 @@ class QScoreBenchmark(Benchmark):
             execution_results = []
             graph_list = []
             qubit_set_list = []
+            theta_list = []
 
             qcvv_logger.debug(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
 
@@ -790,7 +806,17 @@ class QScoreBenchmark(Benchmark):
                     raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
                 qubit_set_list.append(qubit_set)
 
-                qc = self.generate_maxcut_ansatz(graph, theta=[float(q) for q in qubit_set])
+                if self.use_classically_optimized_angles:
+                    if graph.number_of_edges() != 0:
+                        theta = calculate_optimal_angles_for_QAOA_p1(graph)
+                    else:
+                        theta = [1.0, 1.0]
+                else:
+                    theta = get_optimal_angles(self.num_qaoa_layers)
+
+                theta_list.append(theta)
+
+                qc = self.generate_maxcut_ansatz(graph, theta)
                 qc_list.append(qc)
                 qubit_to_node_copy = self.qubit_to_node.copy()
                 qubit_to_node_list.append(qubit_to_node_copy)
@@ -840,6 +866,7 @@ class QScoreBenchmark(Benchmark):
                         "virtual_nodes": virtual_node_list,
                         "qubit_to_node": qubit_to_node_list,
                         "no_edge_instances": no_edge_instances,
+                        "theta": theta_list
                     }
                 }
             )
