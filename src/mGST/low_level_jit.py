@@ -242,7 +242,7 @@ def Mp_norm_lower(X_true, E_true, rho_true, X, E, rho, J, n_povm, p):
 
 @njit(cache=True)
 def dK(X, K, E, rho, J, y, d, r, rK):
-    """Compute the derivative of the Kraus operator K with respect to its parameters.
+    """Compute the derivative of the objective function with respect to the Kraus tensor K.
 
     This function calculates the derivative of the Kraus operator K, based on the
     input matrices X, E, and rho, as well as the isometry condition.
@@ -271,7 +271,7 @@ def dK(X, K, E, rho, J, y, d, r, rK):
     Returns
     -------
     numpy.ndarray
-        The derivative of the Kraus operator K with respect to its parameters,
+        The derivative objective function with respect to the Kraus tensor K,
         reshaped to (d, rK, pdim, pdim), and scaled by 2/m/n_povm.
     """
     K = K.reshape(d, rK, -1)
@@ -295,7 +295,8 @@ def dK(X, K, E, rho, J, y, d, r, rK):
 
 @njit(cache=True)
 def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
-    """Compute the derivatives of K, dM10, and dM11 for the given input parameters.
+    """Compute the derivatives of the objective function with respect to K and the
+    product of derivatives of the measurement map with respect to K.
 
     This function calculates the derivatives of K, dM10, and dM11 based on the input matrices X,
     matrix K, POVM elements E, density matrix rho, and target values y.
@@ -355,7 +356,7 @@ def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
 
 @njit(cache=True, parallel=False)
 def ddM(X, K, E, rho, J, y, d, r, rK):
-    """Compute the second derivative of the objective function with respect to matrix elements.
+    """Compute the second derivative of the objective function with respect to the Kraus tensor K.
 
     This function calculates the second derivative of the objective function for a given
     set of input parameters.
@@ -481,7 +482,7 @@ def ddM(X, K, E, rho, J, y, d, r, rK):
 
 @njit(parallel=True, cache=True)
 def dA(X, A, B, J, y, r, pdim, n_povm):
-    """Compute the derivative of A with respect to the objective function.
+    """Compute the derivative of to the objective function with respect to the POVM tensor A
 
     This function calculates the gradient of A for a given set of input parameters.
 
@@ -507,7 +508,7 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
     Returns
     -------
     dA : ndarray
-        Derivative of A with respect to the objective function.
+        Derivative of the objective function with respect to A.
     """
     A = np.ascontiguousarray(A)
     B = np.ascontiguousarray(B)
@@ -529,9 +530,7 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
 
 @njit(parallel=True, cache=True)
 def dB(X, A, B, J, y, pdim):
-    """Compute the derivative of B with respect to the objective function.
-
-    This function calculates the gradient of B for a given set of input parameters.
+    """Compute the derivative of the objective function with respect to the state tensor B.
 
     Parameters
     ----------
@@ -551,7 +550,7 @@ def dB(X, A, B, J, y, pdim):
     Returns
     -------
     dB : ndarray
-        Derivative of B with respect to the objective function.
+        Derivative of the objective function with respect to the state tensor B.
     """
     A = np.ascontiguousarray(A)
     B = np.ascontiguousarray(B)
@@ -571,11 +570,7 @@ def dB(X, A, B, J, y, pdim):
 
 @njit(parallel=True, cache=True)
 def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
-    """Calculate the derivatives of a given POVM element with respect to its parameters.
-
-    This function computes the derivatives of the POVM element based on input matrices
-    A, B, and X, as well as the isometry condition. The derivatives are only dependent
-    on one POVM element, and different POVM elements are connected via the isometry condition.
+    """Calculate all nonzero terms of the second derivatives with respect to the POVM tensor A.
 
     Parameters
     ----------
@@ -600,9 +595,9 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
     -------
     tuple of numpy.ndarray
         A tuple containing the computed derivatives:
-        - dA: The derivative of the POVM element A with respect to its parameters,
+        - dA: The derivative w.r.t. A
         of shape (n_povm, pdim, pdim).
-        - dMdM: The product of the derivatives dM and dM, of shape (n_povm, r, r).
+        - dMdM: The product of the measurement map derivatives dM and dM, of shape (n_povm, r, r).
         - dMconjdM: The product of the conjugate of dM and dM, of shape (n_povm, r, r).
         - dconjdA: The product of the conjugate of dA, of shape (n_povm, r, r).
     """
@@ -613,7 +608,6 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
         E[k] = (A[k].T.conj() @ A[k]).reshape(-1)
     rho = (B @ B.T.conj()).reshape(-1)
     dA_ = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
-    dM = np.zeros((pdim, pdim)).astype(np.complex128)
     dMdM = np.zeros((n_povm, r, r)).astype(np.complex128)
     dMconjdM = np.zeros((n_povm, r, r)).astype(np.complex128)
     dconjdA = np.zeros((n_povm, r, r)).astype(np.complex128)
@@ -633,10 +627,7 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
 
 @njit(parallel=True, cache=True)
 def ddB_derivs(X, A, B, J, y, r, pdim):
-    """Calculate the derivatives of the isometry matrix B with respect to its parameters.
-
-    This function computes the derivatives of the isometry matrix B based on input matrices A and X,
-    as well as the isometry condition.
+    """Calculate all nonzero terms of the second derivative with respect to the state tensor B.
 
     Parameters
     ----------
@@ -659,11 +650,10 @@ def ddB_derivs(X, A, B, J, y, r, pdim):
     -------
     tuple of numpy.ndarray
         A tuple containing the computed derivatives:
-        - dB: The derivative of the isometry matrix B with respect to its parameters,
-        of shape (pdim, pdim).
+        - dB: The derivative w.r.t. B, of shape (pdim, pdim).
         - dMdM: The product of the derivatives dM and dM, of shape (r, r).
         - dMconjdM: The product of the conjugate of dM and dM, of shape (r, r).
-        - dconjdB: The product of the conjugate of dB, of shape (r, r).
+        - dconjdB: The mixed second derivative of by dB and dB*, of shape (r, r).
     """
     n_povm = A.shape[0]
     A = np.ascontiguousarray(A)

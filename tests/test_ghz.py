@@ -14,7 +14,7 @@ class TestGHZ:
         MINIMAL_GHZ = GHZConfiguration(
             state_generation_routine=f"tree",
             custom_qubits_array=[
-                [0, 1],
+                [10, 15],
                 [0, 1, 3],
                 [0, 1, 3, 4],
                 # [0,1,2,3,4],
