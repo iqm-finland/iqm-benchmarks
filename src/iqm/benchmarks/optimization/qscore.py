@@ -179,6 +179,7 @@ def is_successful(
     """
     return bool(approximation_ratio > 0.2)
 
+
 def get_optimal_angles(num_layers: int) -> List[float]:
     """provides the optimal angles for QAOA MaxCut ansatz given the number of layers
 
@@ -866,7 +867,7 @@ class QScoreBenchmark(Benchmark):
                         "virtual_nodes": virtual_node_list,
                         "qubit_to_node": qubit_to_node_list,
                         "no_edge_instances": no_edge_instances,
-                        "theta": theta_list
+                        "theta": theta_list,
                     }
                 }
             )
