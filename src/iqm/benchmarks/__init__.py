@@ -36,7 +36,6 @@ from .randomized_benchmarking.interleaved_rb.interleaved_rb import (
 )
 from .randomized_benchmarking.mirror_rb.mirror_rb import MirrorRandomizedBenchmarking, MirrorRBConfiguration
 
-
 AVAILABLE_BENCHMARKS = {
     GHZBenchmark.name: GHZBenchmark,
     CLOPSBenchmark.name: CLOPSBenchmark,
@@ -45,6 +44,14 @@ AVAILABLE_BENCHMARKS = {
     InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
     MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
 }
+
+try:
+    # Requires dependencies from "project.optional-dependencies.mgst" section to be installed. See "pyproject.toml"
+    # file
+    from .compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
+    AVAILABLE_BENCHMARKS.update({GSTBenchmark.name: GSTBenchmark})
+except:
+    pass
 
 try:
     # Change here if project is renamed and does not equal the package name
