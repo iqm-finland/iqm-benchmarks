@@ -660,11 +660,16 @@ class GHZBenchmark(Benchmark):
             )
             final_ghz = ghz_native_transpiled
         elif routine == "tree":
+            # For star architectures, create an effective coupling map that represents all-to-all connectivity
+            if "move" in self.backend.operation_names:
+                effective_coupling_map = [[x, y] for x in qubit_layout for y in qubit_layout if x!=y]
+            else:
+                effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
                 edges_cal, fidelities_cal = extract_fidelities(self.cal_url, qubit_layout)
-                graph = get_edges(self.backend.coupling_map, qubit_layout, edges_cal, fidelities_cal)
+                graph = get_edges(effective_coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
-                graph = get_edges(self.backend.coupling_map, qubit_layout)
+                graph = get_edges(effective_coupling_map, qubit_layout)
             ghz, _ = generate_ghz_spanning_tree(graph, qubit_layout, qubit_count)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled, _ = perform_backend_transpilation(
