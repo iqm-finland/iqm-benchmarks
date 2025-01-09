@@ -315,6 +315,10 @@ def get_optimal_angles(num_layers: int) -> List[float]:
             0.107 / 2,
         ],
     }
+
+    if num_layers > 11:
+        raise ValueError("QAOA MaxCut ansatz currently only supports 11 layers")
+
     return OPTIMAL_INITIAL_ANGLES[str(num_layers)]
 
 
