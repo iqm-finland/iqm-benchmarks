@@ -1,0 +1,8 @@
+<map id="inheritance915b5e22bd" name="inheritance915b5e22bd">
+<area shape="rect" id="node1" href="https://docs.python.org/3.11/library/abc.html#abc.ABC" target="_top" title="Helper class that provides a standard way to create an ABC using" alt="" coords="86,203,158,228"/>
+<area shape="rect" id="node2" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" target="_top" title="A base class for running cortex&#45;based Benchmark experiments." alt="" coords="287,203,383,228"/>
+<area shape="rect" id="node3" href="iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html#iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult" target="_top" title="A dataclass storing the results of the analysis." alt="" coords="26,153,218,179"/>
+<area shape="rect" id="node4" href="iqm.benchmarks.benchmark_definition.BenchmarkObservation.html#iqm.benchmarks.benchmark_definition.BenchmarkObservation" target="_top" title="Dataclass to store the main results of a single run of a Benchmark" alt="" coords="35,104,209,129"/>
+<area shape="rect" id="node5" href="iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html#iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier" target="_top" title="Identifier for observations for ease of use" alt="" coords="5,55,239,80"/>
+<area shape="rect" id="node6" href="iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html#iqm.benchmarks.benchmark_definition.BenchmarkRunResult" target="_top" title="A dataclass that stores the results of a single run of a Benchmark." alt="" coords="41,5,203,31"/>
+</map>

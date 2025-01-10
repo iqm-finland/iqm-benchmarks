@@ -1,0 +1,8 @@
+<map id="inheritance6f8bfcae2f" name="inheritance6f8bfcae2f">
+<area shape="rect" id="node1" href="https://docs.python.org/3.11/library/abc.html#abc.ABC" target="_top" title="Helper class that provides a standard way to create an ABC using" alt="" coords="17,55,89,80"/>
+<area shape="rect" id="node3" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" target="_top" title="A base class for running cortex&#45;based Benchmark experiments." alt="" coords="207,55,303,80"/>
+<area shape="rect" id="node2" title="Usage docs: https://docs.pydantic.dev/2.9/concepts/models/" alt="" coords="5,5,100,31"/>
+<area shape="rect" id="node4" href="iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase" target="_top" title="Benchmark configuration base." alt="" coords="148,5,363,31"/>
+<area shape="rect" id="node5" href="iqm.benchmarks.optimization.qscore.QScoreBenchmark.html#iqm.benchmarks.optimization.qscore.QScoreBenchmark" target="_top" title="Q&#45;score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results." alt="" coords="417,55,559,80"/>
+<area shape="rect" id="node6" href="iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration" target="_top" title="Q&#45;score configuration." alt="" coords="411,5,565,31"/>
+</map>
