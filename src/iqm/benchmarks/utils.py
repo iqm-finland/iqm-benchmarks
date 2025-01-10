@@ -238,6 +238,21 @@ def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int
     return groups
 
 
+def get_active_qubits(qc: QuantumCircuit) -> List[int]:
+    """Extract active qubits from a quantum circuit.
+
+    Args:
+        qc (QuantumCircuit): The quantum circuit to extract active qubits from.
+    Returns:
+        List[int]: A list of active qubits.
+    """
+    active_qubits = set()
+    for instruction in qc.data:
+        for qubit in instruction.qubits:
+            active_qubits.add(qc.find_bit(qubit).index)
+    return list(active_qubits)
+
+
 # pylint: disable=too-many-branches
 def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     """Get the IQM backend object from a backend name (str).
@@ -397,18 +412,21 @@ def perform_backend_transpilation(
     return transpiled_qc_list
 
 
-def project_neighbouring_qubits(qc: QuantumCircuit, num_cregs, meas_qubit):
+def project_neighbouring_qubits(qc: QuantumCircuit, meas_qubits: Sequence[int]) -> QuantumCircuit:
     """Project (measure) specified qubits on a given quantum circuit.
 
     Args:
-
+        qc (QuantumCircuit): The quantum circuit in which to project (measure) specified qubits.
+        meas_qubits (Sequence[int]): The qubits to be measured.
     Returns:
+        QuantumCircuit: The projected quantum circuit.
     """
     qc_copy = qc.copy()
     qc_copy.barrier()
+    num_cregs = len(meas_qubits)
     register = ClassicalRegister(num_cregs)
     qc_copy.add_register(register)
-    for idx, iq in enumerate(meas_qubit):
+    for idx, iq in enumerate(meas_qubits):
         qc_copy.measure(iq, register[idx])
     return qc_copy
 
@@ -425,10 +443,7 @@ def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str]
         QuantumCircuit: A new quantum circuit containing only active qubits.
     """
     # Identify active qubits
-    active_qubits = set()
-    for instruction in circuit.data:
-        for qubit in instruction.qubits:
-            active_qubits.add(circuit.find_bit(qubit).index)
+    active_qubits = get_active_qubits(circuit)
     if backend_name is not None and backend_name == "IQMNdonisBackend" and 0 not in active_qubits:
         # For star systems, the resonator must always be there, regardless of whether it MOVE gates on it or not
         active_qubits.add(0)
