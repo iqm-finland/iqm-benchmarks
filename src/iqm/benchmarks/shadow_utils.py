@@ -1,6 +1,7 @@
 import random
 
 import numpy as np
+from qiskit import ClassicalRegister
 from qiskit.circuit.library import UnitaryGate
 
 # from qiskit.extensions import UnitaryGate
@@ -45,12 +46,14 @@ def haar_shadow_tomography(qc, Nu, active_qubits):
     for iu in range(Nu):
         qc_copy = qc.copy()
         qc_copy.barrier()
+        register = ClassicalRegister(len(active_qubits), "RMs")
+        qc_copy.add_register(register)
         for idx, z in enumerate(active_qubits):
             temp_U = CUE(random_gen, 2)
             qc_copy.append(UnitaryGate(temp_U), [z])
             unitaries[iu, idx, :, :] = np.array(temp_U)
 
-        qc_copy.measure_all()
+        qc_copy.measure(active_qubits, register)
         qclist.append(qc_copy)
 
     return unitaries, qclist
