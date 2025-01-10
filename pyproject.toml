@@ -57,10 +57,9 @@ examples = [
 ]
 
 mgst = [
-    "cvxpy == 1.5.3",
-    "pygsti == 0.9.12.3",
-    "tqdm == 4.66.5",
     "numba == 0.60.0",
+    "pygsti[diamond_norm] == 0.9.12.3",
+    "tqdm == 4.66.5",
 ]
 
 test = [
