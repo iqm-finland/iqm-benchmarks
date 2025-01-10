@@ -2,6 +2,11 @@
 Changelog
 =========
 
+
+Version 2.8
+===========
+* Fixed a bug where optional dependencies related to gst were imported with other benchmarks, leading to a ModuleNotFoundError.
+
 Version 2.7
 ===========
 * Fixed bugs in Qscore and enabled benchmark execution for pyrite.
