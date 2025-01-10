@@ -28,8 +28,8 @@ import numpy as np
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
-import xarray as xr
 from rustworkx import PyDiGraph, PyGraph
+import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
@@ -140,28 +140,16 @@ def count_native_gates(
     return avg_native_operations
 
 
-def find_pairs_with_disjoint_neighbors(graph_in: List[Tuple[int]] | PyDiGraph | PyGraph | CouplingMap) -> List[List[Tuple[int]]]:
+def find_pairs_with_disjoint_neighbors(
+    graph: Sequence[Sequence[int]],
+) -> List[List[Tuple[int]]]:
     """Finds sets of edges with non-overlapping neighboring nodes.
 
     Agrs:
-        graph_in: The input graph; can be specified either as
-                * List[Tuple[int]]: a list of edges (Tuple[int]).
-                * PyDiGraph: A rustworkx PyDiGraph object.
-                * PyGraph: A rustworkx PyGraph object.
-                * CouplingMap: A Qiskit CouplingMap object.
+        graph (Sequence[Sequence[int]]): The input graph specified as a sequence of edges (Sequence[int]).
     Returns:
         List[List[Tuple[int]]]: A list of lists of edges (Tuple[int]) from the original graph with non-overlapping neighboring nodes.
     """
-    # The type to work with is List[Tuple[int]]
-    if isinstance(graph_in, PyDiGraph):
-        graph = list(graph_in.to_undirected(multigraph=False).edge_list())
-    elif isinstance(graph_in, PyGraph):
-        graph = list(graph_in.edge_list())
-    elif isinstance(graph_in, CouplingMap):
-        graph = list(graph_in.graph.to_undirected(multigraph=False).edge_list())
-    else:
-        graph = graph_in
-
     # Build adjacency list representation of the graph
     adjacency = defaultdict(set)
     for u, v in graph:
@@ -287,6 +275,32 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
+def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Sequence[int]]) -> List[int]:
+    """Given a Sequence of edges and a graph, return all neighboring nodes of the edges.
+
+    Args:
+        edges (Sequence[Sequence[int]]): A sequence of pairs of integers, representing edges of a graph.
+        graph (Sequence[Sequence[int]]): The input graph specified either as a sequence of edges (Sequence[int]).
+    Returns:
+        List[int]: list of all neighboring nodes of the input edges.
+    """
+    neighboring_nodes = set()
+    nodes_in_edges = set()
+
+    for u, v in edges:
+        nodes_in_edges.add(u)
+        nodes_in_edges.add(v)
+
+    for x, y in graph:
+        if x in nodes_in_edges:
+            neighboring_nodes.add(y)
+        if y in nodes_in_edges:
+            neighboring_nodes.add(x)
+    neighboring_nodes -= nodes_in_edges
+
+    return list(neighboring_nodes)
+
+
 def marginal_distribution(prob_dist: Dict[str, float], indices: Iterable[int]) -> Dict[str, float]:
     """Compute the marginal distribution over specified bits (indices)
 
@@ -376,6 +390,22 @@ def perform_backend_transpilation(
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]
 
     return transpiled_qc_list
+
+
+def project_neighbouring_qubits(qc: QuantumCircuit, num_cregs, meas_qubit):
+    """Project (measure) specified qubits on a given quantum circuit.
+
+    Args:
+
+    Returns:
+    """
+    qc_copy = qc.copy()
+    qc_copy.barrier()
+    register = ClassicalRegister(num_cregs)
+    qc_copy.add_register(register)
+    for idx, iq in enumerate(meas_qubit):
+        qc_copy.measure(iq, register[idx])
+    return qc_copy
 
 
 def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str] = None) -> QuantumCircuit:

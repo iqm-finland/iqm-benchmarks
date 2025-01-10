@@ -21,10 +21,15 @@ from typing import Sequence, Type
 from qiskit import QuantumCircuit, transpile
 import xarray as xr
 
-from iqm.benchmarks import Benchmark
+from iqm.benchmarks import Benchmark, BenchmarkCircuit, Circuits
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.utils import generate_minimal_edge_layers, set_coupling_map, timeit
+from iqm.benchmarks.utils import (
+    find_pairs_with_disjoint_neighbors,
+    generate_minimal_edge_layers,
+    set_coupling_map,
+    timeit, get_neighbors_of_edges,
+)
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -71,9 +76,13 @@ class GraphStatesBenchmark(Benchmark):
 
         self.qubits = configuration.qubits
 
+        # Initialize the variable to contain the QV circuits of each layout
+        self.circuits = Circuits()
+        self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
+        self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
+
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
-
 
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
@@ -92,7 +101,6 @@ class GraphStatesBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         # Defined outside configuration - if any
-
 
     @timeit
     def add_all_circuits_to_dataset(self, dataset: xr.Dataset):
@@ -115,7 +123,6 @@ class GraphStatesBenchmark(Benchmark):
                 }
             dataset.attrs[key] = dictionary
 
-
     def execute(self, backend) -> xr.Dataset:
         """
         Executes the benchmark.
@@ -125,7 +132,23 @@ class GraphStatesBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
+        # Generate native graph state
         graph_state = generate_graph_state(self.qubits, backend)
+
+        # Get projected nodes for each pair of qubits in the graph state
+        coupling_map = set_coupling_map(self.qubits, backend, physical_layout="fixed")
+
+        # Get unique list of edges
+        graph_edges = list(coupling_map.graph.to_undirected(multigraph=False).edge_list())
+
+        # Find pairs of nodes with disjoint neighbors
+        pair_groups = find_pairs_with_disjoint_neighbors(graph_edges)
+
+        # Get all the nodes to be measured for each edge (pair of qubits)
+        projected_nodes = [get_neighbors_of_edges(x, graph_edges) for x in pair_groups]
+
+        # Generate all the circuits
+        qc_list = [project_neighbouring_qubits(qc, len(x), x) for x in projected_nodes]
 
         return dataset
 
