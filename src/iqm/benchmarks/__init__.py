@@ -36,6 +36,7 @@ from .randomized_benchmarking.interleaved_rb.interleaved_rb import (
 )
 from .randomized_benchmarking.mirror_rb.mirror_rb import MirrorRandomizedBenchmarking, MirrorRBConfiguration
 
+
 AVAILABLE_BENCHMARKS = {
     GHZBenchmark.name: GHZBenchmark,
     CLOPSBenchmark.name: CLOPSBenchmark,
