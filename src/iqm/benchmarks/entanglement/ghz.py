@@ -296,7 +296,7 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                             value=fidelity[1],
                         )
                     )
-    plots = {"All layout fidelities": plot_fidelities(observation_list, qubit_layouts)}
+    plots = {"All layout fidelities": plot_fidelities(observation_list, dataset, qubit_layouts)}
     return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list, plots=plots)
 
 
@@ -541,13 +541,17 @@ def get_cx_map(qubit_layout: List[int], graph: networkx.Graph) -> list[list[int]
     return cx_map
 
 
-def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: List[List[int]]) -> Figure:
+def plot_fidelities(
+    observations: List[BenchmarkObservation], dataset: xr.Dataset, qubit_layouts: List[List[int]]
+) -> Figure:
     """Plots all the fidelities stored in the observations into a single plot of fidelity vs. number of qubits
 
     Parameters
     ----------
     observations: List[BenchmarkObservation]
         A list of Observations, each assumed to be a fidelity
+    dataset: xr.Dataset
+        The experiment dataset containing results and metadata
     qubit_layouts
         The list of qubit layouts as given by the user. This is used to name the layouts in order for identification
         in the plot.
@@ -556,35 +560,51 @@ def plot_fidelities(observations: List[BenchmarkObservation], qubit_layouts: Lis
     fig :Figure
         The figure object with the fidelity plot.
     """
+    timestamp = dataset.attrs["execution_timestamp"]
+    backend_name = dataset.attrs["backend_name"]
+
     fig, ax = plt.subplots()
     layout_short = {str(qubit_layout): f" L{i}" for i, qubit_layout in enumerate(qubit_layouts)}
     recorded_labels = []
+    x_positions = []
+    cmap = plt.cm.get_cmap("winter")
+    # colors = [cmap(0), cmap(1)]
     for i, obs in enumerate(observations):
         label = "With REM" if "rem" in obs.name else "Unmitigated"
         if label in recorded_labels:
             label = "_nolegend_"
         else:
             recorded_labels.append(label)
-        x = sum(c.isdigit() for c in obs.identifier.string_identifier)
+        identifier = obs.identifier.string_identifier
+        x = len(
+            identifier.strip("[]").replace('"', "").replace(" ", "").split(",")
+        )  # pylint: disable=inconsistent-quotes
         y = obs.value
         ax.errorbar(
             x,
             y,
             yerr=obs.uncertainty,
             capsize=4,
-            color="orange" if "rem" in obs.name else "cornflowerblue",
+            color=cmap(0.85) if "rem" in obs.name else cmap(0.15),
             label=label,
             fmt="o",
             alpha=1,
+            mec="black",
             markersize=5,
         )
-        ax.annotate(layout_short[obs.identifier.string_identifier], (x, y))
-    ax.axhline(0.5, linestyle="--", color="black", label="GME threshold")
-    # ax.set_ylim([0,1])
-    ax.set_title("GHZ fidelities of all qubit layouts")
+        x_positions.append(x)
+        ax.annotate(layout_short[identifier], (x, y))
+
+    ax.set_xticks(x_positions, labels=[str(x) for x in x_positions])
+    ax.grid()
+
+    ax.axhline(0.5, linestyle="--", color="red", label="GME threshold")
+    ax.set_ylim((0, 1))
+    ax.set_title(f"GHZ fidelities of all qubit layouts\nbackend: {backend_name} --- {timestamp}")
     ax.set_xlabel("Number of qubits")
     ax.set_ylabel("Fidelity")
-    ax.legend(framealpha=0.5)
+    ax.legend(framealpha=0.5, fontsize=8)
+    plt.gcf().set_dpi(250)
     plt.close()
     return fig
 
@@ -625,6 +645,7 @@ class GHZBenchmark(Benchmark):
         self.mit_shots = configuration.mit_shots
         self.cal_url = configuration.cal_url
         self.timestamp = strftime("%Y%m%d-%H%M%S")
+        self.execution_timestamp = ""
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> CircuitGroup:
         """
@@ -793,12 +814,14 @@ class GHZBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
+        dataset.attrs[f"execution_timestamp"] = self.execution_timestamp
         dataset.attrs["fidelity_routine"] = self.fidelity_routine
 
     def execute(self, backend) -> xr.Dataset:
         """
         Executes the benchmark.
         """
+        self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
         aux_custom_qubits_array = cast(List[List[int]], self.custom_qubits_array).copy()
         dataset = xr.Dataset()
 

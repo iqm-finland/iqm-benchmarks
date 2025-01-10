@@ -47,6 +47,15 @@ AVAILABLE_BENCHMARKS = {
 }
 
 try:
+    # Requires dependencies from "project.optional-dependencies.mgst" section to be installed. See "pyproject.toml"
+    # file
+    from .compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
+
+    AVAILABLE_BENCHMARKS.update({CompressiveGST.name: CompressiveGST})
+except ModuleNotFoundError:
+    pass
+
+try:
     # Change here if project is renamed and does not equal the package name
     dist_name = "iqm-benchmarks"
     __version__ = version(dist_name)
