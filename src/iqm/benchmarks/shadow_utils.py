@@ -2,7 +2,8 @@ import random
 
 import numpy as np
 from qiskit.circuit.library import UnitaryGate
-#from qiskit.extensions import UnitaryGate
+
+# from qiskit.extensions import UnitaryGate
 import scipy.linalg as spl
 
 
