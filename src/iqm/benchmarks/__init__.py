@@ -50,6 +50,7 @@ try:
     # Requires dependencies from "project.optional-dependencies.mgst" section to be installed. See "pyproject.toml"
     # file
     from .compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
+
     AVAILABLE_BENCHMARKS.update({CompressiveGST.name: CompressiveGST})
 except ModuleNotFoundError:
     pass
