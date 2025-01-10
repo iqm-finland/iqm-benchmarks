@@ -58,6 +58,8 @@ class CompressiveGST(Benchmark):
 
     analysis_function = staticmethod(mgst_analysis)
 
+    name: str = "compressive_gst"
+
     def __init__(self, backend: IQMBackendBase, configuration: "GSTConfiguration"):
         """Construct the compressive_gst class.
 
@@ -101,10 +103,6 @@ class CompressiveGST(Benchmark):
         # Circuit format used by mGST
         self.J = np.empty((self.configuration.num_circuits, self.num_povm))
         self.bootstrap_results = List[Tuple[np.ndarray]]  # List of GST outcomes from bootstrapping
-
-    @staticmethod
-    def name() -> str:
-        return "compressive_GST"
 
     @timeit
     def generate_meas_circuits(self) -> None:
@@ -172,7 +170,7 @@ class CompressiveGST(Benchmark):
         # Adding configuration entries and class variables, prioritizing the latter in case of conflicts
         for key, value in (self.configuration.__dict__ | self.__dict__).items():
             if key == "benchmark":  # Avoid saving the class objects
-                dataset.attrs[key] = value.name()
+                dataset.attrs[key] = value.name
             elif key == "backend":
                 dataset.attrs[key] = value.name
             else:
