@@ -149,8 +149,13 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
         IQMBackendBase.
     """
     # ****** 5Q star ******
+    # Pyrite
+    if backend_label.lower() == "pyrite":
+        iqm_server_url = "https://cocos.resonance.meetiqm.com/pyrite"
+        provider = IQMProvider(iqm_server_url)
+        backend_object = provider.get_backend()
     # FakeAdonis
-    if backend_label.lower() in ("iqmfakeadonis", "fakeadonis"):
+    elif backend_label.lower() in ("iqmfakeadonis", "fakeadonis"):
         backend_object = IQMFakeAdonis()
 
     # ****** 20Q grid ******

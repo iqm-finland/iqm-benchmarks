@@ -17,4 +17,4 @@ as well as full parametrizations of an initial state and a POVM.
 Low rank compression of the process matrix is used to reduce measurement and post-processing overhead.
 """
 
-from . import compressive_gst
+from . import compressive_gst, gst_analysis

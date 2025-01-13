@@ -3,7 +3,6 @@ The main algorithm and functions that perform iteration steps
 """
 
 from decimal import Decimal
-import sys
 import time
 from warnings import warn
 
@@ -11,8 +10,10 @@ import numpy as np
 import numpy.linalg as la
 from scipy.linalg import eig, eigh
 from scipy.optimize import minimize
-from tqdm import tqdm
+from tqdm import trange
+from tqdm.contrib.logging import logging_redirect_tqdm
 
+from iqm.benchmarks.logging_config import qcvv_logger
 from mGST.additional_fns import batch, random_gs, transp
 from mGST.low_level_jit import ddA_derivs, ddB_derivs, ddM, dK, dK_dMdM, objf
 from mGST.optimization import (
@@ -683,7 +684,7 @@ def run_mGST(
         )
 
     success = False
-    print(f"Starting mGST optimization...")
+    qcvv_logger.info(f"Starting mGST optimization...")
 
     if init:
         K, E = (init[0], init[1])
@@ -699,35 +700,38 @@ def run_mGST(
     res_list = [objf(X, E, rho, J, y)]
 
     for i in range(max_inits):
-        for _ in tqdm(range(max_iter), file=sys.stdout):
-            yb, Jb = batch(y, J, bsize)
-            K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
-            res_list.append(objf(X, E, rho, J, y))
-            if res_list[-1] < delta:
-                print(f"Batch optimization successful, improving estimate over full data....")
-                success = True
-                break
+        with logging_redirect_tqdm(loggers=[qcvv_logger]):
+            for _ in trange(max_iter):
+                yb, Jb = batch(y, J, bsize)
+                K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
+                res_list.append(objf(X, E, rho, J, y))
+                if res_list[-1] < delta:
+                    qcvv_logger.info(f"Batch optimization successful, improving estimate over full data....")
+                    success = True
+                    break
         if testing:
             plot_objf(res_list, delta, f"Objective function for batch optimization")
         if success:
             break
-        print(f"Run ", i, f"failed, trying new initialization...")
+        qcvv_logger.info(f"Run ", i, f"failed, trying new initialization...")
 
     if not success and max_inits > 0:
-        print(f"Success threshold not reached, attempting optimization over full data set...")
-    for _ in tqdm(range(final_iter), file=sys.stdout):
-        K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
-        res_list.append(objf(X, E, rho, J, y))
-        if np.abs(res_list[-2] - res_list[-1]) < delta * target_rel_prec:
-            break
+        qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
+    with logging_redirect_tqdm(loggers=[qcvv_logger]):
+        for _ in trange(final_iter):
+            K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
+            res_list.append(objf(X, E, rho, J, y))
+            if np.abs(res_list[-2] - res_list[-1]) < delta * target_rel_prec:
+                break
     if testing:
         plot_objf(res_list, delta, f"Objective function over batches and full data")
     if success or (res_list[-1] < delta):
-        print(f"\t Convergence criterion satisfied")
+        qcvv_logger.info(f"Convergence criterion satisfied")
     else:
-        print(f"\t Convergence criterion not satisfied,", f"try increasing max_iter or using new initializations.")
-    print(
-        f"\t Final objective {Decimal(res_list[-1]):.2e}",
-        f"in time {(time.time() - t0):.2f}s",
+        qcvv_logger.info(
+            f"Convergence criterion not satisfied,inspect results and consider increasing max_iter or using new initializations.",
+        )
+    qcvv_logger.info(
+        f"Final objective {Decimal(res_list[-1]):.2e} in time {(time.time() - t0):.2f}s",
     )
     return K, X, E, rho, res_list

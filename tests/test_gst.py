@@ -21,13 +21,12 @@ class TestGST:
         benchmark = CompressiveGST(backend, minimal_1Q_config)
         benchmark.run()
         result = benchmark.analyze()
-        print(result.observations)
         mock_fig.assert_called()
 
     @patch('matplotlib.pyplot.figure')
     def test_2q(self, mock_fig):
         minimal_2Q_GST = GSTConfiguration(
-            qubit_layouts=[[0, 1]],
+            qubit_layouts=[[1, 0]],
             gate_set="2QXYCZ_extended",
             num_circuits=4,
             shots=10,
