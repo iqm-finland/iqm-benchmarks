@@ -641,7 +641,7 @@ class GHZBenchmark(Benchmark):
         elif routine == "tree":
             # For star architectures, create an effective coupling map that represents all-to-all connectivity
             if "move" in self.backend.operation_names:
-                effective_coupling_map = [[x, y] for x in qubit_layout for y in qubit_layout if x!=y]
+                effective_coupling_map = [[x, y] for x in qubit_layout for y in qubit_layout if x != y]
             else:
                 effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
@@ -728,9 +728,10 @@ class GHZBenchmark(Benchmark):
         return qc_list_transpiled
 
     @timeit
-    def append_rms(self,
-            num_rms: int,
-            qubit_layout: List[int],
+    def append_rms(
+        self,
+        num_rms: int,
+        qubit_layout: List[int],
     ) -> List[QuantumCircuit]:
         """
         Appends 1Q Clifford gates sampled uniformly at random to all qubits in the given circuit.
@@ -767,7 +768,7 @@ class GHZBenchmark(Benchmark):
             rm_circ.measure_active()
             rm_circuits.append(rm_circ)
 
-        rm_circuits_transpiled,_ = perform_backend_transpilation(
+        rm_circuits_transpiled, _ = perform_backend_transpilation(
             rm_circuits,
             self.backend,
             qubit_layout,
@@ -804,9 +805,7 @@ class GHZBenchmark(Benchmark):
 
         match self.fidelity_routine:
             case "randomized_measurements":
-                all_circuits_list, _ = self.append_rms(
-                    cast(int, self.num_RMs), qubit_layout
-                )
+                all_circuits_list, _ = self.append_rms(cast(int, self.num_RMs), qubit_layout)
                 transpiled_ghz_group.circuits = all_circuits_list
             case "coherences":
                 all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)
