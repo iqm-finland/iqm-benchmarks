@@ -28,7 +28,7 @@ import networkx
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
 import pycurl
-from qiskit import QuantumRegister, transpile
+from qiskit import QuantumRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
