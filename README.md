@@ -23,13 +23,13 @@ The project is split into different benchmarks, all sharing the `Benchmark` clas
 ## Installation _(latest release)_
 
 [uv](https://docs.astral.sh/uv/) is highly recommended for practical Python environment and package management.
-With uv installed in your system, start a terminal in your machine and create a new python environment
+With uv installed in your system, start a terminal in your machine and create a new Python environment
 
 ```sh
 uv venv --python=3.11
 ```
 
-> Note: refer to uv's documentation if there are problems setting up a python environment.
+> Note: refer to uv's documentation if there are problems setting up a Python environment.
 
 After the command has run, read the output and make sure to use the prompt to activate the environment.
 Then, you can install the latest release of the IQM Benchmarks by running:
