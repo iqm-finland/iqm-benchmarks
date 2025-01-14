@@ -2,6 +2,9 @@
 Changelog
 =========
 
+Version 2.9
+===========
+* Add optional security-scanned lockfile.
 
 Version 2.8
 ===========
