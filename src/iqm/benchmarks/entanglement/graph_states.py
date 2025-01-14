@@ -16,7 +16,7 @@
 Graph states benchmark
 """
 from time import strftime
-from typing import Sequence, Type, List
+from typing import List, Sequence, Type
 
 from qiskit import QuantumCircuit, transpile
 import xarray as xr
@@ -24,14 +24,15 @@ import xarray as xr
 from iqm.benchmarks import Benchmark, BenchmarkCircuit, Circuits
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.shadow_utils import haar_shadow_tomography
 from iqm.benchmarks.utils import (
-    find_pairs_with_disjoint_neighbors,
+    find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
+    get_active_qubits,
     get_neighbors_of_edges,
-    project_neighbouring_qubits,
+    project_qubits,
     set_coupling_map,
     timeit,
-    get_active_qubits,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -56,43 +57,18 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
         for edge in layer:
             qc.cz(edge[0], edge[1])
     # Transpile
-    qc_t = transpile(qc, backend=backend, optimization_level=3)
+    qc_t = transpile(qc, backend=backend, initial_layout=qubits, optimization_level=3)
     return qc_t
 
 
-def generate_all_graph_projected_circuits(
-    graph_circuit: QuantumCircuit, backend: IQMBackendBase
-) -> List[QuantumCircuit]:
-    """Generate all graph circuits with disjoint projected (measured) neighbors for each pair of qubits.
-
-    Args:
-        graph_circuit (QuantumCircuit): The graph circuit to generate all projected graph circuits.
-        backend (IQMBackendBase): The backend to target the graph state generating circuit.
-
-    Returns:
-        List[QuantumCircuit]: A list of projected graph circuits.
-    """
-    input_qubits = get_active_qubits(graph_circuit)
-    # Get projected nodes for each pair of qubits in the graph state
-    coupling_map = set_coupling_map(input_qubits, backend, physical_layout="fixed")
-    # Get unique list of edges
-    graph_edges = list(coupling_map.graph.to_undirected(multigraph=False).edge_list())
-    # Find pairs of nodes with disjoint neighbors
-    pair_groups = find_pairs_with_disjoint_neighbors(graph_edges)
-    # Get all the nodes to be measured for each edge (pair of qubits)
-    projected_nodes = [get_neighbors_of_edges(x, graph_edges) for x in pair_groups]
-    # Return all the circuits
-    return [project_neighbouring_qubits(graph_circuit, x) for x in projected_nodes]
-
-
-class GraphStatesBenchmark(Benchmark):
+class GraphStateBenchmark(Benchmark):
     """The Graph States benchmark estimates the bipartite entangelement negativity of native graph states."""
 
     # analysis_function = staticmethod(negativity_analysis)
     name = "graph_states"
 
-    def __init__(self, backend_arg: IQMBackendBase, configuration: "GraphStatesConfiguration"):
-        """Construct the GraphStatesBenchmark class.
+    def __init__(self, backend_arg: IQMBackendBase, configuration: "GraphStateConfiguration"):
+        """Construct the GraphStateBenchmark class.
 
         Args:
             backend_arg (IQMBackendBase): the backend to execute the benchmark on
@@ -103,6 +79,7 @@ class GraphStatesBenchmark(Benchmark):
         self.backend_configuration_name = backend_arg if isinstance(backend_arg, str) else backend_arg.name
 
         self.qubits = configuration.qubits
+        self.n_random_unitaries = configuration.n_random_unitaries
 
         # Initialize the variable to contain the QV circuits of each layout
         self.circuits = Circuits()
@@ -163,19 +140,42 @@ class GraphStatesBenchmark(Benchmark):
         # Generate native graph state
         graph_state_circuit = generate_graph_state(self.qubits, backend)
 
-        # Generate all projected circuits for all pairs of qubits
-        projected_graph_circuits = generate_all_graph_projected_circuits(graph_state_circuit, self.qubits, backend)
+        # Get projected nodes for each pair of qubits in the graph state
+        coupling_map = set_coupling_map(self.qubits, backend, physical_layout="fixed")
+
+        # Get unique list of edges
+        graph_edges = list(coupling_map.graph.to_undirected(multigraph=False).edge_list())
+
+        # Find pairs of nodes with disjoint neighbors
+        pair_groups = find_edges_with_disjoint_neighbors(graph_edges)
+
+        # Get all projected nodes to cover all pairs of qubits with disjoint neighbours
+        projected_nodes = [get_neighbors_of_edges(x, graph_edges) for x in pair_groups]
+
+        # Generate all projected circuits, indexed by unmeasured qubits
+        projected_graph_circuits = {
+            idx: project_qubits(graph_state_circuit, x) for idx, x in enumerate(projected_nodes)
+        }
+        unmeasured_qubit_indices = {idx: [a for b in x for a in b] for idx, x in enumerate(pair_groups)}
+
+        # Get all local Randomized Measurements
+        for idx, circuit in projected_graph_circuits.items():
+            RM_qubits = unmeasured_qubit_indices[idx]
+            unitaries, RM_circuits = haar_shadow_tomography(circuit, self.n_random_unitaries, RM_qubits)
 
         return dataset
 
 
-class GraphStatesConfiguration(BenchmarkConfigurationBase):
+class GraphStateConfiguration(BenchmarkConfigurationBase):
     """Graph States Benchmark configuration.
 
     Attributes:
-        benchmark (Type[Benchmark]): GraphStatesBenchmark
+        benchmark (Type[Benchmark]): GraphStateBenchmark
         qubits (Sequence[int]): The physical qubit layout in which to benchmark graph state generation.
+        n_random_unitaries (int): The number of Haar random single-qubit unitaries to use for (local) shadow tomography.
+
     """
 
-    benchmark: Type[Benchmark] = GraphStatesBenchmark
+    benchmark: Type[Benchmark] = GraphStateBenchmark
     qubits: Sequence[int]
+    n_random_unitaries: int

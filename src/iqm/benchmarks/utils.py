@@ -140,7 +140,7 @@ def count_native_gates(
     return avg_native_operations
 
 
-def find_pairs_with_disjoint_neighbors(
+def find_edges_with_disjoint_neighbors(
     graph: Sequence[Sequence[int]],
 ) -> List[List[Tuple[int]]]:
     """Finds sets of edges with non-overlapping neighboring nodes.
@@ -412,7 +412,7 @@ def perform_backend_transpilation(
     return transpiled_qc_list
 
 
-def project_neighbouring_qubits(qc: QuantumCircuit, meas_qubits: Sequence[int]) -> QuantumCircuit:
+def project_qubits(qc: QuantumCircuit, meas_qubits: Sequence[int]) -> QuantumCircuit:
     """Project (measure) specified qubits on a given quantum circuit.
 
     Args:
@@ -422,7 +422,7 @@ def project_neighbouring_qubits(qc: QuantumCircuit, meas_qubits: Sequence[int]) 
         QuantumCircuit: The projected quantum circuit.
     """
     qc_copy = qc.copy()
-    qc_copy.barrier()
+    # qc_copy.barrier()
     num_cregs = len(meas_qubits)
     register = ClassicalRegister(num_cregs)
     qc_copy.add_register(register)

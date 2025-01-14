@@ -1,7 +1,8 @@
 import random
+from typing import List, Tuple
 
 import numpy as np
-from qiskit import ClassicalRegister
+from qiskit import ClassicalRegister, QuantumCircuit
 from qiskit.circuit.library import UnitaryGate
 
 # from qiskit.extensions import UnitaryGate
@@ -29,7 +30,9 @@ def CUE(random_gen, nh):
     return U
 
 
-def haar_shadow_tomography(qc, Nu, active_qubits):
+def haar_shadow_tomography(
+    qc: QuantumCircuit, Nu: int, active_qubits: List[int]
+) -> Tuple[List[np.ndarray], List[QuantumCircuit]]:
     """Prepares the circuits to perform Haar shadow tomography.
 
     Args:
@@ -37,15 +40,16 @@ def haar_shadow_tomography(qc, Nu, active_qubits):
         Nu (Int): Number of local random unitaries used.
         active_qubits (List[int]): List of active qubits.
     Returns:
-        unitary_gates (List[Array]): List of unitary gates for each random initialisation and qubit.
-        qclist (List[QuantumCircuit]): List of tomography circuits.
+        Tuple(List[ndarray], List[QuantumCircuit])
+        - List[ndarray]: List of unitary gates for each random initialisation and qubit.
+        - List[QuantumCircuit]: List of tomography circuits.
     """
     qclist = []
     unitaries = np.zeros((Nu, len(active_qubits), 2, 2), dtype=np.complex_)
 
     for iu in range(Nu):
         qc_copy = qc.copy()
-        qc_copy.barrier()
+        # qc_copy.barrier()
         register = ClassicalRegister(len(active_qubits), "RMs")
         qc_copy.add_register(register)
         for idx, z in enumerate(active_qubits):
