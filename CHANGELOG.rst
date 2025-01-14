@@ -48,15 +48,15 @@ Version 2.0
 * Updates the usage of `qiskit.QuantumCircuit` to `iqm.qiskit_iqm.IQMCircuit` in many places.
 
 Version 1.12
-===========
+============
 * Miscellaneous small bugs fixed.
 
 Version 1.11
-===========
+============
 * Relaxes dependencies to allow for ranges.
 
 Version 1.10
-===========
+============
 * Added API docs building and publishing.
 
 Version 1.9
