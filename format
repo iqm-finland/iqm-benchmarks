@@ -1,0 +1,2 @@
+python -m isort src tests
+python -m black src tests
