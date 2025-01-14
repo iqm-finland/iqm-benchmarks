@@ -557,20 +557,20 @@ def pandas_results_to_observations(
     """Converts high level GST results from a pandas Dataframe to a simple observation dictionary
 
     Args:
-    dataset: xarray.Dataset
-        A dataset containing counts from the experiment and configurations
-    qubit_layout: List[int]
-        The list of qubits for the current GST experiment
-    df_g: Pandas DataFrame
-        The dataframe with properly formated gate results
-    df_o: Pandas DataFrame
-        The dataframe with properly formated non-gate results like SPAM error measures or fit quality.
-    identifier: BenchmarkObservationIdentifier
-        An identifier object for the current GST run
+        dataset: xarray.Dataset
+            A dataset containing counts from the experiment and configurations
+        qubit_layout: List[int]
+            The list of qubits for the current GST experiment
+        df_g: Pandas DataFrame
+            The dataframe with properly formated gate results
+        df_o: Pandas DataFrame
+            The dataframe with properly formated non-gate results like SPAM error measures or fit quality.
+        identifier: BenchmarkObservationIdentifier
+            An identifier object for the current GST run
 
     Returns:
-    observation_list: List[BenchmarkObservation]
-        List of observations converted from the pandas dataframes
+        observation_list: List[BenchmarkObservation]
+            List of observations converted from the pandas dataframes
     """
     observation_list: list[BenchmarkObservation] = []
     err = dataset.attrs["bootstrap_samples"] > 0
