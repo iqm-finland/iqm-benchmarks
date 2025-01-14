@@ -45,6 +45,8 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           python-version: 3.11
+      - name: Install dependencies
+        run: uv pip install --constraint requirements.txt --editable .[cicd]
       - name: Regenerate requirements.txt
         run: python update-requirements.py
       - name: Check lockfile is up-to-date
