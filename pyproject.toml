@@ -1,5 +1,9 @@
 [build-system]
 requires = [
+    # NOTE: including build deps in the lockfile not yet directly by uv. Working around this by duplicating build deps
+    #       in project dependencies doesn't work either since using them via the lockfile requires
+    #       `--no-build-isolation` while installing, which itself requires setuptools.
+    #       See https://github.com/astral-sh/uv/issues/5190.
     "setuptools>=70.0.0",
     "setuptools_scm[toml]>=8.1.0",
 ]
@@ -16,7 +20,8 @@ authors = [
     {name="Pedro Figueroa Romero", email="pedro.romero@meetiqm.com"},
     {name="Vicente Pina Canelles", email="vicente.pina@meetiqm.com"},
     {name="Raphael Brieger", email="raphael.brieger@meetiqm.com"},
-    {name="Stefan Seegerer", email="stefan.seegerer@meetiqm.com"}
+    {name="Stefan Seegerer", email="stefan.seegerer@meetiqm.com"},
+    {name="Miikka Koistinen", email="miikka@meetiqm.com"},
 ]
 readme = "README.md"
 classifiers = [
@@ -48,8 +53,9 @@ dependencies = [
 "Homepage" = "https://github.com/iqm-finland/iqm-benchmarks"
 
 [project.optional-dependencies]
-develop = [
-    "tox == 4.16.0",
+cicd = [
+    "build == 1.0.3",
+    "pip-licenses == 5.0.0",
 ]
 
 examples = [

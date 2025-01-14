@@ -22,57 +22,71 @@ The project is split into different benchmarks, all sharing the `Benchmark` clas
 
 ## Installation _(latest release)_
 
-Usually it makes sense to use a new Conda environment (e.g. ``iqm-benchmarks``) to isolate your setup from the global Python installation. That way, you can play around without messing the rest of your system.
+[uv](https://docs.astral.sh/uv/) is highly recommended for practical Python environment and package management.
+With uv installed in your system, start a terminal in your machine and create a new python environment
 
-Start a terminal in your machine, and type
-
-```
-conda create -n iqm-benchmarks python=3.11.2
-conda activate iqm-benchmarks
+```sh
+uv venv --python=3.11
 ```
 
+> Note: refer to uv's documentation if there are problems setting up a python environment.
+
+After the command has run, read the output and make sure to use the prompt to activate the environment.
 Then, you can install the latest release of the IQM Benchmarks by running:
-```bash
-$ pip install iqm-benchmarks
+
+```sh
+uv pip install iqm-benchmarks
 ```
 
-If you have already installed `iqm-benchmarks` and want to get the latest release you can add the --upgrade flag:
+Supplied within the Python package there is an additional `requirements.txt` file containing locked, security scanned
+dependencies. The file can be used to constrain installed dependencies either directly from the repo or by
+extracting it from the PyPI package.
 
-```bash
-pip install iqm-benchmarks --upgrade
+```sh
+uv pip install --constraint requirements.txt iqm-benchmarks
 ```
 
 ## Optional dependencies
 
 Optional dependencies like compressive gate set tomography and jupyter notebooks can be installed as follows:
-```bash
-pip install "iqm-benchmarks[mgst, examples]"
+```sh
+uv pip install "iqm-benchmarks[mgst,examples]"
 ```
 Current optional dependencies are:
 * `examples`: Jupyter notebooks
 * `mgst`: Compressive gate set tomography
-* `develop`: Development tools
 * `test`: Code testing and Linting
-* `docs`: Documentation building 
+* `docs`: Documentation building
+* `cicd`: CICD tools
 
-## Development mode _(latest changes: recommended)_
+## Development installation _(latest changes)_
 
-To install in development mode with all required dependencies, you can instead clone the [repository](https://www.github.com/iqm-finland/iqm-benchmarks) and from the project directory run
+To install in development mode with all required dependencies, you can instead clone the
+[repository](https://www.github.com/iqm-finland/iqm-benchmarks) and from the project directory run
 
-```bash
-python -m pip install -e ".[develop,test]" --upgrade --upgrade-strategy=eager
+```sh
+uv pip install --constraint requirements.txt iqm-benchmarks
 ```
 
 To run the tests, you can use the following command:
 
-```bash
-tox -e test
+```sh
+./test
 ```
 
 To build the API documentation as HTML:
 
-```bash
-tox -e docs
+```sh
+./docbuild
+```
+
+Update the requirements. This is necessary when you add a new dependency or update an existing one in `pyproject.toml`.
+After this, any changes in the lockfile `requirements.txt` have to be committed.
+The script upgrades locked dependencies defined in `pyproject.toml` within the given version ranges. However, transitive
+dependencies are deliberately not upgraded automatically.
+
+```sh
+python update-requirements.py
 ```
 
 ## Characterize Physical Hardware
