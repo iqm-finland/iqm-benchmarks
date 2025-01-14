@@ -85,7 +85,7 @@ jobs:
         with:
           python-version: 3.11
       - name: Install dependencies
-        run: uv pip install --constraint requirements.txt --editable .[cicd]
+        run: uv pip install --constraint requirements.txt --editable . --requirement pyproject.toml --all-extras
       - name: Generate license information for dependencies
         run: |
           pip-licenses --format=confluence --with-urls > licenses.txt
