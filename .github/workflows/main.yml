@@ -36,6 +36,19 @@ jobs:
           sudo apt-get install graphviz
       - name: Test if docs can be built
         run: ./docbuild
+  
+  test_requirements_lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: 3.11
+      - name: Regenerate requirements.txt
+        run: python update-requirements.py
+      - name: Check lockfile is up-to-date
+        run: git diff --exit-code HEAD requirements.txt
 
   run_benchmark:
     runs-on: ubuntu-latest
