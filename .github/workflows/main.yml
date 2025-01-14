@@ -32,7 +32,7 @@ jobs:
           python-version: 3.11
       - name: Install dependencies
         run: |
-          uv pip install --constraint requirements.txt --editable .[docs]
+          uv pip install --constraint requirements.txt --editable .[docs,mgst]
           sudo apt-get install graphviz
       - name: Test if docs can be built
         run: ./docbuild
