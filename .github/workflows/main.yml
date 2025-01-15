@@ -11,26 +11,46 @@ on:
 jobs:
   run_tests:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3.11.3
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: 3.11
       - name: Install dependencies
-        run: pip install tox==4.16.0
-      - name: Check Python packages
-        run: python -m pip check
+        run: uv pip install --constraint requirements.txt --editable .[test,mgst]
       - name: Run tests
-        run: tox -e test
+        run: ./test
+  
+  test_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          uv pip install --constraint requirements.txt --editable .[docs,mgst]
+          sudo apt-get install graphviz
+      - name: Test if docs can be built
+        run: ./docbuild
+  
+  test_requirements_lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: uv pip install --constraint requirements.txt --editable .[cicd]
+      - name: Regenerate requirements.txt
+        run: python update-requirements.py
+      - name: Check lockfile is up-to-date
+        run: git diff --exit-code HEAD requirements.txt
 
   run_benchmark:
     runs-on: ubuntu-latest
@@ -40,18 +60,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11.3
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: 3.11
       - name: Install dependencies
-        run: pip install tox==4.16.0
+        run: uv pip install --constraint requirements.txt --editable .
       - name: Run benchmark
-        run: tox -e benchmark -- --backend=${BACKEND}
+        run: python benchmark_runner.py --backend=${BACKEND}
         env:
           BACKEND: ${{ github.event.inputs.backend || 'iqmfakeadonis' }}
       - name: Upload benchmark results

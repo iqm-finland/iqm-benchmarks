@@ -26,7 +26,6 @@ from .benchmark_definition import (
     BenchmarkRunResult,
 )
 from .circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
-from .compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
 from .entanglement.ghz import GHZBenchmark, GHZConfiguration
 from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
@@ -46,6 +45,15 @@ AVAILABLE_BENCHMARKS = {
     InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
     MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
 }
+
+try:
+    # Requires dependencies from "project.optional-dependencies.mgst" section to be installed. See "pyproject.toml"
+    # file
+    from .compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
+
+    AVAILABLE_BENCHMARKS.update({CompressiveGST.name: CompressiveGST})
+except ModuleNotFoundError:
+    pass
 
 try:
     # Change here if project is renamed and does not equal the package name

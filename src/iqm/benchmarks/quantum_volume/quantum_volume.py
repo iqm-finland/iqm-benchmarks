@@ -677,7 +677,8 @@ class QuantumVolumeBenchmark(Benchmark):
         sorted_transpiled_qc_list: Dict[Tuple[int, ...], List[QuantumCircuit]],
     ) -> Dict[str, Any]:
         """
-            Submit jobs for execution in the specified IQMBackend.
+        Submit jobs for execution in the specified IQMBackend.
+
         Args:
             backend (IQMBackendBase): the IQM backend to submit the job.
             qubits (List[int]): the qubits to identify the submitted job.
@@ -862,8 +863,7 @@ class QuantumVolumeConfiguration(BenchmarkConfigurationBase):
                             - "fixed": Restricts the coupling map to only the specified qubits.
                             - "batching": Considers the full coupling map of the backend and circuit execution is batched per final layout.
                             * Default is "fixed"
-        rem (bool): Whether Readout Error Mitigation is applied in post-processing.
-                    When set to True, both results (readout-unmitigated and -mitigated) are produced.
+        rem (bool): Whether Readout Error Mitigation is applied in post-processing. When set to True, both results (readout-unmitigated and -mitigated) are produced.
                             - Default is True.
         mit_shots (int): The measurement shots to use for readout calibration.
                             * Default is 1_000.
