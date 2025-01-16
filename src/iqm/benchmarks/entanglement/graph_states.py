@@ -150,13 +150,13 @@ class GraphStateBenchmark(Benchmark):
         pair_groups = find_edges_with_disjoint_neighbors(graph_edges)
 
         # Get all projected nodes to cover all pairs of qubits with disjoint neighbours
-        projected_nodes = [get_neighbors_of_edges(x, graph_edges) for x in pair_groups]
+        unmeasured_qubit_indices = {idx: [a for b in x for a in b] for idx, x in enumerate(pair_groups)}
+        projected_nodes = {idx: get_neighbors_of_edges(list(x), graph_edges) for idx, x in enumerate(pair_groups)}
 
         # Generate all projected circuits, indexed by unmeasured qubits
         projected_graph_circuits = {
-            idx: project_qubits(graph_state_circuit, x) for idx, x in enumerate(projected_nodes)
+            idx: project_qubits(graph_state_circuit, x) for idx, x in projected_nodes.items()
         }
-        unmeasured_qubit_indices = {idx: [a for b in x for a in b] for idx, x in enumerate(pair_groups)}
 
         # Get all local Randomized Measurements
         for idx, circuit in projected_graph_circuits.items():

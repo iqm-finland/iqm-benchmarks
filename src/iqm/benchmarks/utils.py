@@ -424,7 +424,7 @@ def project_qubits(qc: QuantumCircuit, meas_qubits: Sequence[int]) -> QuantumCir
     qc_copy = qc.copy()
     # qc_copy.barrier()
     num_cregs = len(meas_qubits)
-    register = ClassicalRegister(num_cregs)
+    register = ClassicalRegister(num_cregs, "neighbors")
     qc_copy.add_register(register)
     for idx, iq in enumerate(meas_qubits):
         qc_copy.measure(iq, register[idx])
