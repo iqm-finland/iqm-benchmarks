@@ -170,10 +170,21 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
             }
 
+            if len(qubits) == 1 and rb_type == "clifford":
+                fidelity_native = rb_fit_results.params["fidelity_per_native_sqg"]
+                processed_results[rb_type].update(
+                    {
+                        "avg_native_gate_fidelity": {
+                            "value": fidelity_native.value,
+                            "uncertainty": fidelity_native.stderr,
+                        }
+                    }
+                )
+
             observations.extend(
                 [
                     BenchmarkObservation(
-                        name=f"{key}_{rb_type}",
+                        name=f"{key}_{rb_type}" if "native" not in key else f"{key}",
                         identifier=BenchmarkObservationIdentifier(qubits),
                         value=values["value"],
                         uncertainty=values["uncertainty"],
