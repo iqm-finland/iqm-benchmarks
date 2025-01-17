@@ -174,7 +174,7 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 fidelity_native = rb_fit_results.params["fidelity_per_native_sqg"]
                 processed_results[rb_type].update(
                     {
-                        "avg_native_gate_fidelity": {
+                        "avg_gate_fidelity_native": {
                             "value": fidelity_native.value,
                             "uncertainty": fidelity_native.stderr,
                         }
