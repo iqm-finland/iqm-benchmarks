@@ -1,0 +1,5 @@
+python -m isort --check-only src/iqm
+python -m black --check src/iqm
+python -m pylint src/iqm
+python -m mypy src/iqm
+python -m pytest tests/

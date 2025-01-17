@@ -627,7 +627,8 @@ class MirrorRandomizedBenchmarking(Benchmark):
         sorted_transpiled_circuit_dicts: Dict[Tuple[int, ...], List[QuantumCircuit]],
     ) -> Dict[str, Any]:
         """
-            Submit fixed-depth MRB jobs for execution in the specified IQMBackend
+        Submit fixed-depth MRB jobs for execution in the specified IQMBackend
+
         Args:
             backend_arg (IQMBackendBase): the IQM backend to submit the job
             qubits (Sequence[int]): the qubits to identify the submitted job
