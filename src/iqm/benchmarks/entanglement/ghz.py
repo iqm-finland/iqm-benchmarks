@@ -738,7 +738,7 @@ class GHZBenchmark(Benchmark):
         Args:
             num_rms (int):
                 How many randomized measurement circuits are generated
-            qubit_layout: List[int]
+            qubit_layout List[int]:
                 The subset of system-qubits used in the protocol, indexed from 0
         Returns:
             List[QuantumCircuit] of the original circuit with 1Q Clifford gates appended to it
