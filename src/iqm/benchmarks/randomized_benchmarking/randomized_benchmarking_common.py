@@ -125,6 +125,12 @@ def fit_decay_lmfit(
             )
             params.add(f"p_rb", expr=f"1-depolarization_probability_{1}")
             params.add(f"fidelity_per_clifford", expr=f"p_rb + (1 - p_rb) / (2**{n_qubits})")
+            if n_qubits == 1:
+                # The construction of the 1Q and 2Q Clifford gate dictionaries in "generate_2qubit_cliffords.ipynb"
+                # is based on the reference below; thus the expected amount of 1.875 native gates per Clifford
+                # Native gate set being {I, X(pi/2), X(pi), X(-pi/2), Y(pi/2), Y(pi), Y(-pi)} with X(a)=r(a,0), Y(a)=r(a,pi/2)
+                # Ref: Barends et al., Nature 508, 500-503 (2014); Eq.(S3) of arXiv:1402.4848 [quant-ph]
+                params.add("fidelity_per_native_sqg", expr=f"1 - (1 - (p_rb + (1 - p_rb) / (2**{n_qubits})))/1.875")
         else:
             params = create_multi_dataset_params(
                 func, fit_data, initial_guesses=None, constraints=constraints, simultaneously_fit_vars=None
@@ -578,6 +584,8 @@ def plot_rb_decay(
     stddevs_from_mean = {}
     fidelity_value = {}
     fidelity_stderr = {}
+    fidelity_native1q_value = {}
+    fidelity_native1q_stderr = {}
     decay_rate = {}
     offset = {}
     amplitude = {}
@@ -618,6 +626,14 @@ def plot_rb_decay(
                 str(q): dataset.attrs[q_idx]["avg_fidelities_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
+            fidelity_native1q_value[identifier] = {
+                str(q): observations[q_idx]["avg_native_gate_fidelity"]["value"] if len(q) == 1 else np.nan
+                for q_idx, q in enumerate(qubits_array, qubits_index)
+            }
+            fidelity_native1q_stderr[identifier] = {
+                str(q): observations[q_idx]["avg_native_gate_fidelity"]["uncertainty"] if len(q) == 1 else np.nan
+                for q_idx, q in enumerate(qubits_array, qubits_index)
+            }
         # These are common to both MRB and standard Clifford
         fidelity_value[identifier] = {
             str(q): observations[q_idx]["avg_gate_fidelity"]["value"]
@@ -636,7 +652,7 @@ def plot_rb_decay(
         amplitude[identifier] = {
             str(q): dataset.attrs[q_idx]["fit_amplitude"]["value"] for q_idx, q in enumerate(qubits_array, qubits_index)
         }
-    else:  # id MRB
+    else:  # id IRB
         rb_type_keys = list(observations[0].keys())
         colors = [cmap(i) for i in np.linspace(start=1, stop=0, num=len(rb_type_keys)).tolist()]
         for rb_type in rb_type_keys:
@@ -792,11 +808,11 @@ def plot_rb_decay(
                 plot_label = fr"$\overline{{F}}_{{MRB}} (n={len(qubits)})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             elif key == "interleaved":
                 plot_label = fr"$\overline{{F}}_{{{interleaved_gate}}} ({qubits})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
-            else:
-                print(fidelity_value)
-                print(qubits)
-                print(key)
-                plot_label = fr"$\overline{{F}}_{{CRB}}$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
+            else:  # if id is "clifford"
+                if len(qubits) == 1:
+                    plot_label = fr"$\overline{{F}}_{{native\_sqg}} \simeq$ {100.0 * fidelity_native1q_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_native1q_stderr[key][str(qubits)]:.2f} (%)"
+                else:
+                    plot_label = fr"$\overline{{F}}_{{CRB}}$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
 
             ax.plot(
                 x_linspace,
