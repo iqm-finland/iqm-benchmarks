@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.10
+============
+* Fix docs publishing by CI.
+
 Version 2.9
 ===========
 * Add optional security-scanned lockfile.
