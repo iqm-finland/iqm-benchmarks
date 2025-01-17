@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.11
+============
+* Added compatibility with IQM-Deneb by adapting the transpilation behavior in several benchmarks.
+
 Version 2.10
 ============
 * Fix docs publishing by CI.
