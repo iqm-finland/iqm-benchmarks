@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>IQM Benchmarks &#8212; IQM Benchmarks 2.8 documentation</title>
+    <title>IQM Benchmarks &#8212; IQM Benchmarks 2.10 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=a72db6d2"></script>
+    <script src="_static/documentation_options.js?v=6902f2a3"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="IQM Benchmarks" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.8" />
-    <meta name="docbuild:last-update" content="2025-01-10"/>
+  <meta name="docsearch:version" content="2.10" />
+    <meta name="docbuild:last-update" content="2025-01-17"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.8 documentation - Home"/>
-    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.8 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.10 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.10 documentation - Home"/>
   
   
 </a></div>
@@ -176,6 +176,11 @@
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.circuit_containers.BenchmarkCircuit.html">iqm.benchmarks.circuit_containers.BenchmarkCircuit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.circuit_containers.CircuitGroup.html">iqm.benchmarks.circuit_containers.CircuitGroup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.circuit_containers.Circuits.html">iqm.benchmarks.circuit_containers.Circuits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.compressive_gst.html">iqm.benchmarks.compressive_gst</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.compressive_gst.compressive_gst.html">iqm.benchmarks.compressive_gst.compressive_gst</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.compressive_gst.gst_analysis.html">iqm.benchmarks.compressive_gst.gst_analysis</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -377,7 +382,7 @@
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-latest-release">Installation <em>(latest release)</em></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-dependencies">Optional dependencies</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-mode-latest-changes-recommended">Development mode <em>(latest changes: recommended)</em></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-installation-latest-changes">Development installation <em>(latest changes)</em></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#characterize-physical-hardware">Characterize Physical Hardware</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-jupyter-notebook-or-python-script">Using a Jupyter notebook or Python script</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scheduled-benchmarks-using-a-ci-cd-pipeline">Scheduled benchmarks using a CI/CD Pipeline</a></li>
@@ -427,48 +432,61 @@
 <p>The project is split into different benchmarks, all sharing the <code class="docutils literal notranslate"><span class="pre">Benchmark</span></code> class or the legacy <code class="docutils literal notranslate"><span class="pre">BenchmarkBase</span></code> class. Each individual benchmark takes as an argument their own <code class="docutils literal notranslate"><span class="pre">BenchmarkConfigurationBase</span></code> class. All the (legacy) benchmarks executed at once are wrapped by the <code class="docutils literal notranslate"><span class="pre">BenchmarkExperiment</span></code> class, which handles dependencies among the benchmarks, storing the results, producing the plots…</p>
 <section id="installation-latest-release">
 <h2>Installation <em>(latest release)</em><a class="headerlink" href="#installation-latest-release" title="Link to this heading">#</a></h2>
-<p>Usually it makes sense to use a new Conda environment (e.g. <code class="docutils literal notranslate"><span class="pre">iqm-benchmarks</span></code>) to isolate your setup from the global Python installation. That way, you can play around without messing the rest of your system.</p>
-<p>Start a terminal in your machine, and type</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">iqm</span><span class="o">-</span><span class="n">benchmarks</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.11.2</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">iqm</span><span class="o">-</span><span class="n">benchmarks</span>
+<p><a class="reference external" href="https://docs.astral.sh/uv/">uv</a> is highly recommended for practical Python environment and package management.
+With uv installed in your system, start a terminal in your machine and create a new Python environment</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="o">=</span><span class="m">3</span>.11
 </pre></div>
 </div>
-<p>Then, you can install the latest release of the IQM Benchmarks by running:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>iqm-benchmarks
+<blockquote>
+<div><p>Note: refer to uv’s documentation if there are problems setting up a Python environment.</p>
+</div></blockquote>
+<p>After the command has run, read the output and make sure to use the prompt to activate the environment.
+Then, you can install the latest release of the IQM Benchmarks by running:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>iqm-benchmarks
 </pre></div>
 </div>
-<p>If you have already installed <code class="docutils literal notranslate"><span class="pre">iqm-benchmarks</span></code> and want to get the latest release you can add the –upgrade flag:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>iqm-benchmarks<span class="w"> </span>--upgrade
+<p>Supplied within the Python package there is an additional <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file containing locked, security scanned
+dependencies. The file can be used to constrain installed dependencies either directly from the repo or by
+extracting it from the PyPI package.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--constraint<span class="w"> </span>requirements.txt<span class="w"> </span>iqm-benchmarks
 </pre></div>
 </div>
 </section>
 <section id="optional-dependencies">
 <h2>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Link to this heading">#</a></h2>
 <p>Optional dependencies like compressive gate set tomography and jupyter notebooks can be installed as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;iqm-benchmarks[mgst, examples]&quot;</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;iqm-benchmarks[mgst,examples]&quot;</span>
 </pre></div>
 </div>
 <p>Current optional dependencies are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code>: Jupyter notebooks</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mgst</span></code>: Compressive gate set tomography</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">develop</span></code>: Development tools</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test</span></code>: Code testing and Linting</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">docs</span></code>: Documentation building</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cicd</span></code>: CICD tools</p></li>
 </ul>
 </section>
-<section id="development-mode-latest-changes-recommended">
-<h2>Development mode <em>(latest changes: recommended)</em><a class="headerlink" href="#development-mode-latest-changes-recommended" title="Link to this heading">#</a></h2>
-<p>To install in development mode with all required dependencies, you can instead clone the <a class="reference external" href="https://www.github.com/iqm-finland/iqm-benchmarks">repository</a> and from the project directory run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[develop,test]&quot;</span><span class="w"> </span>--upgrade<span class="w"> </span>--upgrade-strategy<span class="o">=</span>eager
+<section id="development-installation-latest-changes">
+<h2>Development installation <em>(latest changes)</em><a class="headerlink" href="#development-installation-latest-changes" title="Link to this heading">#</a></h2>
+<p>To install in development mode with all required dependencies, you can instead clone the
+<a class="reference external" href="https://www.github.com/iqm-finland/iqm-benchmarks">repository</a> and from the project directory run</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--constraint<span class="w"> </span>requirements.txt<span class="w"> </span>iqm-benchmarks
 </pre></div>
 </div>
 <p>To run the tests, you can use the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span><span class="nb">test</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./test
 </pre></div>
 </div>
 <p>To build the API documentation as HTML:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./docbuild
+</pre></div>
+</div>
+<p>Update the requirements. This is necessary when you add a new dependency or update an existing one in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.
+After this, any changes in the lockfile <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> have to be committed.
+The script upgrades locked dependencies defined in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> within the given version ranges. However, transitive
+dependencies are deliberately not upgraded automatically.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>update-requirements.py
 </pre></div>
 </div>
 </section>
@@ -608,7 +626,7 @@
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-latest-release">Installation <em>(latest release)</em></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-dependencies">Optional dependencies</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-mode-latest-changes-recommended">Development mode <em>(latest changes: recommended)</em></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-installation-latest-changes">Development installation <em>(latest changes)</em></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#characterize-physical-hardware">Characterize Physical Hardware</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-jupyter-notebook-or-python-script">Using a Jupyter notebook or Python script</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scheduled-benchmarks-using-a-ci-cd-pipeline">Scheduled benchmarks using a CI/CD Pipeline</a></li>
@@ -647,7 +665,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-01-10.
+  Last updated on 2025-01-17.
   <br/>
 </p>
   </div>

@@ -1,0 +1,50 @@
+iqm.benchmarks.compressive\_gst.compressive\_gst.GSTConfiguration
+=================================================================
+
+.. currentmodule:: iqm.benchmarks.compressive_gst.compressive_gst
+
+.. autoclass:: GSTConfiguration
+   :members:
+   :show-inheritance:
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GSTConfiguration.model_computed_fields
+      ~GSTConfiguration.model_config
+      ~GSTConfiguration.model_fields
+      ~GSTConfiguration.benchmark
+      ~GSTConfiguration.qubit_layouts
+      ~GSTConfiguration.gate_set
+      ~GSTConfiguration.num_circuits
+      ~GSTConfiguration.rank
+      ~GSTConfiguration.shots
+      ~GSTConfiguration.gate_labels
+      ~GSTConfiguration.seq_len_list
+      ~GSTConfiguration.from_init
+      ~GSTConfiguration.max_inits
+      ~GSTConfiguration.opt_method
+      ~GSTConfiguration.max_iterations
+      ~GSTConfiguration.convergence_criteria
+      ~GSTConfiguration.batch_size
+      ~GSTConfiguration.bootstrap_samples
+      ~GSTConfiguration.testing
+      ~GSTConfiguration.max_gates_per_batch
+      ~GSTConfiguration.calset_id
+      ~GSTConfiguration.routing_method
+      ~GSTConfiguration.physical_layout
+   
+   
+
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+   
+   
