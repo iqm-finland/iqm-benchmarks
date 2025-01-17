@@ -809,7 +809,7 @@ def plot_rb_decay(
             elif key == "interleaved":
                 plot_label = fr"$\overline{{F}}_{{{interleaved_gate}}}$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             else:  # if id is "clifford"
-                if len(qubits) == 1 and identifier is not "irb":
+                if len(qubits) == 1 and identifier != "irb":
                     plot_label = fr"$\overline{{F}}_{{native\_sqg}} \simeq$ {100.0 * fidelity_native1q_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_native1q_stderr[key][str(qubits)]:.2f} (%)"
                 else:
                     plot_label = fr"$\overline{{F}}_{{CRB}}$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
