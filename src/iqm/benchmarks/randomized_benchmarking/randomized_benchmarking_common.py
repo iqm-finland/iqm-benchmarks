@@ -148,23 +148,23 @@ def fit_decay_lmfit(
             constraints=None,
             simultaneously_fit_vars=simultaneous_fit_vars,
         )
-        params.add(f"p_rb", expr=f"1-depolarization_probability_{1}")
-        params.add(f"fidelity_per_clifford", expr=f"p_rb + (1 - p_rb) / (2**{n_qubits})")
-        params.add(f"p_irb", expr=f"1-depolarization_probability_{2}")
-        params.add(f"interleaved_fidelity", expr=f"p_irb / p_rb + (1 - p_irb / p_rb) / (2**{n_qubits})")
+        params.add(f"p_rb", expr=f"1.0 - depolarization_probability_{1}")
+        params.add(f"fidelity_per_clifford", expr=f"p_rb + (1.0 - p_rb) / (2.0**{n_qubits})")
+        params.add(f"p_irb", expr=f"1.0 - depolarization_probability_{2}")
+        params.add(f"interleaved_fidelity", expr=f"p_irb / p_rb + (1.0 - p_irb / p_rb) / (2.0**{n_qubits})")
         if n_qubits == 1:
             # The construction of the 1Q and 2Q Clifford gate dictionaries in "generate_2qubit_cliffords.ipynb"
             # is based on the reference below; thus the expected amount of 1.875 native gates per Clifford
             # Native gate set being {I, X(pi/2), X(pi), X(-pi/2), Y(pi/2), Y(pi), Y(-pi)} with X(a)=r(a,0), Y(a)=r(a,pi/2)
             # Ref: Barends et al., Nature 508, 500-503 (2014); Eq.(S3) of arXiv:1402.4848 [quant-ph]
             # For IRB it may be used as proxy to how well (or bad) the assumption of uniform fidelity in native sqg gates holds.
-            params.add("fidelity_per_native_sqg", expr=f"1 - (1 - fidelity_per_clifford)/1.875")
+            params.add("fidelity_per_native_sqg", expr=f"1.0 - (1.0 - fidelity_per_clifford)/1.875")
         elif n_qubits == 2 and interleaved_gate_str == "CZGate":
             # Here similarly, we may use Eq.(S8 - S11) of arXiv:1402.4848 [quant-ph]
-            params.add(f"fidelity_clifford_and_interleaved", expr=f"p_irb + (1 - p_irb) / (2**{n_qubits})")
+            params.add(f"fidelity_clifford_and_interleaved", expr=f"p_irb + (1.0 - p_irb) / (2.0 ** {n_qubits})")
             params.add(
                 "fidelity_per_native_sqg",
-                expr=f"(1.0/33.0)*(4.0 * fidelity_clifford_and_interleaved - 10.0 * interleaved_fidelity + 39)",
+                expr=f"(1.0 / 33.0) * (4.0 * fidelity_clifford_and_interleaved - 10.0 * interleaved_fidelity + 39.0)",
             )
 
     return fit_data, params
