@@ -27,7 +27,6 @@ from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common impor
     plot_rb_decay,
     validate_irb_gate,
 )
-
 from iqm.benchmarks.utils import (
     get_iqm_backend,
     perform_backend_transpilation,

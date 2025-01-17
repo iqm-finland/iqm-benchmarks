@@ -1,7 +1,9 @@
 """Tests for compressive GST benchmark"""
 
-from iqm.benchmarks.compressive_gst.compressive_gst import GSTConfiguration, CompressiveGST
 from unittest.mock import patch
+
+from iqm.benchmarks.compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
+
 
 backend = "iqmfakeapollo"
 

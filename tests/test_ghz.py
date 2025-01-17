@@ -1,6 +1,6 @@
 """Tests for GHZ fidelity estimation using the new base class"""
 
-import numpy as np
+from unittest.mock import patch
 
 from iqm.benchmarks.entanglement.ghz import GHZBenchmark, GHZConfiguration
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
@@ -10,7 +10,8 @@ backend = IQMFakeApollo()
 
 
 class TestGHZ:
-    def test_layouts(self):
+    @patch('matplotlib.pyplot.figure')
+    def test_layouts(self, mock_fig):
         MINIMAL_GHZ = GHZConfiguration(
             state_generation_routine=f"tree",
             custom_qubits_array=[
@@ -32,8 +33,10 @@ class TestGHZ:
         benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
         benchmark.run()
         benchmark.analyze()
+        mock_fig.assert_called()
 
-    def test_state_routine(self):
+    @patch('matplotlib.pyplot.figure')
+    def test_state_routine(self, mock_fig):
         for gen_routine in [f"tree", f"naive", "log_depth"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=gen_routine,
@@ -49,8 +52,10 @@ class TestGHZ:
             benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
             benchmark.run()
             benchmark.analyze()
+            mock_fig.assert_called()
 
-    def test_rem(self):
+    @patch('matplotlib.pyplot.figure')
+    def test_rem(self, mock_fig):
         for fidelity_routine in [f"coherences", f"randomized_measurements"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=f"tree",
@@ -66,3 +71,4 @@ class TestGHZ:
             benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
             benchmark.run()
             benchmark.analyze()
+            mock_fig.assert_called()
