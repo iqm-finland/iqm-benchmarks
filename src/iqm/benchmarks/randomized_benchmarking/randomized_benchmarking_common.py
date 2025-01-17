@@ -89,6 +89,7 @@ def fit_decay_lmfit(
     data: List[List[float]] | List[List[List[float]]],
     rb_identifier: str,
     simultaneous_fit_vars: Optional[List[str]] = None,
+    interleaved_gate_str: Optional[str] = None,
 ) -> Tuple[np.ndarray, Parameters]:
     """Perform a fitting routine for 0th-order (Ap^m+B) RB using lmfit
 
@@ -98,6 +99,7 @@ def fit_decay_lmfit(
         data (List[List[float]] | List[List[List[float]]]): the data to be fitted
         rb_identifier (str): the RB identifier, either "stdrb", "irb" or "mrb"
         simultaneous_fit_vars (List[str], optional): the list of variables used to fit simultaneously
+        interleaved_gate_str (Optional[str]): the name of the interleaved gate in IRB
     Returns:
         A tuple of fitting data (list of lists of average fidelities or polarizations) and MRB fit parameters
     """
@@ -148,15 +150,22 @@ def fit_decay_lmfit(
         )
         params.add(f"p_rb", expr=f"1-depolarization_probability_{1}")
         params.add(f"fidelity_per_clifford", expr=f"p_rb + (1 - p_rb) / (2**{n_qubits})")
+        params.add(f"p_irb", expr=f"1-depolarization_probability_{2}")
+        params.add(f"interleaved_fidelity", expr=f"p_irb / p_rb + (1 - p_irb / p_rb) / (2**{n_qubits})")
         if n_qubits == 1:
             # The construction of the 1Q and 2Q Clifford gate dictionaries in "generate_2qubit_cliffords.ipynb"
             # is based on the reference below; thus the expected amount of 1.875 native gates per Clifford
             # Native gate set being {I, X(pi/2), X(pi), X(-pi/2), Y(pi/2), Y(pi), Y(-pi)} with X(a)=r(a,0), Y(a)=r(a,pi/2)
             # Ref: Barends et al., Nature 508, 500-503 (2014); Eq.(S3) of arXiv:1402.4848 [quant-ph]
             # For IRB it may be used as proxy to how well (or bad) the assumption of uniform fidelity in native sqg gates holds.
-            params.add("fidelity_per_native_sqg", expr=f"1 - (1 - (p_rb + (1 - p_rb) / (2**{n_qubits})))/1.875")
-        params.add(f"p_irb", expr=f"1-depolarization_probability_{2}")
-        params.add(f"interleaved_fidelity", expr=f"p_irb / p_rb + (1 - p_irb / p_rb) / (2**{n_qubits})")
+            params.add("fidelity_per_native_sqg", expr=f"1 - (1 - fidelity_per_clifford)/1.875")
+        elif n_qubits == 2 and interleaved_gate_str == "CZGate":
+            # Here similarly, we may use Eq.(S8 - S11) of arXiv:1402.4848 [quant-ph]
+            params.add(f"fidelity_clifford_and_interleaved", expr=f"p_irb + (1 - p_irb) / (2**{n_qubits})")
+            params.add(
+                "fidelity_per_native_sqg",
+                expr=f"(1.0/33.0)*(4.0 * fidelity_clifford_and_interleaved - 10.0 * interleaved_fidelity + 39)",
+            )
 
     return fit_data, params
 

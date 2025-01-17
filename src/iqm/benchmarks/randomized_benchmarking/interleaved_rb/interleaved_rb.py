@@ -75,6 +75,11 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     interleaved_gate = dataset.attrs["interleaved_gate"]
     interleaved_gate_parameters = dataset.attrs["interleaved_gate_params"]
+    if interleaved_gate_parameters is None:
+        interleaved_gate_string = f"{interleaved_gate}"
+    else:
+        params_string = str(tuple(f"{x:.2f}" for x in interleaved_gate_parameters))
+        interleaved_gate_string = f"{interleaved_gate}{params_string}"
 
     simultaneous_fit = dataset.attrs["simultaneous_fit"]
 
@@ -138,6 +143,7 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             [list_of_fidelities_clifford, list_of_fidelities_interleaved],
             "interleaved",
             simultaneous_fit,
+            interleaved_gate_string,
         )
         rb_fit_results = lmfit_minimizer(fit_parameters, fit_data, sequence_lengths, exponential_rb)
 
@@ -180,6 +186,16 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                         }
                     }
                 )
+            elif len(qubits) == 2 and rb_type == "clifford" and interleaved_gate_string == "CZGate":
+                fidelity_native_sqg = rb_fit_results.params["fidelity_per_native_sqg"]
+                processed_results[rb_type].update(
+                    {
+                        "avg_gate_fidelity_native_sqg": {
+                            "value": fidelity_native_sqg.value,
+                            "uncertainty": fidelity_native_sqg.stderr,
+                        }
+                    }
+                )
 
             observations.extend(
                 [
@@ -217,12 +233,6 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         obs_dict.update({qubits_idx: processed_results})
 
         # Generate decay plots
-        if interleaved_gate_parameters is None:
-            interleaved_gate_string = f"{interleaved_gate}"
-        else:
-            params_string = str(tuple(f"{x:.2f}" for x in interleaved_gate_parameters))
-            interleaved_gate_string = f"{interleaved_gate}{params_string}"
-
         fig_name, fig = plot_rb_decay(
             "irb",
             [qubits],
