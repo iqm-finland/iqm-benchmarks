@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 2.11
+============
+* Report average native single-qubit gate fidelity estimates in observations of 1Q Clifford RB and 1Q IRB, and display in plots of 1Q Clifford RB.
+
+Version 2.10
+============
+* Fix docs publishing by CI.
+
 Version 2.9
 ===========
 * Add optional security-scanned lockfile.
