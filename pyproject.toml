@@ -22,6 +22,7 @@ authors = [
     {name="Raphael Brieger", email="raphael.brieger@meetiqm.com"},
     {name="Stefan Seegerer", email="stefan.seegerer@meetiqm.com"},
     {name="Miikka Koistinen", email="miikka@meetiqm.com"},
+    {name="Adrian Auer", email="adrian.auer@meetiqm.com"},
 ]
 readme = "README.md"
 classifiers = [

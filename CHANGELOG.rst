@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.12
+============
+* Move all example notebooks to docs. `#30 <https://github.com/iqm-finland/iqm-benchmarks/pull/30>`_
+
 Version 2.11
 ============
 * Report average native single-qubit gate fidelity estimates in observations of 1Q Clifford RB and 1Q IRB, and display in plots of 1Q Clifford RB.
