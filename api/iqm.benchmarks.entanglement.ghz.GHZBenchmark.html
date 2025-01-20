@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.entanglement.ghz.GHZBenchmark &#8212; IQM Benchmarks 2.11 documentation</title>
+    <title>iqm.benchmarks.entanglement.ghz.GHZBenchmark &#8212; IQM Benchmarks 2.12 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=d2fe70be"></script>
+    <script src="../_static/documentation_options.js?v=c58af0d8"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.entanglement.ghz.plot_fidelities" href="iqm.benchmarks.entanglement.ghz.plot_fidelities.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.11" />
-    <meta name="docbuild:last-update" content="2025-01-17"/>
+  <meta name="docsearch:version" content="2.12" />
+    <meta name="docbuild:last-update" content="2025-01-20"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.11 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.11 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.12 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.12 documentation - Home"/>
   
   
 </a></div>
@@ -384,6 +384,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.analysis_function"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.analysis_function()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_native_ghz"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.generate_native_ghz()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.generate_coherence_meas_circuits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.append_rms()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_readout_circuit"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.generate_readout_circuit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.add_configuration_to_dataset"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.add_configuration_to_dataset()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.execute"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.execute()</span></code></a></li>
@@ -425,16 +426,19 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.analysis_function" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.analysis_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analysis_function</span></code></a>(run)</p></td>
 <td><p>Analyze counts and compute the state fidelity</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.execute" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute</span></code></a>(backend)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_rms</span></code></a>(num_rms, qubit_layout)</p></td>
+<td><p>Appends 1Q Clifford gates sampled uniformly at random to all qubits in the given circuit.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.execute" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute</span></code></a>(backend)</p></td>
 <td><p>Executes the benchmark.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_coherence_meas_circuits</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_coherence_meas_circuits</span></code></a>(...)</p></td>
 <td><p>Takes a given GHZ circuit and outputs circuits needed to measure fidelity via mult.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_native_ghz" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_native_ghz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_native_ghz</span></code></a>(qubit_layout, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_native_ghz" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_native_ghz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_native_ghz</span></code></a>(qubit_layout, ...)</p></td>
 <td><p>Generate a circuit preparing a GHZ state, according to a given routine and transpiled to the native gate set and topology.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_readout_circuit" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_readout_circuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_readout_circuit</span></code></a>(qubit_layout, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_readout_circuit" title="iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_readout_circuit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_readout_circuit</span></code></a>(qubit_layout, ...)</p></td>
 <td><p>A wrapper for the creation of different circuits to estimate the fidelity</p></td>
 </tr>
 </tbody>
@@ -519,6 +523,29 @@ the number of qubits in qubit_layout</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>qc_list_transpiled</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms">
+<span class="sig-name descname"><span class="pre">append_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_rms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">IQMCircuit</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms" title="Link to this definition">#</a></dt>
+<dd><p>Appends 1Q Clifford gates sampled uniformly at random to all qubits in the given circuit.
+:param num_rms: How many randomized measurement circuits are generated
+:type num_rms: int
+:param qubit_layout List[int]: The subset of system-qubits used in the protocol, indexed from 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[QuantumCircuit] of the original circuit with 1Q Clifford gates appended to it</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>num_rms</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>qubit_layout</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a>[<em>IQMCircuit</em>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -632,6 +659,7 @@ the number of qubits in qubit_layout</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.analysis_function"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.analysis_function()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_native_ghz"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.generate_native_ghz()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.generate_coherence_meas_circuits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.append_rms()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_readout_circuit"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.generate_readout_circuit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.add_configuration_to_dataset"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.add_configuration_to_dataset()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.GHZBenchmark.execute"><code class="docutils literal notranslate"><span class="pre">GHZBenchmark.execute()</span></code></a></li>
@@ -670,7 +698,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-01-17.
+  Last updated on 2025-01-20.
   <br/>
 </p>
   </div>

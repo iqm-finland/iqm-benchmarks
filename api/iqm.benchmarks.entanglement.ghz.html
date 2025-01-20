@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.entanglement.ghz &#8212; IQM Benchmarks 2.11 documentation</title>
+    <title>iqm.benchmarks.entanglement.ghz &#8212; IQM Benchmarks 2.12 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=d2fe70be"></script>
+    <script src="../_static/documentation_options.js?v=c58af0d8"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -49,12 +49,12 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.entanglement.ghz.append_rms" href="iqm.benchmarks.entanglement.ghz.append_rms.html" />
+    <link rel="next" title="iqm.benchmarks.entanglement.ghz.extract_fidelities" href="iqm.benchmarks.entanglement.ghz.extract_fidelities.html" />
     <link rel="prev" title="iqm.benchmarks.entanglement" href="iqm.benchmarks.entanglement.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.11" />
-    <meta name="docbuild:last-update" content="2025-01-17"/>
+  <meta name="docsearch:version" content="2.12" />
+    <meta name="docbuild:last-update" content="2025-01-20"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.11 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.11 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.12 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.12 documentation - Home"/>
   
   
 </a></div>
@@ -388,40 +388,37 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.append_rms.html#iqm.benchmarks.entanglement.ghz.append_rms" title="iqm.benchmarks.entanglement.ghz.append_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_rms</span></code></a>(circuit, num_rms, backend)</p></td>
-<td><p>Appends 1Q Clifford gates sampled uniformly at random to all qubits in the given circuit.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.extract_fidelities.html#iqm.benchmarks.entanglement.ghz.extract_fidelities" title="iqm.benchmarks.entanglement.ghz.extract_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fidelities</span></code></a>(cal_url, qubit_layout)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.extract_fidelities.html#iqm.benchmarks.entanglement.ghz.extract_fidelities" title="iqm.benchmarks.entanglement.ghz.extract_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fidelities</span></code></a>(cal_url, qubit_layout)</p></td>
 <td><p>Returns couplings and CZ-fidelities from calibration data URL</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.fidelity_analysis.html#iqm.benchmarks.entanglement.ghz.fidelity_analysis" title="iqm.benchmarks.entanglement.ghz.fidelity_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fidelity_analysis</span></code></a>(run)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.fidelity_analysis.html#iqm.benchmarks.entanglement.ghz.fidelity_analysis" title="iqm.benchmarks.entanglement.ghz.fidelity_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fidelity_analysis</span></code></a>(run)</p></td>
 <td><p>Analyze counts and compute the state fidelity</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.fidelity_ghz_coherences.html#iqm.benchmarks.entanglement.ghz.fidelity_ghz_coherences" title="iqm.benchmarks.entanglement.ghz.fidelity_ghz_coherences"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fidelity_ghz_coherences</span></code></a>(dataset, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.fidelity_ghz_coherences.html#iqm.benchmarks.entanglement.ghz.fidelity_ghz_coherences" title="iqm.benchmarks.entanglement.ghz.fidelity_ghz_coherences"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fidelity_ghz_coherences</span></code></a>(dataset, ...)</p></td>
 <td><p>Estimates the GHZ state fidelity based on the multiple quantum coherences method based on [Mooney, 2021]</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.fidelity_ghz_randomized_measurements.html#iqm.benchmarks.entanglement.ghz.fidelity_ghz_randomized_measurements" title="iqm.benchmarks.entanglement.ghz.fidelity_ghz_randomized_measurements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fidelity_ghz_randomized_measurements</span></code></a>(...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.fidelity_ghz_randomized_measurements.html#iqm.benchmarks.entanglement.ghz.fidelity_ghz_randomized_measurements" title="iqm.benchmarks.entanglement.ghz.fidelity_ghz_randomized_measurements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fidelity_ghz_randomized_measurements</span></code></a>(...)</p></td>
 <td><p>Estimates GHZ state fidelity through cross-correlations of RMs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_linear.html#iqm.benchmarks.entanglement.ghz.generate_ghz_linear" title="iqm.benchmarks.entanglement.ghz.generate_ghz_linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_linear</span></code></a>(num_qubits)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_linear.html#iqm.benchmarks.entanglement.ghz.generate_ghz_linear" title="iqm.benchmarks.entanglement.ghz.generate_ghz_linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_linear</span></code></a>(num_qubits)</p></td>
 <td><p>Generates a GHZ state by applying a Hadamard and a series of CX gates in a linear fashion.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_log_cruz.html#iqm.benchmarks.entanglement.ghz.generate_ghz_log_cruz" title="iqm.benchmarks.entanglement.ghz.generate_ghz_log_cruz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_log_cruz</span></code></a>(num_qubits)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_log_cruz.html#iqm.benchmarks.entanglement.ghz.generate_ghz_log_cruz" title="iqm.benchmarks.entanglement.ghz.generate_ghz_log_cruz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_log_cruz</span></code></a>(num_qubits)</p></td>
 <td><p>Generates a GHZ state in log-depth according to <a class="reference external" href="https://arxiv.org/abs/1807.05572">https://arxiv.org/abs/1807.05572</a> :param num_qubits: the number of qubits of the GHZ state</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_log_mooney.html#iqm.benchmarks.entanglement.ghz.generate_ghz_log_mooney" title="iqm.benchmarks.entanglement.ghz.generate_ghz_log_mooney"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_log_mooney</span></code></a>(num_qubits)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_log_mooney.html#iqm.benchmarks.entanglement.ghz.generate_ghz_log_mooney" title="iqm.benchmarks.entanglement.ghz.generate_ghz_log_mooney"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_log_mooney</span></code></a>(num_qubits)</p></td>
 <td><p>Generates a GHZ state in log-depth according to <a class="reference external" href="https://arxiv.org/abs/2101.08946">https://arxiv.org/abs/2101.08946</a> :param num_qubits: the number of qubits of the GHZ state</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree.html#iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree" title="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_spanning_tree</span></code></a>(graph, qubit_layout)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree.html#iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree" title="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_spanning_tree</span></code></a>(graph, qubit_layout)</p></td>
 <td><p>Generates a GHZ state in log-depth by computing a minimal spanning tree for a given coupling map.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_cx_map.html#iqm.benchmarks.entanglement.ghz.get_cx_map" title="iqm.benchmarks.entanglement.ghz.get_cx_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cx_map</span></code></a>(qubit_layout, graph)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_cx_map.html#iqm.benchmarks.entanglement.ghz.get_cx_map" title="iqm.benchmarks.entanglement.ghz.get_cx_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cx_map</span></code></a>(qubit_layout, graph)</p></td>
 <td><p>Calculate the cx_map based on participating qubits and the 2QB gate fidelities between them.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_edges.html#iqm.benchmarks.entanglement.ghz.get_edges" title="iqm.benchmarks.entanglement.ghz.get_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edges</span></code></a>(coupling_map, qubit_layout[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_edges.html#iqm.benchmarks.entanglement.ghz.get_edges" title="iqm.benchmarks.entanglement.ghz.get_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edges</span></code></a>(coupling_map, qubit_layout[, ...])</p></td>
 <td><p>Produces a networkx.Graph from coupling map fidelity information, with edges given by couplings</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.plot_fidelities.html#iqm.benchmarks.entanglement.ghz.plot_fidelities" title="iqm.benchmarks.entanglement.ghz.plot_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_fidelities</span></code></a>(observations, dataset, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.plot_fidelities.html#iqm.benchmarks.entanglement.ghz.plot_fidelities" title="iqm.benchmarks.entanglement.ghz.plot_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_fidelities</span></code></a>(observations, dataset, ...)</p></td>
 <td><p>Plots all the fidelities stored in the observations into a single plot of fidelity vs.</p></td>
 </tr>
 </tbody>
@@ -470,11 +467,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.entanglement.ghz.append_rms.html"
+       href="iqm.benchmarks.entanglement.ghz.extract_fidelities.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.entanglement.ghz.append_rms</p>
+        <p class="prev-next-title">iqm.benchmarks.entanglement.ghz.extract_fidelities</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -513,7 +510,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-01-17.
+  Last updated on 2025-01-20.
   <br/>
 </p>
   </div>

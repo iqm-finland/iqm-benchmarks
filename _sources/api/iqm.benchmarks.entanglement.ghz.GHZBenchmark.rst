@@ -26,6 +26,7 @@ iqm.benchmarks.entanglement.ghz.GHZBenchmark
    
       ~GHZBenchmark.add_configuration_to_dataset
       ~GHZBenchmark.analysis_function
+      ~GHZBenchmark.append_rms
       ~GHZBenchmark.execute
       ~GHZBenchmark.generate_coherence_meas_circuits
       ~GHZBenchmark.generate_native_ghz
