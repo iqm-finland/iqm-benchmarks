@@ -1,5 +1,5 @@
 IQM Benchmarks
-##############
+##########
 
 :Release: |release|
 :Date: |today|
@@ -15,7 +15,8 @@ Contents
    :maxdepth: 2
 
    readme
-   examples
+   examples/examples
+   development/development
    API
    license
 
