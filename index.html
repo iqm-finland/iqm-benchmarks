@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>IQM Benchmarks &#8212; IQM Benchmarks 2.12 documentation</title>
+    <title>IQM Benchmarks &#8212; IQM Benchmarks 2.13 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=c58af0d8"></script>
+    <script src="_static/documentation_options.js?v=7e7672c5"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -52,7 +52,7 @@
     <link rel="next" title="IQM Benchmarks" href="readme.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.12" />
+  <meta name="docsearch:version" content="2.13" />
     <meta name="docbuild:last-update" content="2025-01-20"/>
   </head>
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.12 documentation - Home"/>
-    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.12 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.13 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.13 documentation - Home"/>
   
   
 </a></div>
@@ -150,8 +150,22 @@
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">IQM Benchmarks</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="example_clifford_rb.html">Clifford Randomized Benchmarking (RB) Example</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples/examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_quantum_volume.html">Quantum Volume (QV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_quantum_volume_deneb.html">QV on Deneb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_qscore.html">Q-Score</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="development/development.html">Development</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/how_to_make_your_own_benchmark.html">How to make your own benchmark?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/generate_2qubit_cliffords.html">2-Qubit Clifford Group Decomposition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="API.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -400,7 +414,7 @@
 <h1>IQM Benchmarks<a class="headerlink" href="#iqm-benchmarks" title="Link to this heading">#</a></h1>
 <dl class="field-list simple">
 <dt class="field-odd">Release<span class="colon">:</span></dt>
-<dd class="field-odd"><p>2.12</p>
+<dd class="field-odd"><p>2.13</p>
 </dd>
 <dt class="field-even">Date<span class="colon">:</span></dt>
 <dd class="field-even"><p>2025-01-20</p>
@@ -422,8 +436,22 @@ Developed by <a class="reference external" href="https://meetiqm.com/">IQM</a>.<
 <li class="toctree-l2"><a class="reference internal" href="readme.html#characterize-physical-hardware">Characterize Physical Hardware</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="example_clifford_rb.html">Clifford Randomized Benchmarking (RB) Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_quantum_volume.html">Quantum Volume (QV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_quantum_volume_deneb.html">QV on Deneb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_qscore.html">Q-Score</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development/development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/how_to_make_your_own_benchmark.html">How to make your own benchmark?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/generate_2qubit_cliffords.html">2-Qubit Clifford Group Decomposition</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="API.html">API Reference</a><ul>

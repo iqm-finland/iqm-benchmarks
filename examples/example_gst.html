@@ -1,0 +1,866 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Compressive Gate Set Tomography (GST) &#8212; IQM Benchmarks 2.13 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=7e7672c5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/example_gst';</script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quantum Volume (QV)" href="example_quantum_volume.html" />
+    <link rel="prev" title="Mirror Randomized Benchmarking (MRB)" href="example_mirror_rb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.13" />
+    <meta name="docbuild:last-update" content="2025-01-20"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.13 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.13 documentation - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">IQM Benchmarks</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Compressive Gate Set Tomography (GST)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_quantum_volume.html">Quantum Volume (QV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_quantum_volume_deneb.html">QV on Deneb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_qscore.html">Q-Score</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../development/development.html">Development</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/how_to_make_your_own_benchmark.html">How to make your own benchmark?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/generate_2qubit_cliffords.html">2-Qubit Clifford Group Decomposition</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../API.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/iqm.benchmarks.html">iqm.benchmarks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.html">iqm.benchmarks.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.BenchmarkBase.html">iqm.benchmarks.benchmark.BenchmarkBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html">iqm.benchmarks.benchmark.BenchmarkConfigurationBase</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.html">iqm.benchmarks.benchmark_definition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.add_counts_to_dataset.html">iqm.benchmarks.benchmark_definition.add_counts_to_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.default_analysis_function.html">iqm.benchmarks.benchmark_definition.default_analysis_function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.merge_datasets_dac.html">iqm.benchmarks.benchmark_definition.merge_datasets_dac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.show_figure.html">iqm.benchmarks.benchmark_definition.show_figure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.Benchmark.html">iqm.benchmarks.benchmark_definition.Benchmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html">iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.html">iqm.benchmarks.circuit_containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.BenchmarkCircuit.html">iqm.benchmarks.circuit_containers.BenchmarkCircuit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.CircuitGroup.html">iqm.benchmarks.circuit_containers.CircuitGroup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.Circuits.html">iqm.benchmarks.circuit_containers.Circuits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.html">iqm.benchmarks.compressive_gst</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.compressive_gst.html">iqm.benchmarks.compressive_gst.compressive_gst</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.gst_analysis.html">iqm.benchmarks.compressive_gst.gst_analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.optimization.html">iqm.benchmarks.optimization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.optimization.qscore.html">iqm.benchmarks.optimization.qscore</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.html">iqm.benchmarks.quantum_volume</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.clops.html">iqm.benchmarks.quantum_volume.clops</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.quantum_volume.html">iqm.benchmarks.quantum_volume.quantum_volume</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.html">iqm.benchmarks.readout_mitigation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation.html">iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.readout_error_m3.html">iqm.benchmarks.readout_mitigation.readout_error_m3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/example_gst.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Compressive Gate Set Tomography (GST)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#minimal-gst-experiment-configurations">Minimal GST Experiment configurations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#execute-gst-experiment-s">Execute GST Experiment(s)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-the-results">Examine the results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-results-stored-at-result-observations">High level results stored at result.observations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-final-gate-set-estimates-for-further-processing">Accessing the final gate set estimates for further processing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plots">Plots</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-custom-gate-set">Creating a custom gate set</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis">Checking out the process matrix corresponding to the pi rotation around the y-axis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#all-plots-for-the-custom-gate-set">All plots for the custom gate set</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="compressive-gate-set-tomography-gst">
+<h1>Compressive Gate Set Tomography (GST)<a class="headerlink" href="#compressive-gate-set-tomography-gst" title="Link to this heading">#</a></h1>
+<p>This notebook gives an introduction on how to run compressive gate set tomography, what the input parameters mean and how to display different observations and plots.</p>
+<p>This notebook and the compressive GST functionality <strong>requires the optional dependency “mgst”</strong> to be installed. <br />
+For background, see the journal reference at https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.4.010325</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.compressive_gst.compressive_gst</span><span class="w"> </span><span class="kn">import</span> <span class="n">GSTConfiguration</span><span class="p">,</span> <span class="n">CompressiveGST</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="choose-or-define-a-backend">
+<h2>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#backend = &quot;IQMFakeAdonis&quot;</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;IQMFakeApollo&quot;</span>
+<span class="c1">#backend = &quot;garnet&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="minimal-gst-experiment-configurations">
+<h2>Minimal GST Experiment configurations<a class="headerlink" href="#minimal-gst-experiment-configurations" title="Link to this heading">#</a></h2>
+<p>The most important parameters are the following:</p>
+<ul class="simple">
+<li><p>qubits (<code class="docutils literal notranslate"><span class="pre">List[int]</span></code>): The qubits on the backend where the experiment is performed.</p></li>
+<li><p>gate_set (<code class="docutils literal notranslate"><span class="pre">Union[str,</span> <span class="pre">List[Type[QuantumCircuit]]]</span></code>): Either one of the currently predefined gate sets <code class="docutils literal notranslate"><span class="pre">&quot;1QXYI&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;2QXYCZ&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;2QXYCZ_extended&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;3QXYCZ&quot;</span></code>, or a list of quantum circuits.</p></li>
+<li><p>num_circuits (<code class="docutils literal notranslate"><span class="pre">int</span></code>): The number of circuits for the experiment. Recommended are at least 50 for single qubit GST, at least 300 for two-qubit GST and at least 2000 for 3-qubit GST.</p></li>
+<li><p>shots (<code class="docutils literal notranslate"><span class="pre">int</span></code>): The number of shots per circuit.</p></li>
+<li><p>rank (<code class="docutils literal notranslate"><span class="pre">int</span></code>): The Kraus rank of the reconstruction, i.e. the number of Kraus operators for each gate.
+$$ G(\rho) = \sum_{i = 1}^{\text{rank}} K_i \rho K_i^{\dagger}$$
+Setting <code class="docutils literal notranslate"><span class="pre">rank=1</span></code> will trigger a unitary gate fit, leading to a gate parametrization output in terms Hamiltonian parameters.
+The maximum rank is given by the physical dimension squared. For fully rigorous performance computation of metrics such as the average gate fidelity or the diamond distance it is recommended to choose full rank.
+A low rank has the benefit of needing less circuits and less computing time, while still capturing the dominant error sources.</p></li>
+<li><p>bootstrap_samples (<code class="docutils literal notranslate"><span class="pre">int</span></code>): If bootstrapping error bars are to be generated, this variable sets the number of bootstrap runs. Recommended for trustworthy error bars are 50 samples. The default is 0, since computing bootstrap error bars is very time consuming.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Minimal_1Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
+    <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">]],</span>
+    <span class="n">gate_set</span><span class="o">=</span><span class="s2">&quot;1QXYI&quot;</span><span class="p">,</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">rank</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">Minimal_2Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
+    <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span>
+    <span class="n">gate_set</span><span class="o">=</span><span class="s2">&quot;2QXYCZ&quot;</span><span class="p">,</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">rank</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="execute-gst-experiment-s">
+<h2>Execute GST Experiment(s)<a class="headerlink" href="#execute-gst-experiment-s" title="Link to this heading">#</a></h2>
+<p>Be prepared that the first execution on a new system will take an extra 1-2 minutes to compile the lower level optimization code.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">CompressiveGST</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">Minimal_1Q_GST</span><span class="p">)</span>
+<span class="n">benchmark</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-01-08 12:51:09,571 - iqm.benchmarks.logging_config - INFO - Now generating 50 random GST circuits...
+2025-01-08 12:51:09,790 - iqm.benchmarks.logging_config - INFO - Will transpile all 50 circuits according to fixed physical layout
+2025-01-08 12:51:09,790 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
+2025-01-08 12:51:10,779 - iqm.benchmarks.logging_config - INFO - Submitting batch with 50 circuits corresponding to qubits [0]
+2025-01-08 12:51:10,790 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
+2025-01-08 12:51:10,871 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-01-08 12:51:12,191 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 39%|███████████████████████████████▌                                                 | 39/100 [00:32&lt;00:50,  1.20it/s]
+2025-01-08 12:51:44,621 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-01-08 12:51:44,623 - iqm.benchmarks.logging_config - INFO - Final objective 7.53e-5 in time 32.43s
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="examine-the-results">
+<h2>Examine the results<a class="headerlink" href="#examine-the-results" title="Link to this heading">#</a></h2>
+<section id="high-level-results-stored-at-result-observations">
+<h3>High level results stored at result.observations<a class="headerlink" href="#high-level-results-stored-at-result-observations" title="Link to this heading">#</a></h3>
+<p>For uncertaintites on the observations set <code class="docutils literal notranslate"><span class="pre">bootstrap_samples</span></code> $\geq 10$. The high level results are stored in a list of Observations under <code class="docutils literal notranslate"><span class="pre">restult.observations</span></code>.
+To access only those observations corresponding to a specific qubit layout, one can use the identifier attribute:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">observation</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">observation</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">string_identifier</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">qubit_layout</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Avg. gate fidelity - Idle:QB1: 0.99693 +/- nan
+Diamond distance - Idle:QB1: 0.00703 +/- nan
+Unitarity - Idle:QB1: 0.98781 +/- nan
+Avg. gate fidelity - Rx(pi/2):QB1: 0.99918 +/- nan
+Diamond distance - Rx(pi/2):QB1: 0.0013 +/- nan
+Unitarity - Rx(pi/2):QB1: 0.99674 +/- nan
+Avg. gate fidelity - Ry(pi/2):QB1: 0.99509 +/- nan
+Diamond distance - Ry(pi/2):QB1: 0.01332 +/- nan
+Unitarity - Ry(pi/2):QB1: 0.98074 +/- nan
+Mean TVD: estimate - data: 0.00698 +/- nan
+Mean TVD: target - data: 0.03296 +/- nan
+POVM - diamond dist.: 0.00601 +/- nan
+State - trace dist.: 0.04366 +/- nan
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="accessing-the-final-gate-set-estimates-for-further-processing">
+<h3>Accessing the final gate set estimates for further processing<a class="headerlink" href="#accessing-the-final-gate-set-estimates-for-further-processing" title="Link to this heading">#</a></h3>
+<p>In addition to the high level observations above, the full process matrices for each gate and the full parametrizations for initial state and measurement are stored. They can be accessed under <code class="docutils literal notranslate"><span class="pre">result.dataset.attrs[f&quot;results_layout_{qubit_layout}&quot;]</span></code> as follows.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;results_layout_</span><span class="si">{</span><span class="n">qubit_layout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;raw_Kraus_operators&#39;, &#39;raw_gates&#39;, &#39;raw_POVM&#39;, &#39;raw_state&#39;, &#39;gauge_opt_gates&#39;, &#39;gauge_opt_gates_Pauli_basis&#39;, &#39;gauge_opt_POVM&#39;, &#39;gauge_opt_state&#39;, &#39;main_mGST_time&#39;, &#39;gauge_optimization_time&#39;, &#39;choi_evals&#39;, &#39;full_metrics&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Two gate sets are saved, the raw gate set and the gauge-optimized gate set.
+In most instances the gauge-optimized gate set should be used for further processing, since it gives the gate set in the reference frame in which the target gates are defined.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_gates</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;results_layout_</span><span class="si">{</span><span class="n">qubit_layout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="s2">&quot;raw_gates&quot;</span><span class="p">]</span>
+<span class="n">gauge_opt_gates</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;results_layout_</span><span class="si">{</span><span class="n">qubit_layout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="s2">&quot;gauge_opt_gates&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;raw_gates&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;gauge_opt_gates&quot;</span></code> keys in the outcome dictionary contain a 3D numpy array, where i.e. gate #1 is accessed with <code class="docutils literal notranslate"><span class="pre">raw_results[&quot;gauge_opt_state&quot;][0]</span></code>, and so on.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array_str</span><span class="p">(</span><span class="n">gauge_opt_gates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">suppress_small</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.995+0.j    -0.002-0.002j -0.002+0.002j  0.002+0.j   ]
+ [ 0.005-0.002j  0.994-0.003j  0.002-0.002j -0.005+0.004j]
+ [ 0.005+0.002j  0.002+0.002j  0.994+0.003j -0.005-0.004j]
+ [ 0.005+0.j     0.002+0.002j  0.002-0.002j  0.998+0.j   ]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plots">
+<h3>Plots<a class="headerlink" href="#plots" title="Link to this heading">#</a></h3>
+<p>The plots can be accessed in the notebook via result.plots, a dictionary containing all figure objects. These can then be diplayed as shown below, or saved to disc from the notebook.
+Currently all gauge optimized gate superoperators are shown as matrix plots in their Pauli basis representation, while the state preparation and measurement outcomes are shown as matrix plots in standard basis.
+For reference, a sinlge qubit superoperator for gate $G$ in the Pauli-basis has entries $G_{ij}$ defined via
+$$
+G(\rho) = \frac{1}{2} \sum_{i,j = 1}^4 G_{ij} P_i Tr(P_j \rho),
+$$
+where $P_i, P_j$ are Pauli matrices.</p>
+<p>In addition to gate plots, selections of gate error measures and gate parameters are also stored in figure objects.</p>
+<p>Stored plot names can be displayed and individually plotted as follows.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0]_gate_metrics&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;layout_[0]_choi_eigenvalues&#39;, &#39;layout_[0]_gate_metrics&#39;, &#39;layout_[0]_other_metrics&#39;, &#39;layout_[0]_process_matrix_0&#39;, &#39;layout_[0]_process_matrix_1&#39;, &#39;layout_[0]_process_matrix_2&#39;, &#39;layout_[0]_SPAM_matrices_real&#39;, &#39;layout_[0]_SPAM_matrices_imag&#39;]
+</pre></div>
+</div>
+<img alt="../_images/85973b8a8da2e8539b4c570bd26a3cf94b41010b39267c1e8e3108bc9f05b932.png" src="../_images/85973b8a8da2e8539b4c570bd26a3cf94b41010b39267c1e8e3108bc9f05b932.png" />
+</div>
+</div>
+<p>Alternatively, all plots (of all layouts) can be displayed via <code class="docutils literal notranslate"><span class="pre">result.plot_all()</span></code>.</p>
+</section>
+</section>
+<section id="creating-a-custom-gate-set">
+<h2>Creating a custom gate set<a class="headerlink" href="#creating-a-custom-gate-set" title="Link to this heading">#</a></h2>
+<p>In this example we define a gate set ourselves as a list of quantum circuits. The example gate set chosen here is the “XYI” gate set with the addition of $\pi$-rotations around the X- and Y-axis.
+Note that we also increased the number of random GST sequences in the GST configuration from 50 to 100 to account for the larger gate set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.circuit.library</span><span class="w"> </span><span class="kn">import</span> <span class="n">CZGate</span><span class="p">,</span> <span class="n">RGate</span>
+
+<span class="c1"># Define a list of gate instructions</span>
+<span class="n">gate_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">RGate</span><span class="p">(</span><span class="mf">1e-10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">RGate</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">RGate</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">RGate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">RGate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="c1"># Define the gate set as a list of circuits, each with one gate instruction</span>
+<span class="n">gate_set</span> <span class="o">=</span> <span class="p">[</span><span class="n">QuantumCircuit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gate_list</span><span class="p">))]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gate</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gate_list</span><span class="p">):</span>
+    <span class="n">gate_set</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="c1"># Define the gate names (to be used for indentification and in plots/tables)</span>
+<span class="n">gate_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Idle&quot;</span><span class="p">,</span> <span class="s2">&quot;Rx(pi/2)&quot;</span><span class="p">,</span> <span class="s2">&quot;Ry(pi/2)&quot;</span><span class="p">,</span> <span class="s2">&quot;Rx(pi)&quot;</span><span class="p">,</span> <span class="s2">&quot;Ry(pi)&quot;</span><span class="p">]</span>
+
+<span class="c1"># Checking the gate set for correctness</span>
+<span class="k">for</span> <span class="n">gate</span> <span class="ow">in</span> <span class="n">gate_set</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">gate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   ┌────────┐
+q: ┤ R(0,0) ├
+   └────────┘
+   ┌──────────┐
+q: ┤ R(π/2,0) ├
+   └──────────┘
+   ┌────────────┐
+q: ┤ R(π/2,π/2) ├
+   └────────────┘
+   ┌────────┐
+q: ┤ R(π,0) ├
+   └────────┘
+   ┌──────────┐
+q: ┤ R(π,π/2) ├
+   └──────────┘
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CUSTOM_1Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
+    <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">]],</span>
+    <span class="n">gate_set</span><span class="o">=</span><span class="n">gate_set</span><span class="p">,</span>
+    <span class="n">gate_labels</span> <span class="o">=</span> <span class="n">gate_labels</span><span class="p">,</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">rank</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">CompressiveGST</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">CUSTOM_1Q_GST</span><span class="p">)</span>
+<span class="n">benchmark</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-01-08 12:51:46,758 - iqm.benchmarks.logging_config - INFO - Now generating 100 random GST circuits...
+2025-01-08 12:51:46,806 - iqm.benchmarks.logging_config - INFO - Will transpile all 100 circuits according to fixed physical layout
+2025-01-08 12:51:46,806 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
+2025-01-08 12:51:47,075 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [0]
+2025-01-08 12:51:47,075 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
+2025-01-08 12:51:47,391 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-01-08 12:51:49,408 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 12%|█████████▋                                                                       | 12/100 [00:19&lt;02:22,  1.61s/it]
+2025-01-08 12:52:08,800 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-01-08 12:52:08,803 - iqm.benchmarks.logging_config - INFO - Final objective 2.42e-4 in time 19.39s
+</pre></div>
+</div>
+</div>
+</div>
+<section id="checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis">
+<h3>Checking out the process matrix corresponding to the pi rotation around the y-axis<a class="headerlink" href="#checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gauge_opt_gates</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;results_layout_</span><span class="si">{</span><span class="nb">str</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="s2">&quot;gauge_opt_gates&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array_str</span><span class="p">(</span><span class="n">gauge_opt_gates</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">suppress_small</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.011+0.j    -0.001-0.002j -0.001+0.002j  0.998+0.j   ]
+ [-0.003-0.008j -0.   -0.004j -0.989-0.001j  0.003-0.001j]
+ [-0.003+0.008j -0.989+0.001j -0.   +0.004j  0.003+0.001j]
+ [ 0.989+0.j     0.001+0.002j  0.001-0.002j  0.002+0.j   ]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="all-plots-for-the-custom-gate-set">
+<h3>All plots for the custom gate set<a class="headerlink" href="#all-plots-for-the-custom-gate-set" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/d1b965e9c8b5fc07749f1c7684339bd57ca0a9800c169ac91ea2a7ac68b64369.png" src="../_images/d1b965e9c8b5fc07749f1c7684339bd57ca0a9800c169ac91ea2a7ac68b64369.png" />
+<img alt="../_images/56d729004c20df034e43a33bd493f9c8e298609c841b87800cf5c301e029fcb1.png" src="../_images/56d729004c20df034e43a33bd493f9c8e298609c841b87800cf5c301e029fcb1.png" />
+<img alt="../_images/5867fdf371ca5a7d2dd6efbcdd71cbc35902f250c09e85982e171132a34e3dc8.png" src="../_images/5867fdf371ca5a7d2dd6efbcdd71cbc35902f250c09e85982e171132a34e3dc8.png" />
+<img alt="../_images/dc02c6e6ae2ee4e7a1ec2ad3e9dd7ca027ca5a8fe59b7f8192a751271363322d.png" src="../_images/dc02c6e6ae2ee4e7a1ec2ad3e9dd7ca027ca5a8fe59b7f8192a751271363322d.png" />
+<img alt="../_images/d94b860faf9e2f85c365d1fe46446f0a8992270785ca0bca0c43e4a00b59e3d8.png" src="../_images/d94b860faf9e2f85c365d1fe46446f0a8992270785ca0bca0c43e4a00b59e3d8.png" />
+<img alt="../_images/ed3c5716b3ee706d57efc0761a5f6c857ca1df3aa633291252d7697bf8bebfa6.png" src="../_images/ed3c5716b3ee706d57efc0761a5f6c857ca1df3aa633291252d7697bf8bebfa6.png" />
+<img alt="../_images/3d85a31dd89d74a84e813104d2caeeef849238687c09a099b2c70be12a31c3d6.png" src="../_images/3d85a31dd89d74a84e813104d2caeeef849238687c09a099b2c70be12a31c3d6.png" />
+<img alt="../_images/ce4ebb4b07dd8368a0a58e4897c0715f769acb20055ecd3e2036fde7ade85707.png" src="../_images/ce4ebb4b07dd8368a0a58e4897c0715f769acb20055ecd3e2036fde7ade85707.png" />
+<img alt="../_images/f114e5448332b4d898042c166e1baf2c7be8a9f318d34e48b089cb299cad7608.png" src="../_images/f114e5448332b4d898042c166e1baf2c7be8a9f318d34e48b089cb299cad7608.png" />
+<img alt="../_images/bcc049ab4010d634817b39e2f5796ec8959564f81544c859ba16653d3e37f913.png" src="../_images/bcc049ab4010d634817b39e2f5796ec8959564f81544c859ba16653d3e37f913.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="example_mirror_rb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Mirror Randomized Benchmarking (MRB)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="example_quantum_volume.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Quantum Volume (QV)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#minimal-gst-experiment-configurations">Minimal GST Experiment configurations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#execute-gst-experiment-s">Execute GST Experiment(s)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-the-results">Examine the results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-results-stored-at-result-observations">High level results stored at result.observations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-final-gate-set-estimates-for-further-processing">Accessing the final gate set estimates for further processing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plots">Plots</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-custom-gate-set">Creating a custom gate set</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis">Checking out the process matrix corresponding to the pi rotation around the y-axis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#all-plots-for-the-custom-gate-set">All plots for the custom gate set</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By IQM Benchmarks developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, IQM.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2025-01-20.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
