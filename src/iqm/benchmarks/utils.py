@@ -370,6 +370,9 @@ def perform_backend_transpilation(
 
     Returns:
         List[QuantumCircuit]: A list of transpiled quantum circuits.
+
+    Raises:
+        ValueError: if Star topology and label 0 is in qubit layout.
     """
 
     # Helper function considering whether optimize_sqg is done,
@@ -385,13 +388,18 @@ def perform_backend_transpilation(
         )
         if optimize_sqg:
             transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
-        if backend.name == "IQMNdonisBackend":
+        if "move" in backend.operation_names:
             transpiled = transpile_to_IQM(
                 transpiled, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
-            if backend.name == "IQMNdonisBackend":
-                transpiled = reduce_to_active_qubits(transpiled, backend.name)
+            if "move" in backend.operation_names:
+                if 0 in qubits:
+                    raise ValueError(
+                        "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
+                    )
+                backend_name = "IQMNdonisBackend"
+                transpiled = reduce_to_active_qubits(transpiled, backend_name)
                 transpiled = aux_qc.compose(transpiled, qubits=[0] + qubits, clbits=list(range(qc.num_clbits)))
             else:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
@@ -554,9 +562,17 @@ def set_coupling_map(
         ValueError: if the physical layout is not "fixed" or "batching".
     Returns:
         A coupling map according to the specified physical layout.
+
+    Raises:
+        ValueError: if Star topology and label 0 is in qubit layout.
+        ValueError: if the physical layout is not "fixed" or "batching".
     """
     if physical_layout == "fixed":
-        if backend.name == "IQMNdonisBackend":
+        if "move" in backend.operation_names:
+            if 0 in qubits:
+                raise ValueError(
+                    "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
+                )
             return backend.coupling_map.reduce(mapping=[0] + list(qubits))
         return backend.coupling_map.reduce(mapping=qubits)
     if physical_layout == "batching":

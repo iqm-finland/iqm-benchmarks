@@ -2,7 +2,9 @@
 
 from iqm.benchmarks.optimization.qscore import *
 
+
 backend = "IQMFakeAdonis"
+
 
 class TestQScore:
     def test_qscore(self):

@@ -29,6 +29,7 @@ from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common impor
 )
 from iqm.benchmarks.utils import (
     get_iqm_backend,
+    perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,
     submit_execute,
@@ -326,16 +327,22 @@ def generate_pauli_dressed_mrb_circuits(
 
         # Add measurements to transpiled - before!
         circ.measure_all()
-        circ_transpiled = transpile(
-            circ,
+        if "move" in retrieved_backend.operation_names:
+            # All-to-all coupling map on the active qubits
+            effective_coupling_map = [[x, y] for x in qubits for y in qubits if x != y]
+        else:
+            effective_coupling_map = retrieved_backend.coupling_map
+        circ_transpiled, _ = perform_backend_transpilation(
+            [circ],
             backend=retrieved_backend,
-            initial_layout=qubits,
-            optimization_level=qiskit_optim_level,
+            qubits=qubits,
+            coupling_map=effective_coupling_map,
+            qiskit_optim_level=qiskit_optim_level,
             routing_method=routing_method,
         )
 
         pauli_dressed_circuits_untranspiled.append(circ_untranspiled)
-        pauli_dressed_circuits_transpiled.append(circ_transpiled)
+        pauli_dressed_circuits_transpiled.append(circ_transpiled[0])
 
     # Store the circuit
     all_circuits.update(
