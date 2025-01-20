@@ -1,5 +1,5 @@
 IQM Benchmarks
-##########
+##############
 
 :Release: |release|
 :Date: |today|
