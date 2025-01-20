@@ -28,7 +28,7 @@ import networkx
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
 import pycurl
-from qiskit import QuantumRegister, transpile
+from qiskit import QuantumRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
@@ -58,47 +58,6 @@ from iqm.benchmarks.utils import (
 )
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
-
-
-@timeit
-def append_rms(
-    circuit: QuantumCircuit,
-    num_rms: int,
-    backend: IQMBackendBase,
-    # optimize_sqg: bool = False,
-) -> List[QuantumCircuit]:
-    """
-    Appends 1Q Clifford gates sampled uniformly at random to all qubits in the given circuit.
-    Args:
-        circuit (QuantumCircuit):
-        num_rms (int):
-        backend (Optional[IQMBackendBase]): whether Cliffords are decomposed for the given backend
-    Returns:
-        List[QuantumCircuit] of the original circuit with 1Q Clifford gates appended to it
-    """
-    rm_circuits: list[QuantumCircuit] = []
-    for _ in range(num_rms):
-        rm_circ = circuit.copy()
-        # It shouldn't matter if measurement bits get scrambled
-        rm_circ.remove_final_measurements()
-
-        active_qubits = set()
-        data = rm_circ.data
-        for instruction in data:
-            for qubit in instruction[1]:
-                active_qubits.add(rm_circ.find_bit(qubit)[0])
-
-        for q in active_qubits:
-            if backend is not None:
-                rand_clifford = random_clifford(1).to_circuit()
-            else:
-                rand_clifford = random_clifford(1).to_instruction()
-            rm_circ.compose(rand_clifford, qubits=[q], inplace=True)
-
-        rm_circ.measure_active()
-        rm_circuits.append(transpile(rm_circ, basis_gates=backend.operation_names))
-
-    return rm_circuits
 
 
 def fidelity_ghz_randomized_measurements(
@@ -257,7 +216,7 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 ideal_simulator = Aer.get_backend("statevector_simulator")
                 ideal_probabilities = []
                 idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-                all_circuits = run.circuits["transpiled_circuits"][f"{idx}_native_ghz"].circuits
+                all_circuits = run.circuits["untranspiled_circuits"][f"{idx}_rm_circuits"].circuits
                 for qc in all_circuits:
                     qc_copy = qc.copy()
                     qc_copy.remove_final_measurements()
@@ -474,9 +433,8 @@ def get_edges(
         graph: networkx.Graph
             The final weighted graph for the given calibration or coupling map
     """
-    edges_coupling = list(coupling_map.get_edges())[::2]
     edges_patch = []
-    for idx, edge in enumerate(edges_coupling):
+    for idx, edge in enumerate(coupling_map):
         if edge[0] in qubit_layout and edge[1] in qubit_layout:
             edges_patch.append([edge[0], edge[1]])
 
@@ -681,11 +639,16 @@ class GHZBenchmark(Benchmark):
             )
             final_ghz = ghz_native_transpiled
         elif routine == "tree":
+            # For star architectures, create an effective coupling map that represents all-to-all connectivity
+            if "move" in self.backend.operation_names:
+                effective_coupling_map = [[x, y] for x in qubit_layout for y in qubit_layout if x != y]
+            else:
+                effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
                 edges_cal, fidelities_cal = extract_fidelities(self.cal_url, qubit_layout)
-                graph = get_edges(self.backend.coupling_map, qubit_layout, edges_cal, fidelities_cal)
+                graph = get_edges(effective_coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
-                graph = get_edges(self.backend.coupling_map, qubit_layout)
+                graph = get_edges(effective_coupling_map, qubit_layout)
             ghz, _ = generate_ghz_spanning_tree(graph, qubit_layout, qubit_count)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled, _ = perform_backend_transpilation(
@@ -764,6 +727,60 @@ class GHZBenchmark(Benchmark):
         self.circuits["untranspiled_circuits"].circuit_groups.append(circuit_group)
         return qc_list_transpiled
 
+    @timeit
+    def append_rms(
+        self,
+        num_rms: int,
+        qubit_layout: List[int],
+    ) -> List[QuantumCircuit]:
+        """
+        Appends 1Q Clifford gates sampled uniformly at random to all qubits in the given circuit.
+        Args:
+            num_rms (int):
+                How many randomized measurement circuits are generated
+            qubit_layout List[int]:
+                The subset of system-qubits used in the protocol, indexed from 0
+        Returns:
+            List[QuantumCircuit] of the original circuit with 1Q Clifford gates appended to it
+        """
+        idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+        fixed_coupling_map = set_coupling_map(qubit_layout, self.backend, "fixed")
+        circuit = self.circuits["untranspiled_circuits"][f"{qubit_layout}_native_ghz"].circuits[0]
+        rm_circuits: list[QuantumCircuit] = []
+        for _ in range(num_rms):
+            rm_circ = circuit.copy()
+            # It shouldn't matter if measurement bits get scrambled
+            rm_circ.remove_final_measurements()
+            rm_circ.barrier()
+
+            active_qubits = set()
+            data = rm_circ.data
+            for instruction in data:
+                for qubit in instruction[1]:
+                    active_qubits.add(rm_circ.find_bit(qubit)[0])
+            for q in active_qubits:
+                if self.backend is not None:
+                    rand_clifford = random_clifford(1).to_circuit()
+                else:
+                    rand_clifford = random_clifford(1).to_instruction()
+                rm_circ.compose(rand_clifford, qubits=[q], inplace=True)
+
+            rm_circ.measure_active()
+            rm_circuits.append(rm_circ)
+
+        rm_circuits_transpiled, _ = perform_backend_transpilation(
+            rm_circuits,
+            self.backend,
+            qubit_layout,
+            fixed_coupling_map,
+            qiskit_optim_level=self.qiskit_optim_level,
+            optimize_sqg=self.optimize_sqg,
+        )
+        untranspiled_rm_group = CircuitGroup(circuits=rm_circuits, name=f"{idx}_rm_circuits")
+        self.circuits["untranspiled_circuits"].circuit_groups.append(untranspiled_rm_group)
+
+        return rm_circuits_transpiled
+
     def generate_readout_circuit(self, qubit_layout: List[int], qubit_count: int) -> CircuitGroup:
         """
         A wrapper for the creation of different circuits to estimate the fidelity
@@ -788,9 +805,7 @@ class GHZBenchmark(Benchmark):
 
         match self.fidelity_routine:
             case "randomized_measurements":
-                all_circuits_list, _ = append_rms(
-                    transpiled_ghz_group.circuits[0], cast(int, self.num_RMs), self.backend
-                )
+                all_circuits_list, _ = self.append_rms(cast(int, self.num_RMs), qubit_layout)
                 transpiled_ghz_group.circuits = all_circuits_list
             case "coherences":
                 all_circuits_list = self.generate_coherence_meas_circuits(qubit_layout, qubit_count)
@@ -847,7 +862,6 @@ class GHZBenchmark(Benchmark):
             )
 
         # Retrieve all
-        qcvv_logger.info(f"Retrieving counts and adding counts to dataset...")
         for qubit_layout in aux_custom_qubits_array:
             # for qubit_count in self.qubit_counts[idx]:
             Id = BenchmarkObservationIdentifier(qubit_layout)

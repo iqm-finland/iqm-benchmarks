@@ -4,7 +4,7 @@ Changelog
 
 Version 2.12
 ============
-* Move all example notebooks to docs. `#30 <https://github.com/iqm-finland/iqm-benchmarks/pull/30>`_
+* Added compatibility with IQM-Deneb by adapting the transpilation behavior in several benchmarks.
 
 Version 2.11
 ============
