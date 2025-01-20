@@ -833,14 +833,21 @@ class QScoreBenchmark(Benchmark):
                     qc_list.append([])
                     qcvv_logger.debug(f"This graph instance has no edges.")
                 else:
-                    # execute for a given num_node and a given instance
-                    coupling_map = self.backend.coupling_map.reduce(qubit_set)
                     qcvv_logger.setLevel(logging.WARNING)
+                    # Account for all-to-all connected backends like Deneb
+                    if "move" in self.backend.operation_names:
+                        # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
+                        active_qubit_set = qubit_set[: len(qc.qubits)]
+                        # All-to-all coupling map on the active qubits
+                        effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
+                    else:
+                        active_qubit_set = qubit_set
+                        effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
                     transpiled_qc, _ = perform_backend_transpilation(
                         [qc],
                         backend=self.backend,
-                        qubits=qubit_set,
-                        coupling_map=coupling_map,
+                        qubits=active_qubit_set,
+                        coupling_map=effective_coupling_map,
                         qiskit_optim_level=self.qiskit_optim_level,
                         optimize_sqg=self.optimize_sqg,
                         routing_method=self.routing_method,

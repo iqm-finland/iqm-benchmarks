@@ -502,8 +502,8 @@ class CLOPSBenchmark(Benchmark):
                 # Update parameters
                 parameters = self.generate_random_parameters()
 
-                # NDonis can't use optimize_sqg as is, yet -> complains about MOVE gate not being IQM native!
-                if optimize_sqg and self.backend.name != "IQMNdonisBackend":
+                # Star can't use optimize_sqg as is, yet -> complains about MOVE gate not being IQM native!
+                if optimize_sqg and "move" not in self.backend.operation_names:
                     sorted_dict_parametrized[k].append(
                         optimize_single_qubit_gates(  # Optimize SQG seems worth it AFTER assignment
                             qc.assign_parameters(

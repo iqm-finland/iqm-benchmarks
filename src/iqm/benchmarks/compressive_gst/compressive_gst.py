@@ -137,7 +137,11 @@ class CompressiveGST(Benchmark):
         raw_qc_list = qiskit_interface.get_qiskit_circuits(
             gate_circuits, self.gate_set, self.num_qubits, unmapped_qubits
         )
-
+        if "move" in self.backend.operation_names:
+            qcvv_logger.warning(
+                f"Transpilation on star-architectures currently allows move gates to transit barriers, "
+                f"leading to context-dependent gates which GST can not accurately resolve."
+            )
         for qubits in self.qubit_layouts:
             coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
 

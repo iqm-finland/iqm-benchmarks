@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.12
+============
+* Added compatibility with IQM-Deneb by adapting the transpilation behavior in several benchmarks.
+
 Version 2.11
 ============
 * Report average native single-qubit gate fidelity estimates in observations of 1Q Clifford RB and 1Q IRB, and display in plots of 1Q Clifford RB.
