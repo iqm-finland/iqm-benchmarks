@@ -32,7 +32,7 @@ version.txt
 
 /Outputs/
 /tests/Outputs/
-/examples/Outputs/*
+docs/examples/Outputs/*
 
 # Exceptions
 !logo.png
