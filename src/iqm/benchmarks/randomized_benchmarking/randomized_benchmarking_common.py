@@ -15,7 +15,7 @@
 """
 Common functions for Randomized Benchmarking-based techniques
 """
-
+from copy import deepcopy
 from importlib import import_module
 from itertools import chain
 import os
@@ -30,7 +30,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
 from qiskit import transpile
-from qiskit.quantum_info import Clifford
+from qiskit.quantum_info import Clifford, random_clifford
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -39,6 +39,9 @@ from iqm.benchmarks.utils import get_iqm_backend, marginal_distribution, submit_
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import optimize_single_qubit_gates
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
+
+
+# pylint: disable=too-many-lines
 
 
 def compute_inverse_clifford(qc_inv: QuantumCircuit, clifford_dictionary: Dict) -> Optional[QuantumCircuit]:
@@ -52,6 +55,188 @@ def compute_inverse_clifford(qc_inv: QuantumCircuit, clifford_dictionary: Dict) 
     label_inv = str(Clifford(qc_inv).adjoint().to_labels(mode="B"))
     compiled_inverse = cast(dict, clifford_dictionary)[label_inv]
     return compiled_inverse
+
+
+# pylint: disable=too-many-branches, too-many-statements
+def edge_grab(
+    qubit_set: List[int],
+    n_layers: int,
+    backend_arg: IQMBackendBase | str,
+    density_2q_gates: float = 0.25,
+    two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
+    clifford_sqg_probability=1.0,
+    sqg_gate_ensemble: Optional[Dict[str, float]] = None,
+) -> List[QuantumCircuit]:
+    """Generate a list of random layers containing single-qubit Cliffords and two-qubit gates,
+    sampled according to the edge-grab algorithm (see arXiv:2204.07568 [quant-ph]).
+
+    Args:
+        qubit_set (List[int]): The set of qubits of the backend.
+        n_layers (int): The number of layers.
+        backend_arg (IQMBackendBase | str): IQM backend.
+        density_2q_gates (float): The expected density of 2Q gates in a circuit formed by subsequent application of layers.
+                * Default is 0.25
+        two_qubit_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 2Q gates, and values being corresponding probabilities.
+                * Default is None.
+        clifford_sqg_probability (float): Probability with which to uniformly sample Clifford 1Q gates.
+                * Default is 1.0.
+        sqg_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
+                * Default is None.
+    Raises:
+        ValueError: if the probabilities in the gate ensembles do not add up to unity.
+    Returns:
+        List[QuantumCircuit]: the list of gate layers, in the form of quantum circuits.
+    """
+    # Check the ensemble of 2Q gates, otherwise assign
+    if two_qubit_gate_ensemble is None:
+        two_qubit_gate_ensemble = cast(Dict[str, float], {"CZGate": 1.0})
+    elif int(sum(two_qubit_gate_ensemble.values())) != 1:
+        raise ValueError("The 2Q gate ensemble probabilities must sum to 1.0")
+
+    # Check the ensemble of 1Q gates
+    if sqg_gate_ensemble is None:
+        if int(clifford_sqg_probability) != 1:
+            raise ValueError("If no 1Q gate ensemble is provided, clifford_sqg_probability must be 1.0.")
+            # Alternatively, a uniform set of native 1Q rotations could be provided as default with remaining probability
+            # Implement later if so wanted
+    elif int(sum(sqg_gate_ensemble.values()) + clifford_sqg_probability) != 1:
+        raise ValueError("The 1Q gate ensemble probabilities plus clifford_sqg_probability must sum to 1.0.")
+
+    # Validate 1Q gates and get native circuits
+    one_qubit_circuits = {"clifford": random_clifford(1).to_circuit()}
+    if sqg_gate_ensemble is not None:
+        for k in sqg_gate_ensemble.keys():
+            one_qubit_circuits[k] = validate_irb_gate(k, backend_arg, gate_params=None)
+
+    # Validate 2Q gates and get native circuits
+    two_qubit_circuits = {}
+    for k in two_qubit_gate_ensemble.keys():
+        two_qubit_circuits[k] = validate_irb_gate(k, backend_arg, gate_params=None)
+    # TODO: Admit parametrized 2Q gates! # pylint: disable=fixme
+
+    # Check backend and retrieve if necessary
+    if isinstance(backend_arg, str):
+        backend = get_iqm_backend(backend_arg)
+    else:
+        backend = backend_arg
+
+    # Definitions
+    num_qubits = len(qubit_set)
+    physical_to_virtual_map = {q: i for i, q in enumerate(qubit_set)}
+
+    # Get the possible edges where to place 2Q gates given the backend connectivity
+    twoq_edges = []
+    for i, q0 in enumerate(qubit_set):
+        for q1 in qubit_set[i + 1 :]:
+            if (q0, q1) in list(backend.coupling_map):
+                twoq_edges.append([q0, q1])
+    twoq_edges = list(sorted(twoq_edges))
+
+    # Generate the layers
+    layer_list = []
+    for _ in range(n_layers):
+        # Pick edges at random and store them in a new list "edge_list"
+        aux = deepcopy(twoq_edges)
+        edge_list = []
+        layer = QuantumCircuit(num_qubits)
+        # Take (and remove) edges from "aux", then add to "edge_list"
+        edge_qubits = []
+        while aux:
+            new_edge = random.choice(aux)
+            edge_list.append(new_edge)
+            edge_qubits = list(np.array(edge_list).flatten())
+            # Removes all edges which include either of the qubits in new_edge
+            aux = [e for e in aux if ((new_edge[0] not in e) and (new_edge[1] not in e))]
+
+        # Define the probability for adding 2Q gates, given the input density
+        if len(edge_list) != 0:
+            prob_2qgate = num_qubits * density_2q_gates / len(edge_list)
+        else:
+            prob_2qgate = 0
+
+        # Add gates in selected edges
+        for e in edge_list:
+            # Sample the 2Q gate
+            two_qubit_gate = random.choices(
+                list(two_qubit_gate_ensemble.keys()),
+                weights=list(two_qubit_gate_ensemble.values()),
+                k=1,
+            )[0]
+
+            # Pick whether to place the sampled 2Q gate according to the probability above
+            is_gate_placed = random.choices(
+                [True, False],
+                weights=[prob_2qgate, 1 - prob_2qgate],
+                k=1,
+            )[0]
+
+            if is_gate_placed:
+                if two_qubit_gate == "clifford":
+                    layer.compose(
+                        random_clifford(2).to_instruction(),
+                        qubits=[
+                            physical_to_virtual_map[e[0]],
+                            physical_to_virtual_map[e[1]],
+                        ],
+                        inplace=True,
+                        wrap=False,
+                    )
+                else:
+                    layer.compose(
+                        two_qubit_circuits[two_qubit_gate],
+                        qubits=[
+                            physical_to_virtual_map[e[0]],
+                            physical_to_virtual_map[e[1]],
+                        ],
+                        inplace=True,
+                        wrap=False,
+                    )
+            else:
+                # Sample a 1Q gate
+                one_qubit_gate = random.choices(
+                    list(sqg_gate_ensemble.keys()) + ["clifford"] if sqg_gate_ensemble is not None else ["clifford"],
+                    weights=(
+                        list(sqg_gate_ensemble.values()) + [clifford_sqg_probability]
+                        if sqg_gate_ensemble is not None
+                        else [clifford_sqg_probability]
+                    ),
+                    k=2,
+                )
+                layer.compose(
+                    one_qubit_circuits[one_qubit_gate[0]],
+                    qubits=[physical_to_virtual_map[e[0]]],
+                    inplace=True,
+                )
+                layer.compose(
+                    one_qubit_circuits[one_qubit_gate[1]],
+                    qubits=[physical_to_virtual_map[e[1]]],
+                    inplace=True,
+                )
+
+        # Add 1Q gates in remaining qubits
+        remaining_qubits = [q for q in qubit_set if q not in edge_qubits]
+        while remaining_qubits:
+            for q in remaining_qubits:
+                # Sample the 1Q gate
+                one_qubit_gate = random.choices(
+                    list(sqg_gate_ensemble.keys()) + ["clifford"] if sqg_gate_ensemble is not None else ["clifford"],
+                    weights=(
+                        list(sqg_gate_ensemble.values()) + [clifford_sqg_probability]
+                        if sqg_gate_ensemble is not None
+                        else [clifford_sqg_probability]
+                    ),
+                    k=1,
+                )
+                layer.compose(
+                    one_qubit_circuits[one_qubit_gate[0]],
+                    qubits=[physical_to_virtual_map[q]],
+                    inplace=True,
+                )
+                remaining_qubits.remove(q)
+
+        layer_list.append(layer)
+
+    return layer_list
 
 
 def estimate_survival_probabilities(num_qubits: int, counts: List[Dict[str, int]]) -> List[float]:

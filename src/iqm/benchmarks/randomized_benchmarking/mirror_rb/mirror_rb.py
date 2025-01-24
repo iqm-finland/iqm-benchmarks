@@ -2,10 +2,8 @@
 Mirror Randomized Benchmarking.
 """
 
-from copy import deepcopy
-import random
 from time import strftime
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
 import warnings
 
 import numpy as np
@@ -21,11 +19,11 @@ from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
+    edge_grab,
     exponential_rb,
     fit_decay_lmfit,
     lmfit_minimizer,
     plot_rb_decay,
-    validate_irb_gate,
 )
 from iqm.benchmarks.utils import (
     get_iqm_backend,
@@ -88,143 +86,6 @@ def compute_polarizations(
     return polarizations
 
 
-# TODO: Let edge_grab also admit a 1Q gate ensemble! Currently uniform Clifford by default # pylint: disable=fixme
-# pylint: disable=too-many-branches
-def edge_grab(
-    qubit_set: List[int],
-    n_layers: int,
-    backend_arg: IQMBackendBase | str,
-    density_2q_gates: float = 0.25,
-    two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
-) -> List[QuantumCircuit]:
-    """Generate a list of random layers containing single-qubit Cliffords and two-qubit gates,
-    sampled according to the edge-grab algorithm (see arXiv:2204.07568 [quant-ph]).
-
-    Args:
-        qubit_set (List[int]): The set of qubits of the backend.
-        n_layers (int): The number of layers.
-        backend_arg (IQMBackendBase | str): IQM backend.
-        density_2q_gates (float): The expected density of 2Q gates in a circuit formed by subsequent application of layers
-        two_qubit_gate_ensemble (Dict[str, float]): A dictionary with keys being str specifying 2Q gates, and values being corresponding probabilities
-    Raises:
-        ValueError: if the probabilities in the gate ensembles do not add up to unity.
-    Returns:
-        List[QuantumCircuit]: the list of gate layers, in the form of quantum circuits.
-    """
-    # Check the ensemble of 2Q gates, otherwise assign
-    if two_qubit_gate_ensemble is None:
-        two_qubit_gate_ensemble = cast(Dict[str, float], {"CZGate": 1.0})
-    elif sum(two_qubit_gate_ensemble.values()) != 1.0:
-        raise ValueError("The 2Q gate ensemble probabilities must sum to 1.0")
-
-    # Validate 2Q gates and get circuits
-    two_qubit_circuits = {}
-    for k in two_qubit_gate_ensemble.keys():
-        two_qubit_circuits[k] = validate_irb_gate(k, backend_arg, gate_params=None)
-    # TODO: Admit parametrized 2Q gates! # pylint: disable=fixme
-
-    # Check backend and retrieve if necessary
-    if isinstance(backend_arg, str):
-        backend = get_iqm_backend(backend_arg)
-    else:
-        backend = backend_arg
-
-    # Definitions
-    num_qubits = len(qubit_set)
-    physical_to_virtual_map = {q: i for i, q in enumerate(qubit_set)}
-
-    # Get the possible edges where to place 2Q gates given the backend connectivity
-    twoq_edges = []
-    for i, q0 in enumerate(qubit_set):
-        for q1 in qubit_set[i + 1 :]:
-            if (q0, q1) in list(backend.coupling_map):
-                twoq_edges.append([q0, q1])
-    twoq_edges = list(sorted(twoq_edges))
-
-    # Generate the layers
-    layer_list = []
-    for _ in range(n_layers):
-        # Pick edges at random and store them in a new list "edge_list"
-        aux = deepcopy(twoq_edges)
-        edge_list = []
-        layer = QuantumCircuit(num_qubits)
-        # Take (and remove) edges from "aux", then add to "edge_list"
-        edge_qubits = []
-        while aux:
-            new_edge = random.choice(aux)
-            edge_list.append(new_edge)
-            edge_qubits = list(np.array(edge_list).flatten())
-            # Removes all edges which include either of the qubits in new_edge
-            aux = [e for e in aux if ((new_edge[0] not in e) and (new_edge[1] not in e))]
-
-        # Define the probability for adding 2Q gates, given the input density
-        if len(edge_list) != 0:
-            prob_2qgate = num_qubits * density_2q_gates / len(edge_list)
-        else:
-            prob_2qgate = 0
-
-        # Add gates in selected edges
-        for e in edge_list:
-            # Sample the 2Q gate
-            two_qubit_gate = random.choices(
-                list(two_qubit_gate_ensemble.keys()),
-                weights=list(two_qubit_gate_ensemble.values()),
-                k=1,
-            )[0]
-
-            # Pick whether to place the sampled 2Q gate according to the probability above
-            is_gate_placed = random.choices(
-                [True, False],
-                weights=[prob_2qgate, 1 - prob_2qgate],
-                k=1,
-            )[0]
-
-            if is_gate_placed:
-                if two_qubit_gate == "clifford":
-                    layer.compose(
-                        random_clifford(2).to_instruction(),
-                        qubits=[
-                            physical_to_virtual_map[e[0]],
-                            physical_to_virtual_map[e[1]],
-                        ],
-                        inplace=True,
-                    )
-                else:
-                    layer.append(
-                        two_qubit_circuits[two_qubit_gate],
-                        [
-                            physical_to_virtual_map[e[0]],
-                            physical_to_virtual_map[e[1]],
-                        ],
-                    )
-            else:
-                layer.compose(
-                    random_clifford(1).to_instruction(),
-                    qubits=[physical_to_virtual_map[e[0]]],
-                    inplace=True,
-                )
-                layer.compose(
-                    random_clifford(1).to_instruction(),
-                    qubits=[physical_to_virtual_map[e[1]]],
-                    inplace=True,
-                )
-
-        # Add 1Q gates in remaining qubits
-        remaining_qubits = [q for q in qubit_set if q not in edge_qubits]
-        while remaining_qubits:
-            for q in remaining_qubits:
-                layer.compose(
-                    random_clifford(1).to_instruction(),
-                    qubits=[physical_to_virtual_map[q]],
-                    inplace=True,
-                )
-                remaining_qubits.remove(q)
-
-        layer_list.append(layer)
-
-    return layer_list
-
-
 def generate_pauli_dressed_mrb_circuits(
     qubits: List[int],
     pauli_samples_per_circ: int,
@@ -232,6 +93,8 @@ def generate_pauli_dressed_mrb_circuits(
     backend_arg: IQMBackendBase | str,
     density_2q_gates: float = 0.25,
     two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
+    clifford_sqg_probability=1.0,
+    sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
 ) -> Dict[str, List[QuantumCircuit]]:
@@ -244,16 +107,31 @@ def generate_pauli_dressed_mrb_circuits(
         depth (int): the depth (number of canonical layers) of the circuit
         backend_arg (IQMBackendBase | str): the backend
         density_2q_gates (float): the expected density of 2Q gates
-        two_qubit_gate_ensemble (Optional[Dict[str, float]]):
-        qiskit_optim_level (int):
-        routing_method (str):
+        two_qubit_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 2Q gates, and values being corresponding probabilities.
+                * Default is None.
+        clifford_sqg_probability (float): Probability with which to uniformly sample Clifford 1Q gates.
+                * Default is 1.0.
+        sqg_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
+                * Default is None.
+        qiskit_optim_level (int): Qiskit transpiler optimization level.
+                * Default is 1.
+        routing_method (str): Qiskit transpiler routing method.
+                * Default is "basic".
     Returns:
-
+        Dict[str, List[QuantumCircuit]]
     """
     num_qubits = len(qubits)
 
     # Sample the layers using edge grab sampler - different samplers may be conditionally chosen here in the future
-    cycle_layers = edge_grab(qubits, depth, backend_arg, density_2q_gates, two_qubit_gate_ensemble)
+    cycle_layers = edge_grab(
+        qubits,
+        depth,
+        backend_arg,
+        density_2q_gates,
+        two_qubit_gate_ensemble,
+        clifford_sqg_probability,
+        sqg_gate_ensemble,
+    )
 
     # Sample the edge (initial/final) random Single-qubit Clifford layer
     clifford_layer = [random_clifford(1) for _ in range(num_qubits)]
@@ -364,6 +242,8 @@ def generate_fixed_depth_mrb_circuits(
     backend_arg: IQMBackendBase | str,
     density_2q_gates: float = 0.25,
     two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
+    clifford_sqg_probability=1.0,
+    sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
 ) -> Dict[int, Dict[str, List[QuantumCircuit]]]:
@@ -375,10 +255,18 @@ def generate_fixed_depth_mrb_circuits(
         pauli_samples_per_circ (int): the number of pauli samples per circuit
         depth (int): the depth (number of canonical layers) of the circuits
         backend_arg (IQMBackendBase | str): the backend
-        density_2q_gates (float):
+        density_2q_gates (float): the expected density of 2Q gates
+        two_qubit_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 2Q gates, and values being corresponding probabilities.
+                * Default is None.
         two_qubit_gate_ensemble (Optional[Dict[str, float]]):
-        qiskit_optim_level (int):
-        routing_method (str):
+        clifford_sqg_probability (float): Probability with which to uniformly sample Clifford 1Q gates.
+                * Default is 1.0.
+        sqg_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
+                * Default is None.
+        qiskit_optim_level (int): Qiskit transpiler optimization level.
+                * Default is 1.
+        routing_method (str): Qiskit transpiler routing method.
+                * Default is "basic".
     Returns:
         A dictionary of lists of Pauli-dressed quantum circuits corresponding to the circuit sample index
     """
@@ -392,8 +280,10 @@ def generate_fixed_depth_mrb_circuits(
             backend_arg,
             density_2q_gates,
             two_qubit_gate_ensemble,
-            qiskit_optim_level,
-            routing_method,
+            clifford_sqg_probability,
+            sqg_gate_ensemble,
+            qiskit_optim_level=qiskit_optim_level,
+            routing_method=routing_method,
         )
 
     return circuits
