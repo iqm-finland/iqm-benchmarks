@@ -3,7 +3,7 @@ Mirror Randomized Benchmarking.
 """
 
 from time import strftime
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Literal
 import warnings
 
 import numpy as np
@@ -97,6 +97,7 @@ def generate_pauli_dressed_mrb_circuits(
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
+    simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
 ) -> Dict[str, List[QuantumCircuit]]:
     """Samples a mirror circuit and generates samples of "Pauli-dressed" circuits,
         where for each circuit, random Pauli layers are interleaved between each layer of the circuit
@@ -117,6 +118,9 @@ def generate_pauli_dressed_mrb_circuits(
                 * Default is 1.
         routing_method (str): Qiskit transpiler routing method.
                 * Default is "basic".
+        simulation_method (Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"]):
+                Qiskit's Aer simulation method
+                * Default is "automatic".
     Returns:
         Dict[str, List[QuantumCircuit]]
     """
@@ -141,8 +145,7 @@ def generate_pauli_dressed_mrb_circuits(
     pauli_dressed_circuits_untranspiled: List[QuantumCircuit] = []
     pauli_dressed_circuits_transpiled: List[QuantumCircuit] = []
 
-    sim_method = "stabilizer"
-    simulator = AerSimulator(method=sim_method)
+    simulator = AerSimulator(method=simulation_method)
 
     for _ in range(pauli_samples_per_circ):
         # Initialize the quantum circuit object
@@ -246,6 +249,7 @@ def generate_fixed_depth_mrb_circuits(
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
+    simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
 ) -> Dict[int, Dict[str, List[QuantumCircuit]]]:
     """Generates a dictionary MRB circuits at fixed depth, indexed by sample number
 
@@ -267,6 +271,9 @@ def generate_fixed_depth_mrb_circuits(
                 * Default is 1.
         routing_method (str): Qiskit transpiler routing method.
                 * Default is "basic".
+        simulation_method (Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"]):
+                            Qiskit's Aer simulation method
+                            * Default is "automatic".
     Returns:
         A dictionary of lists of Pauli-dressed quantum circuits corresponding to the circuit sample index
     """
@@ -284,6 +291,7 @@ def generate_fixed_depth_mrb_circuits(
             sqg_gate_ensemble,
             qiskit_optim_level=qiskit_optim_level,
             routing_method=routing_method,
+            simulation_method=simulation_method
         )
 
     return circuits
@@ -479,14 +487,18 @@ class MirrorRandomizedBenchmarking(Benchmark):
 
         self.qubits_array = configuration.qubits_array
         self.depths_array = configuration.depths_array
+
         self.num_circuit_samples = configuration.num_circuit_samples
         self.num_pauli_samples = configuration.num_pauli_samples
+
         self.two_qubit_gate_ensemble = configuration.two_qubit_gate_ensemble
         self.density_2q_gates = configuration.density_2q_gates
+        self.clifford_sqg_probability = configuration.clifford_sqg_probability
+        self.sqg_gate_ensemble = configuration.sqg_gate_ensemble
 
         self.qiskit_optim_level = configuration.qiskit_optim_level
 
-        self.simulator = Aer.get_backend("qasm_simulator")
+        self.simulation_method = configuration.simulation_method
 
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
@@ -602,8 +614,11 @@ class MirrorRandomizedBenchmarking(Benchmark):
                     backend,
                     self.density_2q_gates,
                     self.two_qubit_gate_ensemble,
+                    self.clifford_sqg_probability,
+                    self.sqg_gate_ensemble,
                     self.qiskit_optim_level,
                     self.routing_method,
+                    self.simulation_method
                 )
                 time_circuit_generation[str(qubits)] += elapsed_time
 
@@ -684,6 +699,13 @@ class MirrorRBConfiguration(BenchmarkConfigurationBase):
                             * Default is {"CZGate": 1.0}.
         density_2q_gates (float): The expected density of 2-qubit gates in the final circuits.
                             * Default is 0.25.
+        clifford_sqg_probability (float): Probability with which to uniformly sample Clifford 1Q gates.
+                * Default is 1.0.
+        sqg_gate_ensemble (Optional[Dict[str, float]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
+                * Default is None.
+        simulation_method (Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"]):
+                            Qiskit's Aer simulation method
+                            * Default is "automatic".
     """
 
     benchmark: Type[Benchmark] = MirrorRandomizedBenchmarking
@@ -696,3 +718,6 @@ class MirrorRBConfiguration(BenchmarkConfigurationBase):
         "CZGate": 1.0,
     }
     density_2q_gates: float = 0.25
+    clifford_sqg_probability = 1.0
+    sqg_gate_ensemble: Optional[Dict[str, float]] = None
+    simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"

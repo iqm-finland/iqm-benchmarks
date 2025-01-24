@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Mirror RB reflects the fidelity of mirror circuits
+Mirror RB estimates the average layer fidelity of ensembles of gates
 """
 
 from . import mirror_rb
