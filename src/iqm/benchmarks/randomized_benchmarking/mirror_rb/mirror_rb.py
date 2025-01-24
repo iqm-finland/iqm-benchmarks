@@ -168,7 +168,6 @@ def generate_pauli_dressed_mrb_circuits(
             )
             circ.barrier()
             circ.compose(cycle_layers[k], inplace=True)
-            circ_untransp.compose(cycle_layers[k], inplace=True)
             circ.barrier()
 
         # Apply middle Pauli
@@ -503,6 +502,10 @@ class MirrorRandomizedBenchmarking(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
 
+        # Initialize the variable to contain the circuits for each layout
+        self.untranspiled_circuits = BenchmarkCircuit("untranspiled_circuits")
+        self.transpiled_circuits = BenchmarkCircuit("transpiled_circuits")
+
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
 
@@ -567,10 +570,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
         # Submit jobs for all qubit layouts
         all_mrb_jobs: List[Dict[str, Any]] = []
         time_circuit_generation: Dict[str, float] = {}
-
-        # Initialize the variable to contain the circuits for each layout
-        self.untranspiled_circuits = BenchmarkCircuit("untranspiled_circuits")
-        self.transpiled_circuits = BenchmarkCircuit("transpiled_circuits")
 
         # The depths should be assigned to each set of qubits!
         # The real final MRB depths are twice the originally specified, must be taken into account here!
