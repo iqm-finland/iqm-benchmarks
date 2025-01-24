@@ -150,7 +150,6 @@ def generate_pauli_dressed_mrb_circuits(
     for _ in range(pauli_samples_per_circ):
         # Initialize the quantum circuit object
         circ = QuantumCircuit(num_qubits)
-        circ_untransp = QuantumCircuit(num_qubits)
         # Sample all the random Paulis
         paulis = [random_pauli(num_qubits) for _ in range(depth + 1)]
 
