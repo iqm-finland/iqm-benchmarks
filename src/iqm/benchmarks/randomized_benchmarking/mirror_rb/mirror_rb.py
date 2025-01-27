@@ -716,6 +716,6 @@ class MirrorRBConfiguration(BenchmarkConfigurationBase):
         "CZGate": 1.0,
     }
     density_2q_gates: float = 0.25
-    clifford_sqg_probability = 1.0
+    clifford_sqg_probability: float = 1.0
     sqg_gate_ensemble: Optional[Dict[str, float]] = None
     simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"

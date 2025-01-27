@@ -24,7 +24,7 @@ def generate_drb_circuits(
     backend_arg: IQMBackendBase | str,
     density_2q_gates: float = 0.25,
     two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
-    clifford_sqg_probability=1.0,
+    clifford_sqg_probability: float = 1.0,
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
@@ -57,19 +57,19 @@ def generate_drb_circuits(
     """
     num_qubits = len(qubits)
 
-    # Sample the layers using edge grab sampler - different samplers may be conditionally chosen here in the future
-    cycle_layers = edge_grab(
-        qubits,
-        depth,
-        backend_arg,
-        density_2q_gates,
-        two_qubit_gate_ensemble,
-        clifford_sqg_probability,
-        sqg_gate_ensemble,
-    )
+    # Transpile to backend - no optimize SQG should be used!
+    if isinstance(backend_arg, str):
+        retrieved_backend = get_iqm_backend(backend_arg)
+    else:
+        assert isinstance(backend_arg, IQMBackendBase)
+        retrieved_backend = backend_arg
 
-    # Sample Clifford for stabilizer preparation
-    clifford_layer = random_clifford(num_qubits)
+    # Check if backend includes MOVE gates and set coupling map
+    if "move" in retrieved_backend.operation_names:
+        # All-to-all coupling map on the active qubits
+        effective_coupling_map = [[x, y] for x in qubits for y in qubits if x != y]
+    else:
+        effective_coupling_map = retrieved_backend.coupling_map
 
     # Initialize the list of circuits
     all_circuits = {}
@@ -79,10 +79,28 @@ def generate_drb_circuits(
     simulator = AerSimulator(method=simulation_method)
 
     for _ in range(circ_samples):
+        # Sample Clifford for stabilizer preparation
+        clifford_layer = random_clifford(num_qubits)
+        # NB: The DRB paper contains a more elaborated stabilizer compilation algo.
+        # Not having it WILL be an issue here for larger num qubits !
+        # Intended usage, however, is solely for 2-qubit subroutines.
+
+        # Sample the layers using edge grab sampler - different samplers may be conditionally chosen here in the future
+        cycle_layers = edge_grab(
+            qubits,
+            depth,
+            backend_arg,
+            density_2q_gates,
+            two_qubit_gate_ensemble,
+            clifford_sqg_probability,
+            sqg_gate_ensemble,
+        )
+
         # Initialize the quantum circuit object
         circ = QuantumCircuit(num_qubits)
 
         # Add the edge Clifford
+        print("Using stabilizer circ")
         circ.compose(clifford_layer.to_instruction(), qubits=list(range(num_qubits)), inplace=True)
         circ.barrier()
 
@@ -92,14 +110,10 @@ def generate_drb_circuits(
             circ.barrier()
 
         # Add the inverse Clifford
-        circ.compose(clifford_layer.to_instruction().inverse(), qubits=list(range(num_qubits)), inplace=True)
-
-        # Transpile to backend - no optimize SQG should be used!
-        if isinstance(backend_arg, str):
-            retrieved_backend = get_iqm_backend(backend_arg)
-        else:
-            assert isinstance(backend_arg, IQMBackendBase)
-            retrieved_backend = backend_arg
+        circ.compose(transpile(Clifford(circ.to_instruction().inverse()).to_circuit(), AerSimulator(method="stabilizer")), qubits=list(range(num_qubits)), inplace=True)
+        # Similarly, here the DRB paper contains a stabilizer measurement, determined in a more elaborated way.
+        # Would need to modify this for larger num qubits ! Stabilizer measurement should effectively render the circuit to a Pauli gate.
+        # Here, for 2-qubit subroutines, it *should* suffice (in principle) to compile the inverse.
 
         circ_untransp = circ.copy()
         # Add measurements to untranspiled - after!
@@ -108,11 +122,7 @@ def generate_drb_circuits(
 
         # Add measurements to transpiled - before!
         circ.measure_all()
-        if "move" in retrieved_backend.operation_names:
-            # All-to-all coupling map on the active qubits
-            effective_coupling_map = [[x, y] for x in qubits for y in qubits if x != y]
-        else:
-            effective_coupling_map = retrieved_backend.coupling_map
+
         circ_transpiled, _ = perform_backend_transpilation(
             [circ],
             backend=retrieved_backend,
@@ -134,6 +144,7 @@ def generate_drb_circuits(
     )
 
     return all_circuits
+
 
 
 class DirectRandomizedBenchmarking(Benchmark):
@@ -381,7 +392,7 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     qiskit_optim_level: int = 1
     two_qubit_gate_ensemble: Dict[str, float] = None
     density_2q_gates: float = 0.25
-    clifford_sqg_probability = 1.0
+    clifford_sqg_probability: float = 1.0
     sqg_gate_ensemble: Optional[Dict[str, float]] = None
     simulation_method: Literal[
         "automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
