@@ -16,7 +16,7 @@ Contents
 
    readme
    examples/examples
-   devices
+   devices/devices
    development/development
    API
    license
