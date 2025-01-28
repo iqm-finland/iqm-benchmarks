@@ -100,7 +100,6 @@ def generate_drb_circuits(
         circ = QuantumCircuit(num_qubits)
 
         # Add the edge Clifford
-        print("Using stabilizer circ")
         circ.compose(clifford_layer.to_instruction(), qubits=list(range(num_qubits)), inplace=True)
         circ.barrier()
 
@@ -110,14 +109,16 @@ def generate_drb_circuits(
             circ.barrier()
 
         # Add the inverse Clifford
-        circ.compose(transpile(Clifford(circ.to_instruction().inverse()).to_circuit(), AerSimulator(method="stabilizer")), qubits=list(range(num_qubits)), inplace=True)
+        circ.compose(Clifford(circ.to_instruction().inverse()).to_instruction(), qubits=list(range(num_qubits)), inplace=True)
         # Similarly, here the DRB paper contains a stabilizer measurement, determined in a more elaborated way.
         # Would need to modify this for larger num qubits ! Stabilizer measurement should effectively render the circuit to a Pauli gate.
         # Here, for 2-qubit subroutines, it *should* suffice (in principle) to compile the inverse.
 
         circ_untransp = circ.copy()
         # Add measurements to untranspiled - after!
-        circ_untranspiled = transpile(Clifford(circ_untransp).to_circuit(), simulator)
+        # THIS LINE IS ONLY NEEDED IF STABILIZER MEASUREMENT IS NOT TAKEN TO IDENTITY
+        # circ_untranspiled = transpile(Clifford(circ_untransp).to_circuit(), simulator)
+        circ_untranspiled = circ_untransp
         circ_untranspiled.measure_all()
 
         # Add measurements to transpiled - before!
@@ -352,9 +353,10 @@ class DirectRandomizedBenchmarking(Benchmark):
 
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
-        qcvv_logger.info(f"MRB experiment execution concluded !")
+        qcvv_logger.info(f"DRB experiment execution concluded !")
 
         return dataset
+
 
 class DirectRBConfiguration(BenchmarkConfigurationBase):
     """Direct RB configuration
@@ -396,3 +398,4 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     sqg_gate_ensemble: Optional[Dict[str, float]] = None
     simulation_method: Literal[
         "automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
+
