@@ -16,9 +16,9 @@
 GHZ state benchmark
 """
 
-from io import BytesIO
 from itertools import chain
-import json
+import requests
+import os
 from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
 
@@ -27,7 +27,6 @@ import matplotlib.pyplot as plt
 import networkx
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
-import pycurl
 from qiskit import QuantumRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
@@ -58,6 +57,9 @@ from iqm.benchmarks.utils import (
 )
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
+from iqm.iqm_client.models import CircuitCompilationOptions
+from iqm.iqm_client.models import DDMode
+
 
 
 def fidelity_ghz_randomized_measurements(
@@ -384,29 +386,20 @@ def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List
         list_fids: List[float]
             A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
     """
-
-    byteobj = BytesIO()  # buffer creation
-    curlobj = pycurl.Curl()  # pylint: disable=c-extension-no-member
-    curlobj.setopt(curlobj.URL, f"{cal_url}")  # type: ignore
-    curlobj.setopt(curlobj.WRITEDATA, byteobj)  # type: ignore
-    curlobj.perform()  # perform file transfer
-    curlobj.close()  # end of session
-    body = byteobj.getvalue()
-    res = json.loads(body.decode())
-
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(qubit_layout)}
+    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
+    r = requests.get(cal_url, headers=headers, timeout=60)
+    calibration = r.json()
     list_couplings = []
     list_fids = []
-    for key in res["metrics"]:
-        if "irb.cz" in key:
-            idx_1 = key.index(".QB")
-            idx_2 = key.index("__QB")
-            idx_3 = key.index(".fidelity")
-            qb1 = int(key[idx_1 + 3 : idx_2]) - 1
-            qb2 = int(key[idx_2 + 4 : idx_3]) - 1
-            if all([qb1 in qubit_layout, qb2 in qubit_layout]):
-                list_couplings.append([qubit_mapping[qb1], qubit_mapping[qb2]])
-                list_fids.append(float(res["metrics"][key]["value"]))
+    for item in calibration["calibrations"][0]["metrics"][0]["metrics"]:
+        qb1 = int(item["locus"][0][2:]) - 1
+        qb2 = int(item["locus"][1][2:]) - 1
+        if all([qb1 in qubit_layout, qb2 in qubit_layout]):
+            list_couplings.append([qb1, qb2])
+            list_fids.append(float(item["value"]))
+    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
+    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
     return list_couplings, list_fids
 
 
@@ -604,6 +597,7 @@ class GHZBenchmark(Benchmark):
         self.cal_url = configuration.cal_url
         self.timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
+        self.use_DD = configuration.use_DD
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> CircuitGroup:
         """
@@ -838,6 +832,10 @@ class GHZBenchmark(Benchmark):
         """
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
         aux_custom_qubits_array = cast(List[List[int]], self.custom_qubits_array).copy()
+        if self.use_DD:
+            circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.ENABLED)
+        else:
+            circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.DISABLED)
         dataset = xr.Dataset()
 
         # Submit all
@@ -859,6 +857,7 @@ class GHZBenchmark(Benchmark):
                 self.shots,
                 self.calset_id,
                 max_gates_per_batch=self.max_gates_per_batch,
+                circuit_compilation_options=circuit_compilation_options,
             )
 
         # Retrieve all
@@ -937,3 +936,4 @@ class GHZConfiguration(BenchmarkConfigurationBase):
     rem: bool = True
     mit_shots: int = 1_000
     cal_url: Optional[str] = None
+    use_DD: bool = False
