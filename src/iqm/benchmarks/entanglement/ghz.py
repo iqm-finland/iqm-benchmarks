@@ -677,6 +677,19 @@ class GHZBenchmark(Benchmark):
                 optimize_sqg=self.optimize_sqg,
             )
             final_ghz = ghz_native_transpiled
+        elif routine == "star":
+            ghz: QuantumCircuit = generate_ghz_star(qubit_count)
+            circuit_group.add_circuit(ghz)
+            ghz_native_transpiled, _ = perform_backend_transpilation(
+                [ghz],
+                self.backend,
+                qubit_layout,
+                fixed_coupling_map,
+                qiskit_optim_level=self.qiskit_optim_level,
+                optimize_sqg=self.optimize_sqg,
+            )
+            final_ghz = ghz_native_transpiled
+
         else:
             ghz_log = [generate_ghz_log_cruz(qubit_count), generate_ghz_log_mooney(qubit_count)]
             ghz_native_transpiled, _ = perform_backend_transpilation(
