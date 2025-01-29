@@ -304,6 +304,23 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
     qc.measure_all()
     return qc
 
+def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
+    """
+    Generates a GHZ state my maximizing the number of CZs between MOVE gates.
+    Args:
+        num_qubits: the number of qubits of the GHZ state
+
+    Returns:
+        A quantum circuit generating a GHZ state of n qubits
+    """
+    quantum_register = QuantumRegister(num_qubits)
+    qc = QuantumCircuit(quantum_register, name="GHZ_star")
+    qc.h(0)
+    for i in range(num_qubits - 1):
+        qc.cx(0, i + 1)
+    qc.measure_all()
+    return qc
+
 
 def generate_ghz_log_mooney(num_qubits: int) -> QuantumCircuit:
     """
