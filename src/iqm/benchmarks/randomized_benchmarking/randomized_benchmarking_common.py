@@ -399,13 +399,13 @@ def generate_fixed_depth_parallel_rb_circuits(
     """Generates parallel RB circuits, before and after transpilation, at fixed depth
 
     Args:
-        qubits_array (List[List[int]]): the qubits entering the quantum circuits
-        cliffords_1q (Dict[str, QuantumCircuit]): dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates
-        cliffords_2q (Dict[str, QuantumCircuit]): dictionary of 2-qubit Cliffords in terms of IQM-native r and CZ gates
-        sequence_length (int): the number of random Cliffords in the circuits
-        num_samples (int): the number of circuit samples
-        backend_arg (IQMBackendBase | str): the backend to transpile the circuits to
-        interleaved_gate (Optional[QuantumCircuit]): whether the circuits should have interleaved gates
+        qubits_array (List[List[int]]): the qubits entering the quantum circuits.
+        cliffords_1q (Dict[str, QuantumCircuit]): dictionary of 1-qubit Cliffords in terms of IQM-native r gates.
+        cliffords_2q (Dict[str, QuantumCircuit]): dictionary of 2-qubit Cliffords in terms of IQM-native r and CZ gates.
+        sequence_length (int): the number of random Cliffords in the circuits.
+        num_samples (int): the number of circuit samples.
+        backend_arg (IQMBackendBase | str): the backend to transpile the circuits to.
+        interleaved_gate (Optional[QuantumCircuit]): whether the circuits should have interleaved gates.
     Returns:
         A list of QuantumCircuits of given RB sequence length for parallel RB
     """
