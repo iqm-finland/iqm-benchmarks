@@ -3,7 +3,7 @@ Mirror Randomized Benchmarking.
 """
 
 from time import strftime
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Literal
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
 import warnings
 
 import numpy as np
@@ -97,7 +97,9 @@ def generate_pauli_dressed_mrb_circuits(
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
-    simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
+    simulation_method: Literal[
+        "automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"
+    ] = "automatic",
 ) -> Dict[str, List[QuantumCircuit]]:
     """Samples a mirror circuit and generates samples of "Pauli-dressed" circuits,
         where for each circuit, random Pauli layers are interleaved between each layer of the circuit
@@ -247,7 +249,9 @@ def generate_fixed_depth_mrb_circuits(
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
     routing_method: str = "basic",
-    simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
+    simulation_method: Literal[
+        "automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"
+    ] = "automatic",
 ) -> Dict[int, Dict[str, List[QuantumCircuit]]]:
     """Generates a dictionary MRB circuits at fixed depth, indexed by sample number
 
@@ -289,7 +293,7 @@ def generate_fixed_depth_mrb_circuits(
             sqg_gate_ensemble,
             qiskit_optim_level=qiskit_optim_level,
             routing_method=routing_method,
-            simulation_method=simulation_method
+            simulation_method=simulation_method,
         )
 
     return circuits
@@ -616,7 +620,7 @@ class MirrorRandomizedBenchmarking(Benchmark):
                     self.sqg_gate_ensemble,
                     self.qiskit_optim_level,
                     self.routing_method,
-                    self.simulation_method
+                    self.simulation_method,
                 )
                 time_circuit_generation[str(qubits)] += elapsed_time
 
@@ -643,7 +647,6 @@ class MirrorRandomizedBenchmarking(Benchmark):
             dataset.attrs[qubits_idx] = {"qubits": qubits}
 
         # Retrieve counts of jobs for all qubit layouts
-        all_job_metadata = {}
         for job_dict in all_mrb_jobs:
             qubits = job_dict["qubits"]
             depth = job_dict["depth"]
@@ -718,4 +721,6 @@ class MirrorRBConfiguration(BenchmarkConfigurationBase):
     density_2q_gates: float = 0.25
     clifford_sqg_probability: float = 1.0
     sqg_gate_ensemble: Optional[Dict[str, float]] = None
-    simulation_method: Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"] = "automatic"
+    simulation_method: Literal[
+        "automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"
+    ] = "automatic"
