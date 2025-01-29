@@ -2,7 +2,7 @@ from time import strftime
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
 import warnings
 
-from qiskit import QuantumCircuit, transpile
+from qiskit import QuantumCircuit, transpile, ClassicalRegister
 from qiskit.quantum_info import Clifford, random_clifford
 from qiskit_aer import AerSimulator
 import xarray as xr
@@ -11,13 +11,18 @@ from iqm.benchmarks import Benchmark, BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import edge_grab
+from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
+    edge_grab,
+    relabel_qubits_array_from_zero,
+)
 from iqm.benchmarks.utils import (
     get_iqm_backend,
     perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,
-    submit_execute, timeit,
+    set_coupling_map,
+    submit_execute,
+    timeit,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -32,7 +37,7 @@ def generate_drb_circuits(
     clifford_sqg_probability: float = 1.0,
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
     qiskit_optim_level: int = 1,
-    routing_method: str = "basic",
+    routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates lists of samples of Direct RB circuits, of structure:
        Stabilizer preparation - Layers of canonical randomly sampled gates - Stabilizer measurement
@@ -51,7 +56,7 @@ def generate_drb_circuits(
                 * Default is None.
         qiskit_optim_level (int): Qiskit transpiler optimization level.
                 * Default is 1.
-        routing_method (str): Qiskit transpiler routing method.
+        routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): Qiskit transpiler routing method.
                 * Default is "basic".
     Returns:
         Dict[str, List[QuantumCircuit]]: a dictionary with keys "transpiled", "untranspiled" and values a list of respective DRB circuits.
@@ -128,17 +133,17 @@ def generate_drb_circuits(
         # Add measurements to transpiled - before!
         circ.measure_all()
 
-        circ_transpiled, _ = perform_backend_transpilation(
-            [circ],
+        circ_transpiled = transpile(
+            circ,
             backend=retrieved_backend,
-            qubits=qubits,
             coupling_map=effective_coupling_map,
-            qiskit_optim_level=qiskit_optim_level,
+            optimization_level=qiskit_optim_level,
+            initial_layout=qubits,
             routing_method=routing_method,
         )
 
         drb_circuits_untranspiled.append(circ_untranspiled)
-        drb_circuits_transpiled.append(circ_transpiled[0])
+        drb_circuits_transpiled.append(circ_transpiled)
 
     # Store the circuits
     all_circuits.update(
@@ -152,21 +157,84 @@ def generate_drb_circuits(
 
 
 @timeit
-def generate_fixed_depth_parallel_drb_circuits(qubits_array,
-                    depth,
-                    num_circuit_samples,
-                    backend,
-                ) -> Dict[str, List[QuantumCircuit]]:
+def generate_fixed_depth_parallel_drb_circuits(
+    qubits_array: Sequence[Sequence[int]],
+    depth: int,
+    num_circuit_samples: int,
+    backend_arg: str | IQMBackendBase,
+    assigned_density_2q_gates: Dict[str, float],
+    assigned_two_qubit_gate_ensembles: Dict[str, Dict[str, float]],
+    assigned_clifford_sqg_probabilities: Dict[str, float],
+    assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
+    qiskit_optim_level: int = 1,
+    routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
+) -> Dict[str, List[QuantumCircuit]]:
     """
     Args:
-    :param qubits_array:
-    :param depth:
-    :param num_circuit_samples:
-    :param backend:
-
+        qubits_array (Sequence[Sequence[int]]): The array of physical qubit layouts on which to generate parallel DRB circuits.
+        depth (int): The depth (number of canonical DRB layers) of the circuits.
+        num_circuit_samples (int): The number of DRB circuits to generate.
+        backend_arg (str | IQMBackendBase): The backend on which to generate the circuits.
+        assigned_density_2q_gates (Dict[str, float]): The expected densities of 2-qubit gates in the final circuits per qubit layout.
+        assigned_two_qubit_gate_ensembles (Dict[str, Dict[str, float]]): The two-qubit gate ensembles to use in the random DRB circuits per qubit layout.
+        assigned_clifford_sqg_probabilities (Dict[str, float]): Probability with which to uniformly sample Clifford 1Q gates per qubit layout.
+        assigned_sqg_gate_ensembles (Dict[str, Dict[str, float]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities per qubit layout.
+        qiskit_optim_level (int): Qiskit transpiler optimization level.
+                        * Defaults to 1.
+        routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): Qiskit transpiler routing method.
+                        * Default is "basic".
     Returns:
+        Tuple[List[QuantumCircuit]]: A tuple of untranspiled and transpiled lists of DRB circuits.
     """
+    if isinstance(backend_arg, str):
+        backend = get_iqm_backend(backend_arg)
+    else:
+        backend = backend_arg
 
+    # Identify total amount of qubits
+    qubit_counts = [len(x) for x in qubits_array]
+
+    # Shuffle qubits_array: we don't want unnecessary qubit registers
+    shuffled_qubits_array = relabel_qubits_array_from_zero(qubits_array)
+    # The total amount of qubits the circuits will have
+    n_qubits = sum(qubit_counts)
+
+    # Generate the circuit samples
+    qc = QuantumCircuit(n_qubits)
+    circuits_list: List[QuantumCircuit] = [qc.copy() for _ in range(num_circuit_samples)]
+
+    # Generate all transpiled
+    for q_idx, qubits in enumerate(shuffled_qubits_array):
+        original_qubits = str(qubits_array[q_idx])
+        qcvv_logger.info(f"Depth {depth} - Generating all circuits")
+        drb_circuits = generate_drb_circuits(
+            qubits,
+            depth=depth,
+            circ_samples=num_circuit_samples,
+            backend_arg=backend,
+            density_2q_gates=assigned_density_2q_gates[original_qubits],
+            two_qubit_gate_ensemble=assigned_two_qubit_gate_ensembles[original_qubits],
+            clifford_sqg_probability=assigned_clifford_sqg_probabilities[original_qubits],
+            sqg_gate_ensemble=assigned_sqg_gate_ensembles[original_qubits],
+            qiskit_optim_level=qiskit_optim_level,
+            routing_method=routing_method,
+        )
+
+        for idx, drb_circuit in enumerate(drb_circuits["untranspiled"]):
+            circuits_list[idx].add_register(ClassicalRegister(len(qubits), original_qubits))
+            circuits_list[idx].compose(drb_circuit, qubits=qubits, clbits=ClassicalRegister(len(qubits), original_qubits), inplace=True)
+
+    # Transpile
+    circuits_transpiled_list, _ = perform_backend_transpilation(
+        circuits_list,
+        backend=backend,
+        qubits=[x for y in qubits_array for x in y],
+        coupling_map=backend.coupling_map,
+        qiskit_optim_level=qiskit_optim_level,
+        routing_method=routing_method,
+    )
+
+    return circuits_list, circuits_transpiled_list
 
 
 class DirectRandomizedBenchmarking(Benchmark):
@@ -430,7 +498,7 @@ class DirectRandomizedBenchmarking(Benchmark):
             qubit_idx = {str(self.qubits_array): "parallel_all"}
             dataset.attrs["parallel_all"] = {"qubits": self.qubits_array}
             dataset.attrs.update({q_idx: {"qubits": q} for q_idx, q in enumerate(self.qubits_array)})
-        else: # if sequential
+        else:  # if sequential
             for qubits_idx, qubits in enumerate(self.qubits_array):
                 qubit_idx[str(qubits)] = qubits_idx
 
