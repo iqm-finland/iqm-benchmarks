@@ -617,7 +617,7 @@ def relabel_qubits_array_from_zero(arr: List[List[int]]) -> List[List[int]]:
 
 def submit_parallel_rb_job(
     backend_arg: IQMBackendBase,
-    qubits_array: List[List[int]],
+    qubits_array: Sequence[Sequence[int]],
     depth: int,
     sorted_transpiled_circuit_dicts: Dict[Tuple[int, ...], List[QuantumCircuit]],
     shots: int,
@@ -627,7 +627,7 @@ def submit_parallel_rb_job(
     """Submit fixed-depth parallel MRB jobs for execution in the specified IQMBackend
     Args:
         backend_arg (IQMBackendBase): the IQM backend to submit the job
-        qubits_array (List[int]): the qubits to identify the submitted job
+        qubits_array (Sequence[Sequence[int]]): the qubits to identify the submitted job
         depth (int): the depth (number of canonical layers) of the circuits to identify the submitted job
         sorted_transpiled_circuit_dicts (Dict[Tuple[int,...], List[QuantumCircuit]]): A dictionary containing all MRB circuits
         shots (int): the number of shots to submit the job

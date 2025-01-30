@@ -2,7 +2,7 @@ from time import strftime
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
 import warnings
 
-from qiskit import QuantumCircuit, transpile, ClassicalRegister
+from qiskit import ClassicalRegister, QuantumCircuit, transpile
 from qiskit.quantum_info import Clifford, random_clifford
 from qiskit_aer import AerSimulator
 import xarray as xr
@@ -13,7 +13,7 @@ from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     edge_grab,
-    relabel_qubits_array_from_zero,
+    relabel_qubits_array_from_zero, submit_parallel_rb_job,
 )
 from iqm.benchmarks.utils import (
     get_iqm_backend,
@@ -222,7 +222,9 @@ def generate_fixed_depth_parallel_drb_circuits(
 
         for idx, drb_circuit in enumerate(drb_circuits["untranspiled"]):
             circuits_list[idx].add_register(ClassicalRegister(len(qubits), original_qubits))
-            circuits_list[idx].compose(drb_circuit, qubits=qubits, clbits=ClassicalRegister(len(qubits), original_qubits), inplace=True)
+            circuits_list[idx].compose(
+                drb_circuit, qubits=qubits, clbits=ClassicalRegister(len(qubits), original_qubits), inplace=True
+            )
 
     # Transpile
     circuits_transpiled_list, _ = perform_backend_transpilation(
@@ -470,7 +472,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                 # Submit all
                 flat_qubits_array = [x for y in self.qubits_array for x in y]
                 sorted_transpiled_qc_list = {tuple(flat_qubits_array): parallel_transpiled_rb_circuits[depth]}
-                all_rb_jobs.append(
+                all_drb_jobs.append(
                     submit_parallel_rb_job(
                         backend,
                         self.qubits_array,
