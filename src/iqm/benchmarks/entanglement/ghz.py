@@ -304,6 +304,7 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
     qc.measure_all()
     return qc
 
+
 def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
     """
     Generates a GHZ state my maximizing the number of CZs between MOVE gates.
