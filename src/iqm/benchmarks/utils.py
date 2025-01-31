@@ -31,6 +31,7 @@ from qiskit.transpiler import CouplingMap
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
@@ -39,7 +40,6 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
 from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
-from iqm.iqm_client.models import CircuitCompilationOptions
 
 
 def timeit(f):
@@ -494,7 +494,12 @@ def submit_execute(
                 qcvv_logger.info(
                     f"max_gates_per_batch restriction: submitting subbatch #{index+1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
                 )
-                batch_jobs = backend.run(qc_batch, shots=shots, calibration_set_id=calset_id, circuit_compilation_options=circuit_compilation_options)
+                batch_jobs = backend.run(
+                    qc_batch,
+                    shots=shots,
+                    calibration_set_id=calset_id,
+                    circuit_compilation_options=circuit_compilation_options,
+                )
                 final_batch_jobs.append(batch_jobs)
             final_jobs.extend(final_batch_jobs)
 

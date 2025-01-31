@@ -104,44 +104,8 @@ def contract(X, j_vec):
     return res
 
 
-@njit(cache=True, fastmath=True)
-def objf(X, E, rho, J, y):
-    """Calculate the objective function value for matrices, POVM elements, and target values.
-
-    This function computes the objective function value based on input matrices X, POVM elements E,
-    density matrix rho, and target values y.
-
-    Parameters
-    ----------
-    X : numpy.ndarray
-        A 3D array containing the input matrices, of shape (n_matrices, n_rows, n_columns).
-    E : numpy.ndarray
-        A 2D array representing the POVM elements, of shape (n_povm, r).
-    rho : numpy.ndarray
-        A 1D array representing the density matrix.
-    J : numpy.ndarray
-        A 2D array representing the indices for which the objective function will be evaluated.
-    y : numpy.ndarray
-        A 2D array of shape (n_povm, len(J)) containing the target values.
-
-    Returns
-    -------
-    float
-        The objective function value for the given set of matrices, POVM elements,
-        and target values, normalized by m and n_povm.
-    """
-    m = len(J)
-    n_povm = y.shape[0]
-    objf_ = 0
-    for i in prange(m):  # pylint: disable=not-an-iterable
-        j = J[i][J[i] >= 0]
-        C = contract(X, j)
-        for o in range(n_povm):
-            objf_ += abs(E[o].conj() @ C @ rho - y[o, i]) ** 2
-    return objf_ / m / n_povm
-
 @njit(cache=True, fastmath=True, parallel=True)
-def objf_opt(X, E, rho, J, y):
+def objf(X, E, rho, J, y):
     """Calculate the objective function value for matrices, POVM elements, and target values.
 
     This function computes the objective function value based on input matrices X, POVM elements E,
@@ -173,7 +137,7 @@ def objf_opt(X, E, rho, J, y):
         j = J[i][J[i] >= 0]
         state = rho
         for ind in j[::-1]:
-            state = X[ind]@state
+            state = X[ind] @ state
         for o in range(n_povm):
             objf_ += abs(E[o].conj() @ state - y[o, i]) ** 2
     return objf_ / m / n_povm

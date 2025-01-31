@@ -142,22 +142,46 @@ class CompressiveGST(Benchmark):
                 f"Transpilation on star-architectures currently allows move gates to transit barriers, "
                 f"leading to context-dependent gates which GST can not accurately resolve."
             )
-        for qubits in self.qubit_layouts:
-            coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
 
-            # Perform transpilation to backend
-            qcvv_logger.info(
-                f"Will transpile all {self.configuration.num_circuits} circuits according to fixed physical layout"
-            )
+        # Perform transpilation to backend
+        qcvv_logger.info(
+            f"Will transpile all {self.configuration.num_circuits} circuits according to fixed physical layout"
+        )
+        if self.configuration.parallel:
+            all_qubits = [qubit for layout in self.qubit_layouts for qubit in layout]
+            if len(all_qubits) != len(set(all_qubits)):
+                raise ValueError(
+                    "Qubit layouts can't overlap when parallel execution is enabled, please choose non-overlapping layouts."
+                )
+            raw_qc_list_parallel = []
+            for circ in raw_qc_list:
+                circ_parallel = QuantumCircuit(self.backend.num_qubits, len(set(all_qubits)))
+                clbits = np.arange(self.num_qubits)
+                for qubit_layout in self.qubit_layouts:
+                    circ_parallel.compose(circ, qubits=qubit_layout, clbits=clbits, inplace=True)
+                    clbits += self.num_qubits
+                raw_qc_list_parallel.append(circ_parallel)
             transpiled_qc_list, _ = perform_backend_transpilation(
-                raw_qc_list,
+                raw_qc_list_parallel,
                 self.backend,
-                qubits,
-                coupling_map=coupling_map,
+                qubits=np.arange(self.backend.num_qubits),
+                coupling_map=self.backend.coupling_map,
                 qiskit_optim_level=0,
                 optimize_sqg=False,
                 drop_final_rz=False,
             )
+        for qubits in self.qubit_layouts:
+            if not self.configuration.parallel:
+                coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
+                transpiled_qc_list, _ = perform_backend_transpilation(
+                    raw_qc_list,
+                    self.backend,
+                    qubits,
+                    coupling_map=coupling_map,
+                    qiskit_optim_level=0,
+                    optimize_sqg=False,
+                    drop_final_rz=False,
+                )
             # Saving raw and transpiled circuits in a consistent format with other benchmarks
             self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
             self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
@@ -196,21 +220,37 @@ class CompressiveGST(Benchmark):
         self.generate_meas_circuits()
 
         # Submit all
-        all_jobs: Dict = {}
-        for qubit_layout in self.qubit_layouts:
-            transpiled_circuit_dict = {tuple(qubit_layout): self.transpiled_circuits[str(qubit_layout)].circuits}
-            all_jobs[str(qubit_layout)], _ = submit_execute(
+        if self.configuration.parallel:
+            transpiled_circuit_dict = {
+                tuple(range(self.backend.num_qubits)): self.transpiled_circuits[str(self.qubit_layouts[0])].circuits
+            }
+            all_jobs, _ = submit_execute(
                 transpiled_circuit_dict,
                 backend,
                 self.configuration.shots,
                 self.calset_id,
                 max_gates_per_batch=self.configuration.max_gates_per_batch,
             )
-        # Retrieve all
-        qcvv_logger.info(f"Now executing the corresponding circuit batch")
-        for qubit_layout in self.qubit_layouts:
-            counts, _ = retrieve_all_counts(all_jobs[str(qubit_layout)])
-            dataset, _ = add_counts_to_dataset(counts, str(qubit_layout), dataset)
+            # Retrieve
+            qcvv_logger.info(f"Now executing the corresponding circuit batch")
+            counts, _ = retrieve_all_counts(all_jobs)
+            dataset, _ = add_counts_to_dataset(counts, f"parallel_results", dataset)
+        else:
+            all_jobs: Dict = {}
+            for qubit_layout in self.qubit_layouts:
+                transpiled_circuit_dict = {tuple(qubit_layout): self.transpiled_circuits[str(qubit_layout)].circuits}
+                all_jobs[str(qubit_layout)], _ = submit_execute(
+                    transpiled_circuit_dict,
+                    backend,
+                    self.configuration.shots,
+                    self.calset_id,
+                    max_gates_per_batch=self.configuration.max_gates_per_batch,
+                )
+            # Retrieve all
+            qcvv_logger.info(f"Now executing the corresponding circuit batch")
+            for qubit_layout in self.qubit_layouts:
+                counts, _ = retrieve_all_counts(all_jobs[str(qubit_layout)])
+                dataset, _ = add_counts_to_dataset(counts, str(qubit_layout), dataset)
 
         self.add_configuration_to_dataset(dataset)
         self.circuits.benchmark_circuits = [self.transpiled_circuits, self.untranspiled_circuits]
@@ -270,6 +310,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
             * Default: "auto"
         bootstrap_samples (int): The number of times the optimization algorithm is repeated on fake data to estimate
             the uncertainty via bootstrapping.
+        parallel (bool): Whether to run the circuits for all layouts in parallel on the backend.
     """
 
     benchmark: Type[Benchmark] = CompressiveGST
@@ -288,6 +329,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
     testing: bool = False
+    parallel: bool = False
 
 
 def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List[int]]:

@@ -17,7 +17,6 @@ GHZ state benchmark
 """
 
 from itertools import chain
-import requests
 import os
 from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
@@ -31,6 +30,7 @@ from qiskit import QuantumRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
+import requests
 from scipy.spatial.distance import hamming
 import xarray as xr
 
@@ -55,11 +55,9 @@ from iqm.benchmarks.utils import (
     timeit,
     xrvariable_to_counts,
 )
+from iqm.iqm_client.models import CircuitCompilationOptions, DDMode
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
-from iqm.iqm_client.models import CircuitCompilationOptions
-from iqm.iqm_client.models import DDMode
-
 
 
 def fidelity_ghz_randomized_measurements(

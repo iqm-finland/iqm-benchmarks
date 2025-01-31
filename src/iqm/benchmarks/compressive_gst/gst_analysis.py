@@ -621,15 +621,24 @@ def dataset_counts_to_mgst_format(dataset: xr.Dataset, qubit_layout: List[int]) 
     num_povm = dataset.attrs["num_povm"]
     y_list = []
     for run_index in range(dataset.attrs["num_circuits"]):
-        # result = dataset[f"{qubit_layout}_counts_{run_index}"].to_dict()
-        result = dataset[f"{qubit_layout}_state_{run_index}"].data.tolist()
-        basis_dict = {entry: int("".join([entry[::-1][i] for i in range(num_qubits)][::-1]), 2) for entry in result}
+        if dataset.attrs["parallel"]:
+            result_da = dataset[f"parallel_results_counts_{run_index}"]
+            bit_pos = dataset.attrs["qubit_layouts"].index(qubit_layout)
+            # Create a new coordinate by bit at the position given by the qubit layout
+            new_coords = [coord[bit_pos] for coord in result_da.coords[result_da.dims[0]].values]
+            result_da.coords["new_coord"] = (result_da.dims[0], new_coords)
+            result_da = result_da.groupby("new_coord").sum()
+        else:
+            result_da = dataset[f"{qubit_layout}_counts_{run_index}"]
+
+        coord_strings = list(result_da.coords[result_da.dims[0]].values)
+        basis_dict = {
+            entry: int("".join([entry[::-1][i] for i in range(num_qubits)][::-1]), 2) for entry in coord_strings
+        }
         # Sort by index:
         basis_dict = dict(sorted(basis_dict.items(), key=lambda item: item[1]))
 
-        counts_normalized = (
-            dataset[f"{qubit_layout}_counts_{run_index}"] / dataset[f"{qubit_layout}_counts_{run_index}"].sum()
-        )
+        counts_normalized = result_da / result_da.sum()
         row = [counts_normalized.loc[key].data for key in basis_dict]
         # row = [result[key] for key in basis_dict]
         if len(row) < num_povm:
