@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.13 documentation</title>
+    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.14 documentation</title>
   
   
   
@@ -41,10 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=7e7672c5"></script>
+    <script src="../_static/documentation_options.js?v=eb63f014"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>window.MathJax = {"tex": {"macros": {"vr": "\\vec{r}", "ket": ["\\left| #1 \\right\\rangle", 1], "iprod": ["\\left\\langle #1 | #2 \\right\\rangle", 2]}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/example_ghz';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -53,8 +55,8 @@
     <link rel="prev" title="Circuit Layer Operations Per Second (CLOPS)" href="example_clops.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.13" />
-    <meta name="docbuild:last-update" content="2025-01-20"/>
+  <meta name="docsearch:version" content="2.14" />
+    <meta name="docbuild:last-update" content="2025-01-31"/>
   </head>
   
   
@@ -133,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.13 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.13 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.14 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.14 documentation - Home"/>
   
   
 </a></div>
@@ -160,6 +162,10 @@
 <li class="toctree-l2"><a class="reference internal" href="example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_qscore.html">Q-Score</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../devices/devices.html">Devices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../devices/spark.html">Benchmarking IQM Spark</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../development/development.html">Development</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -408,7 +414,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="greenbergerhornezeilinger-ghz-state-fidelity">
+  <section class="tex2jax_ignore mathjax_ignore" id="greenbergerhornezeilinger-ghz-state-fidelity">
 <h1>Greenberger–Horne–Zeilinger (GHZ) State Fidelity<a class="headerlink" href="#greenbergerhornezeilinger-ghz-state-fidelity" title="Link to this heading">#</a></h1>
 <p>The aim of this benchmark is to show whether a GHZ state with high enough fidelity can be prepared such that the state is genuinely multipartite entangled. One can show that a fidelity larger than 0.5 is a sufficient condition (see Leibfried, D. et al., Creation of a six-atom ‘Schrödinger cat’ state. Nature 438, 639–642 (2005))</p>
 <p>The benchmark currently offers two methods to estimate the fidelity:</p>
@@ -416,9 +422,9 @@
 <li><p>Multiple quantum coherences (G. J. Mooney et al., Generation and verification of 27-qubit Greenberger-Horne-Zeilinger states in a superconducting quantum computer, J. Phys. Commun. 5, 095004 (2021))</p></li>
 <li><p>Randomized measurements (Elben, A. et al., Statistical correlations between locally randomized measurements: A toolbox for probing entanglement in many-body quantum states, Phys. Rev. A 99, 052323 (2019))</p></li>
 </ul>
-<p>Additionally, for a given set of $n$ qubits, different circuits can be applied which lead to the same GHZ state. Currently there are the following implementations:</p>
+<p>Additionally, for a given set of <span class="math notranslate nohighlight">\(n\)</span> qubits, different circuits can be applied which lead to the same GHZ state. Currently there are the following implementations:</p>
 <ul class="simple">
-<li><p>“naive”: The textbook ciruit of depth $n$, which starts from a Hadamrd gate on one qubit and entangles each additional qubit with a CNOT operation from the first.</p></li>
+<li><p>“naive”: The textbook ciruit of depth <span class="math notranslate nohighlight">\(n\)</span>, which starts from a Hadamrd gate on one qubit and entangles each additional qubit with a CNOT operation from the first.</p></li>
 <li><p>“log_depth”: A logarithmic depth circuit utilizing parallel CNOT applications. Either the method in Cruz et al. https://arxiv.org/abs/1807.05572 or the method in Mooney et al. https://arxiv.org/abs/2101.08946 is used, depending on which yields the lower depth or the lower number of 2-qubit gates.</p></li>
 <li><p>“tree”: An in-house logarithmic depth circuit utilizing calibration data of the CZ-fidelities and a tree-graph algorithm to find a circuit with minimal depth and high fidelity 2-qubit gates.</p></li>
 </ul>
@@ -637,7 +643,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-01-20.
+  Last updated on 2025-01-31.
   <br/>
 </p>
   </div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2-Qubit Clifford Group Decomposition &#8212; IQM Benchmarks 2.13 documentation</title>
+    <title>2-Qubit Clifford Group Decomposition &#8212; IQM Benchmarks 2.14 documentation</title>
   
   
   
@@ -41,11 +41,11 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=7e7672c5"></script>
+    <script src="../_static/documentation_options.js?v=eb63f014"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>window.MathJax = {"tex": {"macros": {"vr": "\\vec{r}", "ket": ["\\left| #1 \\right\\rangle", 1], "iprod": ["\\left\\langle #1 | #2 \\right\\rangle", 2]}}}</script>
+    <script>window.MathJax = {"tex": {"macros": {"vr": "\\vec{r}", "ket": ["\\left| #1 \\right\\rangle", 1], "iprod": ["\\left\\langle #1 | #2 \\right\\rangle", 2]}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/generate_2qubit_cliffords';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -55,8 +55,8 @@
     <link rel="prev" title="How to make your own benchmark?" href="how_to_make_your_own_benchmark.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.13" />
-    <meta name="docbuild:last-update" content="2025-01-20"/>
+  <meta name="docsearch:version" content="2.14" />
+    <meta name="docbuild:last-update" content="2025-01-31"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.13 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.13 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.14 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.14 documentation - Home"/>
   
   
 </a></div>
@@ -162,6 +162,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_qscore.html">Q-Score</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../devices/devices.html">Devices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../devices/spark.html">Benchmarking IQM Spark</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="development.html">Development</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -416,7 +420,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="qubit-clifford-group-decomposition">
+  <section class="tex2jax_ignore mathjax_ignore" id="qubit-clifford-group-decomposition">
 <h1>2-Qubit Clifford Group Decomposition<a class="headerlink" href="#qubit-clifford-group-decomposition" title="Link to this heading">#</a></h1>
 <p>Generate the decomposition of the 2-qubit Clifford group according to: https://arxiv.org/abs/1402.4848</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright 2024 IQM Benchmarks developers</span>
@@ -557,7 +561,7 @@
 </div>
 </div>
 </div>
-<p>Verify the condition $\displaystyle{\sum_{k,,k^\prime=1}^K}\left|\mathrm{tr}\left(U_{k^\prime}^{\dagger}U_k\right)\right|^4/K^2 = 2$   (Eq. S2)</p>
+<p>Verify the condition <span class="math notranslate nohighlight">\(\displaystyle{\sum_{k,\,k^\prime=1}^K}\left|\mathrm{tr}\left(U_{k^\prime}^{\dagger}U_k\right)\right|^4/K^2 = 2\)</span>   (Eq. S2)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check that the generated set for 2Q Cliffords satisfies 2-design condition</span>
@@ -867,9 +871,9 @@ True
 </section>
 <section id="design-condition">
 <h2>2-design condition<a class="headerlink" href="#design-condition" title="Link to this heading">#</a></h2>
-<p>Verify the condition $\displaystyle{\sum_{k,,k^\prime=1}^K}\left|\mathrm{tr}\left(U_{k^\prime}^{\dagger}U_k\right)\right|^4/K^2 = 2$   (Eq. S2)</p>
-<p><strong>WARNING</strong>: in total there are $n=11,520^2 = 132,710,400$ values in the sum !</p>
-<p>It suffices to compute the values in a triangular part of the matrix $U_{k^\prime}^{\dagger}U_k$  — however there are still $n(n-1)/2$ such terms !</p>
+<p>Verify the condition <span class="math notranslate nohighlight">\(\displaystyle{\sum_{k,\,k^\prime=1}^K}\left|\mathrm{tr}\left(U_{k^\prime}^{\dagger}U_k\right)\right|^4/K^2 = 2\)</span>   (Eq. S2)</p>
+<p><strong>WARNING</strong>: in total there are <span class="math notranslate nohighlight">\(n=11,520^2 = 132,710,400\)</span> values in the sum !</p>
+<p>It suffices to compute the values in a triangular part of the matrix <span class="math notranslate nohighlight">\(U_{k^\prime}^{\dagger}U_k\)</span>  — however there are still <span class="math notranslate nohighlight">\(n(n-1)/2\)</span> such terms !</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check that the generated set for 2Q Cliffords satisfies 2-design condition</span>
@@ -1005,7 +1009,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-01-20.
+  Last updated on 2025-01-31.
   <br/>
 </p>
   </div>
