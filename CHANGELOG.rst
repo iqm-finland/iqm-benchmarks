@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.14
+============
+* Added devices folder in docs with notebook to benchmark IQM Spark.
+
 Version 2.13
 ============
 * Move all example notebooks to docs. `#30 <https://github.com/iqm-finland/iqm-benchmarks/pull/30>`_
