@@ -164,6 +164,7 @@ extlinks = {
 
 # -- Options for MyST-NB ---------------------------------------------------------
 nb_execution_mode = 'off'
+myst_enable_extensions = ["dollarmath"]
 
 
 # -- Options for sphinxcontrib.bibtex -------------------------------------------------
