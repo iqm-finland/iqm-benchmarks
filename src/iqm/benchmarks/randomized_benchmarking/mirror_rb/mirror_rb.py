@@ -9,7 +9,7 @@ import warnings
 import numpy as np
 from qiskit import transpile
 from qiskit.quantum_info import Clifford, random_clifford, random_pauli
-from qiskit_aer import Aer, AerSimulator
+from qiskit_aer import AerSimulator
 from scipy.spatial.distance import hamming
 import xarray as xr
 
