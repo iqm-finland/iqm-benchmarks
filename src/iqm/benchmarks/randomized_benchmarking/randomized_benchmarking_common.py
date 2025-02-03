@@ -720,13 +720,10 @@ def survival_probabilities_parallel(
 
     # Estimate all marginal probabilities
     marginal_probabilities: Dict[str, List[Dict[str, float]]] = {str(q): [] for q in qubits_array}
-    position_counter = 0
     for position, indices in enumerate(all_bit_indices):
-        print(indices)
-        marginal_probabilities[str(qubits_array[position_counter])] = [
+        marginal_probabilities[str(qubits_array[position])] = [
             marginal_distribution(global_probability, indices) for global_probability in global_probabilities
         ]
-        position_counter += 1
 
     # Estimate the survival probabilities in the marginal distributions
     marginal_survival_probabilities: Dict[str, List[float]] = {str(q): [] for q in qubits_array}
