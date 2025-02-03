@@ -1,34 +1,56 @@
+"""
+Direct Randomized Benchmarking.
+"""
+
 from time import strftime
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
-import warnings
 
+import numpy as np
 from qiskit import ClassicalRegister, QuantumCircuit, transpile
 from qiskit.quantum_info import Clifford, random_clifford
-from qiskit_aer import AerSimulator
 import xarray as xr
 
-from iqm.benchmarks import Benchmark, BenchmarkCircuit, CircuitGroup, Circuits
+from iqm.benchmarks import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkCircuit,
+    BenchmarkRunResult,
+    CircuitGroup,
+    Circuits,
+)
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
     edge_grab,
-    relabel_qubits_array_from_zero, submit_parallel_rb_job,
+    exponential_rb,
+    fit_decay_lmfit,
+    get_survival_probabilities,
+    lmfit_minimizer,
+    plot_rb_decay,
+    relabel_qubits_array_from_zero,
+    submit_parallel_rb_job,
+    survival_probabilities_parallel,
 )
 from iqm.benchmarks.utils import (
     get_iqm_backend,
     perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,
-    set_coupling_map,
     submit_execute,
     timeit,
+    xrvariable_to_counts,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
+@timeit
 def generate_drb_circuits(
-    qubits: List[int],
+    qubits: Sequence[int],
     depth: int,
     circ_samples: int,
     backend_arg: IQMBackendBase | str,
@@ -168,7 +190,7 @@ def generate_fixed_depth_parallel_drb_circuits(
     assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
     qiskit_optim_level: int = 1,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
-) -> Dict[str, List[QuantumCircuit]]:
+) -> Tuple[List[QuantumCircuit], List[QuantumCircuit]]:
     """
     Args:
         qubits_array (Sequence[Sequence[int]]): The array of physical qubit layouts on which to generate parallel DRB circuits.
@@ -207,7 +229,7 @@ def generate_fixed_depth_parallel_drb_circuits(
     for q_idx, qubits in enumerate(shuffled_qubits_array):
         original_qubits = str(qubits_array[q_idx])
         qcvv_logger.info(f"Depth {depth} - Generating all circuits")
-        drb_circuits = generate_drb_circuits(
+        drb_circuits, _ = generate_drb_circuits(# pylint: disable=unbalanced-tuple-unpacking
             qubits,
             depth=depth,
             circ_samples=num_circuit_samples,
@@ -239,10 +261,135 @@ def generate_fixed_depth_parallel_drb_circuits(
     return circuits_list, circuits_transpiled_list
 
 
+def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
+    """Direct RB analysis function
+
+    Args:
+        run (BenchmarkRunResult): The result of the benchmark run.
+
+    Returns:
+        AnalysisResult corresponding to DRB.
+    """
+
+    dataset = run.dataset.copy(deep=True)
+    observations: list[BenchmarkObservation] = []
+    obs_dict = {}
+    plots = {}
+
+    is_parallel_execution = dataset.attrs["parallel_execution"]
+    qubits_array = dataset.attrs["qubits_array"]
+    depths = dataset.attrs["depths"]
+
+    num_circuit_samples = dataset.attrs["num_circuit_samples"]
+
+    # density_2q_gates = dataset.attrs["density_2q_gates"]
+    # two_qubit_gate_ensemble = dataset.attrs["two_qubit_gate_ensemble"]
+
+    all_noisy_counts: Dict[str, Dict[int, List[Dict[str, int]]]] = {}
+
+    polarizations: Dict[str, Dict[int, List[float]]] = {str(q): {} for q in qubits_array}
+
+    if is_parallel_execution:
+        qcvv_logger.info(f"Post-processing parallel Direct RB on qubits {qubits_array}.")
+        all_noisy_counts[str(qubits_array)] = {}
+        for depth in depths:
+            identifier = f"qubits_{str(qubits_array)}_depth_{str(depth)}"
+            all_noisy_counts[str(qubits_array)][depth] = xrvariable_to_counts(dataset, identifier, num_circuit_samples)
+
+            qcvv_logger.info(f"Depth {depth}")
+
+            # Retrieve the marginalized survival probabilities
+            all_survival_probabilities = survival_probabilities_parallel(
+                qubits_array, all_noisy_counts[str(qubits_array)][depth], separate_registers=True
+            )
+
+            # The marginalized survival probabilities will be arranged by qubit layouts
+            for qubits_str in all_survival_probabilities.keys():
+                polarizations[qubits_str][depth] = all_survival_probabilities[qubits_str]
+            # Remaining analysis is the same regardless of whether execution was in parallel or sequential
+    else:  # sequential
+        qcvv_logger.info(f"Post-processing sequential Direct RB for qubits {qubits_array}")
+        for q in qubits_array:
+            all_noisy_counts[str(q)] = {}
+            num_qubits = len(q)
+            polarizations[str(q)] = {}
+            for depth in depths:
+                identifier = f"qubits_{str(q)}_depth_{str(depth)}"
+                all_noisy_counts[str(q)][depth] = xrvariable_to_counts(dataset, identifier, num_circuit_samples)
+
+                qcvv_logger.info(f"Qubits {q} and depth {depth}")
+                polarizations[str(q)][depth] = get_survival_probabilities(num_qubits, all_noisy_counts[str(q)][depth])
+                # Remaining analysis is the same regardless of whether execution was in parallel or sequential
+
+    # All remaining (fitting & plotting) is done per qubit layout
+    for qubits_idx, qubits in enumerate(qubits_array):
+        # Fit decays
+        list_of_polarizations = list(polarizations[str(qubits)].values())
+        fit_data, fit_parameters = fit_decay_lmfit(exponential_rb, qubits, list_of_polarizations, "clifford")
+        rb_fit_results = lmfit_minimizer(fit_parameters, fit_data, depths, exponential_rb)
+
+        average_fidelities = {d: np.mean(polarizations[str(qubits)][d]) for d in depths}
+        stddevs_from_mean = {d: np.std(polarizations[str(qubits)][d]) / np.sqrt(num_circuit_samples) for d in depths}
+        popt = {
+            "amplitude": rb_fit_results.params["amplitude_1"],
+            "offset": rb_fit_results.params["offset_1"],
+            "decay_rate": rb_fit_results.params["p_rb"],
+        }
+        fidelity = rb_fit_results.params["fidelity_per_clifford"]
+
+        processed_results = {
+            "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
+        }
+
+        if len(qubits) == 1:
+            fidelity_native = rb_fit_results.params["fidelity_per_native_sqg"]
+            processed_results.update(
+                {"avg_native_gate_fidelity": {"value": fidelity_native.value, "uncertainty": fidelity_native.stderr}}
+            )
+
+        dataset.attrs[qubits_idx].update(
+            {
+                "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
+                "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
+                "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
+                "fidelities": polarizations[str(qubits)],
+                "avg_fidelities_nominal_values": average_fidelities,
+                "avg_fidelities_stderr": stddevs_from_mean,
+                "fitting_method": str(rb_fit_results.method),
+                "num_function_evals": int(rb_fit_results.nfev),
+                "data_points": int(rb_fit_results.ndata),
+                "num_variables": int(rb_fit_results.nvarys),
+                "chi_square": float(rb_fit_results.chisqr),
+                "reduced_chi_square": float(rb_fit_results.redchi),
+                "Akaike_info_crit": float(rb_fit_results.aic),
+                "Bayesian_info_crit": float(rb_fit_results.bic),
+            }
+        )
+
+        obs_dict.update({qubits_idx: processed_results})
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name=key,
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                    value=values["value"],
+                    uncertainty=values["uncertainty"],
+                )
+                for key, values in processed_results.items()
+            ]
+        )
+
+        # Generate individual decay plots
+        fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, obs_dict)
+        plots[fig_name] = fig
+
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
+
+
 class DirectRandomizedBenchmarking(Benchmark):
     """Direct RB estimates the fidelity of layers of canonical gates"""
 
-    # analysis_function = staticmethod(mrb_analysis)
+    analysis_function = staticmethod(direct_rb_analysis)
 
     name: str = "direct_rb"
 
@@ -296,7 +443,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                 dataset.attrs[key] = value
         # Defined outside configuration - if any
 
-    def assign_inputs_to_qubits(self):
+    def assign_inputs_to_qubits(self):  # pylint: disable=too-many-branches
         """Assigns all DRB inputs (Optional[Sequence[Any]]) to input qubit layouts.
         Args:
         Returns:
@@ -361,9 +508,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                 }
 
         # sqg_gate_ensembles
-        if self.sqg_gate_ensembles is None:
-            assigned_sqg_gate_ensembles = {str(q): 1.0 for q in self.qubits_array}
-        else:
+        if self.sqg_gate_ensembles is not None:
             if len(self.sqg_gate_ensembles) != len(self.qubits_array):
                 if len(self.sqg_gate_ensembles) != 1:
                     qcvv_logger.warning(
@@ -376,6 +521,8 @@ class DirectRandomizedBenchmarking(Benchmark):
                 assigned_sqg_gate_ensembles = {
                     str(q): self.sqg_gate_ensembles[q_idx] for q_idx, q in enumerate(self.qubits_array)
                 }
+        else:
+            assigned_sqg_gate_ensembles = None
 
         return (
             assigned_drb_depths,
@@ -420,7 +567,7 @@ class DirectRandomizedBenchmarking(Benchmark):
         }
         return drb_submit_results
 
-    def execute(self, backend: IQMBackendBase) -> xr.Dataset:
+    def execute(self, backend: IQMBackendBase) -> xr.Dataset:  # pylint: disable=too-many-statements
         """Executes the benchmark"""
 
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
@@ -462,10 +609,16 @@ class DirectRandomizedBenchmarking(Benchmark):
                     (parallel_untranspiled_rb_circuits[depth], parallel_transpiled_rb_circuits[depth]),
                     elapsed_time,
                 ) = generate_fixed_depth_parallel_drb_circuits(
-                    self.qubits_array,
-                    depth,
-                    self.num_circuit_samples,
-                    backend,
+                    qubits_array=self.qubits_array,
+                    depth=depth,
+                    num_circuit_samples=self.num_circuit_samples,
+                    backend_arg=backend,
+                    assigned_density_2q_gates=assigned_density_2q_gates,
+                    assigned_two_qubit_gate_ensembles=assigned_two_qubit_gate_ensembles,
+                    assigned_clifford_sqg_probabilities=assigned_clifford_sqg_probabilities,
+                    assigned_sqg_gate_ensembles=assigned_sqg_gate_ensembles,
+                    qiskit_optim_level=self.qiskit_optim_level,
+                    routing_method=self.routing_method,
                 )
                 time_circuit_generation[str(self.qubits_array)] += elapsed_time
 
@@ -530,16 +683,13 @@ class DirectRandomizedBenchmarking(Benchmark):
                     time_circuit_generation[str(qubits)] += elapsed_time
 
                     # Generated circuits at fixed depth are (dict) indexed by Pauli sample number, turn into List
-                    drb_transpiled_circuits_lists[depth] = []
-                    drb_untranspiled_circuits_lists[depth] = []
-                    for c_s in range(self.num_circuit_samples):
-                        drb_transpiled_circuits_lists[depth].extend(drb_circuits[depth][c_s]["transpiled"])
-                    for c_s in range(self.num_circuit_samples):
-                        drb_untranspiled_circuits_lists[depth].extend(drb_circuits[depth][c_s]["untranspiled"])
+                    drb_transpiled_circuits_lists[depth] = drb_circuits[depth]["transpiled"]
+                    drb_untranspiled_circuits_lists[depth] = drb_circuits[depth]["untranspiled"]
 
                     # Submit
                     sorted_transpiled_qc_list = {tuple(qubits): drb_transpiled_circuits_lists[depth]}
                     all_drb_jobs.append(self.submit_single_drb_job(backend, qubits, depth, sorted_transpiled_qc_list))
+
                     qcvv_logger.info(f"Job for layout {qubits} & depth {depth} submitted successfully!")
 
                     self.untranspiled_circuits.circuit_groups.append(
