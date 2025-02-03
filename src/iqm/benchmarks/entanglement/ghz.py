@@ -305,6 +305,24 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
     return qc
 
 
+def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
+    """
+    Generates a GHZ state my maximizing the number of CZs between MOVE gates.
+    Args:
+        num_qubits: the number of qubits of the GHZ state
+
+    Returns:
+        A quantum circuit generating a GHZ state of n qubits
+    """
+    quantum_register = QuantumRegister(num_qubits)
+    qc = QuantumCircuit(quantum_register, name="GHZ_star")
+    qc.h(0)
+    for i in range(num_qubits - 1):
+        qc.cx(0, i + 1)
+    qc.measure_all()
+    return qc
+
+
 def generate_ghz_log_mooney(num_qubits: int) -> QuantumCircuit:
     """
     Generates a GHZ state in log-depth according to https://arxiv.org/abs/2101.08946
@@ -660,6 +678,19 @@ class GHZBenchmark(Benchmark):
                 optimize_sqg=self.optimize_sqg,
             )
             final_ghz = ghz_native_transpiled
+        elif routine == "star":
+            ghz: QuantumCircuit = generate_ghz_star(qubit_count)
+            circuit_group.add_circuit(ghz)
+            ghz_native_transpiled, _ = perform_backend_transpilation(
+                [ghz],
+                self.backend,
+                qubit_layout,
+                fixed_coupling_map,
+                qiskit_optim_level=self.qiskit_optim_level,
+                optimize_sqg=self.optimize_sqg,
+            )
+            final_ghz = ghz_native_transpiled
+
         else:
             ghz_log = [generate_ghz_log_cruz(qubit_count), generate_ghz_log_mooney(qubit_count)]
             ghz_native_transpiled, _ = perform_backend_transpilation(
