@@ -304,7 +304,7 @@ def fit_decay_lmfit(
         "offset": {"min": 0, "max": 1},
         "amplitude": {"min": 0, "max": 1},
     }
-    if rb_identifier in ("clifford", "mrb"):
+    if rb_identifier in ("clifford", "mrb", "drb"):
         fit_data = np.array([np.mean(data, axis=1)])
         if rb_identifier == "clifford":
             params = create_multi_dataset_params(
@@ -322,8 +322,8 @@ def fit_decay_lmfit(
             params = create_multi_dataset_params(
                 func, fit_data, initial_guesses=None, constraints=constraints, simultaneously_fit_vars=None
             )
-            params.add(f"p_mrb", expr=f"1-depolarization_probability_{1}")
-            params.add(f"fidelity_mrb", expr=f"1 - (1 - p_mrb) * (1 - 1 / (4 ** {n_qubits}))")
+            params.add(f"p_{rb_identifier}", expr=f"1-depolarization_probability_{1}")
+            params.add(f"fidelity_{rb_identifier}", expr=f"1 - (1 - p_{rb_identifier}) * (1 - 1 / (4 ** {n_qubits}))")
     else:
         fit_data = np.array([np.mean(data[0], axis=1), np.mean(data[1], axis=1)])
         params = create_multi_dataset_params(
@@ -605,6 +605,9 @@ def relabel_qubits_array_from_zero(arr: List[List[int]], separate_registers: boo
     Args:
         arr (List[List[int]]): the qubits array to relabel.
         separate_registers (bool): whether the clbits were generated in separate registers.
+
+    Returns:
+        List[List[int]]: the relabeled qubits array.
     """
     # Flatten the original array
     flat_list = [item for sublist in arr for item in sublist]
@@ -803,7 +806,7 @@ def plot_rb_decay(
     if identifier != "irb":
         rb_type_keys = [identifier]
         colors = [cmap(i) for i in np.linspace(start=1, stop=0, num=len(qubits_array)).tolist()]
-        if identifier == "mrb":
+        if identifier in ("mrb", "drb"):
             depths[identifier] = {
                 str(q): list(dataset.attrs[q_idx]["polarizations"].keys())
                 for q_idx, q in enumerate(qubits_array, qubits_index)
@@ -1013,8 +1016,8 @@ def plot_rb_decay(
             if fidelity_stderr[key][str(qubits)] is None:
                 fidelity_stderr[key][str(qubits)] = np.nan
 
-            if identifier == "mrb":
-                plot_label = fr"$\overline{{F}}_{{MRB}} (n={len(qubits)})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
+            if identifier in ("mrb", "drb"):
+                plot_label = fr"$\overline{{F}}_{{{identifier.upper()}}} (n={len(qubits)})$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             elif key == "interleaved":
                 plot_label = fr"$\overline{{F}}_{{{interleaved_gate}}}$ = {100.0 * fidelity_value[key][str(qubits)]:.2f} +/- {100.0 * fidelity_stderr[key][str(qubits)]:.2f} (%)"
             else:  # if id is "clifford"
@@ -1050,7 +1053,7 @@ def plot_rb_decay(
             f"2Q gate density: {mrb_2q_density}, ensemble {mrb_2q_ensemble}\n"
             f"backend: {backend_name} --- {timestamp}"
         )
-    if identifier == "mrb":
+    if identifier in ("mrb", "drb"):
         ax.set_ylabel("Polarization")
         ax.set_xlabel("Layer Depth")
     else:
@@ -1069,7 +1072,7 @@ def plot_rb_decay(
     plt.legend(fontsize=8)
     ax.grid()
 
-    plt.gcf().set_dpi(250)
+    plt.gcf().set_dpi(350)
 
     plt.close()
 

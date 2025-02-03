@@ -58,7 +58,7 @@ def generate_drb_circuits(
     two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
     clifford_sqg_probability: float = 1.0,
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
-    qiskit_optim_level: int = 1,
+    qiskit_optim_level: int = 3,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates lists of samples of Direct RB circuits, of structure:
@@ -188,7 +188,7 @@ def generate_fixed_depth_parallel_drb_circuits(
     assigned_two_qubit_gate_ensembles: Dict[str, Dict[str, float]],
     assigned_clifford_sqg_probabilities: Dict[str, float],
     assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
-    qiskit_optim_level: int = 1,
+    qiskit_optim_level: int = 3,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
 ) -> Tuple[List[QuantumCircuit], List[QuantumCircuit]]:
     """
@@ -228,8 +228,7 @@ def generate_fixed_depth_parallel_drb_circuits(
     # Generate all transpiled
     for q_idx, qubits in enumerate(shuffled_qubits_array):
         original_qubits = str(qubits_array[q_idx])
-        qcvv_logger.info(f"Depth {depth} - Generating all circuits")
-        drb_circuits, _ = generate_drb_circuits(# pylint: disable=unbalanced-tuple-unpacking
+        drb_circuits, _ = generate_drb_circuits(# pylint: disable=unbalanced-dict-unpacking
             qubits,
             depth=depth,
             circ_samples=num_circuit_samples,
@@ -282,8 +281,8 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     num_circuit_samples = dataset.attrs["num_circuit_samples"]
 
-    # density_2q_gates = dataset.attrs["density_2q_gates"]
-    # two_qubit_gate_ensemble = dataset.attrs["two_qubit_gate_ensemble"]
+    density_2q_gates = dataset.attrs["densities_2q_gates"]
+    two_qubit_gate_ensemble = dataset.attrs["two_qubit_gate_ensembles"]
 
     all_noisy_counts: Dict[str, Dict[int, List[Dict[str, int]]]] = {}
 
@@ -325,36 +324,30 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     for qubits_idx, qubits in enumerate(qubits_array):
         # Fit decays
         list_of_polarizations = list(polarizations[str(qubits)].values())
-        fit_data, fit_parameters = fit_decay_lmfit(exponential_rb, qubits, list_of_polarizations, "clifford")
+        fit_data, fit_parameters = fit_decay_lmfit(exponential_rb, qubits, list_of_polarizations, "drb")
         rb_fit_results = lmfit_minimizer(fit_parameters, fit_data, depths, exponential_rb)
 
-        average_fidelities = {d: np.mean(polarizations[str(qubits)][d]) for d in depths}
+        average_polarizations = {d: np.mean(polarizations[str(qubits)][d]) for d in depths}
         stddevs_from_mean = {d: np.std(polarizations[str(qubits)][d]) / np.sqrt(num_circuit_samples) for d in depths}
         popt = {
             "amplitude": rb_fit_results.params["amplitude_1"],
             "offset": rb_fit_results.params["offset_1"],
-            "decay_rate": rb_fit_results.params["p_rb"],
+            "decay_rate": rb_fit_results.params["p_drb"],
         }
-        fidelity = rb_fit_results.params["fidelity_per_clifford"]
+        fidelity = rb_fit_results.params["fidelity_drb"]
 
         processed_results = {
             "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
         }
-
-        if len(qubits) == 1:
-            fidelity_native = rb_fit_results.params["fidelity_per_native_sqg"]
-            processed_results.update(
-                {"avg_native_gate_fidelity": {"value": fidelity_native.value, "uncertainty": fidelity_native.stderr}}
-            )
 
         dataset.attrs[qubits_idx].update(
             {
                 "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
                 "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
                 "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
-                "fidelities": polarizations[str(qubits)],
-                "avg_fidelities_nominal_values": average_fidelities,
-                "avg_fidelities_stderr": stddevs_from_mean,
+                "polarizations": polarizations[str(qubits)],
+                "avg_polarization_nominal_values": average_polarizations,
+                "avg_polatization_stderr": stddevs_from_mean,
                 "fitting_method": str(rb_fit_results.method),
                 "num_function_evals": int(rb_fit_results.nfev),
                 "data_points": int(rb_fit_results.ndata),
@@ -380,7 +373,14 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
 
         # Generate individual decay plots
-        fig_name, fig = plot_rb_decay("clifford", [qubits], dataset, obs_dict)
+        fig_name, fig = plot_rb_decay(
+            identifier="drb",
+            qubits_array=[qubits],
+            dataset=dataset,
+            observations=obs_dict,
+            mrb_2q_density=density_2q_gates,  # Misnomer coming from MRB - ignore
+            mrb_2q_ensemble=two_qubit_gate_ensemble,
+        )
         plots[fig_name] = fig
 
     return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
@@ -521,8 +521,18 @@ class DirectRandomizedBenchmarking(Benchmark):
                 assigned_sqg_gate_ensembles = {
                     str(q): self.sqg_gate_ensembles[q_idx] for q_idx, q in enumerate(self.qubits_array)
                 }
+        elif assigned_clifford_sqg_probabilities == {str(q): 1.0 for q in self.qubits_array}:
+            assigned_sqg_gate_ensembles = {str(q): {"HGate": 0.0} for q in self.qubits_array}
         else:
-            assigned_sqg_gate_ensembles = None
+            assigned_sqg_gate_ensembles = {
+                str(q): {"HGate": 1.0 - assigned_clifford_sqg_probabilities[str(q)]} for q in self.qubits_array
+            }
+
+        # Reset the configuration values to store in dataset
+        self.two_qubit_gate_ensembles = assigned_two_qubit_gate_ensembles
+        self.densities_2q_gates = assigned_density_2q_gates
+        self.clifford_sqg_probabilities = assigned_clifford_sqg_probabilities
+        self.sqg_gate_ensembles = assigned_sqg_gate_ensembles
 
         return (
             assigned_drb_depths,
@@ -573,11 +583,6 @@ class DirectRandomizedBenchmarking(Benchmark):
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
         dataset = xr.Dataset()
-        self.add_all_meta_to_dataset(dataset)
-
-        # Submit jobs for all qubit layouts
-        all_drb_jobs: List[Dict[str, Any]] = []
-        time_circuit_generation: Dict[str, float] = {}
 
         (
             assigned_drb_depths,
@@ -586,6 +591,12 @@ class DirectRandomizedBenchmarking(Benchmark):
             assigned_clifford_sqg_probabilities,
             assigned_sqg_gate_ensembles,
         ) = self.assign_inputs_to_qubits()
+
+        self.add_all_meta_to_dataset(dataset)
+
+        # Submit jobs for all qubit layouts
+        all_drb_jobs: List[Dict[str, Any]] = []
+        time_circuit_generation: Dict[str, float] = {}
 
         # Auxiliary dict from str(qubits) to indices
         qubit_idx: Dict[str, Any] = {}
@@ -774,7 +785,7 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     parallel_execution: bool = False
     depths: Sequence[int]
     num_circuit_samples: int
-    qiskit_optim_level: int = 1
+    qiskit_optim_level: int = 3
     two_qubit_gate_ensembles: Optional[Sequence[Dict[str, float]]] = None
     densities_2q_gates: Optional[Sequence[float]] = None
     clifford_sqg_probabilities: Optional[Sequence[float]] = None
