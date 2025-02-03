@@ -21,7 +21,7 @@ from itertools import chain
 import os
 import pickle
 import random
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, cast
 
 from lmfit import Parameters, minimize
 from lmfit.minimizer import MinimizerResult
@@ -597,21 +597,27 @@ def lmfit_minimizer(
     )
 
 
-def relabel_qubits_array_from_zero(arr: List[List[int]]) -> List[List[int]]:
+def relabel_qubits_array_from_zero(arr: List[List[int]], separate_registers: bool = False) -> List[List[int]]:
     """Helper function to relabel a qubits array to an increasingly ordered one starting from zero
     e.g., [[2,3], [5], [7,8]]  ->  [[0,1], [2], [3,4]]
     Note: this assumes the input array is sorted in increasing order!
+
+    Args:
+        arr (List[List[int]]): the qubits array to relabel.
+        separate_registers (bool): whether the clbits were generated in separate registers.
     """
     # Flatten the original array
     flat_list = [item for sublist in arr for item in sublist]
     # Generate a list of ordered numbers with the same length as the flattened array
-    ordered_indices = list(range(len(flat_list)))
+    # If separate_registers is True, ordered_indices has to skip one value in between each sublist (as if the clbits were generated in separate registers)
+    # e.g. [[2,3], [5], [7,8]] -> [[0,1],[3],[5,6]] if separate_registers=True
+    ordered_indices = list(range(2 * len(flat_list) - 1)) if separate_registers else list(range(len(flat_list)))
     # Reconstruct the list of lists structure
     result = []
     index = 0
     for sublist in arr:
         result.append(ordered_indices[index : index + len(sublist)])
-        index += len(sublist)
+        index += len(sublist) + 1 if separate_registers else len(sublist)
     return result
 
 
@@ -695,27 +701,32 @@ def submit_sequential_rb_jobs(
 
 
 def survival_probabilities_parallel(
-    qubits_array: List[List[int]], counts: List[Dict[str, int]]
+    qubits_array: List[List[int]], counts: List[Dict[str, int]], separate_registers: bool = False
 ) -> Dict[str, List[float]]:
     """Estimates marginalized survival probabilities from a parallel RB execution (at fixed depth)
     Args:
         qubits_array (List[int]): List of qubits in which the experiment was performed
         counts (Dict[str, int]): The measurement counts for corresponding bitstrings
+        separate_registers (bool): Whether the clbits were generated in separate registers
+                        * If True, the bit strings will be separated by a space, e.g., '00 10' means '00' belongs to one register and '10' to another.
+                        * Default is False.
     Returns:
         Dict[str, List[float]]: The survival probabilities for each qubit
     """
     # Global probability estimations
     global_probabilities = [{k: v / sum(c.values()) for k, v in c.items()} for c in counts]
 
-    # The bit indices
-    all_bit_indices = relabel_qubits_array_from_zero(qubits_array)
+    all_bit_indices = relabel_qubits_array_from_zero(qubits_array, separate_registers=separate_registers)
 
     # Estimate all marginal probabilities
     marginal_probabilities: Dict[str, List[Dict[str, float]]] = {str(q): [] for q in qubits_array}
+    position_counter = 0
     for position, indices in enumerate(all_bit_indices):
-        marginal_probabilities[str(qubits_array[position])] = [
+        print(indices)
+        marginal_probabilities[str(qubits_array[position_counter])] = [
             marginal_distribution(global_probability, indices) for global_probability in global_probabilities
         ]
+        position_counter += 1
 
     # Estimate the survival probabilities in the marginal distributions
     marginal_survival_probabilities: Dict[str, List[float]] = {str(q): [] for q in qubits_array}
