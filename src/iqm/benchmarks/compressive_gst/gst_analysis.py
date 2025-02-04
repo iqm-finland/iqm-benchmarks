@@ -622,24 +622,27 @@ def dataset_counts_to_mgst_format(dataset: xr.Dataset, qubit_layout: List[int]) 
     y_list = []
     for run_index in range(dataset.attrs["num_circuits"]):
         if dataset.attrs["parallel"]:
-            result_da = dataset[f"parallel_results_counts_{run_index}"]
+            result_da = dataset[f"parallel_results_counts_{run_index}"].copy()
             bit_pos = dataset.attrs["qubit_layouts"].index(qubit_layout)
-            # Create a new coordinate by bit at the position given by the qubit layout
-            new_coords = [coord[bit_pos] for coord in result_da.coords[result_da.dims[0]].values]
-            result_da.coords["new_coord"] = (result_da.dims[0], new_coords)
-            result_da = result_da.groupby("new_coord").sum()
+            # Create a new coordinate of bits at the position given by the qubit layout and reverse order
+            new_coords = [coord[::-1][bit_pos*num_qubits:(bit_pos+1)*num_qubits] for coord in result_da.coords[result_da.dims[0]].values]
         else:
-            result_da = dataset[f"{qubit_layout}_counts_{run_index}"]
+            result_da = dataset[f"{qubit_layout}_counts_{run_index}"].copy()
+            # Reverse order since counts are stored in qiskit order (bottom to top in circuit diagram)
+            new_coords = [coord[::-1] for coord in result_da.coords[result_da.dims[0]].values]
+        result_da.coords["new_coord"] = (result_da.dims[0], new_coords)
+        result_da = result_da.groupby("new_coord").sum()
 
         coord_strings = list(result_da.coords[result_da.dims[0]].values)
+        # Translating from binary basis labels to integer POVM labels
         basis_dict = {
-            entry: int("".join([entry[::-1][i] for i in range(num_qubits)][::-1]), 2) for entry in coord_strings
+            entry: int(entry, 2) for entry in coord_strings
         }
         # Sort by index:
         basis_dict = dict(sorted(basis_dict.items(), key=lambda item: item[1]))
 
         counts_normalized = result_da / result_da.sum()
-        row = [counts_normalized.loc[key].data for key in basis_dict]
+        row = [float(counts_normalized.loc[key].data) for key in basis_dict]
         # row = [result[key] for key in basis_dict]
         if len(row) < num_povm:
             missing_entries = list(np.arange(num_povm))
