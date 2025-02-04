@@ -267,7 +267,7 @@ def generate_ghz_linear(num_qubits: int) -> QuantumCircuit:
         num_qubits: the number of qubits of the GHZ state
 
     Returns:
-        A quantum circuit generating a GHZ state of n qubits
+        QuantumCircuit: A quantum circuit generating a GHZ state on a given number of qubits.
     """
     s = int(num_qubits / 2)
     quantum_register = QuantumRegister(num_qubits)
@@ -290,7 +290,7 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
         num_qubits: the number of qubits of the GHZ state
 
     Returns:
-        A quantum circuit generating a GHZ state of n qubits
+        QuantumCircuit: A quantum circuit generating a GHZ state on a given number of qubits.
     """
     quantum_register = QuantumRegister(num_qubits)
     qc = QuantumCircuit(quantum_register, name="GHZ_log_Cruz")
@@ -307,12 +307,12 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
 
 def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
     """
-    Generates a GHZ state my maximizing the number of CZs between MOVE gates.
+    Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
     Args:
         num_qubits: the number of qubits of the GHZ state
 
     Returns:
-        A quantum circuit generating a GHZ state of n qubits
+        QuantumCircuit: A quantum circuit generating a GHZ state on a given number of qubits.
     """
     quantum_register = QuantumRegister(num_qubits)
     qc = QuantumCircuit(quantum_register, name="GHZ_star")
@@ -330,7 +330,7 @@ def generate_ghz_log_mooney(num_qubits: int) -> QuantumCircuit:
         num_qubits: the number of qubits of the GHZ state
 
     Returns:
-        A quantum circuit generating a GHZ state of n qubits
+        QuantumCircuit: A quantum circuit generating a GHZ state on a given number of qubits.
     """
     quantum_register = QuantumRegister(num_qubits)
     qc = QuantumCircuit(quantum_register, name="GHZ_log_Mooney")
@@ -658,7 +658,10 @@ class GHZBenchmark(Benchmark):
             final_ghz = ghz_native_transpiled
         elif routine == "tree":
             # For star architectures, create an effective coupling map that represents all-to-all connectivity
-            if "move" in self.backend.operation_names:
+            if "move" in self.backend.operation_names and routine != "star":
+                qcvv_logger.warning(
+                    f"The current backend is a star architecture for which a suboptimal state generation routine is chosen. Consider setting state_generation_routine={routine}."
+                )
                 effective_coupling_map = [[x, y] for x in qubit_layout for y in qubit_layout if x != y]
             else:
                 effective_coupling_map = self.backend.coupling_map
