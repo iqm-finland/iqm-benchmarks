@@ -251,7 +251,7 @@ def generate_fixed_depth_parallel_drb_circuits(
         for q_idx, q in enumerate(shuffled_qubits_array):
             original_qubits = str(qubits_array[q_idx])
             cycle_layers[str(q)] = edge_grab(
-                q,
+                qubits_array[q_idx],
                 depth,
                 backend_arg,
                 assigned_density_2q_gates[original_qubits],
@@ -860,7 +860,7 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     parallel_execution: bool = False
     depths: Sequence[int]
     num_circuit_samples: int
-    qiskit_optim_level: int = 3
+    qiskit_optim_level: int = 1
     two_qubit_gate_ensembles: Optional[Sequence[Dict[str, float]]] = None
     densities_2q_gates: Optional[Sequence[float]] = None
     clifford_sqg_probabilities: Optional[Sequence[float]] = None
