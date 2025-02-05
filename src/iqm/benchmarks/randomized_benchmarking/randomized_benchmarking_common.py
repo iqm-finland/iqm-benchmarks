@@ -320,7 +320,11 @@ def fit_decay_lmfit(
                 params.add("fidelity_per_native_sqg", expr=f"1 - (1 - (p_rb + (1 - p_rb) / (2**{n_qubits})))/1.875")
         else:
             params = create_multi_dataset_params(
-                func, fit_data, initial_guesses=None, constraints=constraints, simultaneously_fit_vars=None
+                func,
+                fit_data,
+                initial_guesses=None if n_qubits > 1 else estimates,
+                constraints=constraints,
+                simultaneously_fit_vars=None,
             )
             params.add(f"p_{rb_identifier}", expr=f"1-depolarization_probability_{1}")
             params.add(f"fidelity_{rb_identifier}", expr=f"1 - (1 - p_{rb_identifier}) * (1 - 1 / (4 ** {n_qubits}))")
@@ -597,7 +601,9 @@ def lmfit_minimizer(
     )
 
 
-def relabel_qubits_array_from_zero(arr: List[List[int]], separate_registers: bool = False) -> List[List[int]]:
+def relabel_qubits_array_from_zero(
+    arr: List[List[int]], separate_registers: bool = False, reversed_arr: bool = False
+) -> List[List[int]]:
     """Helper function to relabel a qubits array to an increasingly ordered one starting from zero
     e.g., [[2,3], [5], [7,8]]  ->  [[0,1], [2], [3,4]]
     Note: this assumes the input array is sorted in increasing order!
@@ -605,6 +611,11 @@ def relabel_qubits_array_from_zero(arr: List[List[int]], separate_registers: boo
     Args:
         arr (List[List[int]]): the qubits array to relabel.
         separate_registers (bool): whether the clbits were generated in separate registers.
+                * This has the effect of skipping one value in between each sublist, e.g., [[2,3], [5], [7,8]]  ->  [[0,1], [3], [5,6]]
+                * Default is False.
+        reversed_arr (bool): whether the input array is reversed.
+                * This has the effect of reversing the output array, e.g., [[2,3], [5,7], [8]] -> [[0], [1,2], [3,4]]
+                * Default is False.
 
     Returns:
         List[List[int]]: the relabeled qubits array.
@@ -618,7 +629,7 @@ def relabel_qubits_array_from_zero(arr: List[List[int]], separate_registers: boo
     # Reconstruct the list of lists structure
     result = []
     index = 0
-    for sublist in arr:
+    for sublist in reversed(arr) if reversed_arr else arr:
         result.append(ordered_indices[index : index + len(sublist)])
         index += len(sublist) + 1 if separate_registers else len(sublist)
     return result
@@ -719,12 +730,14 @@ def survival_probabilities_parallel(
     # Global probability estimations
     global_probabilities = [{k: v / sum(c.values()) for k, v in c.items()} for c in counts]
 
-    all_bit_indices = relabel_qubits_array_from_zero(qubits_array, separate_registers=separate_registers)
+    all_bit_indices = relabel_qubits_array_from_zero(
+        qubits_array, separate_registers=separate_registers, reversed_arr=True
+    )  # Need reversed_arr because count bitstrings get reversed!
 
     # Estimate all marginal probabilities
     marginal_probabilities: Dict[str, List[Dict[str, float]]] = {str(q): [] for q in qubits_array}
-    for position, indices in enumerate(all_bit_indices):
-        marginal_probabilities[str(qubits_array[position])] = [
+    for position, indices in reversed(list(enumerate(all_bit_indices))):
+        marginal_probabilities[str(qubits_array[len(all_bit_indices) - 1 - position])] = [
             marginal_distribution(global_probability, indices) for global_probability in global_probabilities
         ]
 
@@ -1048,9 +1061,15 @@ def plot_rb_decay(
     elif identifier == "clifford":
         ax.set_title(f"{identifier.capitalize()} experiment {on_qubits}\nbackend: {backend_name} --- {timestamp}")
     else:
+        if identifier == "drb" and len(qubits_array) == 1:
+            density = cast(float, mrb_2q_density[str(qubits_array[0])])
+            ensemble = cast(Dict[str, float], mrb_2q_ensemble[str(qubits_array[0])])
+        else:
+            density = mrb_2q_density
+            ensemble = mrb_2q_ensemble
         ax.set_title(
             f"{identifier.upper()} experiment {on_qubits}\n"
-            f"2Q gate density: {mrb_2q_density}, ensemble {mrb_2q_ensemble}\n"
+            f"2Q gate density: {density}, ensemble {ensemble}\n"
             f"backend: {backend_name} --- {timestamp}"
         )
     if identifier in ("mrb", "drb"):
@@ -1067,7 +1086,7 @@ def plot_rb_decay(
     all_depths = [x for d in depths.values() for w in d.values() for x in w]
 
     xticks = sorted(list(set(all_depths)))
-    ax.set_xticks(xticks, labels=xticks)
+    ax.set_xticks(xticks, labels=xticks, rotation=45)
 
     plt.legend(fontsize=8)
     ax.grid()

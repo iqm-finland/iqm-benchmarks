@@ -38,7 +38,6 @@ from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common impor
 )
 from iqm.benchmarks.utils import (
     get_iqm_backend,
-    perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,
     submit_execute,
@@ -85,7 +84,7 @@ def generate_drb_circuits(
     """
     num_qubits = len(qubits)
 
-    # Transpile to backend - no optimize SQG should be used!
+    # Retrieve backend
     if isinstance(backend_arg, str):
         retrieved_backend = get_iqm_backend(backend_arg)
     else:
@@ -190,8 +189,11 @@ def generate_fixed_depth_parallel_drb_circuits(
     assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
     qiskit_optim_level: int = 3,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
-) -> Tuple[List[QuantumCircuit], List[QuantumCircuit]]:
-    """
+) -> Dict[str, List[QuantumCircuit]]:
+    """Generates DRB circuits in parallel on multiple qubit layouts.
+        The circuits follow a layered pattern with barriers, taylored to measured EPLG (arXiv:2311.05933),
+        with layers of random Cliffords interleaved among sampled layers of 2Q gates and sequence inversion.
+
     Args:
         qubits_array (Sequence[Sequence[int]]): The array of physical qubit layouts on which to generate parallel DRB circuits.
         depth (int): The depth (number of canonical DRB layers) of the circuits.
@@ -206,12 +208,20 @@ def generate_fixed_depth_parallel_drb_circuits(
         routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): Qiskit transpiler routing method.
                         * Default is "basic".
     Returns:
-        Tuple[List[QuantumCircuit]]: A tuple of untranspiled and transpiled lists of DRB circuits.
+        Dict[str, List[QuantumCircuit]]: A dictionary of untranspiled and transpiled lists of parallel (simultaneous) DRB circuits.
     """
     if isinstance(backend_arg, str):
         backend = get_iqm_backend(backend_arg)
     else:
         backend = backend_arg
+
+    # Check if backend includes MOVE gates and set coupling map
+    flat_qubits_array = [x for y in qubits_array for x in y]
+    if "move" in backend.operation_names:
+        # All-to-all coupling map on the active qubits
+        effective_coupling_map = [[x, y] for x in flat_qubits_array for y in flat_qubits_array if x != y]
+    else:
+        effective_coupling_map = backend.coupling_map
 
     # Identify total amount of qubits
     qubit_counts = [len(x) for x in qubits_array]
@@ -222,42 +232,89 @@ def generate_fixed_depth_parallel_drb_circuits(
     n_qubits = sum(qubit_counts)
 
     # Generate the circuit samples
-    qc = QuantumCircuit(n_qubits)
-    circuits_list: List[QuantumCircuit] = [qc.copy() for _ in range(num_circuit_samples)]
+    # Initialize the list of circuits
+    all_circuits = {}
+    drb_circuits_untranspiled: List[QuantumCircuit] = []
+    drb_circuits_transpiled: List[QuantumCircuit] = []
 
-    # Generate all transpiled
-    for q_idx, qubits in enumerate(shuffled_qubits_array):
-        original_qubits = str(qubits_array[q_idx])
-        drb_circuits, _ = generate_drb_circuits(# pylint: disable=unbalanced-dict-unpacking
-            qubits,
-            depth=depth,
-            circ_samples=num_circuit_samples,
-            backend_arg=backend,
-            density_2q_gates=assigned_density_2q_gates[original_qubits],
-            two_qubit_gate_ensemble=assigned_two_qubit_gate_ensembles[original_qubits],
-            clifford_sqg_probability=assigned_clifford_sqg_probabilities[original_qubits],
-            sqg_gate_ensemble=assigned_sqg_gate_ensembles[original_qubits],
-            qiskit_optim_level=qiskit_optim_level,
+    # simulator = AerSimulator(method=simulation_method)
+
+    for _ in range(num_circuit_samples):
+        # Initialize the quantum circuit object
+        circ = QuantumCircuit(n_qubits)
+
+        # Generate small circuits to track inverses
+        local_circs = {str(q): QuantumCircuit(len(q)) for q in shuffled_qubits_array}
+
+        # Generate the layers
+        cycle_layers = {}
+        for q_idx, q in enumerate(shuffled_qubits_array):
+            original_qubits = str(qubits_array[q_idx])
+            cycle_layers[str(q)] = edge_grab(
+                q,
+                depth,
+                backend_arg,
+                assigned_density_2q_gates[original_qubits],
+                assigned_two_qubit_gate_ensembles[original_qubits],
+                assigned_clifford_sqg_probabilities[original_qubits],
+                assigned_sqg_gate_ensembles[original_qubits],
+            )
+
+        # Add the cycle layers
+        for k in range(depth):
+            # Add the edge Clifford
+            # The DRB paper here contains a general stabilizer preparation.
+            # We will stick to 1Q Clifford gates for now.
+            for q in shuffled_qubits_array:
+                for idx, i in enumerate(q):
+                    rand_clif = random_clifford(1)
+                    circ.compose(rand_clif.to_instruction(), qubits=[i], inplace=True)
+                    local_circs[str(q)].compose(rand_clif.to_instruction(), qubits=[idx], inplace=True)
+            circ.barrier()
+
+            for q in shuffled_qubits_array:
+                circ.compose(cycle_layers[str(q)][k], qubits=q, inplace=True)
+                local_circs[str(q)].compose(cycle_layers[str(q)][k], inplace=True)
+            circ.barrier()
+
+        # Add the inverse Clifford
+        for q in shuffled_qubits_array:
+            circ.compose(
+                Clifford(local_circs[str(q)].to_instruction().inverse()).to_instruction(), qubits=q, inplace=True
+            )
+        circ.barrier()
+        for q_idx, q in enumerate(shuffled_qubits_array):
+            original_qubits = str(qubits_array[q_idx])
+            local_register = ClassicalRegister(len(q), original_qubits)
+            circ.add_register(local_register)
+            circ.measure(q, local_register)
+        # Similarly, here the DRB paper contains a stabilizer measurement, determined in a more elaborated way.
+        # The stabilizer measurement should effectively render the circuit to a Pauli gate (here always the identity).
+        # Would need to modify this for larger num qubits !
+        # Here, for 2-qubit DRB subroutines, it *should* suffice (in principle) to compile the inverse.
+
+        circ_untranspiled = circ.copy()
+
+        circ_transpiled = transpile(
+            circ,
+            backend=backend,
+            coupling_map=effective_coupling_map,
+            optimization_level=qiskit_optim_level,
+            initial_layout=flat_qubits_array,
             routing_method=routing_method,
         )
 
-        for idx, drb_circuit in enumerate(drb_circuits["untranspiled"]):
-            circuits_list[idx].add_register(ClassicalRegister(len(qubits), original_qubits))
-            circuits_list[idx].compose(
-                drb_circuit, qubits=qubits, clbits=ClassicalRegister(len(qubits), original_qubits), inplace=True
-            )
+        drb_circuits_untranspiled.append(circ_untranspiled)
+        drb_circuits_transpiled.append(circ_transpiled)
 
-    # Transpile
-    circuits_transpiled_list, _ = perform_backend_transpilation(
-        circuits_list,
-        backend=backend,
-        qubits=[x for y in qubits_array for x in y],
-        coupling_map=backend.coupling_map,
-        qiskit_optim_level=qiskit_optim_level,
-        routing_method=routing_method,
+    # Store the circuits
+    all_circuits.update(
+        {
+            "untranspiled": drb_circuits_untranspiled,
+            "transpiled": drb_circuits_transpiled,
+        }
     )
-
-    return circuits_list, circuits_transpiled_list
+    return all_circuits
 
 
 def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
@@ -406,6 +463,12 @@ class DirectRandomizedBenchmarking(Benchmark):
         self.backend_configuration_name = backend_arg if isinstance(backend_arg, str) else backend_arg.name
 
         self.qubits_array = configuration.qubits_array
+        self.eplg = configuration.eplg
+
+        # Override if EPLG is True but parallel_execution was set to False
+        if self.eplg and not configuration.parallel_execution:
+            configuration.parallel_execution = True
+
         self.parallel_execution = configuration.parallel_execution
         self.depths = configuration.depths
         self.num_circuit_samples = configuration.num_circuit_samples
@@ -416,7 +479,6 @@ class DirectRandomizedBenchmarking(Benchmark):
         self.sqg_gate_ensembles = configuration.sqg_gate_ensembles
 
         self.qiskit_optim_level = configuration.qiskit_optim_level
-        self.simulation_method = configuration.simulation_method
 
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
@@ -442,6 +504,10 @@ class DirectRandomizedBenchmarking(Benchmark):
             else:
                 dataset.attrs[key] = value
         # Defined outside configuration - if any
+        dataset.attrs["two_qubit_gate_ensembles"] = self.two_qubit_gate_ensembles
+        dataset.attrs["densities_2q_gates"] = self.densities_2q_gates
+        dataset.attrs["clifford_sqg_probabilities"] = self.clifford_sqg_probabilities
+        dataset.attrs["sqg_gate_ensembles"] = self.sqg_gate_ensembles
 
     def assign_inputs_to_qubits(self):  # pylint: disable=too-many-branches
         """Assigns all DRB inputs (Optional[Sequence[Any]]) to input qubit layouts.
@@ -456,8 +522,8 @@ class DirectRandomizedBenchmarking(Benchmark):
         if self.two_qubit_gate_ensembles is None:
             assigned_two_qubit_gate_ensembles = {str(q): {"CZGate": 1.0} for q in self.qubits_array}
         else:
-            if len(self.two_qubit_gate_ensembles) != len(self.qubits_array):
-                if len(self.two_qubit_gate_ensembles) != 1:
+            if len(self.two_qubit_gate_ensembles.values()) != len(self.qubits_array):
+                if len(self.two_qubit_gate_ensembles.values()) != 1:
                     qcvv_logger.warning(
                         f"The amount of 2Q gate ensembles ({len(self.two_qubit_gate_ensembles)}) is not the same "
                         f"as the amount of qubit layout configurations ({len(self.qubits_array)}):\n\tWill assign to all the first "
@@ -472,7 +538,9 @@ class DirectRandomizedBenchmarking(Benchmark):
                 }
 
         # Density 2Q gates
-        if self.densities_2q_gates is None:
+        if self.densities_2q_gates is None and self.eplg:
+            assigned_density_2q_gates = {str(q): 0.5 for q in self.qubits_array}
+        elif self.densities_2q_gates is None:
             assigned_density_2q_gates = {str(q): 0.25 for q in self.qubits_array}
         else:
             if len(self.densities_2q_gates) != len(self.qubits_array):
@@ -489,7 +557,9 @@ class DirectRandomizedBenchmarking(Benchmark):
                 }
 
         # clifford_sqg_probabilities
-        if self.clifford_sqg_probabilities is None:
+        if self.clifford_sqg_probabilities is None and self.eplg:
+            assigned_clifford_sqg_probabilities = {str(q): 0.0 for q in self.qubits_array}
+        elif self.clifford_sqg_probabilities is None:
             assigned_clifford_sqg_probabilities = {str(q): 1.0 for q in self.qubits_array}
         else:
             if len(self.clifford_sqg_probabilities) != len(self.qubits_array):
@@ -521,7 +591,9 @@ class DirectRandomizedBenchmarking(Benchmark):
                 assigned_sqg_gate_ensembles = {
                     str(q): self.sqg_gate_ensembles[q_idx] for q_idx, q in enumerate(self.qubits_array)
                 }
-        elif assigned_clifford_sqg_probabilities == {str(q): 1.0 for q in self.qubits_array}:
+        elif self.sqg_gate_ensembles is None and self.eplg:  # No Cliffords and no 1Q gates in layers
+            assigned_sqg_gate_ensembles = {str(q): {"IGate": 1.0} for q in self.qubits_array}
+        elif self.sqg_gate_ensembles is None:  # all are Clifford
             assigned_sqg_gate_ensembles = {str(q): {"HGate": 0.0} for q in self.qubits_array}
         else:
             assigned_sqg_gate_ensembles = {
@@ -604,8 +676,7 @@ class DirectRandomizedBenchmarking(Benchmark):
         # Main execution
         if self.parallel_execution:
             # Take the whole qubits_array and do DRB in parallel on each qubits_array element
-            parallel_untranspiled_rb_circuits = {}
-            parallel_transpiled_rb_circuits = {}
+            parallel_drb_circuits = {}
             qcvv_logger.info(
                 f"Executing parallel Direct RB on qubits {self.qubits_array}."
                 f" Will generate and submit all {self.num_circuit_samples} DRB circuits"
@@ -616,10 +687,7 @@ class DirectRandomizedBenchmarking(Benchmark):
             # Generate and submit all circuits
             for depth in self.depths:
                 qcvv_logger.info(f"Depth {depth}")
-                (
-                    (parallel_untranspiled_rb_circuits[depth], parallel_transpiled_rb_circuits[depth]),
-                    elapsed_time,
-                ) = generate_fixed_depth_parallel_drb_circuits(
+                parallel_drb_circuits[depth], elapsed_time = generate_fixed_depth_parallel_drb_circuits(
                     qubits_array=self.qubits_array,
                     depth=depth,
                     num_circuit_samples=self.num_circuit_samples,
@@ -635,7 +703,7 @@ class DirectRandomizedBenchmarking(Benchmark):
 
                 # Submit all
                 flat_qubits_array = [x for y in self.qubits_array for x in y]
-                sorted_transpiled_qc_list = {tuple(flat_qubits_array): parallel_transpiled_rb_circuits[depth]}
+                sorted_transpiled_qc_list = {tuple(flat_qubits_array): parallel_drb_circuits[depth]["transpiled"]}
                 all_drb_jobs.append(
                     submit_parallel_rb_job(
                         backend,
@@ -652,13 +720,13 @@ class DirectRandomizedBenchmarking(Benchmark):
                 self.untranspiled_circuits.circuit_groups.append(
                     CircuitGroup(
                         name=f"{str(self.qubits_array)}_depth_{depth}",
-                        circuits=parallel_untranspiled_rb_circuits[depth],
+                        circuits=parallel_drb_circuits[depth]["untranspiled"],
                     )
                 )
                 self.transpiled_circuits.circuit_groups.append(
                     CircuitGroup(
                         name=f"{str(self.qubits_array)}_depth_{depth}",
-                        circuits=parallel_transpiled_rb_circuits[depth],
+                        circuits=parallel_drb_circuits[depth]["transpiled"],
                     )
                 )
             qubit_idx = {str(self.qubits_array): "parallel_all"}
@@ -752,7 +820,16 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     Attributes:
         benchmark (Type[Benchmark]): DirectRandomizedBenchmarking.
         qubits_array (Sequence[Sequence[int]]): The array of physical qubits in which to execute DRB.
+        eplg (bool): Whether the DRB experiment is executed as a EPLG subroutine.
+                            * If True:
+                                - default parallel_execution below is override to True.
+                                - default two_qubit_gate_ensembles is {"CZGate": 1.0}.
+                                - default densities_2q_gates is 0.5 (probability of sampling 2Q gates is 1).
+                                - default clifford_sqg_probabilities is 0.0.
+                                - default sqg_gate_ensembles is {"IGate": 1.0}.
+                            * Default is False.
         parallel_execution (bool): Whether DRB is executed in parallel for all qubit layouts in qubits_array.
+                            * If eplg is False, it executes parallel DRB with MRB gate ensemble and density defaults.
                             * Default is False.
         depths (Sequence[int]): The list of layer depths in which to execute DRB for all qubit layouts in qubits_array.
         num_circuit_samples (int): The number of random-layer DRB circuits to generate.
@@ -775,13 +852,11 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
         sqg_gate_ensembles (Optional[Sequence[Dict[str, float]]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
                             * If len(sqg_gate_ensembles) != len(qubits_array), the first ensemble is assinged by default.
                             * Default is None, which leaves only uniform sampling of 1Q Clifford gates.
-        simulation_method (Literal["automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"]):
-                            Qiskit's Aer simulation method.
-                            * Default is "automatic".
     """
 
     benchmark: Type[Benchmark] = DirectRandomizedBenchmarking
     qubits_array: Sequence[Sequence[int]]
+    eplg: bool = False
     parallel_execution: bool = False
     depths: Sequence[int]
     num_circuit_samples: int
@@ -790,6 +865,3 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     densities_2q_gates: Optional[Sequence[float]] = None
     clifford_sqg_probabilities: Optional[Sequence[float]] = None
     sqg_gate_ensembles: Optional[Sequence[Dict[str, float]]] = None
-    simulation_method: Literal[
-        "automatic", "statevector", "stabilizer", "extended_stabilizer", "matrix_product_state"
-    ] = "automatic"
