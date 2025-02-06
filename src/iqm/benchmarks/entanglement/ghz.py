@@ -658,7 +658,7 @@ class GHZBenchmark(Benchmark):
             final_ghz = ghz_native_transpiled
         elif routine == "tree":
             # For star architectures, create an effective coupling map that represents all-to-all connectivity
-            if "move" in self.backend.operation_names and routine != "star":
+            if "move" in self.backend.operation_names:
                 qcvv_logger.warning(
                     f"The current backend is a star architecture for which a suboptimal state generation routine is chosen. Consider setting state_generation_routine={routine}."
                 )
