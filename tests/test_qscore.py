@@ -20,6 +20,8 @@ class TestQScore:
             choose_qubits_routine="custom",
             custom_qubits_array=[[2], [2, 0], [2, 0, 1], [2, 0, 1, 3], [2, 0, 1, 3, 4]],
             seed=1,
+            REM=True,
+            mit_shots=10,
         )
         benchmark = QScoreBenchmark(backend, EXAMPLE_QSCORE)
         benchmark.run()
