@@ -290,9 +290,9 @@ def fit_decay_lmfit(
     """
     n_qubits = len(qubit_set)
 
-    fidelity_guess = 0.988**n_qubits
-    offset_guess = 0.2 if n_qubits == 2 else 0.65
-    amplitude_guess = 0.8 if n_qubits == 2 else 0.35
+    fidelity_guess = 0.99**n_qubits
+    offset_guess = 0.3 if n_qubits == 2 else 0.65
+    amplitude_guess = 0.7 if n_qubits == 2 else 0.35
 
     estimates = {
         "depolarization_probability": 2 * (1 - fidelity_guess),
@@ -300,9 +300,9 @@ def fit_decay_lmfit(
         "amplitude": amplitude_guess + offset_guess,
     }
     constraints = {
-        "depolarization_probability": {"min": 0, "max": 1},
-        "offset": {"min": 0, "max": 1},
-        "amplitude": {"min": 0, "max": 1},
+        "depolarization_probability": {"min": 0.0, "max": 1.0},
+        "offset": {"min": 0.0, "max": 1.0},
+        "amplitude": {"min": 0.0, "max": 1.0},
     }
     if rb_identifier in ("clifford", "mrb", "drb"):
         fit_data = np.array([np.mean(data, axis=1)])
@@ -322,8 +322,8 @@ def fit_decay_lmfit(
             params = create_multi_dataset_params(
                 func,
                 fit_data,
-                initial_guesses=None if n_qubits > 1 else estimates,
-                constraints=constraints,
+                initial_guesses=estimates,
+                constraints=None,
                 simultaneously_fit_vars=None,
             )
             params.add(f"p_{rb_identifier}", expr=f"1-depolarization_probability_{1}")
