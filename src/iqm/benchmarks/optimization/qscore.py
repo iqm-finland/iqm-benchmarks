@@ -479,7 +479,7 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         observations.extend(
             [
                 BenchmarkObservation(
-                    name="approximation_ratio",
+                    name="mean_approximation_ratio",
                     value=approximation_ratio,
                     uncertainty=std_of_approximation_ratio,
                     identifier=BenchmarkObservationIdentifier(num_nodes),
@@ -752,7 +752,7 @@ class QScoreBenchmark(Benchmark):
         else:
             max_num_nodes = self.max_num_nodes
 
-        dataset.attrs.update({"max_num_nodes": self.max_num_nodes})
+        dataset.attrs.update({"max_num_nodes": max_num_nodes})
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
             qc_list = []
@@ -802,11 +802,11 @@ class QScoreBenchmark(Benchmark):
                 # Choose the qubit layout
 
                 if self.choose_qubits_routine.lower() == "naive":
-                    qubit_set = self.choose_qubits_naive(num_nodes)
+                    qubit_set = self.choose_qubits_naive(num_nodes - 1)
                 elif (
                     self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic"
                 ):
-                    qubit_set = self.choose_qubits_custom(num_nodes)
+                    qubit_set = self.choose_qubits_custom(num_nodes - 1)
                 else:
                     raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
                 qubit_set_list.append(qubit_set)
