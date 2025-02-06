@@ -874,7 +874,9 @@ class QScoreBenchmark(Benchmark):
                     qcvv_logger.setLevel(logging.INFO)
 
                     if self.REM:
-                        rem_counts = apply_readout_error_mitigation(backend, transpiled_qc, [retrieve_all_counts(jobs)[0][0]], self.mit_shots)
+                        rem_counts = apply_readout_error_mitigation(
+                            backend, transpiled_qc, [retrieve_all_counts(jobs)[0][0]], self.mit_shots
+                        )
                         rem_distribution = rem_counts[0][0].nearest_probability_distribution()
                         execution_results.append(rem_distribution)
                     else:
