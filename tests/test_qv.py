@@ -12,7 +12,7 @@ class TestQV:
     def test_qv(self):
         EXAMPLE_QV = QuantumVolumeConfiguration(
             num_circuits=5,
-            shots=2**4,
+            shots=2**5,
             calset_id=None,
             num_sigmas=2,
             choose_qubits_routine="custom",
@@ -32,9 +32,9 @@ class TestQV:
     def test_clops(self):
         EXAMPLE_CLOPS = CLOPSConfiguration(
             qubits=[2, 3],
-            num_circuits=2,  # By definition set to 100
+            num_circuits=4,  # By definition set to 100
             num_updates=2,  # By definition set to 10
-            num_shots=2,  # By definition set to 100
+            num_shots=2**5,  # By definition set to 100
             calset_id=None,
             clops_h_bool=True,
             qiskit_optim_level=3,
