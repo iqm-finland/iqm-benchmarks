@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 2.15
+============
+* Added optimal GHZ circuit generation and corresponding example notebook for all-to-all connected QPU topology.
+
+Version 2.14
+============
+* Added devices folder in docs with notebook to benchmark IQM Spark.
+
+Version 2.13
+============
+* Move all example notebooks to docs. `#30 <https://github.com/iqm-finland/iqm-benchmarks/pull/30>`_
+
 Version 2.12
 ============
 * Added compatibility with IQM-Deneb by adapting the transpilation behavior in several benchmarks.

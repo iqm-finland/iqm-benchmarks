@@ -15,7 +15,9 @@ Contents
    :maxdepth: 2
 
    readme
-   examples
+   examples/examples
+   devices/devices
+   development/development
    API
    license
 

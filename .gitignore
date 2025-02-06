@@ -7,6 +7,7 @@ __pycache__/
 *.png
 *.jpg
 *.jpeg
+*.pkl
 
 # Package files
 *.eggs/
