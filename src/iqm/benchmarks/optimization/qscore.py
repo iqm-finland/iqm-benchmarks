@@ -922,7 +922,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
         num_instances (int):
         num_qaoa_layers (int):
         min_num_nodes (int):
-        max_num_nodes (int):
+        max_num_nodes (int): The max number of nodes to be taken into account which has to be <= num_qubits + 1.
         use_virtual_node (bool):
         use_classically_optimized_angles (bool):
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
