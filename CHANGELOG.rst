@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 2.16
+============
+* All functional tests extended to the fake Deneb backend.
+* Added backend transpilation to REM calibration circuits to fix errors with REM on fake Deneb.
+
 Version 2.15
 ============
 * Added optimal GHZ circuit generation and corresponding example notebook for all-to-all connected QPU topology.
