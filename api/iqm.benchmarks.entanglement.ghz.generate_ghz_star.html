@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer &#8212; IQM Benchmarks 2.15 documentation</title>
+    <title>iqm.benchmarks.entanglement.ghz.generate_ghz_star &#8212; IQM Benchmarks 2.15 documentation</title>
   
   
   
@@ -45,12 +45,12 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.entanglement.ghz.generate_ghz_star';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.plot_rb_decay" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.plot_rb_decay.html" />
-    <link rel="prev" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.import_native_gate_cliffords" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.import_native_gate_cliffords.html" />
+    <link rel="next" title="iqm.benchmarks.entanglement.ghz.get_cx_map" href="iqm.benchmarks.entanglement.ghz.get_cx_map.html" />
+    <link rel="prev" title="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree" href="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.15" />
@@ -202,8 +202,8 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.compressive_gst.gst_analysis.html">iqm.benchmarks.compressive_gst.gst_analysis</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
@@ -216,12 +216,12 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.quantum_volume.quantum_volume.html">iqm.benchmarks.quantum_volume.quantum_volume</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
-<li class="toctree-l4 current active"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.readout_mitigation.html">iqm.benchmarks.readout_mitigation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -313,7 +313,7 @@
       
       
       
-      <li><a href="../_sources/api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer.rst" target="_blank"
+      <li><a href="../_sources/api/iqm.benchmarks.entanglement.ghz.generate_ghz_star.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -389,7 +389,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer</h1>
+    <h1>iqm.benchmarks.entanglement.ghz.generate_ghz_star</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -399,7 +399,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer"><code class="docutils literal notranslate"><span class="pre">lmfit_minimizer()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.generate_ghz_star"><code class="docutils literal notranslate"><span class="pre">generate_ghz_star()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -411,25 +411,22 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="iqm-benchmarks-randomized-benchmarking-randomized-benchmarking-common-lmfit-minimizer">
-<h1>iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer<a class="headerlink" href="#iqm-benchmarks-randomized-benchmarking-randomized-benchmarking-common-lmfit-minimizer" title="Link to this heading">#</a></h1>
+  <section id="iqm-benchmarks-entanglement-ghz-generate-ghz-star">
+<h1>iqm.benchmarks.entanglement.ghz.generate_ghz_star<a class="headerlink" href="#iqm-benchmarks-entanglement-ghz-generate-ghz-star" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer">
-<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.</span></span><span class="sig-name descname"><span class="pre">lmfit_minimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Callable" title="(in Python v3.11)"><span class="pre">Callable</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MinimizerResult</span></span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dt class="sig sig-object py" id="iqm.benchmarks.entanglement.ghz.generate_ghz_star">
+<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.entanglement.ghz.</span></span><span class="sig-name descname"><span class="pre">generate_ghz_star</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IQMCircuit</span></span></span><a class="headerlink" href="#iqm.benchmarks.entanglement.ghz.generate_ghz_star" title="Link to this definition">#</a></dt>
+<dd><p>Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
+:param num_qubits: the number of qubits of the GHZ state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A quantum circuit generating a GHZ state on a given number of qubits.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QuantumCircuit</p>
+</dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fit_parameters</strong> (<em>Parameters</em>) – the parameters to fit</p></li>
-<li><p><strong>fit_data</strong> (<em>np.ndarray</em>) – the data to fit</p></li>
-<li><p><strong>depths</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – the depths of the RB experiment</p></li>
-<li><p><strong>func</strong> (<em>Callable</em>) – the model function for fitting</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the result of the minimization</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>MinimizerResult</p>
+<dd class="field-odd"><p><strong>num_qubits</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -448,20 +445,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.import_native_gate_cliffords.html"
+       href="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.import_native_gate_cliffords</p>
+        <p class="prev-next-title">iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree</p>
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.plot_rb_decay.html"
+       href="iqm.benchmarks.entanglement.ghz.get_cx_map.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.plot_rb_decay</p>
+        <p class="prev-next-title">iqm.benchmarks.entanglement.ghz.get_cx_map</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -482,7 +479,7 @@
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.lmfit_minimizer"><code class="docutils literal notranslate"><span class="pre">lmfit_minimizer()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.generate_ghz_star"><code class="docutils literal notranslate"><span class="pre">generate_ghz_star()</span></code></a></li>
 </ul>
   </nav></div>
 

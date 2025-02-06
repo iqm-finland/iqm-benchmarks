@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.entanglement.ghz &#8212; IQM Benchmarks 2.14 documentation</title>
+    <title>iqm.benchmarks.entanglement.ghz &#8212; IQM Benchmarks 2.15 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=eb63f014"></script>
+    <script src="../_static/documentation_options.js?v=509f7209"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.entanglement" href="iqm.benchmarks.entanglement.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.14" />
-    <meta name="docbuild:last-update" content="2025-01-31"/>
+  <meta name="docsearch:version" content="2.15" />
+    <meta name="docbuild:last-update" content="2025-02-06"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.14 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.14 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.15 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.15 documentation - Home"/>
   
   
 </a></div>
@@ -159,6 +159,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_quantum_volume_deneb.html">QV on Deneb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_ghz_deneb.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_qscore.html">Q-Score</a></li>
 </ul>
 </details></li>
@@ -430,13 +431,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree.html#iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree" title="iqm.benchmarks.entanglement.ghz.generate_ghz_spanning_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_spanning_tree</span></code></a>(graph, qubit_layout)</p></td>
 <td><p>Generates a GHZ state in log-depth by computing a minimal spanning tree for a given coupling map.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_cx_map.html#iqm.benchmarks.entanglement.ghz.get_cx_map" title="iqm.benchmarks.entanglement.ghz.get_cx_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cx_map</span></code></a>(qubit_layout, graph)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.generate_ghz_star.html#iqm.benchmarks.entanglement.ghz.generate_ghz_star" title="iqm.benchmarks.entanglement.ghz.generate_ghz_star"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_ghz_star</span></code></a>(num_qubits)</p></td>
+<td><p>Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_cx_map.html#iqm.benchmarks.entanglement.ghz.get_cx_map" title="iqm.benchmarks.entanglement.ghz.get_cx_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cx_map</span></code></a>(qubit_layout, graph)</p></td>
 <td><p>Calculate the cx_map based on participating qubits and the 2QB gate fidelities between them.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_edges.html#iqm.benchmarks.entanglement.ghz.get_edges" title="iqm.benchmarks.entanglement.ghz.get_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edges</span></code></a>(coupling_map, qubit_layout[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.get_edges.html#iqm.benchmarks.entanglement.ghz.get_edges" title="iqm.benchmarks.entanglement.ghz.get_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edges</span></code></a>(coupling_map, qubit_layout[, ...])</p></td>
 <td><p>Produces a networkx.Graph from coupling map fidelity information, with edges given by couplings</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.plot_fidelities.html#iqm.benchmarks.entanglement.ghz.plot_fidelities" title="iqm.benchmarks.entanglement.ghz.plot_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_fidelities</span></code></a>(observations, dataset, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.plot_fidelities.html#iqm.benchmarks.entanglement.ghz.plot_fidelities" title="iqm.benchmarks.entanglement.ghz.plot_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_fidelities</span></code></a>(observations, dataset, ...)</p></td>
 <td><p>Plots all the fidelities stored in the observations into a single plot of fidelity vs.</p></td>
 </tr>
 </tbody>
@@ -528,7 +532,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-01-31.
+  Last updated on 2025-02-06.
   <br/>
 </p>
   </div>

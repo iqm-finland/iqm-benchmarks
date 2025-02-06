@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Clifford Randomized Benchmarking (RB) &#8212; IQM Benchmarks 2.15 documentation</title>
+    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.15 documentation</title>
   
   
   
@@ -45,12 +45,14 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/example_clifford_rb';</script>
+    <script>window.MathJax = {"tex": {"macros": {"vr": "\\vec{r}", "ket": ["\\left| #1 \\right\\rangle", 1], "iprod": ["\\left\\langle #1 | #2 \\right\\rangle", 2]}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/example_ghz_deneb';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Interleaved Randomized Benchmarking (IRB)" href="example_interleaved_rb.html" />
-    <link rel="prev" title="IQM Benchmarks: Summary Notebook" href="example_experiment_all.html" />
+    <link rel="next" title="Q-Score" href="example_qscore.html" />
+    <link rel="prev" title="Greenberger–Horne–Zeilinger (GHZ) State Fidelity" href="example_ghz.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.15" />
@@ -151,7 +153,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">IQM Benchmarks</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
@@ -159,7 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="example_quantum_volume_deneb.html">QV on Deneb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="example_ghz_deneb.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_qscore.html">Q-Score</a></li>
 </ul>
 </details></li>
@@ -313,7 +315,7 @@
       
       
       
-      <li><a href="../_sources/examples/example_clifford_rb.ipynb" target="_blank"
+      <li><a href="../_sources/examples/example_ghz_deneb.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -389,7 +391,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Clifford Randomized Benchmarking (RB)</h1>
+    <h1>Greenberger–Horne–Zeilinger (GHZ) State Fidelity</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -399,11 +401,10 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-iqm-token-if-using-resonance">Set IQM Token if using Resonance.</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-benchmarking-configuration">Randomized Benchmarking Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-the-analysis">Perform the analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-the-benchmark-configuration">Definition of the benchmark configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-benchmark">Running the benchmark</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-results">Accessing the results</a></li>
 </ul>
             </nav>
         </div>
@@ -415,332 +416,157 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="clifford-randomized-benchmarking-rb">
-<h1>Clifford Randomized Benchmarking (RB)<a class="headerlink" href="#clifford-randomized-benchmarking-rb" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="greenbergerhornezeilinger-ghz-state-fidelity">
+<h1>Greenberger–Horne–Zeilinger (GHZ) State Fidelity<a class="headerlink" href="#greenbergerhornezeilinger-ghz-state-fidelity" title="Link to this heading">#</a></h1>
+<p>The aim of this benchmark is to show whether a GHZ state with high enough fidelity can be prepared such that the state is genuinely multipartite entangled. One can show that a fidelity larger than 0.5 is a sufficient condition (see Leibfried, D. et al., <a class="reference external" href="https://www.nature.com/articles/nature04251">Nature 438, 639–642</a>  (2005))</p>
+<p>The benchmark currently offers two methods to estimate the fidelity:</p>
+<ul class="simple">
+<li><p>Multiple quantum coherences (G. J. Mooney et al., <a class="reference external" href="https://iopscience.iop.org/article/10.1088/2399-6528/ac1df7">J. Phys. Commun. 5, 095004</a> (2021))</p></li>
+<li><p>Randomized measurements (Elben, A. et al., <a class="reference external" href="https://journals.aps.org/pra/abstract/10.1103/PhysRevA.99.052323">Phys. Rev. A 99, 052323</a> (2019))</p></li>
+</ul>
+<p>Additionally, for a given set of <span class="math notranslate nohighlight">\(n\)</span> qubits, different circuits can be applied which lead to the same GHZ state. Currently there are the following implementations:</p>
+<ul class="simple">
+<li><p>“naive”: The textbook ciruit of depth <span class="math notranslate nohighlight">\(n\)</span>, which starts from a Hadamard gate on one qubit and entangles each additional qubit with a CNOT operation from the first qubit.</p></li>
+<li><p>“log_depth”: A logarithmic depth circuit utilizing parallel CNOT applications. Either the method in Cruz et al. <a class="reference external" href="https://arxiv.org/abs/1807.05572">arXiv:1807.05572</a> or the method in Mooney et al. <a class="reference external" href="https://arxiv.org/abs/2101.08946">arXiv:2101.08946</a> is used, depending on which yields the lower depth or the lower number of 2-qubit gates.</p></li>
+<li><p>“star”: A linear circuit that creates GHZ states that is tailored for IQM’s novel, effectively all-to-all, connected QPU topology.</p></li>
+<li><p>“tree”: An IQM-developed logarithmic depth circuit utilizing calibration data of the CZ average fidelities and a tree-graph algorithm to find a circuit with minimal depth and high fidelity 2-qubit gates.</p></li>
+</ul>
+<p>Note that the first two methods will always give, respectively, the same circuits for the same qubit layouts and same coupling maps, while the <code class="docutils literal notranslate"><span class="pre">tree</span></code> method relies on the latest calibration data and can give different circuits at different execution times.
+Thus, for consistent comparisons, one of the first two methods should be chosen, while for the best results, i.e., the largest possible Genuine Multipartite Entanglement (GME) - entangled GHZ state, the <code class="docutils literal notranslate"><span class="pre">tree</span></code>-method is preferable.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.ghz</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;deneb&quot;</span>
 </pre></div>
 </div>
 </div>
 </div>
-<section id="choose-or-define-a-backend">
-<h2>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#backend = &quot;fakeadonis&quot;</span>
-<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;fakeapollo&quot;</span>
-<span class="c1">#backend = &quot;garnet&quot;</span>
-<span class="c1">#backend = &quot;deneb&quot;</span>
-</pre></div>
-</div>
-</div>
-</div>
-</section>
 <section id="set-iqm-token-if-using-resonance">
 <h2>Set IQM Token if using Resonance.<a class="headerlink" href="#set-iqm-token-if-using-resonance" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import os</span>
-<span class="c1"># os.environ[&quot;IQM_TOKEN&quot;] = &quot;&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="randomized-benchmarking-configuration">
-<h2>Randomized Benchmarking Configuration<a class="headerlink" href="#randomized-benchmarking-configuration" title="Link to this heading">#</a></h2>
-<p>NB: Clifford RB is executed by default with Interleaved RB !</p>
+<section id="definition-of-the-benchmark-configuration">
+<h2>Definition of the benchmark configuration<a class="headerlink" href="#definition-of-the-benchmark-configuration" title="Link to this heading">#</a></h2>
+<p>The important parameters are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">custom_qubits_array</span></code>: A <code class="docutils literal notranslate"><span class="pre">list[list[int]]</span></code> which includes all qubit layouts on which the benchmark is run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shots</span></code>: The number of shots for the fidelity measurement</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fidelity_routine</span></code>: Either “coherences” or “randomized_measurements”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rem</span></code>: Boolean value that controls whether readout error mitigation is used</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mit_shots</span></code>: Whenever rem=True, this parameter controls the total number of shots used to calibrate readout error mitgation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_RMs</span></code>: The number of randomized measurement settings (only necessary when choosing <code class="docutils literal notranslate"><span class="pre">fidelity_routine=randomized_measurements</span></code>)</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EXAMPLE_CRB</span> <span class="o">=</span> <span class="n">CliffordRBConfiguration</span><span class="p">(</span>
-    <span class="n">qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span><span class="c1">#,[8,9],[13,14],[17,18],[5,6],[10,11],[15,16]],</span>
-    <span class="n">sequence_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)],</span>
-    <span class="n">num_circuit_samples</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">parallel_execution</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">MINIMAL_GHZ</span> <span class="o">=</span> <span class="n">GHZConfiguration</span><span class="p">(</span>
+    <span class="n">state_generation_routine</span><span class="o">=</span><span class="s2">&quot;star&quot;</span><span class="p">,</span>
+            <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">num_qubits</span><span class="p">)</span>
+            <span class="p">],</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">fidelity_routine</span><span class="o">=</span><span class="s2">&quot;coherences&quot;</span><span class="p">,</span> 
+    <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="run-the-experiment">
-<h2>Run the experiment<a class="headerlink" href="#run-the-experiment" title="Link to this heading">#</a></h2>
+<section id="running-the-benchmark">
+<h2>Running the benchmark<a class="headerlink" href="#running-the-benchmark" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_clifford_rb</span> <span class="o">=</span> <span class="n">CliffordRandomizedBenchmarking</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">EXAMPLE_CRB</span><span class="p">)</span>
-<span class="n">run_clifford_rb</span> <span class="o">=</span> <span class="n">benchmark_clifford_rb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_ghz</span> <span class="o">=</span> <span class="n">GHZBenchmark</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">MINIMAL_GHZ</span><span class="p">)</span>
+<span class="n">run_ghz</span> <span class="o">=</span> <span class="n">benchmark_ghz</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-12-17 11:56:12,750 - iqm.benchmarks.logging_config - INFO - Clifford dictionaries imported successfully !
-2024-12-17 11:56:12,750 - iqm.benchmarks.logging_config - INFO - Executing sequential Clifford RB on qubits [0, 1]. Will generate and submit all 25 Clifford RB circuits for each depth [1, 3, 7, 15, 31, 63]
-2024-12-17 11:56:12,750 - iqm.benchmarks.logging_config - INFO - Now at sequence length 1
-2024-12-17 11:56:12,831 - iqm.benchmarks.logging_config - INFO - Now at sequence length 3
-2024-12-17 11:56:12,992 - iqm.benchmarks.logging_config - INFO - Now at sequence length 7
-2024-12-17 11:56:13,341 - iqm.benchmarks.logging_config - INFO - Now at sequence length 15
-2024-12-17 11:56:14,040 - iqm.benchmarks.logging_config - INFO - Now at sequence length 31
-2024-12-17 11:56:20,469 - iqm.benchmarks.logging_config - INFO - Now at sequence length 63
-2024-12-17 11:56:23,291 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [0, 1]
-2024-12-17 11:56:23,292 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [0, 1]
-2024-12-17 11:56:23,349 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [0, 1]
-2024-12-17 11:56:23,541 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [0, 1]
-2024-12-17 11:56:23,600 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [0, 1]
-2024-12-17 11:56:23,756 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [0, 1]
-2024-12-17 11:56:23,837 - iqm.benchmarks.logging_config - INFO - All jobs for qubits [0, 1] and sequence lengths [1, 3, 7, 15, 31, 63] submitted successfully!
-2024-12-17 11:56:24,025 - iqm.benchmarks.logging_config - INFO - Executing sequential Clifford RB on qubits [3, 4]. Will generate and submit all 25 Clifford RB circuits for each depth [1, 3, 7, 15, 31, 63]
-2024-12-17 11:56:30,171 - iqm.benchmarks.logging_config - INFO - Now at sequence length 1
-2024-12-17 11:56:30,905 - iqm.benchmarks.logging_config - INFO - Now at sequence length 3
-2024-12-17 11:56:31,544 - iqm.benchmarks.logging_config - INFO - Now at sequence length 7
-2024-12-17 11:56:31,899 - iqm.benchmarks.logging_config - INFO - Now at sequence length 15
-2024-12-17 11:56:32,624 - iqm.benchmarks.logging_config - INFO - Now at sequence length 31
-2024-12-17 11:56:34,004 - iqm.benchmarks.logging_config - INFO - Now at sequence length 63
-2024-12-17 11:56:43,319 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4]
-2024-12-17 11:56:43,319 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4]
-2024-12-17 11:56:43,400 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4]
-2024-12-17 11:56:43,569 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4]
-2024-12-17 11:56:43,777 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4]
-2024-12-17 11:56:43,840 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4]
-2024-12-17 11:56:44,048 - iqm.benchmarks.logging_config - INFO - All jobs for qubits [3, 4] and sequence lengths [1, 3, 7, 15, 31, 63] submitted successfully!
-2024-12-17 11:56:44,098 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[0, 1]_depth_1
-2024-12-17 11:56:44,323 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [0, 1] and depth 1 run to the dataset
-2024-12-17 11:56:45,186 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[0, 1]_depth_3
-2024-12-17 11:56:45,186 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [0, 1] and depth 3 run to the dataset
-2024-12-17 11:56:45,225 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[0, 1]_depth_7
-2024-12-17 11:56:45,225 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [0, 1] and depth 7 run to the dataset
-2024-12-17 11:56:45,267 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[0, 1]_depth_15
-2024-12-17 11:56:45,267 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [0, 1] and depth 15 run to the dataset
-2024-12-17 11:56:45,314 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[0, 1]_depth_31
-2024-12-17 11:56:45,315 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [0, 1] and depth 31 run to the dataset
-2024-12-17 11:56:45,364 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[0, 1]_depth_63
-2024-12-17 11:56:45,364 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [0, 1] and depth 63 run to the dataset
-2024-12-17 11:56:45,416 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[3, 4]_depth_1
-2024-12-17 11:56:45,417 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [3, 4] and depth 1 run to the dataset
-2024-12-17 11:56:45,476 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[3, 4]_depth_3
-2024-12-17 11:56:45,476 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [3, 4] and depth 3 run to the dataset
-2024-12-17 11:56:45,542 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[3, 4]_depth_7
-2024-12-17 11:56:45,542 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [3, 4] and depth 7 run to the dataset
-2024-12-17 11:56:45,615 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[3, 4]_depth_15
-2024-12-17 11:56:45,616 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [3, 4] and depth 15 run to the dataset
-2024-12-17 11:56:45,697 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[3, 4]_depth_31
-2024-12-17 11:56:45,697 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [3, 4] and depth 31 run to the dataset
-2024-12-17 11:56:45,789 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[3, 4]_depth_63
-2024-12-17 11:56:45,789 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [3, 4] and depth 63 run to the dataset
-2024-12-17 11:56:45,890 - iqm.benchmarks.logging_config - INFO - RB experiment concluded !
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-04 14:11:31,352 - iqm.benchmarks.logging_config - INFO - Now generating a 2-qubit GHZ state on qubits [1, 2]
+2025-02-04 14:11:31,356 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:31,704 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:31,776 - iqm.benchmarks.logging_config - INFO - Submitting batch with 7 circuits corresponding to qubits [1, 2]
+/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-02-04 14:11:32,204 - iqm.benchmarks.logging_config - INFO - Now generating a 3-qubit GHZ state on qubits [1, 2, 3]
+2025-02-04 14:11:32,205 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:32,219 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:32,339 - iqm.benchmarks.logging_config - INFO - Submitting batch with 9 circuits corresponding to qubits [1, 2, 3]
+2025-02-04 14:11:32,723 - iqm.benchmarks.logging_config - INFO - Now generating a 4-qubit GHZ state on qubits [1, 2, 3, 4]
+2025-02-04 14:11:32,724 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:32,740 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:32,919 - iqm.benchmarks.logging_config - INFO - Submitting batch with 11 circuits corresponding to qubits [1, 2, 3, 4]
+2025-02-04 14:11:33,276 - iqm.benchmarks.logging_config - INFO - Now generating a 5-qubit GHZ state on qubits [1, 2, 3, 4, 5]
+2025-02-04 14:11:33,278 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:33,308 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:33,543 - iqm.benchmarks.logging_config - INFO - Submitting batch with 13 circuits corresponding to qubits [1, 2, 3, 4, 5]
+2025-02-04 14:11:34,078 - iqm.benchmarks.logging_config - INFO - Now generating a 6-qubit GHZ state on qubits [1, 2, 3, 4, 5, 6]
+2025-02-04 14:11:34,081 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:34,125 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-04 14:11:34,441 - iqm.benchmarks.logging_config - INFO - Submitting batch with 15 circuits corresponding to qubits [1, 2, 3, 4, 5, 6]
+2025-02-04 14:11:34,927 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-04 14:14:20,649 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-02-04 14:14:52,548 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-04 14:14:52,872 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-02-04 14:14:58,455 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-04 14:14:58,912 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-02-04 14:15:04,339 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-04 14:15:04,805 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-02-04 14:15:10,102 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-04 14:15:10,595 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
 </pre></div>
 </div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">benchmark_ghz</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/749f8e7f4c8f15b0e73a88590bdc530124745d075bc93aceca4f5484241dccbd.png" src="../_images/749f8e7f4c8f15b0e73a88590bdc530124745d075bc93aceca4f5484241dccbd.png" />
 </div>
 </div>
 </section>
-<section id="perform-the-analysis">
-<h2>Perform the analysis<a class="headerlink" href="#perform-the-analysis" title="Link to this heading">#</a></h2>
+<section id="accessing-the-results">
+<h2>Accessing the results<a class="headerlink" href="#accessing-the-results" title="Link to this heading">#</a></h2>
+<p>To see individual fidelitiy and uncertainty values of a given qubit layout, one can filter the <code class="docutils literal notranslate"><span class="pre">result.observations</span></code>-list by layout as shown below.</p>
+<p>The plot allows a comparison of all layout results with and without REM, where the data point description labels “L0”, “L1”, … enumerate the layouts in the order defined in the configuration.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clifford_rb</span> <span class="o">=</span> <span class="n">benchmark_clifford_rb</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">observation</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">observation</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">string_identifier</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">qubit_layout</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-12-17 11:56:45,931 - iqm.benchmarks.logging_config - INFO - Post-processing sequential RB for qubits [[0, 1], [3, 4]]
-2024-12-17 11:56:45,938 - iqm.benchmarks.logging_config - INFO - Qubits [0, 1] and depth 1
-2024-12-17 11:56:45,945 - iqm.benchmarks.logging_config - INFO - Qubits [0, 1] and depth 3
-2024-12-17 11:56:45,952 - iqm.benchmarks.logging_config - INFO - Qubits [0, 1] and depth 7
-2024-12-17 11:56:45,959 - iqm.benchmarks.logging_config - INFO - Qubits [0, 1] and depth 15
-2024-12-17 11:56:45,966 - iqm.benchmarks.logging_config - INFO - Qubits [0, 1] and depth 31
-2024-12-17 11:56:45,972 - iqm.benchmarks.logging_config - INFO - Qubits [0, 1] and depth 63
-2024-12-17 11:56:45,979 - iqm.benchmarks.logging_config - INFO - Qubits [3, 4] and depth 1
-2024-12-17 11:56:45,986 - iqm.benchmarks.logging_config - INFO - Qubits [3, 4] and depth 3
-2024-12-17 11:56:45,993 - iqm.benchmarks.logging_config - INFO - Qubits [3, 4] and depth 7
-2024-12-17 11:56:45,999 - iqm.benchmarks.logging_config - INFO - Qubits [3, 4] and depth 15
-2024-12-17 11:56:46,006 - iqm.benchmarks.logging_config - INFO - Qubits [3, 4] and depth 31
-2024-12-17 11:56:46,013 - iqm.benchmarks.logging_config - INFO - Qubits [3, 4] and depth 63
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>fidelity: 0.9430881954317198 +/- None
+fidelity_rem: 0.9742741960417851 +/- None
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;clifford&#39;: {&#39;[0, 1]&#39;: 0.946844466999168}}
-[0, 1]
-clifford
-{&#39;clifford&#39;: {&#39;[3, 4]&#39;: 0.9429197366921651}}
-[3, 4]
-clifford
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_clifford_rb</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;session_timestamp&#39;: &#39;20241217-115553&#39;,
- &#39;execution_timestamp&#39;: &#39;20241217-115553&#39;,
- &#39;backend_configuration_name&#39;: &#39;fakeapollo&#39;,
- &#39;backend_name&#39;: &#39;IQMFakeApolloBackend&#39;,
- &#39;benchmark&#39;: &#39;clifford_rb&#39;,
- &#39;shots&#39;: 256,
- &#39;max_gates_per_batch&#39;: None,
- &#39;calset_id&#39;: None,
- &#39;routing_method&#39;: &#39;sabre&#39;,
- &#39;physical_layout&#39;: &#39;fixed&#39;,
- &#39;qubits_array&#39;: [[0, 1], [3, 4]],
- &#39;sequence_lengths&#39;: [1, 3, 7, 15, 31, 63],
- &#39;num_circuit_samples&#39;: 25,
- &#39;parallel_execution&#39;: False,
- 0: {&#39;qubits&#39;: [0, 1],
-  &#39;depth_1&#39;: {&#39;time_circuit_generation&#39;: 10.541001081466675,
-   &#39;time_submit&#39;: 0.0006990432739257812,
-   &#39;time_retrieve&#39;: 0.22491073608398438,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;8f305755-e038-4596-8617-d96ba3f42ca9&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_3&#39;: {&#39;time_circuit_generation&#39;: 10.541001081466675,
-   &#39;time_submit&#39;: 0.05647683143615723,
-   &#39;time_retrieve&#39;: 0.0005230903625488281,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;2fe0b406-8977-4567-bba0-d4168f0883ed&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_7&#39;: {&#39;time_circuit_generation&#39;: 10.541001081466675,
-   &#39;time_submit&#39;: 0.19257187843322754,
-   &#39;time_retrieve&#39;: 0.0004839897155761719,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;8299918c-be26-40d5-8778-9ea4468a1df2&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_15&#39;: {&#39;time_circuit_generation&#39;: 10.541001081466675,
-   &#39;time_submit&#39;: 0.05831408500671387,
-   &#39;time_retrieve&#39;: 0.0004811286926269531,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;174640c4-9ff3-4ca3-9ffc-d6aa5be304f3&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_31&#39;: {&#39;time_circuit_generation&#39;: 10.541001081466675,
-   &#39;time_submit&#39;: 0.1564040184020996,
-   &#39;time_retrieve&#39;: 0.0006189346313476562,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;7bb739f2-31bc-40af-8dbf-1d60a9310391&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_63&#39;: {&#39;time_circuit_generation&#39;: 10.541001081466675,
-   &#39;time_submit&#39;: 0.08135986328125,
-   &#39;time_retrieve&#39;: 0.0004200935363769531,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;f414a2c1-75c8-4d5a-9e4b-ccce29903f5f&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}}},
- 1: {&#39;qubits&#39;: [3, 4],
-  &#39;depth_1&#39;: {&#39;time_circuit_generation&#39;: 13.147684812545776,
-   &#39;time_submit&#39;: 0.0005502700805664062,
-   &#39;time_retrieve&#39;: 0.00039887428283691406,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;8832576a-6d6e-4abe-8cfa-5001e6bb98ee&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_3&#39;: {&#39;time_circuit_generation&#39;: 13.147684812545776,
-   &#39;time_submit&#39;: 0.08015298843383789,
-   &#39;time_retrieve&#39;: 0.00039315223693847656,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;ecc1bcea-ef4c-4f35-9284-ab49af0c5b9f&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_7&#39;: {&#39;time_circuit_generation&#39;: 13.147684812545776,
-   &#39;time_submit&#39;: 0.16936397552490234,
-   &#39;time_retrieve&#39;: 0.0003960132598876953,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;5582c842-0f07-46b6-96be-2fb3925b19d9&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_15&#39;: {&#39;time_circuit_generation&#39;: 13.147684812545776,
-   &#39;time_submit&#39;: 0.20774221420288086,
-   &#39;time_retrieve&#39;: 0.0004191398620605469,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;6423b02b-8417-4300-b7ac-84d59f87a51f&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_31&#39;: {&#39;time_circuit_generation&#39;: 13.147684812545776,
-   &#39;time_submit&#39;: 0.0635080337524414,
-   &#39;time_retrieve&#39;: 0.0004169940948486328,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;0b324804-44fe-4c16-83eb-08e5cd67aa79&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}},
-  &#39;depth_63&#39;: {&#39;time_circuit_generation&#39;: 13.147684812545776,
-   &#39;time_submit&#39;: 0.20784401893615723,
-   &#39;time_retrieve&#39;: 0.0004961490631103516,
-   &#39;all_job_metadata&#39;: {&#39;batch_job_1&#39;: {&#39;job_id&#39;: &#39;6c633640-d4b4-47de-a46d-d3ae4c84d212&#39;,
-     &#39;backend&#39;: &#39;aer_simulator&#39;,
-     &#39;status&#39;: &#39;job has successfully run&#39;,
-     &#39;circuits_in_batch&#39;: None,
-     &#39;shots&#39;: None,
-     &#39;timestamps&#39;: None}}}}}
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clifford_rb</span><span class="o">.</span><span class="n">observations</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[BenchmarkObservation(name=&#39;avg_gate_fidelity&#39;, value=0.946844466999168, identifier=BenchmarkObservationIdentifier(qubit_indices=[0, 1]), uncertainty=0.0012220693932290373),
- BenchmarkObservation(name=&#39;avg_gate_fidelity&#39;, value=0.9429197366921651, identifier=BenchmarkObservationIdentifier(qubit_indices=[3, 4]), uncertainty=0.001545469960991071)]
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="n">result_clifford_rb</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/81e0df86529ce5e6fb7052dd74f292a229ee906fd3b5049cea7304d9feb6a147.png" src="../_images/81e0df86529ce5e6fb7052dd74f292a229ee906fd3b5049cea7304d9feb6a147.png" />
-<img alt="../_images/5bda7deb75efb0b2bcecf24f138257c43a51bc700e0f527c468ab045eeeab864.png" src="../_images/5bda7deb75efb0b2bcecf24f138257c43a51bc700e0f527c468ab045eeeab864.png" />
 </div>
 </div>
 </section>
@@ -758,20 +584,20 @@ clifford
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="example_experiment_all.html"
+       href="example_ghz.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">IQM Benchmarks: Summary Notebook</p>
+        <p class="prev-next-title">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</p>
       </div>
     </a>
     <a class="right-next"
-       href="example_interleaved_rb.html"
+       href="example_qscore.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Interleaved Randomized Benchmarking (IRB)</p>
+        <p class="prev-next-title">Q-Score</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -792,11 +618,10 @@ clifford
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-iqm-token-if-using-resonance">Set IQM Token if using Resonance.</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-benchmarking-configuration">Randomized Benchmarking Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-the-analysis">Perform the analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-the-benchmark-configuration">Definition of the benchmark configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-benchmark">Running the benchmark</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-results">Accessing the results</a></li>
 </ul>
   </nav></div>
 
