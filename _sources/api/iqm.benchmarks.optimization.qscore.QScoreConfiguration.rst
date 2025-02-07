@@ -29,6 +29,8 @@ iqm.benchmarks.optimization.qscore.QScoreConfiguration
       ~QScoreConfiguration.qiskit_optim_level
       ~QScoreConfiguration.optimize_sqg
       ~QScoreConfiguration.seed
+      ~QScoreConfiguration.REM
+      ~QScoreConfiguration.mit_shots
       ~QScoreConfiguration.shots
       ~QScoreConfiguration.max_gates_per_batch
       ~QScoreConfiguration.calset_id
