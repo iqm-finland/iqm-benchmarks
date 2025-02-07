@@ -189,6 +189,7 @@ def generate_fixed_depth_parallel_drb_circuits(
     assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
     qiskit_optim_level: int = 3,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
+    eplg: bool = False
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates DRB circuits in parallel on multiple qubit layouts.
         The circuits follow a layered pattern with barriers, taylored to measured EPLG (arXiv:2311.05933),
@@ -207,6 +208,9 @@ def generate_fixed_depth_parallel_drb_circuits(
                         * Defaults to 1.
         routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): Qiskit transpiler routing method.
                         * Default is "basic".
+        eplg (bool): Whether the circuits belong to an EPLG experiment.
+                        * If True a single layer is generated.
+                        * Default is False.
     Returns:
         Dict[str, List[QuantumCircuit]]: A dictionary of untranspiled and transpiled lists of parallel (simultaneous) DRB circuits.
     """
@@ -239,15 +243,9 @@ def generate_fixed_depth_parallel_drb_circuits(
 
     # simulator = AerSimulator(method=simulation_method)
 
-    for _ in range(num_circuit_samples):
-        # Initialize the quantum circuit object
-        circ = QuantumCircuit(n_qubits)
-
-        # Generate small circuits to track inverses
-        local_circs = {str(q): QuantumCircuit(len(q)) for q in shuffled_qubits_array}
-
-        # Generate the layers
-        cycle_layers = {}
+    # Generate the layer if EPLG: this will be repeated in all samples and all depths!
+    cycle_layers = {}
+    if eplg:
         for q_idx, q in enumerate(shuffled_qubits_array):
             original_qubits = str(qubits_array[q_idx])
             cycle_layers[str(q)] = edge_grab(
@@ -259,6 +257,27 @@ def generate_fixed_depth_parallel_drb_circuits(
                 assigned_clifford_sqg_probabilities[original_qubits],
                 assigned_sqg_gate_ensembles[original_qubits],
             )
+
+    for _ in range(num_circuit_samples):
+        # Initialize the quantum circuit object
+        circ = QuantumCircuit(n_qubits)
+
+        # Generate small circuits to track inverses
+        local_circs = {str(q): QuantumCircuit(len(q)) for q in shuffled_qubits_array}
+
+        # Sample the layers if EPLG is False.
+        if not eplg:
+            for q_idx, q in enumerate(shuffled_qubits_array):
+                original_qubits = str(qubits_array[q_idx])
+                cycle_layers[str(q)] = edge_grab(
+                    qubits_array[q_idx],
+                    depth,
+                    backend_arg,
+                    assigned_density_2q_gates[original_qubits],
+                    assigned_two_qubit_gate_ensembles[original_qubits],
+                    assigned_clifford_sqg_probabilities[original_qubits],
+                    assigned_sqg_gate_ensembles[original_qubits],
+                )
 
         # Add the cycle layers
         for k in range(depth):
@@ -698,6 +717,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                     assigned_sqg_gate_ensembles=assigned_sqg_gate_ensembles,
                     qiskit_optim_level=self.qiskit_optim_level,
                     routing_method=self.routing_method,
+                    eplg=self.eplg
                 )
                 time_circuit_generation[str(self.qubits_array)] += elapsed_time
 
