@@ -19,9 +19,11 @@ General utility functions
 from collections import defaultdict
 from functools import wraps
 from math import floor
+import random
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple, Union, cast
 
+import requests
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
 import numpy as np
@@ -39,6 +41,8 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
 from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
+
+import networkx as nx
 
 
 def timeit(f):
@@ -181,6 +185,76 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
+def evaluate_hamiltonian_paths(
+    N: int, path_samples: int, backend_arg: str | IQMBackendBase, resonance_url_name: str, token: str, max_tries: int = 10
+) -> Dict[int, List[Tuple[int]]]:
+    """Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.
+
+    Args:
+        N (int): the number of vertices in the Hamiltonian paths to evaluate.
+        path_samples (int): the number of Hamiltonian paths to evaluate.
+        backend_arg (str | IQMBackendBase): the backend to evaluate the Hamiltonian paths on with respect to fidelity.
+        resonance_url_name (str): the name of the backend in the Resonance URL address.
+        token (str): the token to access the Resonance API.
+        max_tries: int = 10
+
+    Returns:
+        Dict[int, List[Tuple[int]]]: A dictionary with keys being fidelity products and values being the respective Hamiltonian paths.
+    """
+    if isinstance(backend_arg, str):
+        backend = get_iqm_backend(backend_arg)
+    else:
+        backend = backend_arg
+
+    backend_nx_graph = rx_to_nx_graph(backend_arg)
+
+    all_paths = []
+    sample_counter = 0
+    tries = 0
+    while sample_counter < path_samples and tries < max_tries:
+        h_path = random_hamiltonian_path(backend_nx_graph, N)
+        if not h_path:
+            tries += 1
+            continue
+        else:
+            all_paths.append(h_path)
+            tries = 0
+            sample_counter += 1
+    if tries == max_tries - 1:
+        raise Exception(f"Max tries to generate a Hamiltonian path with {N} vertices reached - try with less vertices!")
+
+    # Get scores for all paths
+    # Retrieve fidelity data
+    two_qubit_fidelity = {}
+
+    url = f"https://api.resonance.meetiqm.com/quantum-computers/v1/{resonance_url_name}/calibrations"
+    headers = {"Accept": "application/json", "Authorization": f"Bearer {token}"}
+    r = requests.get(url, headers=headers, timeout=5)
+    calibration = r.json()
+
+    edge_dictionary = {}
+    for iq in calibration["calibrations"][0]["metrics"][0]["metrics"]:
+        temp = list(iq.values())
+        two_qubit_fidelity[str(temp[0])] = temp[1]
+        two_qubit_fidelity[str([temp[0][1], temp[0][0]])] = temp[1]
+        edge_dictionary[str([temp[0][1], temp[0][0]])] = (
+            backend.qubit_name_to_index(temp[0][1]),
+            backend.qubit_name_to_index(temp[0][0]),
+        )
+
+    # Rate all the paths
+    path_costs = {}  # keys are costs, values are edge paths
+    for h_path in all_paths:
+        total_cost = 1
+        for edge in h_path:
+            total_cost *= two_qubit_fidelity[
+                str([backend.index_to_qubit_name(edge[0]), backend.index_to_qubit_name(edge[1])])
+            ]
+        path_costs[total_cost] = h_path
+
+    return path_costs
+
+
 def marginal_distribution(prob_dist: Dict[str, float], indices: Iterable[int]) -> Dict[str, float]:
     """Compute the marginal distribution over specified bits (indices)
 
@@ -278,6 +352,73 @@ def perform_backend_transpilation(
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]
 
     return transpiled_qc_list
+
+
+def random_hamiltonian_path(G: nx.Graph, N: int) -> List[Tuple[int]]:
+    """
+    Generates a random Hamiltonian path with N vertices from a given NetworkX graph.
+    If a Hamiltonian path isn't possible, it returns the longest valid path found.
+
+    Args:
+        G (networkx.Graph): The input graph
+        N (int): The desired number of vertices in the Hamiltonian path
+
+    Returns:
+        list: A list of edges (tuples of nodes) representing the Hamiltonian path, or an empty list if not possible.
+    """
+    if N > len(G):
+        raise ValueError(
+            f"The number of vertices in the Hamiltonian path ({N}) cannot be greater than the number of nodes in the graph ({len(G)})"
+        )
+
+    nodes = list(G.nodes)
+    random.shuffle(nodes)  # Shuffle nodes to introduce randomness
+
+    for start in nodes:
+        path = [start]
+        visited = set(path)
+        edges = []
+
+        while len(path) < N:
+            neighbors = [n for n in G.neighbors(path[-1]) if n not in visited]
+
+            if not neighbors:
+                break  # Dead end, stop trying this path
+
+            next_node = random.choice(neighbors)
+            edges.append((path[-1], next_node))
+            path.append(next_node)
+            visited.add(next_node)
+
+        if len(path) == N:
+            return edges  # Successfully found a Hamiltonian path of length N
+
+    return []  # No valid path found
+
+
+def rx_to_nx_graph(backend_arg: str | IQMBackendBase) -> nx.Graph:
+    """Convert the Rustworkx graph returned by a backend to a Networkx graph.
+
+    Args:
+        backend_arg (str | IQMBackendBase): The backend, either specified as str or as IQMBackendBase.
+
+    Returns:
+        networkx.Graph: The Networkx Graph corresponding to the backend graph.
+
+    """
+    if isinstance(backend_arg, str):
+        backend = get_iqm_backend(backend_arg)
+    else:
+        backend = backend_arg
+
+    # Generate a Networkx graph
+    graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
+    backend_egdes, backend_nodes = (list(graph_backend.edge_list()), list(graph_backend.node_indices()))
+    backend_nx_graph = nx.Graph()
+    backend_nx_graph.add_nodes_from(backend_nodes)
+    backend_nx_graph.add_edges_from(backend_egdes)
+
+    return backend_nx_graph
 
 
 def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str] = None) -> QuantumCircuit:
