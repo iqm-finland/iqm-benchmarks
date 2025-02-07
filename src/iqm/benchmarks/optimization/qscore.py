@@ -919,15 +919,21 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
 
     Attributes:
         benchmark (Type[Benchmark]): QScoreBenchmark
-        num_instances (int):
-        num_qaoa_layers (int):
-        min_num_nodes (int):
-        max_num_nodes (int): The max number of nodes to be taken into account which has to be <= num_qubits + 1.
-        use_virtual_node (bool):
-        use_classically_optimized_angles (bool):
+        num_instances (int): Number of random graphs to be chosen.
+        num_qaoa_layers (int): Depth of the QAOA circuit.
+                            * Default is 1.
+        min_num_nodes (int): The min number of nodes to be taken into account, which should be >= 2.
+                            * Default is 2.
+        max_num_nodes (int): The max number of nodes to be taken into account, which has to be <= num_qubits + 1.
+                            * Default is None
+        use_virtual_node (bool): Parameter to increase the potential Qscore by +1.
+                            * Default is True.
+        use_classically_optimized_angles (bool): Use pre-optimised tuned parameters in the QAOA circuit.
+                            * Default is True.
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
                             * Default is "custom".
-        min_num_qubits (int):
+        min_num_qubits (int): Minumum number of qubits. 
+                            * Default is 2
         custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
                             * Default is None.
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
@@ -936,6 +942,10 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is True.
         seed (int): The random seed.
                             * Default is 1.
+        REM (bool): Use readout error mitigation.
+                            * Default is False.
+        mit_shots: (int): Number of shots used in readout error mitigation.
+                            * Default is 1000.
     """
 
     benchmark: Type[Benchmark] = QScoreBenchmark
