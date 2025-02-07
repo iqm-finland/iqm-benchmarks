@@ -35,6 +35,7 @@ from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
+from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
@@ -174,9 +175,11 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
         iqm_server_url = "https://cocos.resonance.meetiqm.com/deneb"
         provider = IQMProvider(iqm_server_url)
         backend_object = provider.get_backend()
+    elif backend_label.lower() in ("iqmfakedeneb", "fakedeneb"):
+        backend_object = IQMFakeDeneb()
 
     else:
-        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis' or 'fakeapollo'.")
+        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis', 'fakeapollo' or 'fakedeneb'.")
 
     return backend_object
 
