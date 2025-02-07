@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.17
+============
+* Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
+
 Version 2.16
 ============
 * Added readout error mitigation for Qscore benchmark.
