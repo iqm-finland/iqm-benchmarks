@@ -1,4 +1,4 @@
-"""Tests for volumetric benchmarks"""
+"""Tests for Qscore estimation"""
 
 from iqm.benchmarks.optimization.qscore import *
 
@@ -14,12 +14,14 @@ class TestQScore:
             shots=4,
             calset_id=None,  # calibration set ID, default is None
             min_num_nodes=2,
-            max_num_nodes=5,
+            max_num_nodes=None,
             use_virtual_node=True,
             use_classically_optimized_angles=True,
             choose_qubits_routine="custom",
-            custom_qubits_array=[[2, 0], [2, 0, 1], [2, 0, 1, 3], [2, 0, 1, 3, 4]],
+            custom_qubits_array=[[2], [2, 0], [2, 0, 1], [2, 0, 1, 3], [2, 0, 1, 3, 4]],
             seed=1,
+            REM=True,
+            mit_shots=10,
         )
         benchmark = QScoreBenchmark(backend, EXAMPLE_QSCORE)
         benchmark.run()

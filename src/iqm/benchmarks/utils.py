@@ -324,7 +324,7 @@ def perform_backend_transpilation(
             transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
         if "move" in backend.operation_names:
             transpiled = transpile_to_IQM(
-                transpiled, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
+                qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
             if "move" in backend.operation_names:
