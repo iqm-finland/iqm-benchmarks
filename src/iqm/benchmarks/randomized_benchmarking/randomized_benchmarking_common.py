@@ -1091,8 +1091,6 @@ def plot_rb_decay(
     plt.legend(fontsize=8)
     ax.grid()
 
-    plt.gcf().set_dpi(350)
-
     plt.close()
 
     return fig_name, fig
