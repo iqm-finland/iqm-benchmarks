@@ -761,7 +761,6 @@ class QScoreBenchmark(Benchmark):
         else:
             max_num_nodes = self.max_num_nodes
 
-        qcvv_logger.info(print(max_num_nodes))
         dataset.attrs.update({"max_num_nodes": max_num_nodes})
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
@@ -940,7 +939,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is "custom".
         min_num_qubits (int): Minumum number of qubits.
                             * Default is 2
-        custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on. 
+        custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
                             If virtual_node is set to True, then a given graph with n nodes requires n-1 selected qubits.
                             If virtual_node is set to False, then a given graph with n nodes requires n selected qubits.
                             * Default is None.
