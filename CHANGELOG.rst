@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.17
+============
+* Update installation command for development mode. `#41 <https://github.com/iqm-finland/iqm-benchmarks/pull/41>`_
+
 Version 2.16
 ============
 * Added readout error mitigation for Qscore benchmark.
