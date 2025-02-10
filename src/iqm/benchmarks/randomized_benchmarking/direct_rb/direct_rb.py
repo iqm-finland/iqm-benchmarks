@@ -286,7 +286,7 @@ def generate_fixed_depth_parallel_drb_circuits(
             for q_idx, q in enumerate(shuffled_qubits_array):
                 original_qubits = str(qubits_array[q_idx])
                 if any(x != "CZGate" for x in assigned_two_qubit_gate_ensembles[original_qubits].keys()):
-                   is_circuit_native = False
+                    is_circuit_native = False
                 cycle_layers[str(q)] = edge_grab(
                     qubits_array[q_idx],
                     depth,
@@ -306,7 +306,7 @@ def generate_fixed_depth_parallel_drb_circuits(
                 for idx, i in enumerate(q):
                     rand_key = random.choice(clifford_1q_keys)
                     rand_clif_1q = cast(dict, cliffords_1q)[rand_key]
-                    #rand_clif = random_clifford(1)
+                    # rand_clif = random_clifford(1)
                     circ.compose(rand_clif_1q.to_instruction(), qubits=[i], inplace=True)
                     local_circs[str(q)].compose(rand_clif_1q.to_instruction(), qubits=[idx], inplace=True)
             circ.barrier()
@@ -340,10 +340,10 @@ def generate_fixed_depth_parallel_drb_circuits(
 
         circ_untranspiled = circ.copy()
 
-        if is_circuit_native: # Simply compose into a larger circuit
+        if is_circuit_native:  # Simply compose into a larger circuit
             circ_transpiled = QuantumCircuit(backend.num_qubits)
             circ_transpiled.compose(circ_untranspiled, qubits=flat_qubits_array, inplace=True)
-        else: # Do full qiskit transpile
+        else:  # Do full qiskit transpile
             circ_transpiled = transpile(
                 circ,
                 backend=backend,
@@ -751,7 +751,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                     cliffords_2q_dict=clifford_2q_dict,
                     qiskit_optim_level=self.qiskit_optim_level,
                     routing_method=self.routing_method,
-                    eplg=self.eplg
+                    eplg=self.eplg,
                 )
                 time_circuit_generation[str(self.qubits_array)] += elapsed_time
 

@@ -185,7 +185,12 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
 
 
 def evaluate_hamiltonian_paths(
-    N: int, path_samples: int, backend_arg: str | IQMBackendBase, resonance_url_name: str, token: str, max_tries: int = 10
+    N: int,
+    path_samples: int,
+    backend_arg: str | IQMBackendBase,
+    resonance_url_name: str,
+    token: str,
+    max_tries: int = 10,
 ) -> Dict[int, List[Tuple[int]]]:
     """Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.
 
