@@ -23,13 +23,14 @@ import random
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple, Union, cast
 
-import requests
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
+import networkx as nx
 import numpy as np
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
+import requests
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -41,8 +42,6 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
 from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
-
-import networkx as nx
 
 
 def timeit(f):

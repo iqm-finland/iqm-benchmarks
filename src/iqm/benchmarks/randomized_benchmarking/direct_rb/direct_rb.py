@@ -2,8 +2,9 @@
 Direct Randomized Benchmarking.
 """
 
+import random
 from time import strftime
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
 import numpy as np
 from qiskit import ClassicalRegister, QuantumCircuit, transpile
@@ -26,10 +27,12 @@ from iqm.benchmarks.benchmark_definition import (
 )
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import (
+    compute_inverse_clifford,
     edge_grab,
     exponential_rb,
     fit_decay_lmfit,
     get_survival_probabilities,
+    import_native_gate_cliffords,
     lmfit_minimizer,
     plot_rb_decay,
     relabel_qubits_array_from_zero,
@@ -187,9 +190,11 @@ def generate_fixed_depth_parallel_drb_circuits(
     assigned_two_qubit_gate_ensembles: Dict[str, Dict[str, float]],
     assigned_clifford_sqg_probabilities: Dict[str, float],
     assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
+    cliffords_1q: Dict[str, QuantumCircuit],
+    cliffords_2q: Dict[str, QuantumCircuit],
     qiskit_optim_level: int = 3,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
-    eplg: bool = False
+    eplg: bool = False,
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates DRB circuits in parallel on multiple qubit layouts.
         The circuits follow a layered pattern with barriers, taylored to measured EPLG (arXiv:2311.05933),
@@ -204,6 +209,8 @@ def generate_fixed_depth_parallel_drb_circuits(
         assigned_two_qubit_gate_ensembles (Dict[str, Dict[str, float]]): The two-qubit gate ensembles to use in the random DRB circuits per qubit layout.
         assigned_clifford_sqg_probabilities (Dict[str, float]): Probability with which to uniformly sample Clifford 1Q gates per qubit layout.
         assigned_sqg_gate_ensembles (Dict[str, Dict[str, float]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities per qubit layout.
+        cliffords_1q (Dict[str, QuantumCircuit]): dictionary of 1-qubit Cliffords in terms of IQM-native r gates.
+        cliffords_2q (Dict[str, QuantumCircuit]): dictionary of 2-qubit Cliffords in terms of IQM-native r and CZ gates.
         qiskit_optim_level (int): Qiskit transpiler optimization level.
                         * Defaults to 1.
         routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): Qiskit transpiler routing method.
@@ -235,6 +242,10 @@ def generate_fixed_depth_parallel_drb_circuits(
     # The total amount of qubits the circuits will have
     n_qubits = sum(qubit_counts)
 
+    # Get the keys of the Clifford dictionaries
+    clifford_1q_keys = list(cliffords_1q.keys())
+    clifford_2q_keys = list(cliffords_2q.keys())
+
     # Generate the circuit samples
     # Initialize the list of circuits
     all_circuits = {}
@@ -245,9 +256,14 @@ def generate_fixed_depth_parallel_drb_circuits(
 
     # Generate the layer if EPLG: this will be repeated in all samples and all depths!
     cycle_layers = {}
+
+    # Assume circuits will already be native - avoid transpiling if so!
+    is_circuit_native = True
     if eplg:
         for q_idx, q in enumerate(shuffled_qubits_array):
             original_qubits = str(qubits_array[q_idx])
+            if any(x != "CZGate" for x in assigned_two_qubit_gate_ensembles[original_qubits].keys()):
+                is_circuit_native = False
             cycle_layers[str(q)] = edge_grab(
                 qubits_array[q_idx],
                 depth,
@@ -269,6 +285,8 @@ def generate_fixed_depth_parallel_drb_circuits(
         if not eplg:
             for q_idx, q in enumerate(shuffled_qubits_array):
                 original_qubits = str(qubits_array[q_idx])
+                if any(x != "CZGate" for x in assigned_two_qubit_gate_ensembles[original_qubits].keys()):
+                   is_circuit_native = False
                 cycle_layers[str(q)] = edge_grab(
                     qubits_array[q_idx],
                     depth,
@@ -286,9 +304,11 @@ def generate_fixed_depth_parallel_drb_circuits(
             # We will stick to 1Q Clifford gates for now.
             for q in shuffled_qubits_array:
                 for idx, i in enumerate(q):
-                    rand_clif = random_clifford(1)
-                    circ.compose(rand_clif.to_instruction(), qubits=[i], inplace=True)
-                    local_circs[str(q)].compose(rand_clif.to_instruction(), qubits=[idx], inplace=True)
+                    rand_key = random.choice(clifford_1q_keys)
+                    rand_clif_1q = cast(dict, cliffords_1q)[rand_key]
+                    #rand_clif = random_clifford(1)
+                    circ.compose(rand_clif_1q.to_instruction(), qubits=[i], inplace=True)
+                    local_circs[str(q)].compose(rand_clif_1q.to_instruction(), qubits=[idx], inplace=True)
             circ.barrier()
 
             for q in shuffled_qubits_array:
@@ -298,8 +318,14 @@ def generate_fixed_depth_parallel_drb_circuits(
 
         # Add the inverse Clifford
         for q in shuffled_qubits_array:
+            clifford_dict = cliffords_1q if len(q) == 1 else cliffords_2q
+            # circ.compose(
+            #     Clifford(local_circs[str(q)].to_instruction().inverse()).to_instruction(), qubits=q, inplace=True
+            # )
             circ.compose(
-                Clifford(local_circs[str(q)].to_instruction().inverse()).to_instruction(), qubits=q, inplace=True
+                compute_inverse_clifford(local_circs[str(q)], clifford_dict),
+                qubits=q,
+                inplace=True,
             )
         circ.barrier()
         for q_idx, q in enumerate(shuffled_qubits_array):
@@ -314,14 +340,18 @@ def generate_fixed_depth_parallel_drb_circuits(
 
         circ_untranspiled = circ.copy()
 
-        circ_transpiled = transpile(
-            circ,
-            backend=backend,
-            coupling_map=effective_coupling_map,
-            optimization_level=qiskit_optim_level,
-            initial_layout=flat_qubits_array,
-            routing_method=routing_method,
-        )
+        if is_circuit_native: # Simply compose into a larger circuit
+            circ_transpiled = QuantumCircuit(backend.num_qubits)
+            circ_transpiled.compose(circ_untranspiled, qubits=flat_qubits_array, inplace=True)
+        else: # Do full qiskit transpile
+            circ_transpiled = transpile(
+                circ,
+                backend=backend,
+                coupling_map=effective_coupling_map,
+                optimization_level=qiskit_optim_level,
+                initial_layout=flat_qubits_array,
+                routing_method=routing_method,
+            )
 
         drb_circuits_untranspiled.append(circ_untranspiled)
         drb_circuits_transpiled.append(circ_transpiled)
@@ -685,6 +715,8 @@ class DirectRandomizedBenchmarking(Benchmark):
 
         self.add_all_meta_to_dataset(dataset)
 
+        clifford_1q_dict, clifford_2q_dict = import_native_gate_cliffords()
+
         # Submit jobs for all qubit layouts
         all_drb_jobs: List[Dict[str, Any]] = []
         time_circuit_generation: Dict[str, float] = {}
@@ -715,6 +747,8 @@ class DirectRandomizedBenchmarking(Benchmark):
                     assigned_two_qubit_gate_ensembles=assigned_two_qubit_gate_ensembles,
                     assigned_clifford_sqg_probabilities=assigned_clifford_sqg_probabilities,
                     assigned_sqg_gate_ensembles=assigned_sqg_gate_ensembles,
+                    cliffords_1q_dict=clifford_1q_dict,
+                    cliffords_2q_dict=clifford_2q_dict,
                     qiskit_optim_level=self.qiskit_optim_level,
                     routing_method=self.routing_method,
                     eplg=self.eplg
