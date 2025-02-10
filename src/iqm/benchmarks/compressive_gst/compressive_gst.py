@@ -33,6 +33,7 @@ import numpy as np
 from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
 
+from iqm.benchmarks import BenchmarkCircuit
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Benchmark, BenchmarkObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
@@ -102,10 +103,9 @@ class CompressiveGST(Benchmark):
 
         # Circuit format used by mGST
         self.J = np.empty((self.configuration.num_circuits, self.num_povm))
-        self.bootstrap_results = List[Tuple[np.ndarray]]  # List of GST outcomes from bootstrapping
 
     @timeit
-    def generate_meas_circuits(self) -> None:
+    def generate_meas_circuits(self) -> tuple[BenchmarkCircuit, BenchmarkCircuit]:
         """Generate random circuits from the gate set
 
         The random circuits are distributed among different depths ranging from L_MIN
@@ -115,10 +115,17 @@ class CompressiveGST(Benchmark):
         meaningful results
 
         Returns:
+            transpiled_circuits: BenchmarkCircuit
+                The transpiled circuits
+            untranspiled_circuits: BenchmarkCircuit
+                The untranspiled circuits
             circuit_gen_transp_time: float
                 The time it took to generate and transpile the circuits
-
         """
+
+        transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
+        untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
+
         # Calculate number of short and long circuits
         N_short = int(np.ceil(self.configuration.num_circuits / 2))
         N_long = int(np.floor(self.configuration.num_circuits / 2))
@@ -183,8 +190,9 @@ class CompressiveGST(Benchmark):
                     drop_final_rz=False,
                 )
             # Saving raw and transpiled circuits in a consistent format with other benchmarks
-            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
-            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+            transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
+            untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+        return transpiled_circuits, untranspiled_circuits
 
     def add_configuration_to_dataset(self, dataset):  # CHECK
         """
@@ -214,15 +222,13 @@ class CompressiveGST(Benchmark):
         qcvv_logger.info(f"Now generating {self.configuration.num_circuits} random GST circuits...")
 
         self.circuits = Circuits()
-        self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
-        self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
         # Generate circuits
-        self.generate_meas_circuits()
+        transpiled_circuits, untranspiled_circuits = self.generate_meas_circuits()[0]
 
         # Submit all
         if self.configuration.parallel:
             transpiled_circuit_dict = {
-                tuple(range(self.backend.num_qubits)): self.transpiled_circuits[str(self.qubit_layouts[0])].circuits
+                tuple(range(self.backend.num_qubits)): transpiled_circuits[str(self.qubit_layouts[0])].circuits
             }
             all_jobs, _ = submit_execute(
                 transpiled_circuit_dict,
@@ -238,7 +244,7 @@ class CompressiveGST(Benchmark):
         else:
             all_jobs: Dict = {}
             for qubit_layout in self.qubit_layouts:
-                transpiled_circuit_dict = {tuple(qubit_layout): self.transpiled_circuits[str(qubit_layout)].circuits}
+                transpiled_circuit_dict = {tuple(qubit_layout): transpiled_circuits[str(qubit_layout)].circuits}
                 all_jobs[str(qubit_layout)], _ = submit_execute(
                     transpiled_circuit_dict,
                     backend,
@@ -252,8 +258,8 @@ class CompressiveGST(Benchmark):
                 counts, _ = retrieve_all_counts(all_jobs[str(qubit_layout)])
                 dataset, _ = add_counts_to_dataset(counts, str(qubit_layout), dataset)
 
+        self.circuits.benchmark_circuits = [transpiled_circuits, untranspiled_circuits]
         self.add_configuration_to_dataset(dataset)
-        self.circuits.benchmark_circuits = [self.transpiled_circuits, self.untranspiled_circuits]
         return dataset
 
 
