@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Sequence, Optional
 
 import numpy as np
 from qiskit import ClassicalRegister, QuantumCircuit
@@ -31,14 +31,21 @@ def CUE(random_gen, nh):
 
 
 def haar_shadow_tomography(
-    qc: QuantumCircuit, Nu: int, active_qubits: List[int]
+    qc: QuantumCircuit,
+        Nu: int,
+        active_qubits: Sequence[int],
+        measure_other: Optional[Sequence[int]] = None,
+        measure_other_name: Optional[str] = None,
 ) -> Tuple[List[np.ndarray], List[QuantumCircuit]]:
     """Prepares the circuits to perform Haar shadow tomography.
 
     Args:
         qc (QuantumCircuit): The quantum circuit to which random unitaries are appended.
         Nu (Int): Number of local random unitaries used.
-        active_qubits (List[int]): List of active qubits.
+        active_qubits (Sequence[int]): List of active qubits.
+        measure_other (Optional[Sequence[int]]): Whether to measure other qubits in qc.
+                * Default is None.
+        measure_other_name (Optional[str]): Name of the classical register to assign measure_other.
     Returns:
         Tuple(List[ndarray], List[QuantumCircuit])
         - List[ndarray]: List of unitary gates for each random initialisation and qubit.
@@ -49,22 +56,31 @@ def haar_shadow_tomography(
 
     for iu in range(Nu):
         qc_copy = qc.copy()
-        # qc_copy.barrier()
-        register = ClassicalRegister(len(active_qubits), "RMs")
-        qc_copy.add_register(register)
         for idx, z in enumerate(active_qubits):
             temp_U = CUE(random_gen, 2)
             qc_copy.append(UnitaryGate(temp_U), [z])
             unitaries[iu, idx, :, :] = np.array(temp_U)
 
-        qc_copy.measure(active_qubits, register)
+        qc_copy.barrier()
+
+        register_rm = ClassicalRegister(len(active_qubits), "RMs")
+        qc_copy.add_register(register_rm)
+        qc_copy.measure(active_qubits, register_rm)
+
+        if measure_other is not None:
+            if measure_other_name is None:
+                measure_other_name = "non_RMs"
+            register_neighbors = ClassicalRegister(len(measure_other), measure_other_name)
+            qc_copy.add_register(register_neighbors)
+            qc_copy.measure(measure_other, register_neighbors)
+
         qclist.append(qc_copy)
 
     return unitaries, qclist
 
 
 def get_shadow(counts, Unitary, subsystem):
-    """Constructs shadows for each individual initialisation..
+    """Constructs shadows for each individual initialisation.
 
     Args:
         counts (Dict): bit-string counts.
