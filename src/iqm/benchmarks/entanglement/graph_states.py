@@ -18,7 +18,6 @@ Graph states benchmark
 from time import strftime
 from typing import Any, Dict, Sequence, Type
 
-from mypyc.analysis.dataflow import AnalysisResult
 from qiskit import QuantumCircuit, transpile
 import xarray as xr
 
@@ -79,6 +78,25 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset = run.dataset.copy(deep=True)
     backend_name = dataset.attrs["backend_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
+
+    qubits = dataset.attrs["qubits"]
+    num_RMs = dataset.attrs["n_random_unitaries"]
+
+    # all_measured_qubits_per_group = dataset.attrs["all_qubit_pairs"]
+    all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
+    all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
+    all_RM_qubits = dataset.attrs["all_RM_qubits"]
+
+    execution_results = {}
+
+    for group_idx, qubit_pairs in all_qubit_pairs_per_group:
+        execution_results[group_idx] = xrvariable_to_counts(dataset, str(all_RM_qubits[group_idx]), num_RMs)
+        for pair_idx, qubit_pair in qubit_pairs:
+            # Get the neighbor qubits of qubit_pair
+            neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
+            # Compute the negativity for each projection
+
+    qcvv_logger.info(f"Post-processing for layout {qubits}")
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
@@ -169,11 +187,19 @@ class GraphStateBenchmark(Benchmark):
 
         # Get unique list of edges
         graph_edges = list(self.coupling_map.graph.to_undirected(multigraph=False).edge_list())
-        # Find pairs of nodes with disjoint neighbors
 
+        # Find pairs of nodes with disjoint neighbors
+        # {idx: [(q1,q2), (q3,q4), ...]}
         pair_groups = find_edges_with_disjoint_neighbors(graph_edges)
+        # {idx: [{n11,n12,n13,...), (n21,n22,n23,...), ...]}
+        neighbor_groups = {
+            idx: [get_neighbors_of_edges([y], graph_edges) for y in x] for idx, x in enumerate(pair_groups)
+        }
+
         # Get all projected nodes to cover all pairs of qubits with disjoint neighbours
+        # {idx: [q1,q2,q3,q4, ...]}
         unmeasured_qubit_indices = {idx: [a for b in x for a in b] for idx, x in enumerate(pair_groups)}
+        # {idx: [n11,n12,n13,...,n21,n22,n23, ...]}
         projected_nodes = {idx: get_neighbors_of_edges(list(x), graph_edges) for idx, x in enumerate(pair_groups)}
 
         # Generate copies of circuits to add projections and randomized measurements
@@ -183,7 +209,8 @@ class GraphStateBenchmark(Benchmark):
             "grouped_graph_circuits": grouped_graph_circuits,
             "unmeasured_qubit_indices": unmeasured_qubit_indices,
             "projected_nodes": projected_nodes,
-            "pair_groups": pair_groups,
+            "pair_groups": {idx: x for idx, x in enumerate(pair_groups)},
+            "neighbor_groups": neighbor_groups,
         }
 
     def execute(self, backend) -> xr.Dataset:
@@ -202,8 +229,20 @@ class GraphStateBenchmark(Benchmark):
         )
         dataset.attrs.update({"time_circuit_generation": time_circuit_generation})
 
-        RM_qubits = {}
-        neighbor_qubits = {}
+        RM_qubits = graph_benchmark_circuit_info["unmeasured_qubit_indices"]
+        neighbor_qubits = graph_benchmark_circuit_info["projected_nodes"]
+        pair_groups = graph_benchmark_circuit_info["pair_groups"]
+        neighbor_groups = graph_benchmark_circuit_info["neighbor_groups"]
+
+        dataset.attrs.update(
+            {
+                "all_RM_qubits": RM_qubits,
+                "all_projected_qubits": neighbor_qubits,
+                "all_pair_groups": pair_groups,
+                "all_neighbor_groups": neighbor_groups,
+            }
+        )
+
         RM_circuits_transpiled = {}
         all_unitaries = {}
         time_RM_circuits = {}
@@ -211,10 +250,7 @@ class GraphStateBenchmark(Benchmark):
         all_graph_submit_results = []
 
         # Get all local Randomized Measurements
-
         for idx, circuit in graph_benchmark_circuit_info["grouped_graph_circuits"].items():
-            RM_qubits[idx] = graph_benchmark_circuit_info["unmeasured_qubit_indices"][idx]
-            neighbor_qubits[idx] = graph_benchmark_circuit_info["projected_nodes"][idx]
             (all_unitaries[idx], RM_circuits), time_RM_circuits[idx] = haar_shadow_tomography(
                 circuit, self.n_random_unitaries, RM_qubits, neighbor_qubits, measure_other_name="neighbors"
             )
@@ -253,8 +289,6 @@ class GraphStateBenchmark(Benchmark):
             dataset.attrs.update(
                 {
                     job_idx: {
-                        "qubit_pairs": RM_qubits[job_idx],
-                        "neighbor_qubits": neighbor_qubits[job_idx],
                         "time_RM_circuits": time_RM_circuits[job_idx],
                         "time_transpilation": time_transpilation[job_idx],
                         "time_submit": job_dict["time_submit"],

@@ -294,14 +294,14 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
-def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Sequence[int]]) -> List[int]:
+def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Sequence[int]]) -> Sequence[int]:
     """Given a Sequence of edges and a graph, return all neighboring nodes of the edges.
 
     Args:
         edges (Sequence[Sequence[int]]): A sequence of pairs of integers, representing edges of a graph.
         graph (Sequence[Sequence[int]]): The input graph specified either as a sequence of edges (Sequence[int]).
     Returns:
-        List[int]: list of all neighboring nodes of the input edges.
+        Sequence[int]: list of all neighboring nodes of the input edges.
     """
     neighboring_nodes = set()
     nodes_in_edges = set()
@@ -317,7 +317,7 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
             neighboring_nodes.add(x)
     neighboring_nodes -= nodes_in_edges
 
-    return list(neighboring_nodes)
+    return neighboring_nodes
 
 
 def marginal_distribution(prob_dist: Dict[str, float], indices: Iterable[int]) -> Dict[str, float]:
