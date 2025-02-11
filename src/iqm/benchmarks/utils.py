@@ -420,25 +420,6 @@ def perform_backend_transpilation(
     return transpiled_qc_list
 
 
-def project_qubits(qc: QuantumCircuit, meas_qubits: Sequence[int]) -> QuantumCircuit:
-    """Project (measure) specified qubits on a given quantum circuit.
-
-    Args:
-        qc (QuantumCircuit): The quantum circuit in which to project (measure) specified qubits.
-        meas_qubits (Sequence[int]): The qubits to be measured.
-    Returns:
-        QuantumCircuit: The projected quantum circuit.
-    """
-    qc_copy = qc.copy()
-    # qc_copy.barrier()
-    num_cregs = len(meas_qubits)
-    register = ClassicalRegister(num_cregs, "neighbors")
-    qc_copy.add_register(register)
-    for idx, iq in enumerate(meas_qubits):
-        qc_copy.measure(iq, register[idx])
-    return qc_copy
-
-
 def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str] = None) -> QuantumCircuit:
     """
     Reduces a quantum circuit to only its active qubits.
