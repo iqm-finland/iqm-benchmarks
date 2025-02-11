@@ -1,10 +1,13 @@
 =========
 Changelog
 =========
+Version 2.18
+============
+* Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
 
 Version 2.17
 ============
-* Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
+* Update installation command for development mode. `#41 <https://github.com/iqm-finland/iqm-benchmarks/pull/41>`_
 
 Version 2.16
 ============
