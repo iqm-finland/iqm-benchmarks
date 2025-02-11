@@ -674,15 +674,16 @@ class QuantumVolumeBenchmark(Benchmark):
         self,
         backend: IQMBackendBase,
         qubits: Sequence[int],
-        sorted_transpiled_qc_list: Dict[Tuple[int, ...], List[QuantumCircuit]],
+        sorted_transpiled_qc_list: Dict[Tuple[int, ...] | str, List[QuantumCircuit]],
     ) -> Dict[str, Any]:
         """
-        Submit jobs for execution in the specified IQMBackend.
+        Submit a single set of QV jobs for execution in the specified IQMBackend:
+         Organizes the results in a dictionary with the qubit layout, the submitted job objects, the type of QV results and submission time.
 
         Args:
             backend (IQMBackendBase): the IQM backend to submit the job.
             qubits (List[int]): the qubits to identify the submitted job.
-            sorted_transpiled_qc_list (Dict[str, List[QuantumCircuit]]): qubits to submit jobs to.
+            sorted_transpiled_qc_list (Dict[Tuple[int, ...] | str, List[QuantumCircuit]]): A dictionary of Lists of quantum circuits.
         Returns:
             Dict with qubit layout, submitted job objects, type (vanilla/DD) and submission time.
         """

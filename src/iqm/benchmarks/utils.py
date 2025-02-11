@@ -594,22 +594,26 @@ def sort_batches_by_final_layout(
 
 @timeit
 def submit_execute(
-    sorted_transpiled_qc_list: Dict[Tuple, List[QuantumCircuit]],
+    sorted_transpiled_qc_list: Dict[Tuple[int] | str, List[QuantumCircuit]],
     backend: IQMBackendBase,
     shots: int,
     calset_id: Optional[str],
     max_gates_per_batch: Optional[int],
 ) -> List[IQMJob]:
-    """Submit for execute a list of quantum circuits on the specified Backend.
+    """Submit function to execute lists of quantum circuits on the specified backend,
+        organized as a dictionary with keys being identifiers of a batch (normally qubits) and values corresponding lists of quantum circuits.
+        The result is returned as a single list of IQMJob objects.
 
     Args:
-        sorted_transpiled_qc_list (Dict[Tuple, List[QuantumCircuit]]): the list of quantum circuits to be executed.
+        sorted_transpiled_qc_list (Dict[Tuple[int] | str, List[QuantumCircuit]]): A dictionary of lists of quantum circuits to be executed.
+            * The keys (Tuple[int] | str) should correspond to final measured qubits.
+            * The values (List[QuantumCircuit]) should be the corresponding list (batch) of quantum circuits.
         backend (IQMBackendBase): the backend to execute the circuits on.
         shots (int): the number of shots per circuit.
         calset_id (Optional[str]): the calibration set ID, uses the latest one if None.
         max_gates_per_batch (int): the maximum number of gates per batch sent to the backend, used to make manageable batches.
     Returns:
-        List[IQMJob]: the IQMJob objects of the executed circuits.
+        List[IQMJob]: a list of IQMJob objects corresponding to the submitted circuits.
     """
     final_jobs = []
     for k in sorted(
