@@ -320,11 +320,11 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
     return neighboring_nodes
 
 
-def marginal_distribution(prob_dist: Dict[str, float], indices: Iterable[int]) -> Dict[str, float]:
+def marginal_distribution(prob_dist_or_counts: Dict[str, float | int], indices: Iterable[int]) -> Dict[str, float]:
     """Compute the marginal distribution over specified bits (indices).
 
     Params:
-    - prob_dist (Dict[str, float]): A dictionary with keys being bitstrings and values are their probabilities
+    - prob_dist (Dict[str, float | int]): A dictionary with keys being bitstrings and values are either probabilities or counts
     - indices (Iterable[int]): List of bit indices to marginalize over
 
     Returns:
@@ -332,7 +332,7 @@ def marginal_distribution(prob_dist: Dict[str, float], indices: Iterable[int]) -
     """
     marginal_dist: Dict[str, float] = defaultdict(float)
 
-    for bitstring, prob in prob_dist.items():
+    for bitstring, prob in prob_dist_or_counts.items():
         # Extract the bits at the specified indices and form the marginalized bitstring
         marginalized_bitstring = "".join(bitstring[i] for i in indices)
         # Sum up probabilities for each marginalized bitstring
