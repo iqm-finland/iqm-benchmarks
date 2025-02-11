@@ -8,6 +8,7 @@ from qiskit.circuit.library import UnitaryGate
 # from qiskit.extensions import UnitaryGate
 import scipy.linalg as spl
 
+from iqm.benchmarks.utils import timeit
 
 a = random.SystemRandom().randrange(2**32 - 1)  # Init Random Generator
 random_gen = np.random.RandomState(a)
@@ -30,6 +31,7 @@ def CUE(random_gen, nh):
     return U
 
 
+@timeit
 def haar_shadow_tomography(
     qc: QuantumCircuit,
         Nu: int,
