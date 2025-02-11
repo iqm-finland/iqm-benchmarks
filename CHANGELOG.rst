@@ -1,6 +1,7 @@
 =========
 Changelog
 =========
+
 Version 2.18
 ============
 * Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
