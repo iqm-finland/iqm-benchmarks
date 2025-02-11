@@ -932,7 +932,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is True.
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
                             * Default is "custom".
-        min_num_qubits (int): Minumum number of qubits. 
+        min_num_qubits (int): Minumum number of qubits.
                             * Default is 2
         custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
                             * Default is None.

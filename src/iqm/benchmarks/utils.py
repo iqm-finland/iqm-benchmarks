@@ -28,7 +28,6 @@ import numpy as np
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
-from rustworkx import PyDiGraph, PyGraph
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger

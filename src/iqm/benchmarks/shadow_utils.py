@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple, Sequence, Optional
+from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
 from qiskit import ClassicalRegister, QuantumCircuit
@@ -9,6 +9,7 @@ from qiskit.circuit.library import UnitaryGate
 import scipy.linalg as spl
 
 from iqm.benchmarks.utils import timeit
+
 
 a = random.SystemRandom().randrange(2**32 - 1)  # Init Random Generator
 random_gen = np.random.RandomState(a)
@@ -34,10 +35,10 @@ def CUE(random_gen, nh):
 @timeit
 def haar_shadow_tomography(
     qc: QuantumCircuit,
-        Nu: int,
-        active_qubits: Sequence[int],
-        measure_other: Optional[Sequence[int]] = None,
-        measure_other_name: Optional[str] = None,
+    Nu: int,
+    active_qubits: Sequence[int],
+    measure_other: Optional[Sequence[int]] = None,
+    measure_other_name: Optional[str] = None,
 ) -> Tuple[List[np.ndarray], List[QuantumCircuit]]:
     """Prepares the circuits to perform Haar shadow tomography.
 
