@@ -1,5 +1,5 @@
 import random
-from typing import List, Optional, Sequence, Tuple, Dict, Literal, cast
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
 
 import numpy as np
 from qiskit import ClassicalRegister, QuantumCircuit
@@ -41,7 +41,7 @@ def local_shadow_tomography(
     measure_other_name: Optional[str] = None,
     clifford_or_haar: Literal["clifford", "haar"] = "clifford",
     cliffords_1q: Optional[Dict[str, QuantumCircuit]] = None,
-) -> Tuple[List[np.ndarray], List[QuantumCircuit]]:
+) -> Tuple[np.ndarray | Dict[str, str], List[QuantumCircuit]]:
     """Prepares the circuits to perform Haar shadow tomography.
 
     Args:
@@ -61,10 +61,10 @@ def local_shadow_tomography(
         Exception: If cliffords_1q is None and clifford_or_haar is "clifford".
 
     Returns:
-        Tuple(List[ndarray], List[QuantumCircuit])
-        - List[ndarray] | List[str]: Either:
-                * List of unitary gates (numpy ndarray) for each random initialisation and qubit, if clifford_or_haar == 'haar'.
-                * List of (str) Clifford labels, if clifford_or_haar == 'clifford'.
+        Tuple(np.ndarray | Dict[str, str], List[QuantumCircuit])
+        - ndarray | Dict[str, List[str]]: Either:
+                * Unitary gate (numpy ndarray), composed of local unitaries for each random initialisation and qubit, if clifford_or_haar == 'haar'.
+                * Dictionary of lists of Clifford labels corresp. to each RM, keys being str(qubit), if clifford_or_haar == 'clifford'.
         - List[QuantumCircuit]: List of tomography circuits.
     """
     if clifford_or_haar not in ["clifford", "haar"]:
@@ -80,7 +80,7 @@ def local_shadow_tomography(
     if clifford_or_haar == "haar":
         unitaries = np.zeros((Nu, len(active_qubits), 2, 2), dtype=np.complex_)
     else:
-        unitaries = []
+        unitaries = {str(q): [] for q in active_qubits}
 
     for u in range(Nu):
         qc_copy = qc.copy()
@@ -93,7 +93,7 @@ def local_shadow_tomography(
                 rand_key = random.choice(clifford_1q_keys)
                 c_1q = cast(dict, cliffords_1q)[rand_key]
                 qc_copy.append(c_1q, [qubit])
-                unitaries.append(rand_key)
+                unitaries[str(qubit)].append(rand_key)
 
         qc_copy.barrier()
 
@@ -113,12 +113,14 @@ def local_shadow_tomography(
     return unitaries, qclist
 
 
-def get_shadow(counts: Dict[str, int], Unitary: np.ndarray, subsystem: Sequence[int]):
+def get_shadow(counts: Dict[str, int], Unitary: np.ndarray | List[str], subsystem: Sequence[int]):
     """Constructs shadows for each individual initialisation.
 
     Args:
         counts (Dict[str, int]): a dictionary of bit-string counts.
-        Unitary (Numpy Array): local random unitaries used for a given initialisation.
+        Unitary (np.ndrray | str): local random unitaries used for a given initialisation, either specified as
+                    - a numpy array, or
+                    - a list of Clifford labels.
         subsystem (Sequence[int]): Sequence of qubits to construct the shadow of.
     Returns:
         rhoshadows (Array): shadow of considered subsystem.

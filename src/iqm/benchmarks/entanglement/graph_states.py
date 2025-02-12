@@ -31,13 +31,14 @@ from iqm.benchmarks.utils import (
     find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
     get_neighbors_of_edges,
+    marginal_distribution,
     perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,
     set_coupling_map,
     submit_execute,
     timeit,
-    xrvariable_to_counts, marginal_distribution,
+    xrvariable_to_counts,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -77,35 +78,50 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     plots = {}
     observations: list[BenchmarkObservation] = []
     dataset = run.dataset.copy(deep=True)
-    backend_name = dataset.attrs["backend_name"]
-    execution_timestamp = dataset.attrs["execution_timestamp"]
+    # backend_name = dataset.attrs["backend_name"]
+    # execution_timestamp = dataset.attrs["execution_timestamp"]
 
     qubits = dataset.attrs["qubits"]
     num_RMs = dataset.attrs["n_random_unitaries"]
 
-    # all_measured_qubits_per_group = dataset.attrs["all_qubit_pairs"]
     all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
     all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
     all_RM_qubits = dataset.attrs["all_RM_qubits"]
     all_projected_qubits = dataset.attrs["all_projected_qubits"]
 
     all_unitaries = dataset.attrs["all_unitaries"]
+    # For graph states benchmark, all_unitaries is a Dict[int, Dict[str, str]] where
+    # the keys are the group indices and values are Dict[str,str] with
+    # keys being str(qubit) and values Clifford labels (keys for clifford_1q_dict below)
+
+    clifford_1q_dict, _ = import_native_gate_cliffords()
 
     execution_results = {}
 
-    for group_idx, qubit_pairs in all_qubit_pairs_per_group:
+    for group_idx, qubit_pairs in all_qubit_pairs_per_group.items():
         execution_results[group_idx] = xrvariable_to_counts(dataset, str(all_RM_qubits[group_idx]), num_RMs)
 
-        for pair_idx, qubit_pair in qubit_pairs:
+        for pair_idx, qubit_pair in enumerate(qubit_pairs):
             # Get the neighbor qubits of qubit_pair
             neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
 
-            # Marginalize the counts
-            qubits_to_marginalize = [x for x in all_projected_qubits if x not in neighbor_qubits]
-            bits_idx_to_marginalize = [i for i, x in enumerate(all_projected_qubits) if x in qubits_to_marginalize]
-            marginal_counts = marginal_distribution(execution_results[group_idx], bits_idx_to_marginalize)
+            # Marginalize the counts over non-neighbor qubits of the current pair
+            qubits_to_marginalize = [x for x in all_projected_qubits if x not in neighbor_qubits and x not in qubit_pair]
+            if qubits_to_marginalize:
+                bits_idx_to_marginalize = [i for i, x in enumerate(all_projected_qubits) if x in qubits_to_marginalize]
+                marginal_counts = [
+                    marginal_distribution(counts, bits_idx_to_marginalize) for counts in execution_results[group_idx]
+                ]
+            else:
+                marginal_counts = execution_results[group_idx]
 
-            # Compute the negativity for each projection
+            print(marginal_counts)
+
+            # Get all shadows of qubit_pair
+
+            # Compute the negativity of the shadow of each projection
+
+            # Extract the max negativity and the corresponding projection - save in dictionary
 
     qcvv_logger.info(f"Post-processing for layout {qubits}")
 
@@ -235,6 +251,7 @@ class GraphStateBenchmark(Benchmark):
 
         # Routine to generate all
         graph_benchmark_circuit_info: Dict[str, Any]
+        qcvv_logger.info(f"Generating all circuits for the Graph State benchmark")
         graph_benchmark_circuit_info, time_circuit_generation = (
             self.generate_all_circuit_info_for_graph_state_benchmark()
         )
@@ -254,6 +271,7 @@ class GraphStateBenchmark(Benchmark):
             }
         )
 
+        RM_circuits_untranspiled = {}
         RM_circuits_transpiled = {}
         all_unitaries = {}
         time_RM_circuits = {}
@@ -261,33 +279,38 @@ class GraphStateBenchmark(Benchmark):
         all_graph_submit_results = []
 
         # Get all local Randomized Measurements
+        qcvv_logger.info(f"Performing Randomized Measurements of all qubit pairs")
         clifford_1q_dict, _ = import_native_gate_cliffords()
         for idx, circuit in graph_benchmark_circuit_info["grouped_graph_circuits"].items():
-            (all_unitaries[idx], RM_circuits), time_RM_circuits[idx] = local_shadow_tomography(qc=circuit,
-                                                                                               Nu=self.n_random_unitaries,
-                                                                                               active_qubits=RM_qubits,
-                                                                                               measure_other=neighbor_qubits,
-                                                                                               measure_other_name="neighbors",
-                                                                                               clifford_or_haar="clifford",
-                                                                                               cliffords_1q=clifford_1q_dict,)
+            qcvv_logger.info(f"Now on group {idx+1}/{len(graph_benchmark_circuit_info['grouped_graph_circuits'])}")
+            (all_unitaries[idx], RM_circuits_untranspiled[idx]), time_RM_circuits[idx] = local_shadow_tomography(
+                qc=circuit,
+                Nu=self.n_random_unitaries,
+                active_qubits=RM_qubits[idx],
+                measure_other=neighbor_qubits[idx],
+                measure_other_name="neighbors",
+                clifford_or_haar="clifford",
+                cliffords_1q=clifford_1q_dict,
+            )
 
             # Transpile
             RM_circuits_transpiled[idx], time_transpilation[idx] = perform_backend_transpilation(
-                qc_list=RM_circuits,
+                qc_list=RM_circuits_untranspiled[idx],
                 backend=backend,
                 qubits=self.qubits,
+                coupling_map=backend.coupling_map,
             )
 
             # Submit for execution in backend
-            sorted_transpiled_qc_list = {str(RM_qubits): RM_circuits_transpiled[idx]}
+            sorted_transpiled_qc_list = {tuple(RM_qubits[idx]): RM_circuits_transpiled[idx]}
             rm_graph_jobs, time_submit = submit_execute(
                 sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch
             )
 
             all_graph_submit_results.append(
                 {
-                    "RM_qubits": RM_qubits,
-                    "neighbor_qubits": neighbor_qubits,
+                    "RM_qubits": RM_qubits[idx],
+                    "neighbor_qubits": neighbor_qubits[idx],
                     "jobs": rm_graph_jobs,
                     "time_submit": time_submit,
                 }
