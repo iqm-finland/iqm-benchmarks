@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Benchmarking IQM Spark &#8212; IQM Benchmarks 2.18 documentation</title>
+    <title>Benchmarking IQM Star &#8212; IQM Benchmarks 2.18 documentation</title>
   
   
   
@@ -47,12 +47,12 @@
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>window.MathJax = {"tex": {"macros": {"vr": "\\vec{r}", "ket": ["\\left| #1 \\right\\rangle", 1], "iprod": ["\\left\\langle #1 | #2 \\right\\rangle", 2]}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'devices/spark';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'devices/star';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Benchmarking IQM Star" href="star.html" />
-    <link rel="prev" title="Devices" href="devices.html" />
+    <link rel="next" title="Development" href="../development/development.html" />
+    <link rel="prev" title="Benchmarking IQM Spark" href="spark.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.18" />
@@ -166,8 +166,8 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="devices.html">Devices</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Benchmarking IQM Spark</a></li>
-<li class="toctree-l2"><a class="reference internal" href="star.html">Benchmarking IQM Star</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spark.html">Benchmarking IQM Spark</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Benchmarking IQM Star</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../development/development.html">Development</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -316,7 +316,7 @@
       
       
       
-      <li><a href="../_sources/devices/spark.ipynb" target="_blank"
+      <li><a href="../_sources/devices/star.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -392,7 +392,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Benchmarking IQM Spark</h1>
+    <h1>Benchmarking IQM Star</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -403,11 +403,10 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connect-to-the-backend">Connect to the backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#as-one-can-see-the-label-0-is-reserved-for-the-resontor-so-it-is-advised-to-define-the-qubit-indices-in-the-layout-of-interest-starting-from-1">As one can see, the label “0” is reserved for the resontor. So it is advised to define the qubit indices in the layout of interest starting from 1.</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ghz-state-fidelity">GHZ state fidelity</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-volume">Quantum Volume</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circuit-layer-operations-per-second-clops">Circuit Layer Operations Per Second (CLOPS)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clifford-randomized-benchmarking">Clifford Randomized Benchmarking</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interleaved-randomized-benchmarking-irb">Interleaved Randomized Benchmarking (IRB)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-score">Q-Score</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
@@ -421,17 +420,9 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="benchmarking-iqm-spark">
-<h1>Benchmarking IQM Spark<a class="headerlink" href="#benchmarking-iqm-spark" title="Link to this heading">#</a></h1>
-<p>This notebook allows you to run some useful benchmarks for the Spark system. Before starting, make sure you have installed all the necessary packages:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>iqm-benchmarks
-<span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>ipykernel
-</pre></div>
-</div>
-</div>
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="benchmarking-iqm-star">
+<h1>Benchmarking IQM Star<a class="headerlink" href="#benchmarking-iqm-star" title="Link to this heading">#</a></h1>
+<p>This notebook allows you to run some useful benchmarks for the Star system.</p>
 <section id="connect-to-the-backend">
 <h2>Connect to the backend<a class="headerlink" href="#connect-to-the-backend" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
@@ -440,15 +431,18 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKENS_FILE&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;YOUR TOKEN HERE&quot;</span>
-<span class="n">iqm_url</span> <span class="o">=</span>  <span class="s1">&#39;YOUR URL HERE&#39;</span>
+<span class="n">QPU</span> <span class="o">=</span> <span class="s2">&quot;deneb&quot;</span> <span class="c1"># or any other star QPU</span>
+<span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+
+<span class="n">iqm_url</span> <span class="o">=</span> <span class="s2">&quot;https://cocos.resonance.meetiqm.com/&quot;</span> <span class="o">+</span> <span class="n">QPU</span>
 <span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_url</span><span class="p">)</span>
 <span class="n">backend</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We can access the Spark backend and plot its connectivity graph to check that everything is working properly.</p>
+<p>We can access the Star backend and plot its connectivity graph to check that everything is working properly.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
@@ -466,6 +460,9 @@
 </div>
 </div>
 </div>
+</section>
+<section id="as-one-can-see-the-label-0-is-reserved-for-the-resontor-so-it-is-advised-to-define-the-qubit-indices-in-the-layout-of-interest-starting-from-1">
+<h2>As one can see, the label “0” is reserved for the resontor. So it is advised to define the qubit indices in the layout of interest starting from 1.<a class="headerlink" href="#as-one-can-see-the-label-0-is-reserved-for-the-resontor-so-it-is-advised-to-define-the-qubit-indices-in-the-layout-of-interest-starting-from-1" title="Link to this heading">#</a></h2>
 <p>We run the cell below to ignore those warnings that are not critical for the correct run of the benchmarks.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -494,38 +491,16 @@ F(\text{ideal}, \text{measured})= \langle GHZ | \rho_{\text{measured}} | GHZ \ra
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">GHZ</span> <span class="o">=</span> <span class="n">GHZConfiguration</span><span class="p">(</span>
-    <span class="n">state_generation_routine</span><span class="o">=</span><span class="s2">&quot;tree&quot;</span><span class="p">,</span>
-    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span>
-    <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">qiskit_optim_level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">optimize_sqg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">num_qubits</span>
+<span class="n">chosen_layout</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">qubits</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">qubits</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">num_qubits</span><span class="p">)]</span>
+<span class="n">GHZ</span> <span class="o">=</span> <span class="n">GHZConfiguration</span><span class="p">(</span>
+    <span class="n">state_generation_routine</span><span class="o">=</span><span class="s2">&quot;star&quot;</span><span class="p">,</span>
+    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="n">chosen_layout</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
     <span class="n">fidelity_routine</span><span class="o">=</span><span class="s2">&quot;coherences&quot;</span><span class="p">,</span> 
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<blockquote>
-<div><p>If you want to modify the settings above, please refer to the documentation <a class="reference external" href="https://iqm-finland.github.io/iqm-benchmarks/api/iqm.benchmarks.entanglement.ghz.GHZConfiguration.html#iqm.benchmarks.entanglement.ghz.GHZConfiguration">here</a>.</p>
-</div></blockquote>
-<p>Before running the benchmark analysis, we can visualize the histogram of counts obtained from measuring a GHZ state on 5 qubits:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.ghz</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_ghz_spanning_tree</span><span class="p">,</span> <span class="n">get_edges</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">transpile</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_histogram</span>
-
-<span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
-<span class="n">graph</span> <span class="o">=</span> <span class="n">get_edges</span><span class="p">(</span><span class="n">coupling_map</span><span class="o">=</span><span class="n">backend</span><span class="o">.</span><span class="n">coupling_map</span><span class="p">,</span> <span class="n">qubit_layout</span><span class="o">=</span><span class="n">qubit_layout</span><span class="p">)</span>
-<span class="n">ghz_circuit</span> <span class="o">=</span> <span class="n">generate_ghz_spanning_tree</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">qubit_layout</span><span class="p">,</span> <span class="n">n_state</span><span class="o">=</span><span class="mi">5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">qc_transp</span> <span class="o">=</span> <span class="n">transpile</span><span class="p">(</span><span class="n">ghz_circuit</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">optimization_level</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">qc_transp</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> 
-<span class="n">counts</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">get_counts</span><span class="p">()</span>
-
-<span class="n">plot_histogram</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -541,9 +516,7 @@ F(\text{ideal}, \text{measured})= \langle GHZ | \rho_{\text{measured}} | GHZ \ra
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_ghz</span> <span class="o">=</span> <span class="n">benchmark_ghz</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">observation</span> <span class="ow">in</span> <span class="n">result_ghz</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">observation</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">string_identifier</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">qubit_layout</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> 
+<span class="n">result_ghz</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -564,19 +537,20 @@ The quantum volume is then defined as</p>
 </div>
 </div>
 </div>
-<p>We define a combination of qubits to test quantum volume on. Due to the star topology, the combinations must contain at least qubit #2 (see topmost graph).</p>
+<p>We define a combination of qubits to test quantum volume on. Due to the star topology, the combinations must not contain the index of the resontor “0”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">QV</span> <span class="o">=</span> <span class="n">QuantumVolumeConfiguration</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_layouts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">]]</span> <span class="c1">## choose the optimal layouts to run</span>
+<span class="n">QV</span> <span class="o">=</span> <span class="n">QuantumVolumeConfiguration</span><span class="p">(</span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> 
     <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
     <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">num_sigmas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">choose_qubits_routine</span><span class="o">=</span><span class="s2">&quot;custom&quot;</span><span class="p">,</span>
-    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span> 
+    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="n">chosen_layouts</span><span class="p">,</span> 
     <span class="n">qiskit_optim_level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">optimize_sqg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">60_000</span><span class="p">,</span>
+    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span>
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
 <span class="p">)</span>
@@ -625,7 +599,7 @@ The quantum volume is then defined as</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CLOPS</span> <span class="o">=</span> <span class="n">CLOPSConfiguration</span><span class="p">(</span>
-    <span class="n">qubits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">qubits</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="c1"># run with the same layout as </span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">num_updates</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
     <span class="n">num_shots</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
@@ -660,121 +634,6 @@ The quantum volume is then defined as</p>
 </div>
 </div>
 </section>
-<section id="clifford-randomized-benchmarking">
-<h2>Clifford Randomized Benchmarking<a class="headerlink" href="#clifford-randomized-benchmarking" title="Link to this heading">#</a></h2>
-<p>The idea behind Clifford Randomized Benchmarking (CRB) is that under certain (simplified) types of noise, the average survival probability of an initial state <span class="math notranslate nohighlight">\(|0\rangle\)</span> under random sequences of Clifford gates and a final sequence inverse will decay exponentially in the length of the sequences. This can be written as</p>
-<div class="math notranslate nohighlight">
-\[
-\langle0|C_\text{inv}C_m\cdots{C}_2C_1|0\rangle\sim{A}p^m + B,
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(C_1, C_2, \ldots, C_m\)</span> is the random sequences of Clifford gates, <span class="math notranslate nohighlight">\(C_\text{inv}=(C_1C_2\cdots{C}_m)^{-1}\)</span>, <span class="math notranslate nohighlight">\(0\leq{p}\leq{1}\)</span> and <span class="math notranslate nohighlight">\(0\leq{A,B}\leq1\)</span> are constants isolating the effects of state-preparation and measurement (SPAM) errors (<a class="reference external" href="https://journals.aps.org/pra/abstract/10.1103/PhysRevA.85.042311">Magesan,2012</a>). From such decay, one can in turn infer the average fidelity of the corresponding Clifford group.</p>
-<p>The main assumption we will make here is that the noise can be modeled as Markovian, time-stationary and gate-independent.</p>
-<p>The theory of CRB under these approximations, and the fact that the multi-qubit Clifford group is a <strong>unitary 2-design</strong> (i.e., uniformly averaging with two pairs of <span class="math notranslate nohighlight">\(C\)</span>, <span class="math notranslate nohighlight">\(C^{\dagger}\)</span> Clifford operators gives the same result as using fully random unitaries), ensures that the average fidelity of our gate set is given by</p>
-<div class="math notranslate nohighlight">
-\[
-\overline{F}_\text{CRB}=p+2^{-n}(1-p).
-\]</div>
-<p>CRB is not generally intended to work for <span class="math notranslate nohighlight">\(n&gt;2\)</span>, both because of the scaling of the size of the <span class="math notranslate nohighlight">\(n\)</span>-qubit Clifford group in <span class="math notranslate nohighlight">\(n\)</span>, and because such gates have to eventually be transpiled to a native basis of 1Q and 2Q gates!</p>
-<p>It is important to mention that the average Clifford fidelity is related to the average fidelity of IQM’s native gate set for single-qubit gates as (<a class="reference external" href="https://arxiv.org/abs/1402.4848">Barends, 2014</a>)</p>
-<div class="math notranslate nohighlight">
-\[
-\overline{F}_\text{GATE} \approx 1 - \frac{1-\overline{F}_\text{CRB}}{1.875}.
-\]</div>
-<p>This is because all the single-qubit Clifford gates can be decomposed using on average 1.875 gates from IQM’s native set. This formula shows that the value of <span class="math notranslate nohighlight">\(\overline{F}_\text{GATE}\)</span> will always be slightly higher than <span class="math notranslate nohighlight">\(\overline{F}_\text{CRB}\)</span>, so one must be careful when comparing with average fidelities reported in the specs of a QPU.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb</span><span class="w"> </span><span class="kn">import</span> <span class="n">CliffordRBConfiguration</span><span class="p">,</span><span class="n">CliffordRandomizedBenchmarking</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CRB</span> <span class="o">=</span> <span class="n">CliffordRBConfiguration</span><span class="p">(</span>
-    <span class="n">qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">]],</span>
-    <span class="n">sequence_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)],</span>
-    <span class="n">num_circuit_samples</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">parallel_execution</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<blockquote>
-<div><p>If you want to modify the settings above, please refer to the documentation <a class="reference external" href="https://iqm-finland.github.io/iqm-benchmarks/api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration">here</a>.</p>
-</div></blockquote>
-<p>Warning: The following code cell may take few minutes to run since it will compute the average fidelities for all the qubits in the QPU (and we set <code class="docutils literal notranslate"><span class="pre">parallel_execution=False</span></code>).</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_clifford_rb</span> <span class="o">=</span> <span class="n">CliffordRandomizedBenchmarking</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">CRB</span><span class="p">)</span>
-<span class="n">run_clifford_rb</span> <span class="o">=</span> <span class="n">benchmark_clifford_rb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clifford_rb</span> <span class="o">=</span> <span class="n">benchmark_clifford_rb</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="n">result_clifford_rb</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</section>
-<section id="interleaved-randomized-benchmarking-irb">
-<h2>Interleaved Randomized Benchmarking (IRB)<a class="headerlink" href="#interleaved-randomized-benchmarking-irb" title="Link to this heading">#</a></h2>
-<p>Differently from the previous protocol, this benchmark aims at estimating the average fidelity of an <strong>individual</strong> quantum gate. This can be achieved interleaving random Clifford gates between the gate of interest. This method was introduced in <a class="reference external" href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.109.080505">Magesan, 2012</a>, and just as CRB, it is robust with respect to SPAM errors.</p>
-<p>The protocol runs two sets of sequences, one solely made up of random Clifford gates, as in CRB, and one made up of random Clifford sequences but interleaving the gate of interest among these (and compiling the corresponding sequence inverse). IRB then extracts the corresponding decay parameters (where we expect the decay rate for IRB to be smaller than the CRB one, because the sequence is longer), and the average fidelity of the gate we wish to characterize is then calculated with a simple formula using the two decay parameters.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb</span><span class="w"> </span><span class="kn">import</span> <span class="n">InterleavedRBConfiguration</span><span class="p">,</span> <span class="n">InterleavedRandomizedBenchmarking</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">IRB_CZ</span> <span class="o">=</span> <span class="n">InterleavedRBConfiguration</span><span class="p">(</span>
-    <span class="n">qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span>
-    <span class="n">sequence_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)],</span>
-    <span class="n">num_circuit_samples</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">parallel_execution</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">interleaved_gate</span> <span class="o">=</span> <span class="s2">&quot;CZGate&quot;</span><span class="p">,</span>
-    <span class="n">interleaved_gate_params</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">simultaneous_fit</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="s2">&quot;offset&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<blockquote>
-<div><p>If you want to modify the settings above, please refer to the documentation <a class="reference external" href="https://iqm-finland.github.io/iqm-benchmarks/api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration">here</a>.</p>
-</div></blockquote>
-<p>NB: Clifford RB is executed by default when running Interleaved RB!</p>
-<p>Warning: The following code cells may take <strong>several</strong> minutes to run.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_irb_CZ</span> <span class="o">=</span> <span class="n">InterleavedRandomizedBenchmarking</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">IRB_CZ</span><span class="p">)</span>
-<span class="n">run_irb_CZ</span> <span class="o">=</span> <span class="n">benchmark_irb_CZ</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_irb_CZ</span> <span class="o">=</span> <span class="n">benchmark_irb_CZ</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="n">result_irb_CZ</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</section>
 <section id="q-score">
 <h2>Q-Score<a class="headerlink" href="#q-score" title="Link to this heading">#</a></h2>
 <p><em>The Q-score measures the maximum number of qubits that can be used
@@ -791,25 +650,23 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">QSCORE</span> <span class="o">=</span> <span class="n">QScoreConfiguration</span><span class="p">(</span>
-    <span class="n">num_instances</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">num_qubits</span>
+<span class="n">chosen_layout</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">qubits</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">qubits</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">num_qubits</span><span class="p">)]</span>
+<span class="n">QSCORE</span> <span class="o">=</span> <span class="n">QScoreConfiguration</span><span class="p">(</span>
+    <span class="n">num_instances</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">num_qaoa_layers</span><span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">shots</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
     <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
     <span class="n">min_num_nodes</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">max_num_nodes</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">max_num_nodes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">use_virtual_node</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_classically_optimized_angles</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">choose_qubits_routine</span> <span class="o">=</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span>
-    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">2</span><span class="p">],</span>
-                    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-                    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
-                    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
+    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="n">chosen_layout</span><span class="p">,</span>
     <span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">999999</span><span class="p">),</span>
     <span class="n">REM</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-    <span class="n">qpu_topology</span> <span class="o">=</span> <span class="s2">&quot;crystal&quot;</span><span class="p">,</span>
+    <span class="n">qpu_topology</span> <span class="o">=</span> <span class="s2">&quot;star&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -844,7 +701,6 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
 </section>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
-<p>Typical performance for IQM Spark is summarized in the table below and compared to the values obtained with your device. The typical single- and two-qubit gate fidelities reported below refer to the median over the 5 qubits and 4 couplings of the system, respectively.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -861,31 +717,23 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
 <span class="n">obs_clops</span> <span class="o">=</span> <span class="n">result_clops</span><span class="o">.</span><span class="n">observations</span>
 <span class="n">clops</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">obs_clops</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;clops_v&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obs_clops</span><span class="p">])</span>
 
-<span class="c1">### CRB</span>
-<span class="n">obs_crb</span> <span class="o">=</span> <span class="n">result_clifford_rb</span><span class="o">.</span><span class="n">observations</span>
-<span class="n">f_crb</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">([</span><span class="n">obs_crb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs_crb</span><span class="p">))]),</span><span class="mi">3</span><span class="p">)</span>
-
-<span class="c1">### IRB</span>
-<span class="n">obs_irb</span> <span class="o">=</span> <span class="n">result_irb_CZ</span><span class="o">.</span><span class="n">observations</span>
-<span class="n">f_irb</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">([</span><span class="n">obs_irb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs_irb</span><span class="p">))</span> <span class="k">if</span> <span class="n">obs_irb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s1">&#39;avg_gate_fidelity_interleaved&#39;</span><span class="p">]),</span><span class="mi">3</span><span class="p">)</span>
-
 <span class="c1">### QS </span>
 <span class="n">obs_qs</span> <span class="o">=</span> <span class="n">result_qscore</span><span class="o">.</span><span class="n">observations</span>
 <span class="n">qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">([</span><span class="n">obs_qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="o">-</span><span class="mf">0.2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs_qs</span><span class="p">))</span> <span class="k">if</span> <span class="n">obs_qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;mean_approximation_ratio&#39;</span> <span class="ow">and</span> <span class="n">obs_qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="o">-</span><span class="mf">0.2</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">2</span>
 
 
-<span class="n">summary</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;5-qubit GHZ state fidelity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;≥ 0.5&#39;</span><span class="p">,</span> <span class="n">fidelity</span><span class="p">],</span>
-    <span class="s1">&#39;Quantum Volume&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;≥ 8&#39;</span><span class="p">,</span> <span class="n">qv</span><span class="p">],</span> 
-    <span class="s1">&#39;CLOPS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;3000&#39;</span><span class="p">,</span> <span class="n">clops</span><span class="p">],</span> 
-    <span class="s1">&#39;Single-qubit gate fidelity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;≥ 0.999&#39;</span><span class="p">,</span> <span class="n">f_crb</span><span class="p">],</span>
-    <span class="s1">&#39;Two-qubit gate (CZ) fidelity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;≥ 0.98&#39;</span><span class="p">,</span> <span class="n">f_irb</span><span class="p">],</span> 
-    <span class="s1">&#39;Q-Score&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;≥ 5&#39;</span><span class="p">,</span> <span class="n">qs</span><span class="p">]</span> 
+<span class="n">summary</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;GHZ state fidelity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;≥ 0.5&#39;</span><span class="p">,</span> <span class="n">fidelity</span><span class="p">],</span>
+    <span class="s1">&#39;Quantum Volume&#39;</span><span class="p">:</span> <span class="n">qv</span><span class="p">,</span> 
+    <span class="s1">&#39;CLOPS&#39;</span><span class="p">:</span>  <span class="n">clops</span><span class="p">,</span> 
+    <span class="s1">&#39;Q-Score&#39;</span><span class="p">:</span>  <span class="n">qs</span> 
 <span class="p">}</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&lt;30}</span><span class="s2"> </span><span class="si">{:&lt;15}</span><span class="s2"> </span><span class="si">{:&lt;15}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Benchmark&#39;</span><span class="p">,</span> <span class="s1">&#39;Typical&#39;</span><span class="p">,</span> <span class="s1">&#39;Your device&#39;</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">label</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">v</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&lt;30}</span><span class="s2"> </span><span class="si">{:&lt;15}</span><span class="s2"> </span><span class="si">{:&lt;15}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">num</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summary</span>
 </pre></div>
 </div>
 </div>
@@ -905,20 +753,20 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="devices.html"
+       href="spark.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Devices</p>
+        <p class="prev-next-title">Benchmarking IQM Spark</p>
       </div>
     </a>
     <a class="right-next"
-       href="star.html"
+       href="../development/development.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Benchmarking IQM Star</p>
+        <p class="prev-next-title">Development</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -940,11 +788,10 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connect-to-the-backend">Connect to the backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#as-one-can-see-the-label-0-is-reserved-for-the-resontor-so-it-is-advised-to-define-the-qubit-indices-in-the-layout-of-interest-starting-from-1">As one can see, the label “0” is reserved for the resontor. So it is advised to define the qubit indices in the layout of interest starting from 1.</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ghz-state-fidelity">GHZ state fidelity</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-volume">Quantum Volume</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circuit-layer-operations-per-second-clops">Circuit Layer Operations Per Second (CLOPS)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clifford-randomized-benchmarking">Clifford Randomized Benchmarking</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interleaved-randomized-benchmarking-irb">Interleaved Randomized Benchmarking (IRB)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-score">Q-Score</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
