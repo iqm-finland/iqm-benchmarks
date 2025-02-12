@@ -387,14 +387,12 @@ def generate_ghz_spanning_tree(
     return qc, list(participating_qubits)
 
 
-def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List[int]], List[float]]:
+def extract_fidelities(cal_url: str) -> Tuple[List[List[int]], List[float]]:
     """Returns couplings and CZ-fidelities from calibration data URL
 
     Args:
         cal_url: str
             The url under which the calibration data for the backend can be found
-        qubit_layout: List[int]
-            The subset of system-qubits used in the protocol, indexed from 0
     Returns:
         list_couplings: List[List[int]]
             A list of pairs, each of which is a qubit coupling for which the calibration
@@ -410,9 +408,8 @@ def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List
     for item in calibration["calibrations"][0]["metrics"][0]["metrics"]:
         qb1 = int(item["locus"][0][2:]) - 1
         qb2 = int(item["locus"][1][2:]) - 1
-        if all([qb1 in qubit_layout, qb2 in qubit_layout]):
-            list_couplings.append([qb1, qb2])
-            list_fids.append(float(item["value"]))
+        list_couplings.append([qb1, qb2])
+        list_fids.append(float(item["value"]))
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
     qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
     list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
@@ -445,7 +442,8 @@ def get_edges(
     edges_patch = []
     for idx, edge in enumerate(coupling_map):
         if edge[0] in qubit_layout and edge[1] in qubit_layout:
-            edges_patch.append([edge[0], edge[1]])
+            if not set(edge) in edges_patch:
+                edges_patch.append(set(edge))
 
     if fidelities_cal is not None:
         fidelities_cal = list(
@@ -454,7 +452,7 @@ def get_edges(
         fidelities_patch = []
         for edge in edges_patch:
             for idx, edge_2 in enumerate(cast(List[int], edges_cal)):
-                if edge == edge_2:
+                if edge == set(edge_2):
                     fidelities_patch.append(fidelities_cal[idx])
         weights = -np.log(np.array(fidelities_patch))
     else:
@@ -658,7 +656,7 @@ class GHZBenchmark(Benchmark):
             else:
                 effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
-                edges_cal, fidelities_cal = extract_fidelities(self.cal_url, qubit_layout)
+                edges_cal, fidelities_cal = extract_fidelities(self.cal_url)
                 graph = get_edges(effective_coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
                 graph = get_edges(effective_coupling_map, qubit_layout)
