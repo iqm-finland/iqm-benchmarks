@@ -31,7 +31,6 @@ from qiskit.transpiler import CouplingMap
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
@@ -447,9 +446,8 @@ def submit_execute(
     sorted_transpiled_qc_list: Dict[Tuple, List[QuantumCircuit]],
     backend: IQMBackendBase,
     shots: int,
-    calset_id: Optional[str] = None,
-    max_gates_per_batch: Optional[int] = None,
-    circuit_compilation_options: Optional[CircuitCompilationOptions] = None,
+    calset_id: Optional[str],
+    max_gates_per_batch: Optional[int],
 ) -> List[IQMJob]:
     """Submit for execute a list of quantum circuits on the specified Backend.
 
@@ -459,11 +457,8 @@ def submit_execute(
         shots (int): the number of shots per circuit.
         calset_id (Optional[str]): the calibration set ID, uses the latest one if None.
         max_gates_per_batch (int): the maximum number of gates per batch sent to the backend, used to make manageable batches.
-        circuit_compilation_options (CircuitCompilationOptions): Ability to pass a compilation options object,
-            enabling execution with dynamical decoupling among other things.
     Returns:
         List[IQMJob]: the IQMJob objects of the executed circuits.
-
     """
     final_jobs = []
     for k in sorted(
@@ -494,12 +489,7 @@ def submit_execute(
                 qcvv_logger.info(
                     f"max_gates_per_batch restriction: submitting subbatch #{index+1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
                 )
-                batch_jobs = backend.run(
-                    qc_batch,
-                    shots=shots,
-                    calibration_set_id=calset_id,
-                    circuit_compilation_options=circuit_compilation_options,
-                )
+                batch_jobs = backend.run(qc_batch, shots=shots, calibration_set_id=calset_id)
                 final_batch_jobs.append(batch_jobs)
             final_jobs.extend(final_batch_jobs)
 

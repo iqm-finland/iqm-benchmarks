@@ -55,7 +55,6 @@ from iqm.benchmarks.utils import (
     timeit,
     xrvariable_to_counts,
 )
-from iqm.iqm_client.models import CircuitCompilationOptions, DDMode
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -613,7 +612,6 @@ class GHZBenchmark(Benchmark):
         self.cal_url = configuration.cal_url
         self.timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
-        self.use_DD = configuration.use_DD
 
     def generate_native_ghz(self, qubit_layout: List[int], qubit_count: int, routine: str) -> CircuitGroup:
         """
@@ -864,10 +862,6 @@ class GHZBenchmark(Benchmark):
         """
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
         aux_custom_qubits_array = cast(List[List[int]], self.custom_qubits_array).copy()
-        if self.use_DD:
-            circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.ENABLED)
-        else:
-            circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.DISABLED)
         dataset = xr.Dataset()
 
         # Submit all
@@ -889,7 +883,6 @@ class GHZBenchmark(Benchmark):
                 self.shots,
                 self.calset_id,
                 max_gates_per_batch=self.max_gates_per_batch,
-                circuit_compilation_options=circuit_compilation_options,
             )
 
         # Retrieve all
@@ -968,4 +961,3 @@ class GHZConfiguration(BenchmarkConfigurationBase):
     rem: bool = True
     mit_shots: int = 1_000
     cal_url: Optional[str] = None
-    use_DD: bool = False
