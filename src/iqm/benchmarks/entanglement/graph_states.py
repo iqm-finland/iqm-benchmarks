@@ -1,4 +1,4 @@
-# Copyright 2024 IQM Benchmarks developers
+# Copyright 2025 IQM Benchmarks developers
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ from iqm.benchmarks import Benchmark, BenchmarkCircuit, BenchmarkRunResult, Circ
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkObservation, add_counts_to_dataset
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.shadow_utils import haar_shadow_tomography
+from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
+from iqm.benchmarks.shadow_utils import local_shadow_tomography
 from iqm.benchmarks.utils import (
     find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
@@ -36,7 +37,7 @@ from iqm.benchmarks.utils import (
     set_coupling_map,
     submit_execute,
     timeit,
-    xrvariable_to_counts,
+    xrvariable_to_counts, marginal_distribution,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -86,14 +87,24 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
     all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
     all_RM_qubits = dataset.attrs["all_RM_qubits"]
+    all_projected_qubits = dataset.attrs["all_projected_qubits"]
+
+    all_unitaries = dataset.attrs["all_unitaries"]
 
     execution_results = {}
 
     for group_idx, qubit_pairs in all_qubit_pairs_per_group:
         execution_results[group_idx] = xrvariable_to_counts(dataset, str(all_RM_qubits[group_idx]), num_RMs)
+
         for pair_idx, qubit_pair in qubit_pairs:
             # Get the neighbor qubits of qubit_pair
             neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
+
+            # Marginalize the counts
+            qubits_to_marginalize = [x for x in all_projected_qubits if x not in neighbor_qubits]
+            bits_idx_to_marginalize = [i for i, x in enumerate(all_projected_qubits) if x in qubits_to_marginalize]
+            marginal_counts = marginal_distribution(execution_results[group_idx], bits_idx_to_marginalize)
+
             # Compute the negativity for each projection
 
     qcvv_logger.info(f"Post-processing for layout {qubits}")
@@ -250,10 +261,15 @@ class GraphStateBenchmark(Benchmark):
         all_graph_submit_results = []
 
         # Get all local Randomized Measurements
+        clifford_1q_dict, _ = import_native_gate_cliffords()
         for idx, circuit in graph_benchmark_circuit_info["grouped_graph_circuits"].items():
-            (all_unitaries[idx], RM_circuits), time_RM_circuits[idx] = haar_shadow_tomography(
-                circuit, self.n_random_unitaries, RM_qubits, neighbor_qubits, measure_other_name="neighbors"
-            )
+            (all_unitaries[idx], RM_circuits), time_RM_circuits[idx] = local_shadow_tomography(qc=circuit,
+                                                                                               Nu=self.n_random_unitaries,
+                                                                                               active_qubits=RM_qubits,
+                                                                                               measure_other=neighbor_qubits,
+                                                                                               measure_other_name="neighbors",
+                                                                                               clifford_or_haar="clifford",
+                                                                                               cliffords_1q=clifford_1q_dict,)
 
             # Transpile
             RM_circuits_transpiled[idx], time_transpilation[idx] = perform_backend_transpilation(
@@ -276,6 +292,8 @@ class GraphStateBenchmark(Benchmark):
                     "time_submit": time_submit,
                 }
             )
+
+        dataset.attrs.update({"all_unitaries": all_unitaries})
 
         # Retrieve all counts and add to dataset
         for job_idx, job_dict in enumerate(all_graph_submit_results):
