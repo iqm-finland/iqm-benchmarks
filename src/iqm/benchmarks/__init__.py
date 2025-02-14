@@ -27,6 +27,7 @@ from .benchmark_definition import (
 )
 from .circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from .entanglement.ghz import GHZBenchmark, GHZConfiguration
+from .optimization.qscore import QScoreBenchmark, QScoreConfiguration
 from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
 from .randomized_benchmarking.clifford_rb.clifford_rb import CliffordRandomizedBenchmarking, CliffordRBConfiguration
@@ -44,6 +45,7 @@ AVAILABLE_BENCHMARKS = {
     CliffordRandomizedBenchmarking.name: CliffordRandomizedBenchmarking,
     InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
     MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
+    QScoreBenchmark.name: QScoreBenchmark
 }
 
 try:

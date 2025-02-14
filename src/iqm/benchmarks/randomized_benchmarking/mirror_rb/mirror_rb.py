@@ -553,6 +553,15 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
         plots[fig_name] = fig
 
+        observations.extend([
+            BenchmarkObservation(
+                name="decay_rate",
+                identifier=BenchmarkObservationIdentifier(qubits),
+                value=popt["decay_rate"].value,
+                uncertainty=popt["decay_rate"].stderr,
+            )
+        ])
+
     # Generate the combined plot
     fig_name, fig = plot_rb_decay(
         "mrb",
@@ -563,15 +572,6 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         mrb_2q_ensemble=two_qubit_gate_ensemble,
     )
     plots[fig_name] = fig
-
-    observations.extend([
-        BenchmarkObservation(
-            name="decay_rate",
-            identifier=BenchmarkObservationIdentifier(qubits),
-            value=popt["decay_rate"].value,
-            uncertainty=popt["decay_rate"].stderr,
-        )
-    ])
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
