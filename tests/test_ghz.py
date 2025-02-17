@@ -29,6 +29,7 @@ class TestGHZ:
             num_RMs=10,
             rem=False,
             mit_shots=10,
+            use_dd = True
         )
         benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
         benchmark.run()

@@ -154,11 +154,11 @@ class CompressiveGST(Benchmark):
         qcvv_logger.info(
             f"Will transpile all {self.configuration.num_circuits} circuits according to fixed physical layout"
         )
-        if self.configuration.parallel:
+        if self.configuration.parallel_execution:
             all_qubits = [qubit for layout in self.qubit_layouts for qubit in layout]
             if len(all_qubits) != len(set(all_qubits)):
                 raise ValueError(
-                    "Qubit layouts can't overlap when parallel execution is enabled, please choose non-overlapping layouts."
+                    "Qubit layouts can't overlap when parallel_execution is enabled, please choose non-overlapping layouts."
                 )
             raw_qc_list_parallel = []
             for circ in raw_qc_list:
@@ -178,7 +178,7 @@ class CompressiveGST(Benchmark):
                 drop_final_rz=False,
             )
         for qubits in self.qubit_layouts:
-            if not self.configuration.parallel:
+            if not self.configuration.parallel_execution:
                 coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
                 transpiled_qc_list, _ = perform_backend_transpilation(
                     raw_qc_list,
@@ -226,7 +226,7 @@ class CompressiveGST(Benchmark):
         transpiled_circuits, untranspiled_circuits = self.generate_meas_circuits()[0]
 
         # Submit all
-        if self.configuration.parallel:
+        if self.configuration.parallel_execution:
             transpiled_circuit_dict = {
                 tuple(range(self.backend.num_qubits)): transpiled_circuits[str(self.qubit_layouts[0])].circuits
             }
@@ -236,6 +236,7 @@ class CompressiveGST(Benchmark):
                 self.configuration.shots,
                 self.calset_id,
                 max_gates_per_batch=self.configuration.max_gates_per_batch,
+                circuit_compilation_options=self.circuit_compilation_options,
             )
             # Retrieve
             qcvv_logger.info(f"Now executing the corresponding circuit batch")
@@ -316,7 +317,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
             * Default: "auto"
         bootstrap_samples (int): The number of times the optimization algorithm is repeated on fake data to estimate
             the uncertainty via bootstrapping.
-        parallel (bool): Whether to run the circuits for all layouts in parallel on the backend.
+        parallel_execution (bool): Whether to run the circuits for all layouts in parallel on the backend.
     """
 
     benchmark: Type[Benchmark] = CompressiveGST
@@ -335,8 +336,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
     testing: bool = False
-    parallel: bool = False
-
+    parallel_execution: bool = False
 
 def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List[int]]:
     """Checks for correct setting of qubit_layouts in the configuration and return a correct type

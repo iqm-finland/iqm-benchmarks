@@ -698,6 +698,7 @@ class QuantumVolumeBenchmark(Benchmark):
             self.shots,
             self.calset_id,
             max_gates_per_batch=self.max_gates_per_batch,
+            circuit_compilation_options=self.circuit_compilation_options,
         )
         # else:
         # DD IN DIQE VERSION PREVENTS SUBMITTING JOBS DYNAMICALLY:

@@ -621,7 +621,7 @@ def dataset_counts_to_mgst_format(dataset: xr.Dataset, qubit_layout: List[int]) 
     num_povm = dataset.attrs["num_povm"]
     y_list = []
     for run_index in range(dataset.attrs["num_circuits"]):
-        if dataset.attrs["parallel"]:
+        if dataset.attrs["parallel_execution"]:
             result_da = dataset[f"parallel_results_counts_{run_index}"].copy()
             bit_pos = dataset.attrs["qubit_layouts"].index(qubit_layout)
             # Create a new coordinate of bits at the position given by the qubit layout and reverse order

@@ -353,6 +353,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         self.backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        circuit_compilation_options=self.configuration.circuit_compilation_options,
                     )
                 )
                 qcvv_logger.info(
