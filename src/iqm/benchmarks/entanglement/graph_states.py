@@ -15,18 +15,28 @@
 """
 Graph states benchmark
 """
+import itertools
 from time import strftime
-from typing import Any, Dict, Sequence, Type
+from typing import Any, Dict, Sequence, Tuple, Type
 
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import numpy as np
 from qiskit import QuantumCircuit, transpile
+from scipy.linalg import fractional_matrix_power
 import xarray as xr
 
 from iqm.benchmarks import Benchmark, BenchmarkCircuit, BenchmarkRunResult, Circuits
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkObservation, add_counts_to_dataset
+from iqm.benchmarks.benchmark_definition import (
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    add_counts_to_dataset,
+)
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
-from iqm.benchmarks.shadow_utils import local_shadow_tomography
+from iqm.benchmarks.shadow_utils import get_local_shadow, get_negativity, local_shadow_tomography
 from iqm.benchmarks.utils import (
     find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
@@ -67,6 +77,53 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     return qc_t
 
 
+def plot_shadows(avg_shadow, qubit_pair, projection, negativity) -> Tuple[str, Figure]:
+    """
+
+    :return:
+    """
+
+    fig, ax = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(6, 6))
+
+    cmap = "hot_r"
+
+    fig_name = str(qubit_pair)
+
+    ax[0].matshow(avg_shadow.real, interpolation="nearest", vmin=0, vmax=1, cmap=cmap)
+    ax[0].set_title("real".capitalize())
+    for (i, j), z in np.ndenumerate(avg_shadow.real):
+        ax[0].text(
+            j,
+            i,
+            '{:0.2f}'.format(z),
+            ha='center',
+            va='center',
+            bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'),
+        )
+
+    im1 = ax[1].matshow(avg_shadow.imag, interpolation="nearest", vmin=0, vmax=1, cmap=cmap)
+    ax[1].set_title("imag".capitalize())
+    for (i, j), z in np.ndenumerate(avg_shadow.imag):
+        ax[1].text(
+            j,
+            i,
+            '{:0.1f}'.format(z),
+            ha='center',
+            va='center',
+            bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'),
+        )
+
+    fig.suptitle(
+        f"Average shadow for qubits {qubit_pair}\nProjection: {projection}\nNegativity: {negativity['value']:.4f} +/- {negativity['uncertainty']:.1e}"
+    )
+
+    fig.colorbar(im1, shrink=0.5)
+    plt.show()
+    plt.close()
+
+    return fig_name, fig
+
+
 def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a Graph State benchmark experiment.
 
@@ -81,7 +138,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     # backend_name = dataset.attrs["backend_name"]
     # execution_timestamp = dataset.attrs["execution_timestamp"]
 
-    qubits = dataset.attrs["qubits"]
+    # qubits = dataset.attrs["qubits"]
     num_RMs = dataset.attrs["n_random_unitaries"]
 
     all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
@@ -90,23 +147,37 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     all_projected_qubits = dataset.attrs["all_projected_qubits"]
 
     all_unitaries = dataset.attrs["all_unitaries"]
-    # For graph states benchmark, all_unitaries is a Dict[int, Dict[str, str]] where
-    # the keys are the group indices and values are Dict[str,str] with
-    # keys being str(qubit) and values Clifford labels (keys for clifford_1q_dict below)
+    # For graph states benchmark, all_unitaries is a Dict[int, Dict[str, List[str]]] where
+    # the keys are the group indices and values are Dict[str, List[str]] with
+    # keys being str(qubit) and values being lists of Clifford labels (keys for clifford_1q_dict below) for each RM
 
     clifford_1q_dict, _ = import_native_gate_cliffords()
 
     execution_results = {}
 
-    for group_idx, qubit_pairs in all_qubit_pairs_per_group.items():
-        execution_results[group_idx] = xrvariable_to_counts(dataset, str(all_RM_qubits[group_idx]), num_RMs)
+    shadows_per_projection = {}
+    average_shadows = {}
+    stddev_shadows = {}
+    all_negativities = {}  # {str(qubit_pair): {projections: negativities}}
+    max_negativities = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
 
+    for group_idx, qubit_pairs in all_qubit_pairs_per_group.items():
+        qcvv_logger.info(f"Retrieving shadows for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}")
+        execution_results[group_idx] = xrvariable_to_counts(dataset, str(all_RM_qubits[group_idx]), num_RMs)
+        # shadows_per_projection : {str(qubit_pair): {projection bitstring: shadow}}
         for pair_idx, qubit_pair in enumerate(qubit_pairs):
+            qcvv_logger.info(f"Now on qubit pair {qubit_pair} ({pair_idx+1}/{len(qubit_pairs)})")
+
+            all_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {projections: negativities}}
+            max_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
+
             # Get the neighbor qubits of qubit_pair
             neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
 
             # Marginalize the counts over non-neighbor qubits of the current pair
-            qubits_to_marginalize = [x for x in all_projected_qubits if x not in neighbor_qubits and x not in qubit_pair]
+            qubits_to_marginalize = [
+                x for x in all_projected_qubits if x not in neighbor_qubits and x not in qubit_pair
+            ]
             if qubits_to_marginalize:
                 bits_idx_to_marginalize = [i for i, x in enumerate(all_projected_qubits) if x in qubits_to_marginalize]
                 marginal_counts = [
@@ -115,15 +186,119 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             else:
                 marginal_counts = execution_results[group_idx]
 
-            print(marginal_counts)
-
             # Get all shadows of qubit_pair
+            neighbor_bit_strings_length = len(neighbor_qubits)
+            all_projection_bit_strings = [
+                ''.join(x) for x in itertools.product(('0', '1'), repeat=neighbor_bit_strings_length)
+            ]
+            shadows_per_projection[str(qubit_pair)] = {projection: [] for projection in all_projection_bit_strings}
+            for RM_idx, counts in enumerate(marginal_counts):
+                # NEED TO RETRIEVE BOTH CLIFFORDS
+                cliffords_rm = [all_unitaries[group_idx][str(q)][RM_idx] for q in qubit_pair]
+                # Organize counts by projection
+                # e.g. counts ~ {'000 00': 31, '000 01': 31, '000 10': 38, '000 11': 41, '001 00': 28, '001 01': 33,
+                #                   '001 10': 31, '001 11': 37, '010 00': 29, '010 01': 32, '010 10': 31, '010 11': 25,
+                #                   '011 00': 36, '011 01': 24, '011 10': 33, '011 11': 32, '100 00': 22, '100 01': 38,
+                #                   '100 10': 34, '100 11': 26, '101 00': 26, '101 01': 26, '101 10': 37, '101 11': 30,
+                #                   '110 00': 36, '110 01': 35, '110 10': 31, '110 11': 35, '111 00': 31, '111 01': 32,
+                #                   '111 10': 37, '111 11': 36}
+                # organize to projected_counts['000'] ~ {'00': 31, '01': 31, '10': 38, '11': 41},
+                #             projected_counts['001'] ~ {'00': 28, '01': 33, '10': 31, '11': 37}
+                #             ...
+                projected_counts = {
+                    projection: {
+                        b_s[-2:]: b_c for b_s, b_c in counts.items() if b_s[:neighbor_bit_strings_length] == projection
+                    }
+                    for projection in all_projection_bit_strings
+                }
+
+                # Get the individual shadow for each projection
+                for projected_bit_string in all_projection_bit_strings:
+                    shadows_per_projection[str(qubit_pair)][projected_bit_string].append(
+                        get_local_shadow(
+                            counts=projected_counts[projected_bit_string],
+                            unitary_arg=cliffords_rm,
+                            subsystem_bit_indices=list(range(2)),
+                            clifford_or_haar="clifford",
+                            cliffords_1q=clifford_1q_dict,
+                        )
+                    )
+
+            # Average the shadows for each projection
+            average_shadows[str(qubit_pair)] = {
+                projected_bit_string: np.mean(shadows_per_projection[str(qubit_pair)][projected_bit_string], axis=0)
+                for projected_bit_string in all_projection_bit_strings
+            }
+            stddev_shadows[str(qubit_pair)] = {
+                projected_bit_string: fractional_matrix_power(
+                    np.std(shadows_per_projection[str(qubit_pair)][projected_bit_string], axis=0), 0.5
+                )
+                / len(all_projection_bit_strings)
+                for projected_bit_string in all_projection_bit_strings
+            }
 
             # Compute the negativity of the shadow of each projection
+            qcvv_logger.info(
+                f"Computing the negativity of all shadow projections for qubit pair {qubit_pair} ({pair_idx+1}/{len(qubit_pairs)})"
+            )
+            all_negativities[str(qubit_pair)] = {
+                projected_bit_string: {
+                    "value": get_negativity(average_shadows[str(qubit_pair)][projected_bit_string], 1, 1),
+                    "uncertainty": get_negativity(stddev_shadows[str(qubit_pair)][projected_bit_string], 1, 1),
+                }
+                for projected_bit_string in all_projection_bit_strings
+            }
 
             # Extract the max negativity and the corresponding projection - save in dictionary
+            all_negativities_list = [
+                all_negativities[str(qubit_pair)][projected_bit_string]["value"]
+                for projected_bit_string in all_projection_bit_strings
+            ]
+            all_negativities_uncertainty = [
+                all_negativities[str(qubit_pair)][projected_bit_string]["uncertainty"]
+                for projected_bit_string in all_projection_bit_strings
+            ]
 
-    qcvv_logger.info(f"Post-processing for layout {qubits}")
+            max_negativity_projection = np.argmax(all_negativities_list)
+            max_negativity = {
+                "value": all_negativities_list[max_negativity_projection],
+                "uncertainty": all_negativities_uncertainty[max_negativity_projection],
+            }
+            max_negativities[str(qubit_pair)].update(max_negativity)
+            max_negativities[str(qubit_pair)].update(
+                {
+                    "projection": all_projection_bit_strings[max_negativity_projection],
+                }
+            )
+
+            fig_name, fig = plot_shadows(
+                avg_shadow=average_shadows[str(qubit_pair)][all_projection_bit_strings[max_negativity_projection]],
+                qubit_pair=qubit_pair,
+                projection=all_projection_bit_strings[max_negativity_projection],
+                negativity=max_negativity,
+            )
+            plots[fig_name] = fig
+
+            observations.extend(
+                [
+                    BenchmarkObservation(
+                        name="max negativity",
+                        value=max_negativity["value"],
+                        uncertainty=max_negativity["uncertainty"],
+                        identifier=BenchmarkObservationIdentifier(qubit_pair),
+                    )
+                ]
+            )
+
+    dataset.attrs.update(
+        {
+            "max negativities": max_negativities,
+            "average shadows": average_shadows,
+            "stddev shadows": stddev_shadows,
+            "all_negativities": all_negativities,
+            "all shadows": shadows_per_projection,
+        }
+    )
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 
@@ -278,9 +453,10 @@ class GraphStateBenchmark(Benchmark):
         time_transpilation = {}
         all_graph_submit_results = []
 
+        clifford_1q_dict, _ = import_native_gate_cliffords()
+
         # Get all local Randomized Measurements
         qcvv_logger.info(f"Performing Randomized Measurements of all qubit pairs")
-        clifford_1q_dict, _ = import_native_gate_cliffords()
         for idx, circuit in graph_benchmark_circuit_info["grouped_graph_circuits"].items():
             qcvv_logger.info(f"Now on group {idx+1}/{len(graph_benchmark_circuit_info['grouped_graph_circuits'])}")
             (all_unitaries[idx], RM_circuits_untranspiled[idx]), time_RM_circuits[idx] = local_shadow_tomography(

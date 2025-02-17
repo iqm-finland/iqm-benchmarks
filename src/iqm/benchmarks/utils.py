@@ -347,7 +347,7 @@ def perform_backend_transpilation(
     backend: IQMBackendBase,
     qubits: Sequence[int],
     coupling_map: List[List[int]],
-    basis_gates: Sequence[str, ...] = ("r", "cz"),
+    basis_gates: Sequence[str] = ("r", "cz"),
     qiskit_optim_level: int = 1,
     optimize_sqg: bool = False,
     drop_final_rz: bool = True,

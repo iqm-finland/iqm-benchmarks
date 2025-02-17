@@ -2,11 +2,12 @@ import random
 from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
 
 import numpy as np
-from qiskit import ClassicalRegister, QuantumCircuit
+from qiskit import ClassicalRegister, QuantumCircuit, quantum_info
 from qiskit.circuit.library import UnitaryGate
 
 # from qiskit.extensions import UnitaryGate
 import scipy.linalg as spl
+from sympy.codegen.ast import continue_
 
 from iqm.benchmarks.utils import timeit
 
@@ -113,32 +114,64 @@ def local_shadow_tomography(
     return unitaries, qclist
 
 
-def get_shadow(counts: Dict[str, int], Unitary: np.ndarray | List[str], subsystem: Sequence[int]):
+def get_local_shadow(
+    counts: Dict[str, int],
+    unitary_arg: np.ndarray | Sequence[str],
+    subsystem_bit_indices: Sequence[int],
+    clifford_or_haar: Literal["clifford", "haar"] = "clifford",
+    cliffords_1q: Optional[Dict[str, QuantumCircuit]] = None,
+):
     """Constructs shadows for each individual initialisation.
 
     Args:
         counts (Dict[str, int]): a dictionary of bit-string counts.
-        Unitary (np.ndrray | str): local random unitaries used for a given initialisation, either specified as
+        unitary_arg (np.ndrray | Sequence[str]): local random unitaries used for a given initialisation, either specified as
                     - a numpy array, or
                     - a list of Clifford labels.
-        subsystem (Sequence[int]): Sequence of qubits to construct the shadow of.
+        subsystem_bit_indices (Sequence[int]): Bit indices in the counts of the subsystem to construct the shadow of.
+        clifford_or_haar (Literal["clifford", "haar"]): Whether to use Clifford or Haar random 1Q gates.
+                * Default is "clifford".
+        cliffords_1q (Optional[Dict[str, QuantumCircuit]]): dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates
+                * Default is None.
+
     Returns:
         rhoshadows (Array): shadow of considered subsystem.
     """
-    nqubits = len(subsystem)
+    if clifford_or_haar not in ["clifford", "haar"]:
+        raise ValueError("clifford_or_haar must be either 'clifford' or 'haar'.")
+    elif clifford_or_haar == "clifford" and cliffords_1q is None:
+        raise Exception("cliffords_1q dictionary must be provided if clifford_or_haar is 'clifford'.")
+    elif clifford_or_haar == 'haar' and isinstance(unitary_arg, Sequence):
+        raise ValueError("If clifford_or_haar is 'haar', the unitary operator must be a numpy array.")
+    elif clifford_or_haar == 'clifford' and not isinstance(unitary_arg, Sequence):
+        raise ValueError(
+            "If clifford_or_haar is 'clifford', the unitary operator must be specified as a Sequence of strings."
+        )
+
+    nqubits = len(subsystem_bit_indices)
     rhoshadows = np.zeros([2**nqubits, 2**nqubits], dtype=complex)
     proj = np.zeros((2, 2, 2), dtype=complex)
     proj[0, :, :] = np.array([[1, 0], [0, 0]])
     proj[1, :, :] = np.array([[0, 0], [0, 1]])
     shots = sum(list(counts.values()))
+
+    if clifford_or_haar == "haar":
+        unitary_op = unitary_arg
+    else:
+        unitary_op = np.zeros((nqubits, 2, 2), dtype=complex)
+        for qubit_idx, clif_label in enumerate(unitary_arg):
+            unitary_op[qubit_idx, :, :] = quantum_info.Operator(cliffords_1q[clif_label]).to_matrix()
+
     for bit_strings in counts.keys():
         rho_j = 1
-        for j in subsystem:
+        for j in subsystem_bit_indices:
             s_j = int(bit_strings[::-1][j])
             rho_j = np.kron(
                 rho_j,
                 3
-                * np.einsum('ab,bc,cd', np.transpose(np.conjugate(Unitary[j, :, :])), proj[s_j, :, :], Unitary[j, :, :])
+                * np.einsum(
+                    'ab,bc,cd', np.transpose(np.conjugate(unitary_op[j, :, :])), proj[s_j, :, :], unitary_op[j, :, :]
+                )
                 - np.array([[1, 0], [0, 1]]),
             )
 
@@ -164,4 +197,4 @@ def get_negativity(rho, NA, NB):
     rho_t = rho_t.reshape(2 ** (NA + NB), 2 ** (NA + NB))
     eigs = np.linalg.eig(rho_t)
     neg = np.sum(i for i in np.real(eigs[0]) if np.all(i < 0))
-    return neg
+    return np.abs(neg)
