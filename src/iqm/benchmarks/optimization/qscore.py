@@ -27,6 +27,7 @@ from iqm.benchmarks.benchmark_definition import (
 )
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
     perform_backend_transpilation,
     retrieve_all_counts,
@@ -479,7 +480,7 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         observations.extend(
             [
                 BenchmarkObservation(
-                    name="approximation_ratio",
+                    name="mean_approximation_ratio",
                     value=approximation_ratio,
                     uncertainty=std_of_approximation_ratio,
                     identifier=BenchmarkObservationIdentifier(num_nodes),
@@ -596,9 +597,12 @@ class QScoreBenchmark(Benchmark):
         self.choose_qubits_routine = configuration.choose_qubits_routine
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.optimize_sqg = configuration.optimize_sqg
+        self.REM = configuration.REM
+        self.mit_shots = configuration.mit_shots
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
         self.seed = configuration.seed
+        self.qpu_topology = configuration.qpu_topology
 
         self.graph_physical: Graph
         self.virtual_nodes: List[Tuple[int, int]]
@@ -744,15 +748,20 @@ class QScoreBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
-        if self.max_num_nodes is None:
+        if self.qpu_topology == "star":
+            nqubits = self.backend.num_qubits - 1  # need to leave out the resonator
+        else:
+            nqubits = self.backend.num_qubits
+
+        if self.max_num_nodes is None or self.max_num_nodes == nqubits + 1:
             if self.use_virtual_node:
-                max_num_nodes = self.backend.num_qubits + 1
+                max_num_nodes = nqubits + 1
             else:
-                max_num_nodes = self.backend.num_qubits
+                max_num_nodes = nqubits
         else:
             max_num_nodes = self.max_num_nodes
 
-        dataset.attrs.update({"max_num_nodes": self.max_num_nodes})
+        dataset.attrs.update({"max_num_nodes": max_num_nodes})
 
         for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
             qc_list = []
@@ -761,6 +770,11 @@ class QScoreBenchmark(Benchmark):
             graph_list = []
             qubit_set_list = []
             theta_list = []
+            ## updates the number of qubits to choose for the grpah problem.
+            if self.use_virtual_node:
+                updated_num_nodes = num_nodes - 1
+            else:
+                updated_num_nodes = num_nodes
 
             qcvv_logger.debug(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
 
@@ -800,13 +814,12 @@ class QScoreBenchmark(Benchmark):
                     qcvv_logger.debug(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
 
                 # Choose the qubit layout
-
                 if self.choose_qubits_routine.lower() == "naive":
-                    qubit_set = self.choose_qubits_naive(num_nodes)
+                    qubit_set = self.choose_qubits_naive(updated_num_nodes)
                 elif (
                     self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic"
                 ):
-                    qubit_set = self.choose_qubits_custom(num_nodes)
+                    qubit_set = self.choose_qubits_custom(updated_num_nodes)
                 else:
                     raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
                 qubit_set_list.append(qubit_set)
@@ -863,8 +876,16 @@ class QScoreBenchmark(Benchmark):
                         max_gates_per_batch=self.max_gates_per_batch,
                     )
                     qc_transpiled_list.append(transpiled_qc)
-                    execution_results.append(retrieve_all_counts(jobs)[0][0])
                     qcvv_logger.setLevel(logging.INFO)
+
+                    if self.REM:
+                        rem_counts = apply_readout_error_mitigation(
+                            backend, transpiled_qc, [retrieve_all_counts(jobs)[0][0]], self.mit_shots
+                        )
+                        rem_distribution = rem_counts[0][0].nearest_probability_distribution()
+                        execution_results.append(rem_distribution)
+                    else:
+                        execution_results.append(retrieve_all_counts(jobs)[0][0])
 
                 seed += 1
                 qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
@@ -903,16 +924,24 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
 
     Attributes:
         benchmark (Type[Benchmark]): QScoreBenchmark
-        num_instances (int):
-        num_qaoa_layers (int):
-        min_num_nodes (int):
-        max_num_nodes (int):
-        use_virtual_node (bool):
-        use_classically_optimized_angles (bool):
+        num_instances (int): Number of random graphs to be chosen.
+        num_qaoa_layers (int): Depth of the QAOA circuit.
+                            * Default is 1.
+        min_num_nodes (int): The min number of nodes to be taken into account, which should be >= 2.
+                            * Default is 2.
+        max_num_nodes (int): The max number of nodes to be taken into account, which has to be <= num_qubits + 1.
+                            * Default is None
+        use_virtual_node (bool): Parameter to increase the potential Qscore by +1.
+                            * Default is True.
+        use_classically_optimized_angles (bool): Use pre-optimised tuned parameters in the QAOA circuit.
+                            * Default is True.
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
                             * Default is "custom".
-        min_num_qubits (int):
+        min_num_qubits (int): Minumum number of qubits.
+                            * Default is 2
         custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
+                            If virtual_node is set to True, then a given graph with n nodes requires n-1 selected qubits.
+                            If virtual_node is set to False, then a given graph with n nodes requires n selected qubits.
                             * Default is None.
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
                             * Default is 3.
@@ -920,6 +949,12 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is True.
         seed (int): The random seed.
                             * Default is 1.
+        REM (bool): Use readout error mitigation.
+                            * Default is False.
+        mit_shots: (int): Number of shots used in readout error mitigation.
+                            * Default is 1000.
+        qpu_topology: (str): Topology of the QPU, either "crystal" or "star".
+                            * Default is "crystal".
     """
 
     benchmark: Type[Benchmark] = QScoreBenchmark
@@ -935,3 +970,6 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     qiskit_optim_level: int = 3
     optimize_sqg: bool = True
     seed: int = 1
+    REM: bool = False
+    mit_shots: int = 1000
+    qpu_topology: str = "crystal"
