@@ -1,14 +1,16 @@
 """Tests for Qscore estimation"""
 
 from iqm.benchmarks.optimization.qscore import *
-from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
+from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
 from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 
 class TestQScore:
-    backend = IQMFakeApollo()
+    backend = IQMFakeAdonis()
+    qpu_topology = "crystal"
+    custom_qubits_array = [[0], [0, 2], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3, 4]]
 
-    def test_qscore_crystal(self):
+    def test_qscore(self):
         EXAMPLE_QSCORE = QScoreConfiguration(
             num_instances=2,
             num_qaoa_layers=1,
@@ -19,32 +21,11 @@ class TestQScore:
             use_virtual_node=True,
             use_classically_optimized_angles=True,
             choose_qubits_routine="custom",
-            custom_qubits_array=[[2], [2, 3], [2, 3, 4], [2, 3, 4, 5], [2, 3, 4, 5, 6]],
+            custom_qubits_array=self.custom_qubits_array,
             seed=1,
             REM=True,
             mit_shots=10,
-            qpu_topology="crystal"
-        )
-        benchmark = QScoreBenchmark(backend, EXAMPLE_QSCORE)
-        benchmark.run()
-        benchmark.analyze()
-
-    def test_qscore_star(self):
-        EXAMPLE_QSCORE = QScoreConfiguration(
-            num_instances=2,
-            num_qaoa_layers=1,
-            shots=4,
-            calset_id=None,  # calibration set ID, default is None
-            min_num_nodes=2,
-            max_num_nodes=None,
-            use_virtual_node=True,
-            use_classically_optimized_angles=True,
-            choose_qubits_routine="custom",
-            custom_qubits_array=[[1], [1, 2], [1, 2, 3], [1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5, 6]],
-            seed=1,
-            REM=True,
-            mit_shots=10,
-            qpu_topology="star"
+            qpu_topology=self.qpu_topology
         )
         benchmark = QScoreBenchmark(self.backend, EXAMPLE_QSCORE)
         benchmark.run()
@@ -52,3 +33,5 @@ class TestQScore:
 
 class TestQScoreDeneb(TestQScore):
     backend = IQMFakeDeneb()
+    qpu_topology = "star"
+    custom_qubits_array = [[1], [1, 2], [1, 2, 3], [1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5, 6]]
