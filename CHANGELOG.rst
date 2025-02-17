@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.19
+============
+* Standardizes observations for CLOPS and Mirror RB.
+
 Version 2.18
 ============
 * Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
