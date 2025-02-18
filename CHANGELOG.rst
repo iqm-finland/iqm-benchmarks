@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 2.19
+============
+* All functional tests extended to the fake Deneb backend.
+* Added backend transpilation to REM calibration circuits to fix errors with REM on fake Deneb.
+
 Version 2.18
 ============
 * Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
