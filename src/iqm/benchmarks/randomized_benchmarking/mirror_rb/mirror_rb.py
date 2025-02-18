@@ -15,7 +15,12 @@ from qiskit_aer import Aer, AerSimulator
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmarks import BenchmarkAnalysisResult, BenchmarkRunResult, BenchmarkObservationIdentifier, BenchmarkObservation
+from iqm.benchmarks import (
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
@@ -553,14 +558,16 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
         plots[fig_name] = fig
 
-        observations.extend([
-            BenchmarkObservation(
-                name="decay_rate",
-                identifier=BenchmarkObservationIdentifier(qubits),
-                value=popt["decay_rate"].value,
-                uncertainty=popt["decay_rate"].stderr,
-            )
-        ])
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name="decay_rate",
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                    value=popt["decay_rate"].value,
+                    uncertainty=popt["decay_rate"].stderr,
+                )
+            ]
+        )
 
     # Generate the combined plot
     fig_name, fig = plot_rb_decay(

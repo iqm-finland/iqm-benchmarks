@@ -30,7 +30,12 @@ import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkRunResult, BenchmarkObservation, BenchmarkObservationIdentifier
+from iqm.benchmarks.benchmark_definition import (
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (
@@ -315,17 +320,8 @@ def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset.attrs = dict(sorted(dataset.attrs.items()))
 
     observations = [
-        BenchmarkObservation(
-            name="clops_v",
-            value=int(clops_v),
-            identifier=BenchmarkObservationIdentifier(qubits)
-        ),
-        BenchmarkObservation(
-            name="clops_h",
-            value=int(clops_h),
-            identifier=BenchmarkObservationIdentifier(qubits)
-
-        )
+        BenchmarkObservation(name="clops_v", value=int(clops_v), identifier=BenchmarkObservationIdentifier(qubits)),
+        BenchmarkObservation(name="clops_h", value=int(clops_h), identifier=BenchmarkObservationIdentifier(qubits)),
     ]
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)

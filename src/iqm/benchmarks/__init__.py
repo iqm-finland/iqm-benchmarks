@@ -45,7 +45,7 @@ AVAILABLE_BENCHMARKS = {
     CliffordRandomizedBenchmarking.name: CliffordRandomizedBenchmarking,
     InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
     MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
-    QScoreBenchmark.name: QScoreBenchmark
+    QScoreBenchmark.name: QScoreBenchmark,
 }
 
 try:
