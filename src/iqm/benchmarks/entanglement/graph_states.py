@@ -17,7 +17,7 @@ Graph states benchmark
 """
 import itertools
 from time import strftime
-from typing import Any, Dict, Sequence, Tuple, Type, List
+from typing import Any, Dict, List, Sequence, Tuple, Type
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -184,7 +184,7 @@ def plot_max_negativities(
     plt.title(f"Max negativities for qubit pairs in {backend_name}\n{num_RM_samples} local RM samples\n{timestamp}")
     # plt.legend(fontsize=8)
 
-    ax.set_aspect((2/3)*len(x))
+    ax.set_aspect((2 / 3) * len(x))
 
     plt.close()
 
@@ -229,7 +229,9 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
     average_shadows = {}
     stddev_shadows = {}
     all_negativities: Dict[str, Dict[str, Dict[str, float]]] = {}  # {str(qubit_pair): {projections: negativities}}
-    max_negativities: Dict[str, Dict[str, str | float]] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
+    max_negativities: Dict[str, Dict[str, str | float]] = (
+        {}
+    )  # {str(qubit_pair): {"negativity": float, "projection": str}}
 
     for group_idx, group in all_qubit_pairs_per_group.items():
         qcvv_logger.info(f"Retrieving shadows for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}")

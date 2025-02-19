@@ -26,7 +26,6 @@ from qiskit.circuit.library import UnitaryGate
 import scipy.linalg as spl
 
 from iqm.benchmarks.utils import timeit
-from mGST.reporting.reporting import unitarities
 
 
 def CUE(random_gen: RandomState, n: int) -> np.ndarray:

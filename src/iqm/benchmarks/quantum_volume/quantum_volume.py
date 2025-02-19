@@ -674,7 +674,7 @@ class QuantumVolumeBenchmark(Benchmark):
         self,
         backend: IQMBackendBase,
         qubits: Sequence[int],
-        sorted_transpiled_qc_list: Dict[Tuple[int, ...] , List[QuantumCircuit]],
+        sorted_transpiled_qc_list: Dict[Tuple[int, ...], List[QuantumCircuit]],
     ) -> Dict[str, Any]:
         """
         Submit a single set of QV jobs for execution in the specified IQMBackend:
