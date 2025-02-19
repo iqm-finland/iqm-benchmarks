@@ -143,7 +143,7 @@ def get_local_shadow(
         counts (Dict[str, int]): a dictionary of bit-string counts.
         unitary_arg (np.ndrray | Sequence[str]): local random unitaries used for a given initialisation, either specified as
                     - a numpy array, or
-                    - a list of Clifford labels.
+                    - a Sequence of Clifford labels.
         subsystem_bit_indices (Sequence[int]): Bit indices in the counts of the subsystem to construct the shadow of.
         clifford_or_haar (Literal["clifford", "haar"]): Whether to use Clifford or Haar random 1Q gates.
                 * Default is "clifford".
@@ -171,15 +171,16 @@ def get_local_shadow(
     proj[1, :, :] = np.array([[0, 0], [0, 1]])
     shots = sum(list(counts.values()))
 
+    unitary_op: np.ndarray
     if clifford_or_haar == "haar":
-        unitary_op = unitary_arg
+        unitary_op = cast(np.ndarray, unitary_arg)
     else:
         unitary_op = np.zeros((nqubits, 2, 2), dtype=complex)
         for qubit_idx, clif_label in enumerate(unitary_arg):
             unitary_op[qubit_idx, :, :] = quantum_info.Operator(cast(dict, cliffords_1q)[clif_label]).to_matrix()
 
     for bit_strings in counts.keys():
-        rho_j = 1
+        rho_j: int | np.ndarray = 1
         for j in subsystem_bit_indices:
             s_j = int(bit_strings[::-1][j])
             rho_j = np.kron(
@@ -215,6 +216,6 @@ def get_negativity(rho: np.ndarray, NA: int, NB: int) -> float:
     rho_t = np.einsum("ijkl -> kjil", rho)
     rho_t = rho_t.reshape(2 ** (NA + NB), 2 ** (NA + NB))
     evals, _ = np.linalg.eig(rho_t)
-    neg = np.sum(np.abs(i) - i for i in np.real(evals)) / 2
+    neg = np.sum([np.abs(i) - i for i in np.real(evals)]) / 2
 
     return neg
