@@ -184,7 +184,7 @@ def plot_max_negativities(
     plt.title(f"Max negativities for qubit pairs in {backend_name}\n{num_RM_samples} local RM samples\n{timestamp}")
     # plt.legend(fontsize=8)
 
-    ax.set_aspect(len(x))
+    ax.set_aspect((2/3)*len(x))
 
     plt.close()
 

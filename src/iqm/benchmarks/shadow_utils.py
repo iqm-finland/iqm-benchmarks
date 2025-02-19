@@ -26,6 +26,7 @@ from qiskit.circuit.library import UnitaryGate
 import scipy.linalg as spl
 
 from iqm.benchmarks.utils import timeit
+from mGST.reporting.reporting import unitarities
 
 
 def CUE(random_gen: RandomState, n: int) -> np.ndarray:
@@ -92,6 +93,7 @@ def local_shadow_tomography(
     seed = random.SystemRandom().randrange(2**32 - 1)  # Init Random Generator
     random_gen: RandomState = np.random.RandomState(seed)  # pylint: disable=no-member
 
+    unitaries: Dict[str, List[str]] | np.ndarray
     if clifford_or_haar == "haar":
         unitaries = np.zeros((Nu, len(active_qubits), 2, 2), dtype=np.complex_)
     else:
@@ -103,12 +105,12 @@ def local_shadow_tomography(
             if clifford_or_haar == "haar":
                 temp_U = CUE(random_gen, 2)
                 qc_copy.append(UnitaryGate(temp_U), [qubit])
-                unitaries[u, q_idx, :, :] = np.array(temp_U)
+                cast(np.ndarray, unitaries)[u, q_idx, :, :] = np.array(temp_U)
             elif clifford_or_haar == "clifford":
                 rand_key = random.choice(clifford_1q_keys)
                 c_1q = cast(dict, cliffords_1q)[rand_key]
                 qc_copy.compose(c_1q, qubits=[qubit], inplace=True)
-                unitaries[str(qubit)].append(rand_key)
+                cast(dict, unitaries)[str(qubit)].append(rand_key)
 
         qc_copy.barrier()
 
@@ -174,7 +176,7 @@ def get_local_shadow(
     else:
         unitary_op = np.zeros((nqubits, 2, 2), dtype=complex)
         for qubit_idx, clif_label in enumerate(unitary_arg):
-            unitary_op[qubit_idx, :, :] = quantum_info.Operator(cliffords_1q[clif_label]).to_matrix()
+            unitary_op[qubit_idx, :, :] = quantum_info.Operator(cast(dict, cliffords_1q)[clif_label]).to_matrix()
 
     for bit_strings in counts.keys():
         rho_j = 1
