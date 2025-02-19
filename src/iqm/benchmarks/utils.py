@@ -434,7 +434,8 @@ def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str]
     active_qubits = get_active_qubits(circuit)
     if backend_name is not None and backend_name == "IQMNdonisBackend" and 0 not in active_qubits:
         # For star systems, the resonator must always be there, regardless of whether it MOVE gates on it or not
-        active_qubits.add(0)
+        active_qubits.append(0)
+        active_qubits.sort()
 
     # Create a mapping from old qubits to new qubits
     active_qubits = set(sorted(active_qubits))
