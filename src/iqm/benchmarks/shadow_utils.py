@@ -55,19 +55,20 @@ def local_shadow_tomography(
     clifford_or_haar: Literal["clifford", "haar"] = "clifford",
     cliffords_1q: Optional[Dict[str, QuantumCircuit]] = None,
 ) -> Tuple[np.ndarray | Dict[str, List[str]], List[QuantumCircuit]]:
-    """Prepares the circuits to perform Haar shadow tomography.
+    """
+    Prepares the circuits to perform Haar shadow tomography.
 
     Args:
         qc (QuantumCircuit): The quantum circuit to which random unitaries are appended.
-        Nu (Int): Number of local random unitaries used.
+        Nu (int): Number of local random unitaries used.
         active_qubits (Sequence[int]): The Sequence of active qubits.
         measure_other (Optional[Sequence[int]]): Whether to measure other qubits in the qc QuantumCircuit.
-                * Default is None.
+            * Default is None.
         measure_other_name (Optional[str]): Name of the classical register to assign measure_other.
         clifford_or_haar (Literal["clifford", "haar"]): Whether to use Clifford or Haar random 1Q gates.
-                * Default is "clifford".
-        cliffords_1q (Optional[Dict[str, QuantumCircuit]]): dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates
-                * Default is None.
+            * Default is "clifford".
+        cliffords_1q (Optional[Dict[str, QuantumCircuit]]): Dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates
+            * Default is None.
 
     Raises:
         ValueError: If clifford_or_haar is not "clifford" or "haar".
@@ -76,8 +77,8 @@ def local_shadow_tomography(
     Returns:
         Tuple(np.ndarray | Dict[str, List[str]], List[QuantumCircuit])
         - ndarray | Dict[str, List[str]]: Either:
-                * Unitary gate (numpy ndarray), composed of local unitaries for each random initialisation and qubit, if clifford_or_haar == 'haar'.
-                * Dictionary of lists of Clifford labels corresp. to each RM, keys being str(qubit), if clifford_or_haar == 'clifford'.
+            * Unitary gate (numpy ndarray), composed of local unitaries for each random initialisation and qubit, if clifford_or_haar == 'haar'.
+            * Dictionary of lists of Clifford labels corresponding to each RM, keys being str(qubit), if clifford_or_haar == 'clifford'.
         - List[QuantumCircuit]: List of tomography circuits.
     """
     if clifford_or_haar not in ["clifford", "haar"]:
