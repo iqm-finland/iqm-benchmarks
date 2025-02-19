@@ -25,7 +25,7 @@ import numpy as np
 from qiskit import QuantumCircuit, transpile
 import xarray as xr
 
-from iqm.benchmarks import Benchmark, BenchmarkCircuit, BenchmarkRunResult, Circuits, CircuitGroup
+from iqm.benchmarks import Benchmark, BenchmarkCircuit, BenchmarkRunResult, CircuitGroup, Circuits
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
     BenchmarkAnalysisResult,
@@ -36,12 +36,10 @@ from iqm.benchmarks.benchmark_definition import (
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
 from iqm.benchmarks.shadow_utils import get_local_shadow, get_negativity, local_shadow_tomography
-from iqm.benchmarks.utils import (
+from iqm.benchmarks.utils import (  # marginal_distribution,; perform_backend_transpilation,
     find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
     get_neighbors_of_edges,
-    #marginal_distribution,
-    #perform_backend_transpilation,
     retrieve_all_counts,
     retrieve_all_job_metadata,
     set_coupling_map,
@@ -74,6 +72,7 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     # Transpile
     qc_t = transpile(qc, backend=backend, initial_layout=qubits, optimization_level=3)
     return qc_t
+
 
 def plot_shadows(
     avg_shadow: np.ndarray,
@@ -136,6 +135,7 @@ def plot_shadows(
 
     return fig_name, fig
 
+
 def plot_max_negativities(
     negativities: Dict[str, Dict[str, float]], backend_name: str, timestamp: str, num_RM_samples: int
 ) -> Tuple[str, Figure]:
@@ -190,6 +190,7 @@ def plot_max_negativities(
 
     return fig_name, fig
 
+
 def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # pylint: disable=too-many-statements
     """Analysis function for a Graph State benchmark experiment.
 
@@ -212,7 +213,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
     all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
     all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
     all_RM_qubits = dataset.attrs["all_RM_qubits"]
-    #all_projected_qubits = dataset.attrs["all_projected_qubits"]
+    # all_projected_qubits = dataset.attrs["all_projected_qubits"]
 
     all_unitaries = dataset.attrs["all_unitaries"]
     # For graph states benchmark, all_unitaries is a Dict[int, Dict[str, List[str]]] where
@@ -233,9 +234,13 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
     for group_idx, group in all_qubit_pairs_per_group.items():
         qcvv_logger.info(f"Retrieving shadows for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}")
         # Assume only pairs and nearest-neighbors were measured, and each pair in the group user num_RMs randomized measurements:
-        execution_results[group_idx] = xrvariable_to_counts(dataset, str(all_RM_qubits[group_idx]), num_RMs*len(group))
+        execution_results[group_idx] = xrvariable_to_counts(
+            dataset, str(all_RM_qubits[group_idx]), num_RMs * len(group)
+        )
         # Organize the counts into Dict[str, Dict[str,int]] with outermost keys being qubit pairs
-        partitioned_counts = [execution_results[group_idx][i:i + num_RMs] for i in range(0, len(execution_results[group_idx]), num_RMs)]
+        partitioned_counts = [
+            execution_results[group_idx][i : i + num_RMs] for i in range(0, len(execution_results[group_idx]), num_RMs)
+        ]
         marginal_counts = {}
         for pair_idx, qubit_pair in enumerate(group):
             qcvv_logger.info(f"Now on qubit pair {qubit_pair} ({pair_idx+1}/{len(group)})")
@@ -509,11 +514,13 @@ class GraphStateBenchmark(Benchmark):
         )
         dataset.attrs.update({"time_circuit_generation": time_circuit_generation})
 
+        # pylint: disable=invalid-sequence-index
         grouped_graph_circuits: Dict[int, QuantumCircuit] = graph_benchmark_circuit_info["grouped_graph_circuits"]
         RM_qubits = graph_benchmark_circuit_info["unmeasured_qubit_indices"]
         neighbor_qubits = graph_benchmark_circuit_info["projected_nodes"]
         pair_groups = graph_benchmark_circuit_info["pair_groups"]
         neighbor_groups = graph_benchmark_circuit_info["neighbor_groups"]
+        # pylint: enable=invalid-sequence-index
 
         dataset.attrs.update(
             {
@@ -550,14 +557,16 @@ class GraphStateBenchmark(Benchmark):
             time_transpilation[idx] = 0
             for rms, neighbors in zip(pair_groups[idx], neighbor_groups[idx]):
                 qcvv_logger.info(f"Now on RMs {rms} and neighbors {neighbors}")
-                (unitaries_single_pair, rm_circuits_untranspiled_single_pair), time_rm_circuits_single_pair = local_shadow_tomography(
-                    qc=circuit,
-                    Nu=self.n_random_unitaries,
-                    active_qubits=rms,
-                    measure_other=neighbors,
-                    measure_other_name="neighbors",
-                    clifford_or_haar="clifford",
-                    cliffords_1q=clifford_1q_dict,
+                (unitaries_single_pair, rm_circuits_untranspiled_single_pair), time_rm_circuits_single_pair = (
+                    local_shadow_tomography(
+                        qc=circuit,
+                        Nu=self.n_random_unitaries,
+                        active_qubits=rms,
+                        measure_other=neighbors,
+                        measure_other_name="neighbors",
+                        clifford_or_haar="clifford",
+                        cliffords_1q=clifford_1q_dict,
+                    )
                 )
 
                 all_unitaries[idx].update(unitaries_single_pair)
