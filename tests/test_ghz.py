@@ -4,23 +4,19 @@ from unittest.mock import patch
 
 from iqm.benchmarks.entanglement.ghz import GHZBenchmark, GHZConfiguration
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
-
-
-backend = IQMFakeApollo()
-
+from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 class TestGHZ:
+    backend = IQMFakeApollo()
+
     @patch('matplotlib.pyplot.figure')
     def test_layouts(self, mock_fig):
         MINIMAL_GHZ = GHZConfiguration(
             state_generation_routine=f"tree",
             custom_qubits_array=[
-                [10, 15],
-                [0, 1, 3],
-                [0, 1, 3, 4],
-                # [0,1,2,3,4],
-                # [0,1,2,3,4,5],
-                # [0,1,2,3,4,5,6],
+                [5, 6],
+                [1, 3, 4],
+                [1, 3, 4, 5],
             ],
             shots=3,
             qiskit_optim_level=3,
@@ -30,17 +26,17 @@ class TestGHZ:
             rem=False,
             mit_shots=10,
         )
-        benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
+        benchmark = GHZBenchmark(self.backend, MINIMAL_GHZ)
         benchmark.run()
         benchmark.analyze()
         mock_fig.assert_called()
 
     @patch('matplotlib.pyplot.figure')
     def test_state_routine(self, mock_fig):
-        for gen_routine in [f"tree", f"naive", "log_depth"]:
+        for gen_routine in [f"tree", f"naive", "log_depth", "star"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=gen_routine,
-                custom_qubits_array=[[0, 1, 2, 3]],
+                custom_qubits_array=[[2, 3, 4]],
                 shots=3,
                 qiskit_optim_level=3,
                 optimize_sqg=True,
@@ -49,7 +45,7 @@ class TestGHZ:
                 rem=False,
                 mit_shots=10,
             )
-            benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
+            benchmark = GHZBenchmark(self.backend, MINIMAL_GHZ)
             benchmark.run()
             benchmark.analyze()
             mock_fig.assert_called()
@@ -59,7 +55,7 @@ class TestGHZ:
         for fidelity_routine in [f"coherences", f"randomized_measurements"]:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=f"tree",
-                custom_qubits_array=[[0, 1, 2, 3]],
+                custom_qubits_array=[[2, 3, 4]],
                 shots=3,
                 qiskit_optim_level=3,
                 optimize_sqg=True,
@@ -68,7 +64,10 @@ class TestGHZ:
                 rem=True,
                 mit_shots=10,
             )
-            benchmark = GHZBenchmark(backend, MINIMAL_GHZ)
+            benchmark = GHZBenchmark(self.backend, MINIMAL_GHZ)
             benchmark.run()
             benchmark.analyze()
             mock_fig.assert_called()
+
+class TestGHZDeneb(TestGHZ):
+    backend = IQMFakeDeneb()
