@@ -1,31 +1,43 @@
+# Copyright 2025 IQM Benchmarks developers
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Shadow Tomography utility functions
+"""
+
 import random
 from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
 
 import numpy as np
+from numpy.random import RandomState
 from qiskit import ClassicalRegister, QuantumCircuit, quantum_info
 from qiskit.circuit.library import UnitaryGate
-
-# from qiskit.extensions import UnitaryGate
 import scipy.linalg as spl
-from sympy.codegen.ast import continue_
 
 from iqm.benchmarks.utils import timeit
 
 
-a = random.SystemRandom().randrange(2**32 - 1)  # Init Random Generator
-random_gen = np.random.RandomState(a)
-
-
-def CUE(random_gen, nh):
-    """Prepares single qubit Haar unitary.
+def CUE(random_gen: RandomState, n: int) -> np.ndarray:
+    """Prepares single qubit Haar-random unitary (drawn from Circuilar Unitary Ensemble - CUE).
 
     Args:
-        random_gen (Int): random generator.
-        nh (Int): size of the matrix.
+        random_gen (RandomState): a random generator.
+        n (int): the size of the matrix.
     Returns:
-        U (Array): nh x nh CUE matrix
+        np.ndarray: an n x n CUE matrix
     """
-    U = (random_gen.randn(nh, nh) + 1j * random_gen.randn(nh, nh)) / np.sqrt(2)
+    U = (random_gen.randn(n, n) + 1j * random_gen.randn(n, n)) / np.sqrt(2)
     q, r = spl.qr(U)
     d = np.diagonal(r)
     ph = d / np.absolute(d)
@@ -42,7 +54,7 @@ def local_shadow_tomography(
     measure_other_name: Optional[str] = None,
     clifford_or_haar: Literal["clifford", "haar"] = "clifford",
     cliffords_1q: Optional[Dict[str, QuantumCircuit]] = None,
-) -> Tuple[np.ndarray | Dict[str, str], List[QuantumCircuit]]:
+) -> Tuple[np.ndarray | Dict[str, List[str]], List[QuantumCircuit]]:
     """Prepares the circuits to perform Haar shadow tomography.
 
     Args:
@@ -62,7 +74,7 @@ def local_shadow_tomography(
         Exception: If cliffords_1q is None and clifford_or_haar is "clifford".
 
     Returns:
-        Tuple(np.ndarray | Dict[str, str], List[QuantumCircuit])
+        Tuple(np.ndarray | Dict[str, List[str]], List[QuantumCircuit])
         - ndarray | Dict[str, List[str]]: Either:
                 * Unitary gate (numpy ndarray), composed of local unitaries for each random initialisation and qubit, if clifford_or_haar == 'haar'.
                 * Dictionary of lists of Clifford labels corresp. to each RM, keys being str(qubit), if clifford_or_haar == 'clifford'.
@@ -70,13 +82,15 @@ def local_shadow_tomography(
     """
     if clifford_or_haar not in ["clifford", "haar"]:
         raise ValueError("clifford_or_haar must be either 'clifford' or 'haar'.")
-    elif clifford_or_haar == "clifford" and cliffords_1q is None:
-        raise Exception("cliffords_1q dictionary must be provided if clifford_or_haar is 'clifford'.")
-    elif clifford_or_haar == "clifford":
+    if clifford_or_haar == "clifford" and cliffords_1q is None:
+        raise ValueError("cliffords_1q dictionary must be provided if clifford_or_haar is 'clifford'.")
+    if clifford_or_haar == "clifford":
         # Get the keys of the Clifford dictionaries
-        clifford_1q_keys = list(cliffords_1q.keys())
+        clifford_1q_keys = list(cast(Dict, cliffords_1q).keys())
 
     qclist = []
+    seed = random.SystemRandom().randrange(2**32 - 1)  # Init Random Generator
+    random_gen: RandomState = np.random.RandomState(seed)  # pylint: disable=no-member
 
     if clifford_or_haar == "haar":
         unitaries = np.zeros((Nu, len(active_qubits), 2, 2), dtype=np.complex_)
@@ -93,7 +107,7 @@ def local_shadow_tomography(
             elif clifford_or_haar == "clifford":
                 rand_key = random.choice(clifford_1q_keys)
                 c_1q = cast(dict, cliffords_1q)[rand_key]
-                qc_copy.append(c_1q, [qubit])
+                qc_copy.compose(c_1q, qubits=[qubit], inplace=True)
                 unitaries[str(qubit)].append(rand_key)
 
         qc_copy.barrier()
@@ -120,7 +134,7 @@ def get_local_shadow(
     subsystem_bit_indices: Sequence[int],
     clifford_or_haar: Literal["clifford", "haar"] = "clifford",
     cliffords_1q: Optional[Dict[str, QuantumCircuit]] = None,
-):
+) -> np.ndarray:
     """Constructs shadows for each individual initialisation.
 
     Args:
@@ -135,15 +149,15 @@ def get_local_shadow(
                 * Default is None.
 
     Returns:
-        rhoshadows (Array): shadow of considered subsystem.
+        np.ndarray: shadow of considered subsystem.
     """
     if clifford_or_haar not in ["clifford", "haar"]:
         raise ValueError("clifford_or_haar must be either 'clifford' or 'haar'.")
-    elif clifford_or_haar == "clifford" and cliffords_1q is None:
-        raise Exception("cliffords_1q dictionary must be provided if clifford_or_haar is 'clifford'.")
-    elif clifford_or_haar == 'haar' and isinstance(unitary_arg, Sequence):
+    if clifford_or_haar == "clifford" and cliffords_1q is None:
+        raise ValueError("cliffords_1q dictionary must be provided if clifford_or_haar is 'clifford'.")
+    if clifford_or_haar == "haar" and isinstance(unitary_arg, Sequence):
         raise ValueError("If clifford_or_haar is 'haar', the unitary operator must be a numpy array.")
-    elif clifford_or_haar == 'clifford' and not isinstance(unitary_arg, Sequence):
+    if clifford_or_haar == "clifford" and not isinstance(unitary_arg, Sequence):
         raise ValueError(
             "If clifford_or_haar is 'clifford', the unitary operator must be specified as a Sequence of strings."
         )
@@ -170,7 +184,7 @@ def get_local_shadow(
                 rho_j,
                 3
                 * np.einsum(
-                    'ab,bc,cd', np.transpose(np.conjugate(unitary_op[j, :, :])), proj[s_j, :, :], unitary_op[j, :, :]
+                    "ab,bc,cd", np.transpose(np.conjugate(unitary_op[j, :, :])), proj[s_j, :, :], unitary_op[j, :, :]
                 )
                 - np.array([[1, 0], [0, 1]]),
             )
@@ -180,21 +194,25 @@ def get_local_shadow(
     return rhoshadows
 
 
-def get_negativity(rho, NA, NB):
+def get_negativity(rho: np.ndarray, NA: int, NB: int) -> float:
     """Computes the negativity of a given density matrix.
 
     Args:
-        rho (Array): Density matrix.
-        NA (Int): Number of qubits for subsystem A.
-        NB (Int): Number of qubits for subsystem B.
+        rho (np.ndarray): Density matrix.
+        NA (int): Number of qubits for subsystem A.
+        NB (int): Number of qubits for subsystem B.
     Returns:
-        neg (Array): shadow of considered subsystem.
+        float: the negativity of the input density matrix.
     """
     da = 2**NA
     db = 2**NB
     rho = rho.reshape(da, db, da, db)
-    rho_t = np.einsum('ijkl -> kjil', rho)
+    # TODO: # pylint: disable=fixme
+    #  This is a one-liner here, but generally it would be nicer to have
+    #  a partial transpose function w.r.t. any subsystem in the utils file!
+    rho_t = np.einsum("ijkl -> kjil", rho)
     rho_t = rho_t.reshape(2 ** (NA + NB), 2 ** (NA + NB))
-    eigs = np.linalg.eig(rho_t)
-    neg = np.sum(i for i in np.real(eigs[0]) if np.all(i < 0))
-    return np.abs(neg)
+    evals, _ = np.linalg.eig(rho_t)
+    neg = np.sum(np.abs(i) - i for i in np.real(evals)) / 2
+
+    return neg
