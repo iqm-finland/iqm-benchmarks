@@ -67,7 +67,7 @@ def local_shadow_tomography(
         measure_other_name (Optional[str]): Name of the classical register to assign measure_other.
         clifford_or_haar (Literal["clifford", "haar"]): Whether to use Clifford or Haar random 1Q gates.
             * Default is "clifford".
-        cliffords_1q (Optional[Dict[str, QuantumCircuit]]): Dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates
+        cliffords_1q (Optional[Dict[str, QuantumCircuit]]): Dictionary of 1-qubit Cliffords in terms of IQM-native r and CZ gates.
             * Default is None.
 
     Raises:
