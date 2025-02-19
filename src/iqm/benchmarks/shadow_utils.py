@@ -75,7 +75,7 @@ def local_shadow_tomography(
         Exception: If cliffords_1q is None and clifford_or_haar is "clifford".
 
     Returns:
-        Tuple[np.ndarray | Dict[str, List[str]], List[QuantumCircuit]]
+        Tuple[np.ndarray | Dict[str, List[str]], List[QuantumCircuit]]:
         - ndarray | Dict[str, List[str]]: Either:
             * Unitary gate (numpy ndarray), composed of local unitaries for each random initialisation and qubit, if clifford_or_haar == 'haar'.
             * Dictionary of lists of Clifford labels corresponding to each RM, keys being str(qubit), if clifford_or_haar == 'clifford'.

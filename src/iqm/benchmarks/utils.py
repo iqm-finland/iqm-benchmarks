@@ -144,7 +144,7 @@ def find_edges_with_disjoint_neighbors(
 ) -> List[List[Sequence[int]]]:
     """Finds sets of edges with non-overlapping neighboring nodes.
 
-    Agrs:
+    Args:
         graph (Sequence[Sequence[int]]): The input graph specified as a sequence of edges (Sequence[int]).
     Returns:
         List[List[Tuple[int]]]: A list of lists of edges (Tuple[int]) from the original graph with non-overlapping neighboring nodes.
@@ -192,13 +192,11 @@ def find_edges_with_disjoint_neighbors(
 
 
 def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int]]]:
-    """Sorts the edges of a coupling map, arranging them in a dictionary
-        with values being subsets of the coupling map with no overlapping nodes.
+    """Sorts the edges of a coupling map, arranging them in a dictionary with values being subsets of the coupling map with no overlapping nodes.
     Each item will correspond to a layer of pairs of qubits in which parallel 2Q gates can be applied.
 
     Args:
-         cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
-
+        cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
     Returns:
         Dict[int, List[List[int]]]: A dictionary with values being subsets of the coupling map with no overlapping nodes.
     """
