@@ -17,7 +17,7 @@ Graph states benchmark
 """
 import itertools
 from time import strftime
-from typing import Any, Dict, Sequence, Tuple, Type
+from typing import Any, Dict, Sequence, Tuple, Type, List
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -78,7 +78,7 @@ def plot_shadows(
     avg_shadow: np.ndarray,
     qubit_pair: Sequence[int],
     projection: str,
-    negativity: float,
+    negativity: Dict[str, float],
     backend_name: str,
     timestamp: str,
     num_RM_samples: int,
@@ -129,7 +129,7 @@ def plot_shadows(
         f"{backend_name} --- {timestamp}"
     )
     fig.colorbar(im1, shrink=0.5)
-    fig.tight_layout(rect=[0, 0.03, 1, 1.25])
+    fig.tight_layout(rect=(0, 0.03, 1, 1.25))
 
     plt.close()
 
@@ -137,7 +137,7 @@ def plot_shadows(
 
 
 def plot_max_negativities(
-    negativities: Dict[str, Dict[str, float]], backend_name: str, timestamp: str, num_RM_samples: int
+    negativities: Dict[str, Dict[str, str | float]], backend_name: str, timestamp: str, num_RM_samples: int
 ) -> Tuple[str, Figure]:
     """Plots the maximum negativity for each corresponding pair of qubits.
 
@@ -225,11 +225,11 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
 
     execution_results = {}
 
-    shadows_per_projection = {}
+    shadows_per_projection: Dict[str, Dict[str, List[np.ndarray]]] = {}
     average_shadows = {}
     stddev_shadows = {}
-    all_negativities = {}  # {str(qubit_pair): {projections: negativities}}
-    max_negativities = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
+    all_negativities: Dict[str, Dict[str, Dict[str, float]]] = {}  # {str(qubit_pair): {projections: negativities}}
+    max_negativities: Dict[str, Dict[str, str | float]] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
 
     for group_idx, group in all_qubit_pairs_per_group.items():
         qcvv_logger.info(f"Retrieving shadows for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}")
@@ -260,7 +260,6 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
             #     marginal_counts = execution_results[group_idx]
 
             all_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {projections: negativities}}
-            max_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
 
             # Get the neighbor qubits of qubit_pair
             neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
@@ -337,16 +336,19 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
             ]
 
             max_negativity_projection = np.argmax(all_negativities_list)
+
             max_negativity = {
                 "value": all_negativities_list[max_negativity_projection],
                 "uncertainty": all_negativities_uncertainty[max_negativity_projection],
             }
-            max_negativities[str(qubit_pair)].update(max_negativity)
+
+            max_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
             max_negativities[str(qubit_pair)].update(
                 {
                     "projection": all_projection_bit_strings[max_negativity_projection],
                 }
             )
+            max_negativities[str(qubit_pair)].update(max_negativity)
 
             fig_name, fig = plot_shadows(
                 avg_shadow=average_shadows[str(qubit_pair)][all_projection_bit_strings[max_negativity_projection]],
@@ -531,9 +533,9 @@ class GraphStateBenchmark(Benchmark):
             }
         )
 
-        RM_circuits_untranspiled = {}
-        RM_circuits_transpiled = {}
-        all_unitaries = {}
+        RM_circuits_untranspiled: Dict[int, List[QuantumCircuit]] = {}
+        RM_circuits_transpiled: Dict[int, List[QuantumCircuit]] = {}
+        all_unitaries: Dict[int, Dict[str, List[str]]] = {}
         time_RM_circuits = {}
         time_transpilation = {}
         all_graph_submit_results = []
