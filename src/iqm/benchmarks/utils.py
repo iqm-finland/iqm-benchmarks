@@ -141,7 +141,7 @@ def count_native_gates(
 
 def find_edges_with_disjoint_neighbors(
     graph: Sequence[Sequence[int]],
-) -> List[List[Tuple[int]]]:
+) -> List[List[Sequence[int]]]:
     """Finds sets of edges with non-overlapping neighboring nodes.
 
     Agrs:
@@ -294,7 +294,7 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
-def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Sequence[int]]) -> Sequence[int]:
+def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Sequence[int]]) -> Set[int]:
     """Given a Sequence of edges and a graph, return all neighboring nodes of the edges.
 
     Args:
@@ -438,7 +438,7 @@ def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str]
         active_qubits.sort()
 
     # Create a mapping from old qubits to new qubits
-    active_qubits = set(sorted(active_qubits))
+    active_qubits = list(set(sorted(active_qubits)))
     qubit_map = {old_idx: new_idx for new_idx, old_idx in enumerate(active_qubits)}
 
     # Create a new quantum circuit with the reduced number of qubits
