@@ -155,7 +155,7 @@ def plot_max_negativities(
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
 
-    x = list(sorted_negativities.keys())
+    x = [x.replace("(","").replace(")","").replace(", ","-") for x in list(sorted_negativities.keys())]
     y = [a["value"] for a in sorted_negativities.values()]
     yerr = [a["uncertainty"] for a in sorted_negativities.values()]
 
@@ -168,12 +168,12 @@ def plot_max_negativities(
         x,
         y,
         yerr=yerr,
-        capsize=4,
+        capsize=2,
         color=cmap(0.15),
         fmt="o",
         alpha=1,
         mec="black",
-        markersize=5,
+        markersize=3,
     )
     plt.axhline(0.5, color=cmap(1.0), linestyle="dashed")
 
@@ -181,11 +181,29 @@ def plot_max_negativities(
     ax.set_ylabel("Negativity")
     ax.grid()
 
-    plt.xticks(rotation=60)
-    plt.title(f"Max negativities for qubit pairs in {backend_name}\n{num_RM_samples} local RM samples\n{timestamp}")
-    # plt.legend(fontsize=8)
+    plt.xticks(rotation=90)
+    plt.yticks(np.arange(0, 0.51, step=0.1))
+    plt.title(f"Max entanglement negativities for qubit pairs in {backend_name}\n{num_RM_samples} local RM samples\n{timestamp}")
+    #plt.legend(fontsize=8)
 
-    ax.set_aspect((2 / 3) * len(x))
+    # ax.margins(tight=True)
+    # ax.set_aspect(0.5*len(x))
+    # ax.autoscale(enable=True, axis='x')
+
+    ####################################################################################
+    # Solution to fix tick spacings taken from:
+    # https://stackoverflow.com/questions/44863375/how-to-change-spacing-between-ticks
+
+    plt.gca().margins(x=0.01)
+    plt.gcf().canvas.draw()
+    tl = plt.gca().get_xticklabels()
+    maxsize = max([t.get_window_extent().width for t in tl])
+    m = 0.2  # inch margin
+    s = maxsize / plt.gcf().dpi * len(x) + 2 * m
+    margin = m / plt.gcf().get_size_inches()[0]
+    plt.gcf().subplots_adjust(left=margin, right=1. - margin)
+    plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
+    #####################################################################################
 
     plt.close()
 
