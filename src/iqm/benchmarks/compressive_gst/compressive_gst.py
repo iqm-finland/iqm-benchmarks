@@ -338,6 +338,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     testing: bool = False
     parallel_execution: bool = False
 
+
 def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List[int]]:
     """Checks for correct setting of qubit_layouts in the configuration and return a correct type
 

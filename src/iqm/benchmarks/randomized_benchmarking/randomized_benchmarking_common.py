@@ -36,10 +36,10 @@ import xarray as xr
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.multi_lmfit import create_multi_dataset_params, multi_dataset_residual
 from iqm.benchmarks.utils import get_iqm_backend, marginal_distribution, submit_execute, timeit
+from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import optimize_single_qubit_gates
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
-from iqm.iqm_client.models import CircuitCompilationOptions
 
 
 def compute_inverse_clifford(qc_inv: QuantumCircuit, clifford_dictionary: Dict) -> Optional[QuantumCircuit]:
@@ -474,7 +474,7 @@ def submit_sequential_rb_jobs(
     backend_arg: str | IQMBackendBase,
     calset_id: Optional[str] = None,
     max_gates_per_batch: Optional[int] = None,
-    circuit_compilation_options: Optional[CircuitCompilationOptions] = None
+    circuit_compilation_options: Optional[CircuitCompilationOptions] = None,
 ) -> List[Dict[str, Any]]:
     """Submit sequential RB jobs for execution in the specified IQMBackend
     Args:
@@ -499,7 +499,11 @@ def submit_sequential_rb_jobs(
         # Submit - send to execute on backend
         # pylint: disable=unbalanced-tuple-unpacking
         execution_jobs, time_submit = submit_execute(
-            {tuple(qubits): transpiled_circuits[depth]}, backend, shots, calset_id, max_gates_per_batch,
+            {tuple(qubits): transpiled_circuits[depth]},
+            backend,
+            shots,
+            calset_id,
+            max_gates_per_batch,
             circuit_compilation_options=circuit_compilation_options,
         )
         rb_submit_results[depth] = {

@@ -298,6 +298,7 @@ def dK(X, K, E, rho, J, y, d, r, rK):
                         dK_[k] += D_ind * K[k].conj() @ np.kron(L.reshape(pdim, pdim).T, R.reshape(pdim, pdim).T)
     return dK_.reshape(d, rK, pdim, pdim) * 2 / m / n_povm
 
+
 @njit(cache=True)
 def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivatives of the objective function with respect to K and the

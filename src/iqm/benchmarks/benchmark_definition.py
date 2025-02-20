@@ -31,9 +31,9 @@ import xarray as xr
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, Circuits
 from iqm.benchmarks.utils import get_iqm_backend, timeit
+from iqm.iqm_client.models import CircuitCompilationOptions, DDMode
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
-from iqm.iqm_client.models import CircuitCompilationOptions, DDMode
 
 
 @dataclass
@@ -248,7 +248,9 @@ class Benchmark(ABC):
 
         # Circuit compilation options
         if self.configuration.use_dd:
-            self.circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.ENABLED, dd_strategy=self.configuration.dd_strategy)
+            self.circuit_compilation_options = CircuitCompilationOptions(
+                dd_mode=DDMode.ENABLED, dd_strategy=self.configuration.dd_strategy
+            )
         else:
             self.circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.DISABLED)
 

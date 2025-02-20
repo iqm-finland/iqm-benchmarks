@@ -17,7 +17,6 @@ GHZ state benchmark
 """
 
 from itertools import chain
-import os
 from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
 
@@ -30,7 +29,6 @@ from qiskit import QuantumRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
-import requests
 from scipy.spatial.distance import hamming
 import xarray as xr
 
@@ -47,6 +45,7 @@ from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Ci
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
+    extract_fidelities,
     perform_backend_transpilation,
     reduce_to_active_qubits,
     retrieve_all_counts,
@@ -387,35 +386,6 @@ def generate_ghz_spanning_tree(
     return qc, list(participating_qubits)
 
 
-def extract_fidelities(cal_url: str) -> Tuple[List[List[int]], List[float]]:
-    """Returns couplings and CZ-fidelities from calibration data URL
-
-    Args:
-        cal_url: str
-            The url under which the calibration data for the backend can be found
-    Returns:
-        list_couplings: List[List[int]]
-            A list of pairs, each of which is a qubit coupling for which the calibration
-            data contains a fidelity.
-        list_fids: List[float]
-            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
-    """
-    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
-    r = requests.get(cal_url, headers=headers, timeout=60)
-    calibration = r.json()
-    list_couplings = []
-    list_fids = []
-    for item in calibration["calibrations"][0]["metrics"][0]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) - 1
-        qb2 = int(item["locus"][1][2:]) - 1
-        list_couplings.append([qb1, qb2])
-        list_fids.append(float(item["value"]))
-    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
-    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
-    return list_couplings, list_fids
-
-
 def get_edges(
     coupling_map: CouplingMap,
     qubit_layout: List[int],
@@ -655,7 +625,7 @@ class GHZBenchmark(Benchmark):
             else:
                 effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
-                edges_cal, fidelities_cal = extract_fidelities(self.cal_url)
+                edges_cal, fidelities_cal, _ = extract_fidelities(self.cal_url)
                 graph = get_edges(effective_coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
                 graph = get_edges(effective_coupling_map, qubit_layout)
@@ -948,6 +918,7 @@ class GHZConfiguration(BenchmarkConfigurationBase):
             CZ fidelity.
             * Default: None
     """
+
     benchmark: Type[Benchmark] = GHZBenchmark
     state_generation_routine: str = "tree"
     custom_qubits_array: Optional[Sequence[Sequence[int]]] = None

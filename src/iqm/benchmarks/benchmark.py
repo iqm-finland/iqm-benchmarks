@@ -23,8 +23,8 @@ from typing import Dict, Literal, Optional, OrderedDict, Type
 from matplotlib.figure import Figure
 from pydantic import BaseModel
 
-from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.iqm_client.models import DDStrategy
+from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
 class BenchmarkBase(ABC):
