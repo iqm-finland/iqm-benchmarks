@@ -242,7 +242,7 @@ def Mp_norm_lower(X_true, E_true, rho_true, X, E, rho, J, n_povm, p):
     return dist ** (1 / p) / m / n_povm, max_dist ** (1 / p)
 
 
-@njit(cache=True)
+@njit(cache=True, parallel=True)
 def dK(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivative of the objective function with respect to the Kraus tensor K.
 
@@ -282,18 +282,21 @@ def dK(X, K, E, rho, J, y, d, r, rK):
     dK_ = np.zeros((d, rK, r))
     dK_ = np.ascontiguousarray(dK_.astype(np.complex128))
     m = len(J)
-    for k in range(d):
+    for k in prange(d):
         for n in range(m):
             j = J[n][J[n] >= 0]
             for i, j_curr in enumerate(j):
                 if j_curr == k:
+                    R = rho.copy()
+                    for ind in j[i + 1 :][::-1]:
+                        R = X[ind] @ R
                     for o in range(n_povm):
-                        L = E[o].conj() @ contract(X, j[:i])
-                        R = contract(X, j[i + 1 :]) @ rho
+                        L = E[o].conj()
+                        for ind in j[:i]:
+                            L = L @ X[ind]
                         D_ind = L @ X[k] @ R - y[o, n]
                         dK_[k] += D_ind * K[k].conj() @ np.kron(L.reshape(pdim, pdim).T, R.reshape(pdim, pdim).T)
     return dK_.reshape(d, rK, pdim, pdim) * 2 / m / n_povm
-
 
 @njit(cache=True)
 def dK_dMdM(X, K, E, rho, J, y, d, r, rK):

@@ -83,7 +83,7 @@ def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     # derivative
     Fy = dA_.reshape(n, pdim)
     Y = A.reshape(n, pdim)
-    rGrad = Fy.conj() - Y @ Fy.T @ Y
+    rGrad = 2*(Fy.conj() - Y @ Fy.T @ Y)
     G = np.array([rGrad, rGrad.conj()]).reshape(-1)
 
     P = np.eye(n) - Y @ Y.T.conj()
@@ -193,7 +193,7 @@ def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     # derivative
     Fy = dB_.reshape(n)
     Y = B.reshape(n)
-    rGrad = Fy.conj() - Y * (Fy.T @ Y)
+    rGrad = 2*(Fy.conj() - Y * (Fy.T @ Y))
     G = np.array([rGrad, rGrad.conj()]).reshape(-1)
 
     P = np.eye(n) - np.outer(Y, Y.T.conj())
@@ -297,10 +297,8 @@ def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA"):
         Fy = dK_[k].reshape(n, pdim)
         Y = K[k].reshape(n, pdim)
         # Riem. gradient taken from conjugate derivative
-        rGrad = Fy.conj() - Y @ Fy.T @ Y
+        rGrad = 2*(Fy.conj() - Y @ Fy.T @ Y)
         Delta[k] = rGrad
-
-    Delta = tangent_proj(K, Delta, d, rK)
     res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y), method=ls, options={"maxiter": 200})
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
@@ -368,7 +366,7 @@ def SFN_riem_Hess(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=
         Fy = dK_[k].reshape(n, pdim)
         Y = K[k].reshape(n, pdim)
         # riemannian gradient, taken from conjugate derivative
-        rGrad = Fy.conj() - Y @ Fy.T @ Y
+        rGrad = 2*(Fy.conj() - Y @ Fy.T @ Y)
         G = np.array([rGrad, rGrad.conj()]).reshape(-1)
 
         P = np.eye(n) - Y @ Y.T.conj()
@@ -471,7 +469,7 @@ def SFN_riem_Hess_full(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA"):
     for k in range(d):
         Fy = dK_[k].reshape((n, pdim))
         Y = K[k].reshape((n, pdim))
-        rGrad = Fy.conj() - Y @ Fy.T @ Y
+        rGrad = 2*(Fy.conj() - Y @ Fy.T @ Y)
 
         G[0, k, :] = rGrad.reshape(-1)
         G[1, k, :] = rGrad.conj().reshape(-1)
