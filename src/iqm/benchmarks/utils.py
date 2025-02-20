@@ -15,12 +15,12 @@
 """
 General utility functions
 """
-
 from collections import defaultdict
 from functools import wraps
 from math import floor
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
+import warnings
 
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
@@ -557,6 +557,29 @@ def set_coupling_map(
     if physical_layout == "batching":
         return backend.coupling_map
     raise ValueError('physical_layout must either be "fixed" or "batching"')
+
+
+def split_list_in_chunks(list_in: List[Any], split_size: int) -> List[List[Any]]:
+    """Split a given list into a given split size.
+
+    Args:
+        list_in (List[Any]): The input list.
+        split_size (int): The split size.
+
+    Returns:
+        List[List[Any]]: A List of Lists
+    """
+    if split_size > len(list_in):
+        raise ValueError("The split size should be smaller or equal than the list length")
+    if len(list_in) % split_size != 0 and (split_size != 1 or split_size != len(list_in)):
+        qcvv_logger.debug(
+            f"Since len(input_list) = {len(list_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
+        )
+        warnings.warn(
+            f"Since len(input_list) = {len(list_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
+        )
+
+    return [list_in[i : i + split_size] for i in range(0, len(list_in), split_size)]
 
 
 @timeit
