@@ -8,10 +8,8 @@ Version 2.20
 
 Version 2.19
 ============
-
 * All functional tests extended to the fake Deneb backend.
 * Added backend transpilation to REM calibration circuits to fix errors with REM on fake Deneb.
-
 
 Version 2.18
 ============
