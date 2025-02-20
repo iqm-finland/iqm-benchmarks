@@ -559,27 +559,27 @@ def set_coupling_map(
     raise ValueError('physical_layout must either be "fixed" or "batching"')
 
 
-def split_list_in_chunks(list_in: List[Any], split_size: int) -> List[List[Any]]:
-    """Split a given list into a given split size.
+def split_list_in_chunks(sequence_in: Sequence[Any], split_size: int) -> List[Sequence[Any]]:
+    """Split a given Sequence into a given split size, return as a List of Sequences.
 
     Args:
-        list_in (List[Any]): The input list.
+        sequence_in (Sequence[Any]): The input list.
         split_size (int): The split size.
 
     Returns:
-        List[List[Any]]: A List of Lists
+        List[Sequence[Any]]: A List of Sequences.
     """
-    if split_size > len(list_in):
+    if split_size > len(sequence_in):
         raise ValueError("The split size should be smaller or equal than the list length")
-    if len(list_in) % split_size != 0 and (split_size != 1 or split_size != len(list_in)):
+    if len(sequence_in) % split_size != 0 and (split_size != 1 or split_size != len(sequence_in)):
         qcvv_logger.debug(
-            f"Since len(input_list) = {len(list_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
+            f"Since len(input_list) = {len(sequence_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
         )
         warnings.warn(
-            f"Since len(input_list) = {len(list_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
+            f"Since len(input_list) = {len(sequence_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
         )
 
-    return [list_in[i : i + split_size] for i in range(0, len(list_in), split_size)]
+    return [sequence_in[i : i + split_size] for i in range(0, len(sequence_in), split_size)]
 
 
 @timeit
