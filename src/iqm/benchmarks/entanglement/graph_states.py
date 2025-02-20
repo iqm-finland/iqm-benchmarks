@@ -43,7 +43,7 @@ from iqm.benchmarks.utils import (  # marginal_distribution,; perform_backend_tr
     retrieve_all_counts,
     retrieve_all_job_metadata,
     set_coupling_map,
-    split_list_in_chunks,
+    split_sequence_in_chunks,
     submit_execute,
     timeit,
     xrvariable_to_counts,
@@ -241,7 +241,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
             dataset, str(all_RM_qubits[group_idx]), num_RMs * len(group)
         )
         # Organize the counts into Dict[str, Dict[str,int]] with outermost keys being qubit pairs
-        partitioned_counts = split_list_in_chunks(execution_results[group_idx], num_RMs)
+        partitioned_counts = split_sequence_in_chunks(execution_results[group_idx], num_RMs)
         marginal_counts = {}
         for pair_idx, qubit_pair in enumerate(group):
             qcvv_logger.info(f"Now on qubit pair {qubit_pair} ({pair_idx+1}/{len(group)})")

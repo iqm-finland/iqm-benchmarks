@@ -559,7 +559,7 @@ def set_coupling_map(
     raise ValueError('physical_layout must either be "fixed" or "batching"')
 
 
-def split_list_in_chunks(sequence_in: Sequence[Any], split_size: int) -> List[Sequence[Any]]:
+def split_sequence_in_chunks(sequence_in: Sequence[Any], split_size: int) -> List[Sequence[Any]]:
     """Split a given Sequence into a given split size, return as a List of Sequences.
 
     Args:
