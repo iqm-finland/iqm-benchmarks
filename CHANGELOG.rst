@@ -2,9 +2,16 @@
 Changelog
 =========
 
-Version 2.19
+Version 2.20
 ============
 * Standardizes observations for CLOPS and Mirror RB.
+
+Version 2.19
+============
+
+* All functional tests extended to the fake Deneb backend.
+* Added backend transpilation to REM calibration circuits to fix errors with REM on fake Deneb.
+
 
 Version 2.18
 ============
