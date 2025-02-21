@@ -22,6 +22,7 @@ from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
 import warnings
 
+import networkx as nx
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
 import numpy as np
@@ -339,9 +340,7 @@ def marginal_distribution(prob_dist_or_counts: Dict[str, float | int], indices: 
     return dict(marginal_dist)
 
 
-def median_with_uncertainty(
-    observations: Sequence[float]
-) -> Dict[str, float]:
+def median_with_uncertainty(observations: Sequence[float]) -> Dict[str, float]:
     """Computes the median of a Sequence of float observations and returns value and propagated uncertainty.
     Reference: https://mathworld.wolfram.com/StatisticalMedian.html
 
@@ -543,6 +542,31 @@ def retrieve_all_job_metadata(
         )
 
     return all_meta
+
+
+def rx_to_nx_graph(backend_arg: str | IQMBackendBase) -> nx.Graph:
+    """Convert the Rustworkx graph returned by a backend to a Networkx graph.
+
+    Args:
+        backend_arg (str | IQMBackendBase): The backend, either specified as str or as IQMBackendBase.
+
+    Returns:
+        networkx.Graph: The Networkx Graph corresponding to the backend graph.
+
+    """
+    if isinstance(backend_arg, str):
+        backend = get_iqm_backend(backend_arg)
+    else:
+        backend = backend_arg
+
+    # Generate a Networkx graph
+    graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
+    backend_egdes, backend_nodes = (list(graph_backend.edge_list()), list(graph_backend.node_indices()))
+    backend_nx_graph = nx.Graph()
+    backend_nx_graph.add_nodes_from(backend_nodes)
+    backend_nx_graph.add_edges_from(backend_egdes)
+
+    return backend_nx_graph
 
 
 def set_coupling_map(
