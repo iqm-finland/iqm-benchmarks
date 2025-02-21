@@ -22,9 +22,9 @@ from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
 import warnings
 
-import networkx as nx
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
+import networkx as nx
 import numpy as np
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
@@ -293,6 +293,25 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
+def get_measurement_mapping(circuit: QuantumCircuit):
+    """
+    Extracts the final measurement mapping (qubits to bits) of a quantum circuit.
+
+    Parameters:
+        circuit (QuantumCircuit): The quantum circuit to extract the measurement mapping from.
+
+    Returns:
+        dict: A dictionary where keys are qubits and values are classical bits.
+    """
+    mapping = {}
+    for instruction, qargs, cargs in circuit.data:
+        if instruction.name == 'measure':
+            qubit = circuit.find_bit(qargs[0]).registers[0][1]
+            cbit = circuit.find_bit(cargs[0]).registers[0][1]
+            mapping[qubit] = cbit
+    return mapping
+
+
 def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Sequence[int]]) -> Set[int]:
     """Given a Sequence of edges and a graph, return all neighboring nodes of the edges.
 
@@ -333,7 +352,7 @@ def marginal_distribution(prob_dist_or_counts: Dict[str, float | int], indices: 
 
     for bitstring, prob in prob_dist_or_counts.items():
         # Extract the bits at the specified indices and form the marginalized bitstring
-        marginalized_bitstring = "".join(bitstring[i] for i in indices)
+        marginalized_bitstring = "".join(bitstring[i] for i in sorted(indices))
         # Sum up probabilities for each marginalized bitstring
         marginal_dist[marginalized_bitstring] += prob
 
