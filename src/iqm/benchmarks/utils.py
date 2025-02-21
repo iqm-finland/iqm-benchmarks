@@ -339,6 +339,26 @@ def marginal_distribution(prob_dist_or_counts: Dict[str, float | int], indices: 
     return dict(marginal_dist)
 
 
+def median_with_uncertainty(
+    observations: Sequence[float]
+) -> Dict[str, float]:
+    """Computes the median of a Sequence of float observations and returns value and propagated uncertainty.
+    Reference: https://mathworld.wolfram.com/StatisticalMedian.html
+
+    Args:
+        observations (Sequence[float]): a Sequence of floating-point numbers.
+
+    Returns:
+        Dict[str, float]: a dictionary with keys "value" and "uncertainty" for the median of the input Sequence.
+    """
+    median = np.median(observations)
+    N = len(observations)
+    error_from_mean = np.std(observations) / np.sqrt(N)
+    median_uncertainty = error_from_mean * np.sqrt(np.pi * N / (2 * (N - 1)))
+
+    return {"value": float(median), "uncertainty": float(median_uncertainty)}
+
+
 @timeit
 def perform_backend_transpilation(
     qc_list: List[QuantumCircuit],
