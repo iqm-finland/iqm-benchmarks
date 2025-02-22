@@ -15,6 +15,7 @@
 """
 General utility functions
 """
+import itertools
 from collections import defaultdict
 from functools import wraps
 from math import floor
@@ -234,6 +235,75 @@ def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int
         groups[color].append(undirect_cp_map_list[idx])
 
     return groups
+
+
+@timeit
+def generate_state_tomography_circuits(qc: QuantumCircuit,
+                                       active_qubits: Sequence[int],
+                                       measure_other: Optional[Sequence[int]] = None,
+                                       measure_other_name: Optional[str] = None,
+                                       native: bool = True) -> Dict[str, QuantumCircuit]:
+    """Generate all quantum circuits required for a quantum state tomography experiment.
+
+    Args:
+        qc (QuantumCircuit): The quantum circuit.
+        active_qubits (Sequence[int]): The qubits to perform tomograhy on.
+        measure_other (Optional[Sequence[int]]): Whether to measure other qubits in the qc QuantumCircuit.
+            * Default is None.
+        measure_other_name (Optional[str]): Name of the classical register to assign measure_other.
+        native (bool): Whether circuits are prepared using IQM-native gates.
+            * Default is True.
+    Returns:
+        Dict[str, QuantumCircuit]: A dictionary with keys being Pauli (measurement) strings and values the respective circuit.
+            * Pauli strings are ordered for qubit labels in increasing order, e.g., "XY" for active_qubits 4, 1 corresponds to "X" measurement on qubit 1 and "Y" measurement on qubit 4.
+    """
+    num_qubits = len(active_qubits)
+
+    # Organize all Pauli measurements as circuits
+    aux_circ = QuantumCircuit(1)
+    sqg_pauli_strings = ("Z", "X", "Y")
+    pauli_measurements = {p: aux_circ.copy() for p in sqg_pauli_strings}
+
+    # Avoid transpilation, generate either directly in native basis or in H, S
+    if native:
+        # Z measurement
+        pauli_measurements["Z"].r(0, 0, 0)
+        # X measurement
+        pauli_measurements["X"].r(np.pi/2, np.pi/2, 0)
+        pauli_measurements["X"].r(np.pi, 0, 0)
+        # Y measurement
+        pauli_measurements["Y"].r(-np.pi/2, 0, 0)
+        pauli_measurements["Y"].r(np.pi, np.pi/4, 0)
+    else:
+        # Z measurement
+        pauli_measurements["Z"].id(0)
+        # X measurement
+        pauli_measurements["X"].h(0)
+        # Y measurement
+        pauli_measurements["Y"].sdg(0)
+        pauli_measurements["Y"].h(0)
+
+    all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
+    all_circuits = {P_n: qc.copy() for P_n in all_pauli_labels}
+    for P_n_idx, P_n in enumerate(all_pauli_labels):
+        all_circuits[P_n].barrier()
+        for q_idx, q_active in enumerate(sorted(active_qubits)):
+            all_circuits[P_n].compose(pauli_measurements[P_n[q_idx]], qubits=q_active, inplace=True)
+
+        all_circuits[P_n].barrier()
+
+        register_tomo = ClassicalRegister(len(active_qubits), "tomo_qubits")
+        all_circuits[P_n].add_register(register_tomo)
+        all_circuits[P_n].measure(active_qubits, register_tomo)
+
+        if measure_other is not None:
+            if measure_other_name is None:
+                measure_other_name = "non_tomo_qubits"
+            register_neighbors = ClassicalRegister(len(measure_other), measure_other_name)
+            all_circuits[P_n].add_register(register_neighbors)
+            all_circuits[P_n].measure(measure_other, register_neighbors)
+
+    return all_circuits
 
 
 def get_active_qubits(qc: QuantumCircuit) -> List[int]:
