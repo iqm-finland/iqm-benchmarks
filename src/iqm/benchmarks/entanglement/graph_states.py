@@ -17,7 +17,7 @@ Graph states benchmark
 """
 import itertools
 from time import strftime
-from typing import Any, Dict, List, Sequence, Tuple, Type
+from typing import Any, Dict, List, Sequence, Tuple, Type, Literal
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -47,7 +47,7 @@ from iqm.benchmarks.utils import (  # marginal_distribution,; perform_backend_tr
     split_sequence_in_chunks,
     submit_execute,
     timeit,
-    xrvariable_to_counts,
+    xrvariable_to_counts, generate_state_tomography_circuits,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -248,7 +248,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
     num_MoMs = dataset.attrs["n_median_of_means"]
     all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
     all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
-    all_RM_qubits = dataset.attrs["all_RM_qubits"]
+    all_unprojected_qubits = dataset.attrs["all_unprojected_qubits"]
     all_unitaries = dataset.attrs["all_unitaries"]
     # For graph states benchmark, all_unitaries is a Dict[int, Dict[int, Dict[str, List[str]]]] where
     # the first two keys are the group indices and MoMs indices,
@@ -276,13 +276,13 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:  # 
         qcvv_logger.info(f"Retrieving shadows for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}")
         # Assume only pairs and nearest-neighbors were measured, and each pair in the group user num_RMs randomized measurements:
         execution_results[group_idx] = xrvariable_to_counts(
-            dataset, str(all_RM_qubits[group_idx]), num_RMs * num_MoMs * len(group)
+            dataset, str(all_unprojected_qubits[group_idx]), num_RMs * num_MoMs * len(group)
         )
         marginal_counts: Dict[str, Dict[int, List[Dict[str, int]]]] = {}
         # marginal_counts: qubit_pair -> MoMs index -> List[{bitstring: count}]
 
         # For parallel execution: Marginalizing the counts over non-neighbor qubits of the current pair.
-        # NB: MARGINALIZING (EVEN NON-NEAREST-NEIGHBORS) SEEMS TO ALWAYS GENERATE A MAXIMALLY-MIXED STATE.
+        # NB: MARGINALIZING (EVEN NON-NEAREST-NEIGHBORS) SEEMS TO ALWAYS GENERATE ALMOST MAXIMALLY-MIXED STATES.
         # Currently, only pairs and nearest-neighbors are measured.
         # Keeping this here because something else might've been wrong before: tracing out non-neighbors shouldn't do this (?)
         # In that case parallelizing would still be beneficial, the code below should apply (ALMOST) directly.
@@ -480,6 +480,8 @@ class GraphStateBenchmark(Benchmark):
         self.backend_configuration_name = backend_arg if isinstance(backend_arg, str) else backend_arg.name
 
         self.qubits = configuration.qubits
+        self.tomography = configuration.tomography
+
         self.n_random_unitaries = configuration.n_random_unitaries
         self.n_median_of_means = configuration.n_median_of_means
 
@@ -553,7 +555,7 @@ class GraphStateBenchmark(Benchmark):
         # Find pairs of nodes with disjoint neighbors
         # {idx: [(q1,q2), (q3,q4), ...]}
         pair_groups = find_edges_with_disjoint_neighbors(graph_edges)
-        # {idx: [{n11,n12,n13,...), (n21,n22,n23,...), ...]}
+        # {idx: [(n11,n12,n13,...), (n21,n22,n23,...), ...]}
         neighbor_groups = {
             idx: [get_neighbors_of_edges([y], graph_edges) for y in x] for idx, x in enumerate(pair_groups)
         }
@@ -593,7 +595,7 @@ class GraphStateBenchmark(Benchmark):
 
         # pylint: disable=invalid-sequence-index
         grouped_graph_circuits: Dict[int, QuantumCircuit] = graph_benchmark_circuit_info["grouped_graph_circuits"]
-        RM_qubits = graph_benchmark_circuit_info["unmeasured_qubit_indices"]
+        unprojected_qubits = graph_benchmark_circuit_info["unmeasured_qubit_indices"]
         neighbor_qubits = graph_benchmark_circuit_info["projected_nodes"]
         pair_groups = graph_benchmark_circuit_info["pair_groups"]
         neighbor_groups = graph_benchmark_circuit_info["neighbor_groups"]
@@ -601,107 +603,139 @@ class GraphStateBenchmark(Benchmark):
 
         dataset.attrs.update(
             {
-                "all_RM_qubits": RM_qubits,
+                "all_unprojected_qubits": unprojected_qubits,
                 "all_projected_qubits": neighbor_qubits,
                 "all_pair_groups": pair_groups,
                 "all_neighbor_groups": neighbor_groups,
             }
         )
 
-        RM_circuits_untranspiled: Dict[int, List[QuantumCircuit]] = {}  # group_idx -> MoMs -> List[QCs]
-        RM_circuits_transpiled: Dict[int, List[QuantumCircuit]] = {}
-        all_unitaries: Dict[int, Dict[int, Dict[str, List[str]]]] = {}
-        time_RM_circuits = {}
+        circuits_untranspiled: Dict[int, List[QuantumCircuit]] = {}
+        circuits_transpiled: Dict[int, List[QuantumCircuit]] = {}
+
+        time_circuits = {}
         time_transpilation = {}
         all_graph_submit_results = []
 
         clifford_1q_dict, _ = import_native_gate_cliffords()
 
-        # Get all shadow and neighbor-projection measurements
-        qcvv_logger.info("Performing Randomized Measurements of all qubit pairs")
-        for idx, circuit in grouped_graph_circuits.items():
-            # It is not clear now that grouping is needed,
-            # since it seems like pairs must be measured one at a time
-            # (marginalizing any other qubits gives maximally mixed states)
-            # however, the same structure is used in case this can still somehow be parallelized
-            qcvv_logger.info(f"Now on group {idx+1}/{len(grouped_graph_circuits)}")
+        qcvv_logger.info(f"Performing {self.tomography.capitalize()} of all qubit pairs")
 
-            # Outer loop for each mean to be considered for Median of Means (MoMs) estimators
-            all_unitaries[idx] = {m: {} for m in range(self.n_median_of_means)}
-            RM_circuits_untranspiled[idx] = []
-            RM_circuits_transpiled[idx] = []
-            time_RM_circuits[idx] = 0
-            time_transpilation[idx] = 0
-            for rms, neighbors in zip(pair_groups[idx], neighbor_groups[idx]):
-                RM_circuits_untranspiled_MoMs = []
-                RM_circuits_transpiled_MoMs = []
-                time_RM_circuits_MoMs = 0
-                for MoMs in range(self.n_median_of_means):
-                    # Go though each pair and only project neighbors
-                    # all_unitaries[idx][MoMs] = {}
+        if self.tomography == "shadow_tomography":
+            all_unitaries: Dict[int, Dict[int, Dict[str, List[str]]]] = {}
+            # all_unitaries: group_idx -> MoMs -> projection -> List[Clifford labels]
+            for idx, circuit in grouped_graph_circuits.items():
+                # It is not clear now that grouping is needed,
+                # since it seems like pairs must be measured one at a time
+                # (marginalizing any other qubits gives maximally mixed states)
+                # however, the same structure is used in case this can still somehow be parallelized
+                qcvv_logger.info(f"Now on group {idx+1}/{len(grouped_graph_circuits)}")
 
-                    qcvv_logger.info(
-                        f"Now on RMs {rms} and neighbors {neighbors} for Median of Means sample {MoMs+1}/{self.n_median_of_means}"
-                    )
-                    (unitaries_single_pair, rm_circuits_untranspiled_single_pair), time_rm_circuits_single_pair = (
-                        local_shadow_tomography(
-                            qc=circuit,
-                            Nu=self.n_random_unitaries,
-                            active_qubits=rms,
-                            measure_other=neighbors,
-                            measure_other_name="neighbors",
-                            clifford_or_haar="clifford",
-                            cliffords_1q=clifford_1q_dict,
+                # Outer loop for each mean to be considered for Median of Means (MoMs) estimators
+                all_unitaries[idx] = {m: {} for m in range(self.n_median_of_means)}
+                circuits_untranspiled[idx] = []
+                circuits_transpiled[idx] = []
+                time_circuits[idx] = 0
+                time_transpilation[idx] = 0
+                for qubit_pair, neighbors in zip(pair_groups[idx], neighbor_groups[idx]):
+                    RM_circuits_untranspiled_MoMs = []
+                    RM_circuits_transpiled_MoMs = []
+                    time_circuits_MoMs = 0
+                    for MoMs in range(self.n_median_of_means):
+                        # Go though each pair and only project neighbors
+                        # all_unitaries[idx][MoMs] = {}
+                        qcvv_logger.info(
+                            f"Now on qubit pair {qubit_pair} and neighbors {neighbors} for Median of Means sample {MoMs + 1}/{self.n_median_of_means}"
                         )
+                        (unitaries_single_pair, rm_circuits_untranspiled_single_pair), time_rm_circuits_single_pair = (
+                            local_shadow_tomography(
+                                qc=circuit,
+                                Nu=self.n_random_unitaries,
+                                active_qubits=qubit_pair,
+                                measure_other=neighbors,
+                                measure_other_name="neighbors",
+                                clifford_or_haar="clifford",
+                                cliffords_1q=clifford_1q_dict,
+                            )
+                        )
+
+                        all_unitaries[idx][MoMs].update(unitaries_single_pair)
+                        RM_circuits_untranspiled_MoMs.extend(rm_circuits_untranspiled_single_pair)
+                        time_circuits_MoMs += time_rm_circuits_single_pair
+                        # Transpile
+                        # rm_circuits_transpiled_single_pair, time_transpilation_single_pair = perform_backend_transpilation(
+                        #     qc_list=rm_circuits_untranspiled_single_pair,
+                        #     backend=backend,
+                        #     qubits=self.qubits,
+                        #     coupling_map=backend.coupling_map,
+                        # )
+                        # When using a Clifford dictionary, both the graph state and the RMs are generated natively
+                        RM_circuits_transpiled_MoMs.extend(rm_circuits_untranspiled_single_pair)
+
+                        self.transpiled_circuits.circuit_groups.append(
+                            CircuitGroup(name=str(qubit_pair), circuits=rm_circuits_untranspiled_single_pair)
+                        )
+
+                    time_circuits[idx] += time_circuits_MoMs
+                    circuits_untranspiled[idx].extend(RM_circuits_untranspiled_MoMs)
+                    circuits_transpiled[idx].extend(RM_circuits_transpiled_MoMs)
+
+                # Submit for execution in backend.
+                # A whole group is considered as a single batch.
+                # Jobs will only be split in separate submissions if there are batch size limitations (retrieval will occur per batch).
+                # It shouldn't be a problem [anymore] that different qubits are being measured in a single batch.
+                # Post-processing will take care of separating MoMs samples and identifying all unitary (Clifford) labels.
+                sorted_transpiled_qc_list = {tuple(unprojected_qubits[idx]): circuits_transpiled[idx]}
+                graph_jobs, time_submit = submit_execute(
+                    sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch
+                )
+
+                all_graph_submit_results.append(
+                    {
+                        "unprojected_qubits": unprojected_qubits[idx],
+                        "neighbor_qubits": neighbor_qubits[idx],
+                        "jobs": graph_jobs,
+                        "time_submit": time_submit,
+                    }
+                )
+        else: # if self.tomography == "state_tomography" (default)
+            for idx, circuit in grouped_graph_circuits.items():
+                # It is not clear now that grouping is needed,
+                # since it seems like pairs must be measured one at a time
+                # (marginalizing any other qubits gives maximally mixed states)
+                # however, the same structure is used in case this can still somehow be parallelized
+                qcvv_logger.info(f"Now on group {idx+1}/{len(grouped_graph_circuits)}")
+
+                all_unitaries: Dict[int, Dict[str, List[str]]] = {}
+                # all_unitaries: group_idx -> projection -> List[Clifford labels]
+
+                circuits_untranspiled[idx] = []
+                circuits_transpiled[idx] = []
+                time_circuits[idx] = 0
+                time_transpilation[idx] = 0
+                for qubit_pair, neighbors in zip(pair_groups[idx], neighbor_groups[idx]):
+                    qcvv_logger.info(
+                        f"Now on qubit pair {qubit_pair} and neighbors {neighbors}"
                     )
+                    state_tomography_circuits_dict, time_state_tomo_circuits_single_pair = (
+                            generate_state_tomography_circuits(
+                                qc=circuit,
+                                active_qubits=qubit_pair,
+                                measure_other=neighbors,
+                                measure_other_name="neighbors",
+                            )
+                        )
 
-                    all_unitaries[idx][MoMs].update(unitaries_single_pair)
-                    RM_circuits_untranspiled_MoMs.extend(rm_circuits_untranspiled_single_pair)
-                    time_RM_circuits_MoMs += time_rm_circuits_single_pair
-                    # Transpile
-                    # rm_circuits_transpiled_single_pair, time_transpilation_single_pair = perform_backend_transpilation(
-                    #     qc_list=rm_circuits_untranspiled_single_pair,
-                    #     backend=backend,
-                    #     qubits=self.qubits,
-                    #     coupling_map=backend.coupling_map,
-                    # )
-                    # When using a Clifford dictionary, both the graph state and the RMs are generated natively
-                    RM_circuits_transpiled_MoMs.extend(rm_circuits_untranspiled_single_pair)
 
-                    self.transpiled_circuits.circuit_groups.append(
-                        CircuitGroup(name=str(rms), circuits=rm_circuits_untranspiled_single_pair)
-                    )
 
-                time_RM_circuits[idx] += time_RM_circuits_MoMs
-                RM_circuits_untranspiled[idx].extend(RM_circuits_untranspiled_MoMs)
-                RM_circuits_transpiled[idx].extend(RM_circuits_transpiled_MoMs)
-
-            # Submit for execution in backend.
-            # A whole group is considered as a single batch.
-            # Jobs will only be split in separate submissions if there are batch size limitations (retrieval will occur per batch).
-            # It shouldn't be a problem [anymore] that different qubits are being measured in a single batch.
-            # Post-processing will take care of separating MoMs samples and identifying all unitary (Clifford) labels.
-            sorted_transpiled_qc_list = {tuple(RM_qubits[idx]): RM_circuits_transpiled[idx]}
-            rm_graph_jobs, time_submit = submit_execute(
-                sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch
-            )
-
-            all_graph_submit_results.append(
-                {
-                    "RM_qubits": RM_qubits[idx],
-                    "neighbor_qubits": neighbor_qubits[idx],
-                    "jobs": rm_graph_jobs,
-                    "time_submit": time_submit,
-                }
-            )
 
         dataset.attrs.update({"all_unitaries": all_unitaries})
 
         # Retrieve all counts and add to dataset
         for job_idx, job_dict in enumerate(all_graph_submit_results):
-            RM_qubits = job_dict["RM_qubits"]
+            unprojected_qubits = job_dict["unprojected_qubits"]
             # Retrieve counts
-            execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier=str(RM_qubits))
+            execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier=str(unprojected_qubits))
 
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
@@ -710,7 +744,7 @@ class GraphStateBenchmark(Benchmark):
             dataset.attrs.update(
                 {
                     job_idx: {
-                        "time_RM_circuits": time_RM_circuits[job_idx],
+                        "time_circuits": time_circuits[job_idx],
                         "time_transpilation": time_transpilation[job_idx],
                         "time_submit": job_dict["time_submit"],
                         "time_retrieve": time_retrieve,
@@ -719,8 +753,8 @@ class GraphStateBenchmark(Benchmark):
                 }
             )
 
-            qcvv_logger.info(f"Adding counts of qubit pairs {RM_qubits} to the dataset")
-            dataset, _ = add_counts_to_dataset(execution_results, str(RM_qubits), dataset)
+            qcvv_logger.info(f"Adding counts of qubit pairs {unprojected_qubits} to the dataset")
+            dataset, _ = add_counts_to_dataset(execution_results, str(unprojected_qubits), dataset)
 
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
@@ -737,8 +771,11 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
     Attributes:
         benchmark (Type[Benchmark]): GraphStateBenchmark
         qubits (Sequence[int]): The physical qubit layout in which to benchmark graph state generation.
+        tomography (Literal["state_tomography", "shadow_tomography"]): Whether to use state or shadow tomography.
+            * Default is "state_tomography".
         n_random_unitaries (int): The number of Haar random single-qubit unitaries to use for (local) shadow tomography.
-        n_median_of_means(int): The number of mean samples over n_random_unitaries to generate a median of means estimator.
+            * Default is 100.
+        n_median_of_means(int): The number of mean samples over n_random_unitaries to generate a median of means estimator for shadow tomography.
             * NB: The total amount of execution calls will be a multiplicative factor of n_random_unitaries x n_median_of_means.
             * Default is 1 (no median of means).
 
@@ -746,5 +783,6 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
 
     benchmark: Type[Benchmark] = GraphStateBenchmark
     qubits: Sequence[int]
-    n_random_unitaries: int
+    tomography: Literal["state_tomography", "shadow_tomography"] = "state_tomography"
+    n_random_unitaries: int = 100
     n_median_of_means: int = 1
