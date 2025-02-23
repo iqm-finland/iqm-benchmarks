@@ -15,9 +15,9 @@
 """
 General utility functions
 """
-import itertools
 from collections import defaultdict
 from functools import wraps
+import itertools
 from math import floor
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
@@ -239,11 +239,13 @@ def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int
 
 
 @timeit
-def generate_state_tomography_circuits(qc: QuantumCircuit,
-                                       active_qubits: Sequence[int],
-                                       measure_other: Optional[Sequence[int]] = None,
-                                       measure_other_name: Optional[str] = None,
-                                       native: bool = True) -> Dict[str, QuantumCircuit]:
+def generate_state_tomography_circuits(
+    qc: QuantumCircuit,
+    active_qubits: Sequence[int],
+    measure_other: Optional[Sequence[int]] = None,
+    measure_other_name: Optional[str] = None,
+    native: bool = True,
+) -> Dict[str, QuantumCircuit]:
     """Generate all quantum circuits required for a quantum state tomography experiment.
 
     Args:
@@ -270,11 +272,11 @@ def generate_state_tomography_circuits(qc: QuantumCircuit,
         # Z measurement
         pauli_measurements["Z"].r(0, 0, 0)
         # X measurement
-        pauli_measurements["X"].r(np.pi/2, np.pi/2, 0)
+        pauli_measurements["X"].r(np.pi / 2, np.pi / 2, 0)
         pauli_measurements["X"].r(np.pi, 0, 0)
         # Y measurement
-        pauli_measurements["Y"].r(-np.pi/2, 0, 0)
-        pauli_measurements["Y"].r(np.pi, np.pi/4, 0)
+        pauli_measurements["Y"].r(-np.pi / 2, 0, 0)
+        pauli_measurements["Y"].r(np.pi, np.pi / 4, 0)
     else:
         # Z measurement
         pauli_measurements["Z"].id(0)
@@ -286,7 +288,7 @@ def generate_state_tomography_circuits(qc: QuantumCircuit,
 
     all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
     all_circuits = {P_n: qc.copy() for P_n in all_pauli_labels}
-    for P_n_idx, P_n in enumerate(all_pauli_labels):
+    for P_n in all_pauli_labels:
         all_circuits[P_n].barrier()
         for q_idx, q_active in enumerate(sorted(active_qubits)):
             all_circuits[P_n].compose(pauli_measurements[P_n[q_idx]], qubits=q_active, inplace=True)
@@ -376,7 +378,7 @@ def get_measurement_mapping(circuit: QuantumCircuit):
     """
     mapping = {}
     for instruction, qargs, cargs in circuit.data:
-        if instruction.name == 'measure':
+        if instruction.name == "measure":
             qubit = circuit.find_bit(qargs[0]).registers[0][1]
             cbit = circuit.find_bit(cargs[0]).registers[0][1]
             mapping[qubit] = cbit
@@ -436,37 +438,39 @@ def get_Pauli_expectation(counts: Dict[str, int], pauli_label: str) -> float:
                 expect += count_b
             else:
                 expect -= count_b
-        return expect/sum(counts.values())
+        return expect / sum(counts.values())
 
-    non_I_indices = [idx for idx, P in enumerate(pauli_label) if P != 'I']
+    non_I_indices = [idx for idx, P in enumerate(pauli_label) if P != "I"]
     for b, count_b in counts.items():
         b_Z_parity = [1 if b[i] == "1" else 0 for i in non_I_indices]
         if sum(b_Z_parity) % 2 == 0:
             expect += count_b
         else:
             expect -= count_b
-    return expect/sum(counts.values())
+    return expect / sum(counts.values())
 
 
 def get_tomography_matrix(pauli_expectations: Dict[str, float]) -> np.ndarray:
     """Reconstructs a density matrix from given Pauli expectations.
 
-        Args:
-            pauli_expectations (Dict[str, float]): A dictionary of Pauli expectations, with keys being Pauli strings.
-        Raises:
-            ValueError: If Pauli not all 4**n expectations are specified.
-        Returns:
-            np.ndarray: A tomographically reconstructed density matrix.
+    Args:
+        pauli_expectations (Dict[str, float]): A dictionary of Pauli expectations, with keys being Pauli strings.
+    Raises:
+        ValueError: If Pauli not all 4**n expectations are specified.
+    Returns:
+        np.ndarray: A tomographically reconstructed density matrix.
     """
     num_qubits = len(list(pauli_expectations.keys())[0])
     sqg_pauli_strings = ("I", "Z", "X", "Y")
     all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
     if set(list(pauli_expectations.keys())) != set(all_pauli_labels):
-        raise ValueError(f"Pauli expectations is incomplete ({len(list(pauli_expectations.values()))} out of {len(all_pauli_labels)} expectations)")
+        raise ValueError(
+            f"Pauli expectations is incomplete ({len(list(pauli_expectations.values()))} out of {len(all_pauli_labels)} expectations)"
+        )
 
-    rho = np.zeros([2 ** num_qubits, 2 ** num_qubits], dtype=complex)
+    rho = np.zeros([2**num_qubits, 2**num_qubits], dtype=complex)
     for pauli_string, pauli_expectation in pauli_expectations.items():
-        rho += 2**(-num_qubits) * pauli_expectation * Pauli(pauli_string).to_matrix()
+        rho += 2 ** (-num_qubits) * pauli_expectation * Pauli(pauli_string).to_matrix()
     return rho
 
 
