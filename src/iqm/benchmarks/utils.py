@@ -29,6 +29,7 @@ import networkx as nx
 import numpy as np
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
+from qiskit.quantum_info import Pauli
 from qiskit.transpiler import CouplingMap
 import xarray as xr
 
@@ -406,6 +407,67 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
     neighboring_nodes -= nodes_in_edges
 
     return neighboring_nodes
+
+
+def get_Pauli_expectation(counts: Dict[str, int], pauli_label: str) -> float:
+    """Gets an estimate of a Pauli expectation value for a given set of counts and a Pauli measurement label.
+
+    Args:
+        counts (Dict[str, int]): A dictionary of counts.
+            * NB: keys are assumed to have a single bitstring, i.e., coming from a single classical register.
+        pauli_label (str): A Pauli measurement label, specified as a string of I, X, Y, Z characters.
+
+    Raises:
+        ValueError: If Pauli labels are not specified in terms of I, X, Y, Z characters.
+    Returns:
+        float: The estimate of the Pauli expectation value.
+    """
+    num_qubits = len(list(counts.keys())[0])
+    sqg_pauli_strings = ("I", "Z", "X", "Y")
+    all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
+
+    if pauli_label not in all_pauli_labels:
+        raise ValueError("pauli_label must be specified as a string made up of characters  'X', 'Y', or 'Z'.")
+
+    expect = 0
+    if "I" not in pauli_label:
+        for b, count_b in counts.items():
+            if b.count("1") % 2 == 0:
+                expect += count_b
+            else:
+                expect -= count_b
+        return expect/sum(counts.values())
+
+    non_I_indices = [idx for idx, P in enumerate(pauli_label) if P != 'I']
+    for b, count_b in counts.items():
+        b_Z_parity = [1 if b[i] == "1" else 0 for i in non_I_indices]
+        if sum(b_Z_parity) % 2 == 0:
+            expect += count_b
+        else:
+            expect -= count_b
+    return expect/sum(counts.values())
+
+
+def get_tomography_matrix(pauli_expectations: Dict[str, float]) -> np.ndarray:
+    """Reconstructs a density matrix from given Pauli expectations.
+
+        Args:
+            pauli_expectations (Dict[str, float]): A dictionary of Pauli expectations, with keys being Pauli strings.
+        Raises:
+            ValueError: If Pauli not all 4**n expectations are specified.
+        Returns:
+            np.ndarray: A tomographically reconstructed density matrix.
+    """
+    num_qubits = len(list(pauli_expectations.keys())[0])
+    sqg_pauli_strings = ("I", "Z", "X", "Y")
+    all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
+    if set(list(pauli_expectations.keys())) != set(all_pauli_labels):
+        raise ValueError(f"Pauli expectations is incomplete ({len(list(pauli_expectations.values()))} out of {len(all_pauli_labels)} expectations)")
+
+    rho = np.zeros([2 ** num_qubits, 2 ** num_qubits], dtype=complex)
+    for pauli_string, pauli_expectation in pauli_expectations.items():
+        rho += 2**(-num_qubits) * pauli_expectation * Pauli(pauli_string).to_matrix()
+    return rho
 
 
 def marginal_distribution(prob_dist_or_counts: Dict[str, float | int], indices: Iterable[int]) -> Dict[str, float]:
