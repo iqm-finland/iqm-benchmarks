@@ -737,7 +737,7 @@ class GraphStateBenchmark(Benchmark):
 
         """
         layout_mapping = {
-            a._index: b # pylint: disable=W0212
+            a._index: b  # pylint: disable=W0212
             for a, b in self.graph_state_circuit.layout.initial_layout.get_virtual_bits().items()
             if b in self.qubits
         }
