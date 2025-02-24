@@ -25,6 +25,7 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
 import numpy as np
+from numpy.random import Generator
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
@@ -63,6 +64,54 @@ def timeit(f):
         return result, elapsed
 
     return wrap
+
+
+def bootstrap_counts(
+    original_counts: Dict[str, int],
+    num_bootstrap_samples: int = 100,
+    rgen: Optional[Generator] = None,
+    include_original_counts: bool = False,
+) -> List[Dict[str, int]]:
+    """Returns tot_bs resampled copies of the original_counts.
+
+    Args:
+        original_counts (Dict[str, int]): The original dictionary of counts to bootstrap from.
+        num_bootstrap_samples (int): The number of bootstrapping samples to generate.
+            * Default is 100.
+        rgen (Optional[Generator]): The random number generator.
+            * Default is None: assigns numpy's default_rng().
+        include_original_counts (bool): Whether to include the original counts in the returned bootstrapped count samples.
+            * Default is False.
+    Returns:
+        List[Dict[str, int]]: A list of bootstrapped counts.
+    """
+    if rgen is None:
+        rgen = np.random.default_rng()
+
+    keys = list(original_counts.keys())
+    values = list(original_counts.values())
+    tot_shots = int(sum(values))
+
+    # Pre-calculate cumulative sum and create bins
+    cumulative_sum = np.cumsum(values)
+    bins = np.insert(cumulative_sum, 0, 0)
+
+    if include_original_counts:
+        bs_counts_fast = [original_counts]
+    else:
+        bs_counts_fast = []
+
+    for _ in range(num_bootstrap_samples):
+        # Generate random integers
+        random_integers = rgen.integers(low=0, high=tot_shots, size=tot_shots)
+        # Bin the random integers
+        binned_integers = np.digitize(random_integers, bins) - 1
+        # Count occurrences in each bin
+        occurrences = np.bincount(binned_integers, minlength=len(keys))
+        # Create dictionary mapping keys to occurrence counts
+        bs_counts_fast.append(dict(zip(keys, occurrences)))
+
+    return bs_counts_fast
 
 
 @timeit
@@ -510,37 +559,3 @@ def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int
         dict(zip(list(dataset[f"{identifier}_state_{u}"].data), dataset[f"{identifier}_counts_{u}"].data))
         for u in range(counts_range)
     ]
-
-
-def bootstrap(original_counts, tot_bs=100, rgen=None):
-    """
-    Returns tot_bs resampled copies of the original_counts.
-    This code is generated via optimizing the code originally written by Alessio to increase the execution speed.
-    """
-    if rgen is None:
-        rgen = np.random.default_rng()
-
-    keys = list(original_counts.keys())
-    values = list(original_counts.values())
-    tot_shots = int(sum(values))
-
-    # Pre-calculate cumulative sum and create bins
-    cumulative_sum = np.cumsum(values)
-    bins = np.insert(cumulative_sum, 0, 0)
-
-    # below is optional; use this if you would like to include the original counts as well.
-    # bs_counts_fast = [original_counts]
-
-    bs_counts_fast = []
-    for _ in range(tot_bs):
-        # Generate random integers
-        random_integers = rgen.integers(low=0, high=tot_shots, size=tot_shots)
-        # Bin the random integers
-        binned_integers = np.digitize(random_integers, bins) - 1
-        # Count occurrences in each bin
-        occurrences = np.bincount(binned_integers, minlength=len(keys))
-        # Create dictionary mapping keys to occurrence counts
-        bs_counts_fast.append(dict(zip(keys, occurrences)))
-
-    return bs_counts_fast
-
