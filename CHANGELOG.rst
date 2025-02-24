@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.21
+============
+* Function to bootstrap counts added to utils file.
+
 Version 2.20
 ============
 * Standardizes observations for CLOPS and Mirror RB.
