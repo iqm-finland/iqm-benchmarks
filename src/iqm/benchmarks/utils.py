@@ -32,7 +32,7 @@ from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
 import requests
-import rustworkx as rx
+from rustworkx import PyGraph, visualization, spring_layout
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -579,7 +579,7 @@ class GraphPositions:
     }
 
     @staticmethod
-    def create_positions(graph: rx.PyGraph, topology: Literal["star", "crystal"]) -> Dict[int, Tuple[float, float]]:
+    def create_positions(graph: PyGraph, topology: Literal["star", "crystal"]) -> Dict[int, Tuple[float, float]]:
         """Generate node positions for a given graph and topology.
 
         Args:
@@ -611,7 +611,7 @@ class GraphPositions:
             fixed_pos = {0: (1.0, 1.0)}  # For more consistent layouts
 
             # Get spring layout with one fixed position
-            pos = rx.spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0})  # keep node 0 fixed
+            pos = spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0})  # keep node 0 fixed
 
         return pos
 
@@ -680,7 +680,7 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: list[list[int]], sta
     weights = -np.log(np.array(fidelities_cal))
     edges_graph = [tuple(edge) + (weight,) for edge, weight in zip(edges_cal, weights)]
 
-    graph = rx.PyGraph()
+    graph = PyGraph()
 
     # Add nodes
     nodes = set()
@@ -698,7 +698,7 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: list[list[int]], sta
         pos = GraphPositions.create_positions(graph, topology)
 
     # Define node colors
-    node_colors = ['lightgrey' for _ in range(len(nodes))]
+    node_colors = ["lightgrey" for _ in range(len(nodes))]
     for qb in set([qb for layout in qubit_layouts for qb in layout]):
         node_colors[qb] = "orange"
 
@@ -719,7 +719,7 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: list[list[int]], sta
     fig, _ = plt.subplots(figsize=(6, 6))
 
     # Draw the graph
-    rx.visualization.mpl_draw(
+    visualization.mpl_draw(
         graph,
         with_labels=True,
         node_color=node_colors,
@@ -735,13 +735,13 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: list[list[int]], sta
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         plt.annotate(
-            f'{edge[2]:.1e}',
+            f"{edge[2]:.1e}",
             xy=(x, y),
             xytext=(0, 0),
-            textcoords='offset points',
-            ha='center',
-            va='center',
-            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.6),
+            textcoords="offset points",
+            ha="center",
+            va="center",
+            bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="none", alpha=0.6),
         )
 
     plt.gca().invert_yaxis()

@@ -299,7 +299,7 @@ def dK(X, K, E, rho, J, y, d, r, rK):
     return dK_.reshape(d, rK, pdim, pdim) * 2 / m / n_povm
 
 
-@njit(cache=True)
+@njit(cache=True, parallel=False)
 def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivatives of the objective function with respect to K and the
     product of derivatives of the measurement map with respect to K.
@@ -403,7 +403,7 @@ def ddM(X, K, E, rho, J, y, d, r, rK):
     ddK = np.zeros((d**2, rK**2, r, r))
     ddK = np.ascontiguousarray(ddK.astype(np.complex128))
     dconjdK = np.zeros((d**2, rK**2, r, r))
-    dconjdK = np.ascontiguousarray(ddK.astype(np.complex128))
+    dconjdK = np.ascontiguousarray(dconjdK.astype(np.complex128))
     m = len(J)
     for k in range(d**2):
         k1, k2 = local_basis(k, d, 2)
@@ -522,16 +522,17 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
     for k in range(n_povm):
         E[k] = (A[k].T.conj() @ A[k]).reshape(-1)
     rho = (B @ B.T.conj()).reshape(-1)
-    dA_ = np.zeros((n_povm, pdim, pdim))
-    dA_ = dA_.astype(np.complex128)
+    dA_ = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
     m = len(J)
     for n in prange(m):  # pylint: disable=not-an-iterable
-        jE = J[n][J[n] >= 0][0]
-        j = J[n][J[n] >= 0][1:]
+        j = J[n][J[n] >= 0]
         inner_deriv = contract(X, j) @ rho
-        D_ind = E[jE].conj().dot(inner_deriv) - y[n]
-        dA_[jE] += D_ind * A[jE] @ inner_deriv.reshape(pdim, pdim).T.conj()
-    return dA_
+        dA_step = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
+        for o in range(n_povm):
+            D_ind = E[o].conj()@inner_deriv - y[o,n]
+            dA_step[o] += D_ind * A[o].conj() @ inner_deriv.reshape(pdim, pdim).T
+        dA_ += dA_step
+    return dA_ * 2 / m / n_povm
 
 
 @njit(parallel=True, cache=True)
@@ -621,13 +622,21 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
     for n in prange(m):  # pylint: disable=not-an-iterable
         j = J[n][J[n] >= 0]
         R = contract(X, j) @ rho
+        dA_step = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
+        dMdM_step = np.zeros((n_povm, r, r)).astype(np.complex128)
+        dMconjdM_step = np.zeros((n_povm, r, r)).astype(np.complex128)
+        dconjdA_step = np.zeros((n_povm, r, r)).astype(np.complex128)
         for o in range(n_povm):
             D_ind = E[o].conj() @ R - y[o, n]
             dM = A[o].conj() @ R.reshape(pdim, pdim).T
-            dMdM[o] += np.outer(dM, dM)
-            dMconjdM[o] += np.outer(dM.conj(), dM)
-            dA_[o] += D_ind * dM
-            dconjdA[o] += D_ind * np.kron(np.eye(pdim).astype(np.complex128), R.reshape(pdim, pdim).T)
+            dMdM_step[o] += np.outer(dM, dM)
+            dMconjdM_step[o] += np.outer(dM.conj(), dM)
+            dA_step[o] += D_ind * dM
+            dconjdA_step[o] += D_ind * np.kron(np.eye(pdim).astype(np.complex128), R.reshape(pdim, pdim).T)
+        dA_ += dA_step
+        dMdM += dMdM_step
+        dMconjdM += dMconjdM_step
+        dconjdA += dconjdA_step
     return dA_ * 2 / m / n_povm, dMdM * 2 / m / n_povm, dMconjdM * 2 / m / n_povm, dconjdA * 2 / m / n_povm
 
 
