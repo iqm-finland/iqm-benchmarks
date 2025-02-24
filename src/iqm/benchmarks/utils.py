@@ -510,3 +510,37 @@ def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int
         dict(zip(list(dataset[f"{identifier}_state_{u}"].data), dataset[f"{identifier}_counts_{u}"].data))
         for u in range(counts_range)
     ]
+
+
+def bootstrap(original_counts, tot_bs=100, rgen=None):
+    """
+    Returns tot_bs resampled copies of the original_counts.
+    This code is generated via optimizing the code originally written by Alessio to increase the execution speed.
+    """
+    if rgen is None:
+        rgen = np.random.default_rng()
+
+    keys = list(original_counts.keys())
+    values = list(original_counts.values())
+    tot_shots = int(sum(values))
+
+    # Pre-calculate cumulative sum and create bins
+    cumulative_sum = np.cumsum(values)
+    bins = np.insert(cumulative_sum, 0, 0)
+
+    # below is optional; use this if you would like to include the original counts as well.
+    # bs_counts_fast = [original_counts]
+
+    bs_counts_fast = []
+    for _ in range(tot_bs):
+        # Generate random integers
+        random_integers = rgen.integers(low=0, high=tot_shots, size=tot_shots)
+        # Bin the random integers
+        binned_integers = np.digitize(random_integers, bins) - 1
+        # Count occurrences in each bin
+        occurrences = np.bincount(binned_integers, minlength=len(keys))
+        # Create dictionary mapping keys to occurrence counts
+        bs_counts_fast.append(dict(zip(keys, occurrences)))
+
+    return bs_counts_fast
+
