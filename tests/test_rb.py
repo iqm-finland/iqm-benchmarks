@@ -40,7 +40,7 @@ class TestRB:
         EXAMPLE_IRB_1Q = InterleavedRBConfiguration(
             qubits_array=[[1]],
             sequence_lengths=[2 ** (m + 1) - 1 for m in range(4)],
-            num_circuit_samples=2,
+            num_circuit_samples=5,
             shots=2**4,
             parallel_execution=True,
             interleaved_gate="RGate",
@@ -55,7 +55,7 @@ class TestRB:
         EXAMPLE_CRB_1Q = CliffordRBConfiguration(
             qubits_array=[[3]],
             sequence_lengths=[2 ** (m + 1) - 1 for m in range(4)],
-            num_circuit_samples=2,
+            num_circuit_samples=5,
             shots=2**4,
             calset_id=None,
             parallel_execution=False,
