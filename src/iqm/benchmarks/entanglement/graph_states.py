@@ -36,7 +36,7 @@ from iqm.benchmarks.benchmark_definition import (
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
 from iqm.benchmarks.shadow_utils import get_local_shadow, get_negativity, local_shadow_tomography
-from iqm.benchmarks.utils import (  # marginal_distribution,; perform_backend_transpilation,
+from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_transpilation,
     find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
     generate_state_tomography_circuits,
@@ -79,7 +79,7 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     return qc_t
 
 
-def plot_matrix(
+def plot_densityt_matrix(
     matrix: np.ndarray,
     qubit_pair: Sequence[int],
     projection: str,
@@ -99,7 +99,7 @@ def plot_matrix(
     """
 
     fig, ax = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(6, 6))
-    cmap = "seismic"
+    cmap = "winter_r"
     fig_name = str(qubit_pair)
 
     ax[0].matshow(matrix.real, interpolation="nearest", vmin=-np.max(matrix.real), vmax=np.max(matrix.real), cmap=cmap)
@@ -153,6 +153,7 @@ def plot_max_negativities(
     backend_name: str,
     timestamp: str,
     tomography: Literal["shadow_tomography", "state_tomography"],
+    num_shots: int,
     num_RM_samples: Optional[int] = None,
     num_MoMs_samples: Optional[int] = None,
 ) -> Tuple[str, Figure]:
@@ -163,6 +164,7 @@ def plot_max_negativities(
         backend_name (str):
         timestamp (str):
         tomography (Literal["shadow_tomography", "state_tomography"]):
+        num_shots (int):
         num_RM_samples (int):
         num_MoMs_samples (int):
 
@@ -206,7 +208,9 @@ def plot_max_negativities(
             f"Max entanglement negativities for qubit pairs in {backend_name}\n{num_RM_samples} local RM samples x {num_MoMs_samples} Median of Means samples\n{timestamp}"
         )
     else:
-        plt.title(f"Max entanglement negativities for qubit pairs in {backend_name}\n{timestamp}")
+        plt.title(
+            f"Max entanglement negativities for qubit pairs in {backend_name}\nShots per tomography sample: {num_shots}\n{timestamp}"
+        )
     # plt.legend(fontsize=8)
 
     ax.margins(tight=True)
@@ -242,13 +246,18 @@ def plot_max_negativities(
 
 
 def update_pauli_expectations(
-    pauli_expectations,
+    pauli_expectations: Dict[str, Dict[str, float]],
     projected_counts: Dict[str, Dict[str, int]],
     all_projection_bit_strings: List[str],
     non_pauli_label: str,
 ):
-    """
+    """Helper function that updates the input Pauli expectations dictionary.
+
     Args:
+         pauli_expectations (Dict[str, Dict[str, float]]):
+        projected_counts (Dict[str, Dict[str, int]]):
+        all_projection_bit_strings (List[str]):
+        non_pauli_label (str):
 
     Returns:
     """
@@ -285,9 +294,9 @@ def update_pauli_expectations(
     return pauli_expectations
 
 
-def negativity_analysis(
+def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branches
     run: BenchmarkRunResult,
-) -> BenchmarkAnalysisResult:  # pylint: disable=too-many-statements, too-many-branches
+) -> BenchmarkAnalysisResult:
     """Analysis function for a Graph State benchmark experiment.
 
     Args:
@@ -303,6 +312,7 @@ def negativity_analysis(
     backend_name = dataset.attrs["backend_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     tomography = dataset.attrs["tomography"]
+    num_shots = dataset.attrs["shots"]
 
     all_qubit_pairs_per_group = dataset.attrs["all_pair_groups"]
     all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
@@ -480,7 +490,7 @@ def negativity_analysis(
                 )
                 max_negativities[str(qubit_pair)].update(max_negativity)
 
-                fig_name, fig = plot_matrix(
+                fig_name, fig = plot_densityt_matrix(
                     matrix=MoMs_shadows[str(qubit_pair)][all_projection_bit_strings[max_negativity_projection]],
                     qubit_pair=qubit_pair,
                     projection=all_projection_bit_strings[max_negativity_projection],
@@ -519,7 +529,9 @@ def negativity_analysis(
         tomography_negativities: Dict[int, Dict[str, Dict[str, float]]] = {}
         num_tomo_samples = 3**2  # In general 3**n samples suffice (assuming trace-preservation and unitality)
         for group_idx, group in all_qubit_pairs_per_group.items():
-            qcvv_logger.info(f"Retrieving shadows for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}")
+            qcvv_logger.info(
+                f"Retrieving tomography-reconstructed states for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
+            )
 
             # Assume only pairs and nearest-neighbors were measured, and each pair in the group user num_RMs randomized measurements:
             execution_results[group_idx] = xrvariable_to_counts(
@@ -599,7 +611,7 @@ def negativity_analysis(
                 )
                 max_negativities[str(qubit_pair)].update(max_negativity)
 
-                fig_name, fig = plot_matrix(
+                fig_name, fig = plot_densityt_matrix(
                     matrix=tomography_state[group_idx][str(qubit_pair)][
                         all_projection_bit_strings[max_negativity_projection]
                     ],
@@ -632,7 +644,7 @@ def negativity_analysis(
 
     dataset.attrs.update({"max_negativities": max_negativities})
 
-    fig_name, fig = plot_max_negativities(max_negativities, backend_name, execution_timestamp, tomography)
+    fig_name, fig = plot_max_negativities(max_negativities, backend_name, execution_timestamp, tomography, num_shots)
     plots[fig_name] = fig
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
@@ -724,9 +736,17 @@ class GraphStateBenchmark(Benchmark):
             Dict[str, Any]: A dictionary containing all circuit information for the Graph State benchmark.
 
         """
+        layout_mapping = {
+            a._index: b # pylint: disable=W0212
+            for a, b in self.graph_state_circuit.layout.initial_layout.get_virtual_bits().items()
+            if b in self.qubits
+        }
 
-        # Get unique list of edges
-        graph_edges = list(self.coupling_map.graph.to_undirected(multigraph=False).edge_list())
+        # Get unique list of edges - Use layout_mapping to determine the connections between phyical qubits
+        graph_edges = [
+            (layout_mapping[e[0]], layout_mapping[e[1]])
+            for e in list(self.coupling_map.graph.to_undirected(multigraph=False).edge_list())
+        ]
 
         # Find pairs of nodes with disjoint neighbors
         # {idx: [(q1,q2), (q3,q4), ...]}
