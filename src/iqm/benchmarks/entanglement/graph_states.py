@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=too-many-lines
+
 """
 Graph states benchmark
 """
@@ -37,6 +39,7 @@ from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
 from iqm.benchmarks.shadow_utils import get_local_shadow, get_negativity, local_shadow_tomography
 from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_transpilation,
+    bootstrap_counts,
     find_edges_with_disjoint_neighbors,
     generate_minimal_edge_layers,
     generate_state_tomography_circuits,
@@ -154,6 +157,7 @@ def plot_max_negativities(
     timestamp: str,
     tomography: Literal["shadow_tomography", "state_tomography"],
     num_shots: int,
+    num_bootstraps: Optional[int] = None,
     num_RM_samples: Optional[int] = None,
     num_MoMs_samples: Optional[int] = None,
 ) -> Tuple[str, Figure]:
@@ -165,8 +169,9 @@ def plot_max_negativities(
         timestamp (str):
         tomography (Literal["shadow_tomography", "state_tomography"]):
         num_shots (int):
-        num_RM_samples (int):
-        num_MoMs_samples (int):
+        num_bootstraps (Optional[int]):
+        num_RM_samples (Optional[int]):
+        num_MoMs_samples (Optional[int]):
 
     Returns:
         Tuple[str, Figure]: The figure label and the max negativities plot figure.
@@ -199,7 +204,22 @@ def plot_max_negativities(
 
     ax.set_xlabel("Qubit pair")
     ax.set_ylabel("Negativity")
-    ax.grid()
+
+    # Major y-ticks every 0.1, minor ticks every 0.05
+    major_ticks = np.arange(0, 0.5, 0.1)
+    minor_ticks = np.arange(-0.05, 0.55, 0.05)
+    ax.set_yticks(major_ticks)
+    ax.set_yticks(minor_ticks, minor=True)
+    ax.grid(which="both")
+
+    lower_y = np.min(y) - 1.75 * float(yerr[0]) - 0.02 if np.min(y) - float(yerr[0]) < 0 else -0.01
+    upper_y = np.max(y) + 1.75 * float(yerr[-1]) + 0.02 if np.max(y) + float(yerr[-1]) > 0.5 else 0.51
+    ax.set_ylim(
+        (
+            lower_y,
+            upper_y,
+        )
+    )
 
     plt.xticks(rotation=90)
     # plt.yticks(np.arange(0, 0.51, step=0.1))
@@ -209,18 +229,11 @@ def plot_max_negativities(
         )
     else:
         plt.title(
-            f"Max entanglement negativities for qubit pairs in {backend_name}\nShots per tomography sample: {num_shots}\n{timestamp}"
+            f"Max entanglement negativities for qubit pairs in {backend_name}\nShots per tomography sample: {num_shots}; Bootstraps: {num_bootstraps}\n{timestamp}"
         )
     # plt.legend(fontsize=8)
 
     ax.margins(tight=True)
-
-    # ax.set_ylim(
-    #     (
-    #         np.min(y) - 1.75 * float(yerr[0]) if np.min(y) - float(yerr[0]) < 0 else -0.01,
-    #         np.max(y) + 1.75 * float(yerr[-1]) if np.max(y) + float(yerr[-1]) > 0.5 else 0.51,
-    #     )
-    # )
 
     if len(x) <= 40:
         ax.set_aspect((2 / 3) * len(x))
@@ -318,16 +331,17 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
     all_qubit_neighbors_per_group = dataset.attrs["all_neighbor_groups"]
     all_unprojected_qubits = dataset.attrs["all_unprojected_qubits"]
 
-    qcvv_logger.info("Fetching Clifford dictionary")
-    clifford_1q_dict, _ = import_native_gate_cliffords()
+    num_bootstraps = dataset.attrs["num_bootstraps"]
+    num_RMs = dataset.attrs["n_random_unitaries"]
+    num_MoMs = dataset.attrs["n_median_of_means"]
 
     execution_results = {}
     max_negativities: Dict[str, Dict[str, str | float]] = {}
     # max_negativities: qubit_pair -> {"negativity": float, "projection": str}
 
     if tomography == "shadow_tomography":  # pylint:disable=too-many-nested-blocks
-        num_RMs = dataset.attrs["n_random_unitaries"]
-        num_MoMs = dataset.attrs["n_median_of_means"]
+        qcvv_logger.info("Fetching Clifford dictionary")
+        clifford_1q_dict, _ = import_native_gate_cliffords()
         all_unitaries = dataset.attrs["all_unitaries"]
 
         shadows_per_projection: Dict[str, Dict[int, Dict[str, List[np.ndarray]]]] = {}
@@ -525,12 +539,16 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
 
     else:  # if tomography == "state_tomography"
         tomography_state: Dict[int, Dict[str, Dict[str, np.ndarray]]] = {}
-        # tomography_state: group_idx -> qubit_pair -> numpy array
+        # tomography_state: group_idx -> qubit_pair -> {projection:numpy array}
+        bootstrapped_states: Dict[int, Dict[str, List[np.ndarray]]] = {}
+        # bootstrapped_states: group_idx -> qubit_pair -> List of bootstrapped states for max_neg_projection
         tomography_negativities: Dict[int, Dict[str, Dict[str, float]]] = {}
+        bootstrapped_negativities: Dict[int, Dict[str, List[float]]] = {}
+        bootstrapped_avg_negativities: Dict[int, Dict[str, Dict[str, float]]] = {}
         num_tomo_samples = 3**2  # In general 3**n samples suffice (assuming trace-preservation and unitality)
         for group_idx, group in all_qubit_pairs_per_group.items():
             qcvv_logger.info(
-                f"Retrieving tomography-reconstructed states for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
+                f"Retrieving tomography-reconstructed states with {num_bootstraps} for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
             )
 
             # Assume only pairs and nearest-neighbors were measured, and each pair in the group user num_RMs randomized measurements:
@@ -539,7 +557,10 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
             )
 
             tomography_state[group_idx] = {}
+            bootstrapped_states[group_idx] = {}
             tomography_negativities[group_idx] = {}
+            bootstrapped_negativities[group_idx] = {}
+            bootstrapped_avg_negativities[group_idx] = {}
 
             partitioned_counts = split_sequence_in_chunks(execution_results[group_idx], num_tomo_samples)
 
@@ -554,6 +575,7 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
 
                 sqg_pauli_strings = ("Z", "X", "Y")
                 all_nonid_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=2)]
+
                 pauli_expectations: Dict[str, Dict[str, float]] = {
                     projection: {} for projection in all_projection_bit_strings
                 }
@@ -592,31 +614,67 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
                     tomography_negativities[group_idx][str(qubit_pair)][projected_bit_string]
                     for projected_bit_string in all_projection_bit_strings
                 ]
-                all_negativities_uncertainty_list = [
-                    np.nan for _ in all_projection_bit_strings
-                ]  # Update with bootstrapping
 
                 max_negativity_projection = np.argmax(all_negativities_list)
+                max_negativity_bitstring = all_projection_bit_strings[max_negativity_projection]
+
+                # Bootstrapping - do only for max projection bitstring
+                bootstrapped_pauli_expectations: List[Dict[str, Dict[str, float]]] = [
+                    {max_negativity_bitstring: {}} for _ in range(num_bootstraps)
+                ]
+                for pauli_idx, counts in enumerate(partitioned_counts[pair_idx]):
+                    projected_counts = {
+                        b_s[-2:]: b_c
+                        for b_s, b_c in counts.items()
+                        if b_s[:neighbor_bit_strings_length] == max_negativity_bitstring
+                    }
+                    all_bootstrapped_counts = bootstrap_counts(
+                        projected_counts, num_bootstraps, include_original_counts=True
+                    )
+                    for bootstrap in range(num_bootstraps):
+                        bootstrapped_pauli_expectations[bootstrap] = update_pauli_expectations(
+                            bootstrapped_pauli_expectations[bootstrap],
+                            projected_counts={max_negativity_bitstring: all_bootstrapped_counts[bootstrap]},
+                            all_projection_bit_strings=[max_negativity_bitstring],
+                            non_pauli_label=all_nonid_pauli_labels[pauli_idx],
+                        )
+
+                bootstrapped_states[group_idx][str(qubit_pair)] = [
+                    get_tomography_matrix(
+                        pauli_expectations=bootstrapped_pauli_expectations[bootstrap][max_negativity_bitstring]
+                    )
+                    for bootstrap in range(num_bootstraps)
+                ]
+
+                bootstrapped_negativities[group_idx][str(qubit_pair)] = [
+                    get_negativity(bootstrapped_states[group_idx][str(qubit_pair)][bootstrap], 1, 1)
+                    for bootstrap in range(num_bootstraps)
+                ]
+
+                bootstrapped_avg_negativities[group_idx][str(qubit_pair)] = {
+                    "value": float(np.mean(bootstrapped_negativities[group_idx][str(qubit_pair)])),
+                    "uncertainty": np.std(bootstrapped_negativities[group_idx][str(qubit_pair)])
+                    / np.sqrt(num_bootstraps),
+                }
 
                 max_negativity = {
                     "value": all_negativities_list[max_negativity_projection],
-                    "uncertainty": all_negativities_uncertainty_list[max_negativity_projection],
+                    "boostrapped_average": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["value"],
+                    "uncertainty": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["uncertainty"],
                 }
 
                 max_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
                 max_negativities[str(qubit_pair)].update(
                     {
-                        "projection": all_projection_bit_strings[max_negativity_projection],
+                        "projection": max_negativity_bitstring,
                     }
                 )
                 max_negativities[str(qubit_pair)].update(max_negativity)
 
                 fig_name, fig = plot_densityt_matrix(
-                    matrix=tomography_state[group_idx][str(qubit_pair)][
-                        all_projection_bit_strings[max_negativity_projection]
-                    ],
+                    matrix=tomography_state[group_idx][str(qubit_pair)][max_negativity_bitstring],
                     qubit_pair=qubit_pair,
-                    projection=all_projection_bit_strings[max_negativity_projection],
+                    projection=max_negativity_bitstring,
                     negativity=max_negativity,
                     backend_name=backend_name,
                     timestamp=execution_timestamp,
@@ -644,7 +702,9 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
 
     dataset.attrs.update({"max_negativities": max_negativities})
 
-    fig_name, fig = plot_max_negativities(max_negativities, backend_name, execution_timestamp, tomography, num_shots)
+    fig_name, fig = plot_max_negativities(
+        max_negativities, backend_name, execution_timestamp, tomography, num_shots, num_bootstraps, num_RMs, num_MoMs
+    )
     plots[fig_name] = fig
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
@@ -670,6 +730,7 @@ class GraphStateBenchmark(Benchmark):
         self.qubits = configuration.qubits
         self.tomography = configuration.tomography
 
+        self.num_bootstraps = configuration.num_bootstraps
         self.n_random_unitaries = configuration.n_random_unitaries
         self.n_median_of_means = configuration.n_median_of_means
 
@@ -958,6 +1019,8 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
         qubits (Sequence[int]): The physical qubit layout in which to benchmark graph state generation.
         tomography (Literal["state_tomography", "shadow_tomography"]): Whether to use state or shadow tomography.
             * Default is "state_tomography".
+        num_bootstraps (int): The amount of bootstrap samples to use with state tomography.
+            * Default is 50.
         n_random_unitaries (int): The number of Haar random single-qubit unitaries to use for (local) shadow tomography.
             * Default is 100.
         n_median_of_means(int): The number of mean samples over n_random_unitaries to generate a median of means estimator for shadow tomography.
@@ -969,5 +1032,6 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
     benchmark: Type[Benchmark] = GraphStateBenchmark
     qubits: Sequence[int]
     tomography: Literal["state_tomography", "shadow_tomography"] = "state_tomography"
+    num_bootstraps: int = 50
     n_random_unitaries: int = 100
     n_median_of_means: int = 1
