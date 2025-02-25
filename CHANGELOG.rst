@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 2.21
+============
+* Function to bootstrap counts added to utils file.
+
+Version 2.20
+============
+* Standardizes observations for CLOPS and Mirror RB.
+
 Version 2.19
 ============
 * All functional tests extended to the fake Deneb backend.
