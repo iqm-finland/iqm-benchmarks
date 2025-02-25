@@ -72,7 +72,7 @@ def bootstrap_counts(
     rgen: Optional[Generator] = None,
     include_original_counts: bool = False,
 ) -> List[Dict[str, int]]:
-    """Returns tot_bs resampled copies of the original_counts.
+    """Returns num_bootstrap_samples resampled copies of the original_counts.
 
     Args:
         original_counts (Dict[str, int]): The original dictionary of counts to bootstrap from.
