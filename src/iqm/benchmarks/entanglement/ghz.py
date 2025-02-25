@@ -682,7 +682,7 @@ class GHZBenchmark(Benchmark):
             )
             final_ghz = ghz_native_transpiled
         elif routine == "star":
-            ghz: QuantumCircuit = generate_ghz_star(qubit_count)
+            ghz = generate_ghz_star(qubit_count)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled, _ = perform_backend_transpilation(
                 [ghz],
