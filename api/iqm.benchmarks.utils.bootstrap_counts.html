@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits &#8212; IQM Benchmarks 2.21 documentation</title>
+    <title>iqm.benchmarks.utils.bootstrap_counts &#8212; IQM Benchmarks 2.21 documentation</title>
   
   
   
@@ -45,12 +45,12 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.utils.bootstrap_counts';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_pauli_dressed_mrb_circuits" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_pauli_dressed_mrb_circuits.html" />
-    <link rel="prev" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.edge_grab" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.edge_grab.html" />
+    <link rel="next" title="iqm.benchmarks.utils.count_2q_layers" href="iqm.benchmarks.utils.count_2q_layers.html" />
+    <link rel="prev" title="iqm.benchmarks.utils" href="iqm.benchmarks.utils.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.21" />
@@ -217,10 +217,10 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.quantum_volume.quantum_volume.html">iqm.benchmarks.quantum_volume.quantum_volume</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
-<li class="toctree-l4 current active"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
 </ul>
@@ -231,8 +231,8 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
@@ -315,7 +315,7 @@
       
       
       
-      <li><a href="../_sources/api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits.rst" target="_blank"
+      <li><a href="../_sources/api/iqm.benchmarks.utils.bootstrap_counts.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -391,7 +391,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits</h1>
+    <h1>iqm.benchmarks.utils.bootstrap_counts</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -401,7 +401,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits"><code class="docutils literal notranslate"><span class="pre">generate_fixed_depth_mrb_circuits()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.bootstrap_counts"><code class="docutils literal notranslate"><span class="pre">bootstrap_counts()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -413,31 +413,29 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="iqm-benchmarks-randomized-benchmarking-mirror-rb-mirror-rb-generate-fixed-depth-mrb-circuits">
-<h1>iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits<a class="headerlink" href="#iqm-benchmarks-randomized-benchmarking-mirror-rb-mirror-rb-generate-fixed-depth-mrb-circuits" title="Link to this heading">#</a></h1>
+  <section id="iqm-benchmarks-utils-bootstrap-counts">
+<h1>iqm.benchmarks.utils.bootstrap_counts<a class="headerlink" href="#iqm-benchmarks-utils-bootstrap-counts" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits">
-<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.</span></span><span class="sig-name descname"><span class="pre">generate_fixed_depth_mrb_circuits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circ_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pauli_samples_per_circ</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IQMBackendBase</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_2q_gates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_qubit_gate_ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qiskit_optim_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'basic'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">IQMCircuit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits" title="Link to this definition">#</a></dt>
-<dd><p>Generates a dictionary MRB circuits at fixed depth, indexed by sample number</p>
+<dt class="sig sig-object py" id="iqm.benchmarks.utils.bootstrap_counts">
+<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.utils.</span></span><span class="sig-name descname"><span class="pre">bootstrap_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_counts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bootstrap_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Generator</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_original_counts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.utils.bootstrap_counts" title="Link to this definition">#</a></dt>
+<dd><p>Returns num_bootstrap_samples resampled copies of the original_counts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qubits</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – A list of integers specifying physical qubit labels</p></li>
-<li><p><strong>circ_samples</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of sets of Pauli-dressed circuit samples</p></li>
-<li><p><strong>pauli_samples_per_circ</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – the number of pauli samples per circuit</p></li>
-<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – the depth (number of canonical layers) of the circuits</p></li>
-<li><p><strong>backend_arg</strong> (<em>IQMBackendBase</em><em> | </em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – the backend</p></li>
-<li><p><strong>density_2q_gates</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
-<li><p><strong>two_qubit_gate_ensemble</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>]</em><em>]</em>) – </p></li>
-<li><p><strong>qiskit_optim_level</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
-<li><p><strong>routing_method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>original_counts</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The original dictionary of counts to bootstrap from.</p></li>
+<li><p><strong>num_bootstrap_samples</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of bootstrapping samples to generate.
+* Default is 100.</p></li>
+<li><p><strong>rgen</strong> (<em>Optional</em><em>[</em><em>Generator</em><em>]</em>) – The random number generator.
+* Default is None: assigns numpy’s default_rng().</p></li>
+<li><p><strong>include_original_counts</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether to include the original counts in the returned bootstrapped count samples.
+* Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary of lists of Pauli-dressed quantum circuits corresponding to the circuit sample index</p>
+<dd class="field-even"><p>A list of bootstrapped counts.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a>[<em>IQMCircuit</em>]]]</p>
+<dd class="field-odd"><p>List[Dict[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -456,20 +454,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.edge_grab.html"
+       href="iqm.benchmarks.utils.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.edge_grab</p>
+        <p class="prev-next-title">iqm.benchmarks.utils</p>
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_pauli_dressed_mrb_circuits.html"
+       href="iqm.benchmarks.utils.count_2q_layers.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_pauli_dressed_mrb_circuits</p>
+        <p class="prev-next-title">iqm.benchmarks.utils.count_2q_layers</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -490,7 +488,7 @@
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits"><code class="docutils literal notranslate"><span class="pre">generate_fixed_depth_mrb_circuits()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.bootstrap_counts"><code class="docutils literal notranslate"><span class="pre">bootstrap_counts()</span></code></a></li>
 </ul>
   </nav></div>
 

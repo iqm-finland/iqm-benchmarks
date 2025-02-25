@@ -14,6 +14,7 @@ iqm.benchmarks.utils
    .. autosummary::
       :toctree:
    
+      bootstrap_counts
       count_2q_layers
       count_native_gates
       get_iqm_backend

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.utils &#8212; IQM Benchmarks 2.20 documentation</title>
+    <title>iqm.benchmarks.utils &#8212; IQM Benchmarks 2.21 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=cdc4424e"></script>
+    <script src="../_static/documentation_options.js?v=7638c053"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -49,12 +49,12 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.utils.count_2q_layers" href="iqm.benchmarks.utils.count_2q_layers.html" />
+    <link rel="next" title="iqm.benchmarks.utils.bootstrap_counts" href="iqm.benchmarks.utils.bootstrap_counts.html" />
     <link rel="prev" title="iqm.benchmarks.readout_mitigation.M3IQM" href="iqm.benchmarks.readout_mitigation.M3IQM.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.20" />
-    <meta name="docbuild:last-update" content="2025-02-20"/>
+  <meta name="docsearch:version" content="2.21" />
+    <meta name="docbuild:last-update" content="2025-02-25"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.20 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.20 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.21 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.21 documentation - Home"/>
   
   
 </a></div>
@@ -232,6 +232,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">iqm.benchmarks.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
@@ -408,43 +409,46 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html#iqm.benchmarks.utils.count_2q_layers" title="iqm.benchmarks.utils.count_2q_layers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_2q_layers</span></code></a>(circuit_list)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html#iqm.benchmarks.utils.bootstrap_counts" title="iqm.benchmarks.utils.bootstrap_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bootstrap_counts</span></code></a>(original_counts[, ...])</p></td>
+<td><p>Returns num_bootstrap_samples resampled copies of the original_counts.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html#iqm.benchmarks.utils.count_2q_layers" title="iqm.benchmarks.utils.count_2q_layers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_2q_layers</span></code></a>(circuit_list)</p></td>
 <td><p>Calculate the number of layers of parallel 2-qubit gates in a list of circuits.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html#iqm.benchmarks.utils.count_native_gates" title="iqm.benchmarks.utils.count_native_gates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_native_gates</span></code></a>(backend_arg, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html#iqm.benchmarks.utils.count_native_gates" title="iqm.benchmarks.utils.count_native_gates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_native_gates</span></code></a>(backend_arg, ...)</p></td>
 <td><p>Count the number of IQM native gates of each quantum circuit in a list.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html#iqm.benchmarks.utils.get_iqm_backend" title="iqm.benchmarks.utils.get_iqm_backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_iqm_backend</span></code></a>(backend_label)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html#iqm.benchmarks.utils.get_iqm_backend" title="iqm.benchmarks.utils.get_iqm_backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_iqm_backend</span></code></a>(backend_label)</p></td>
 <td><p>Get the IQM backend object from a backend name (str).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.marginal_distribution.html#iqm.benchmarks.utils.marginal_distribution" title="iqm.benchmarks.utils.marginal_distribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">marginal_distribution</span></code></a>(prob_dist, indices)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.marginal_distribution.html#iqm.benchmarks.utils.marginal_distribution" title="iqm.benchmarks.utils.marginal_distribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">marginal_distribution</span></code></a>(prob_dist, indices)</p></td>
 <td><p>Compute the marginal distribution over specified bits (indices)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.perform_backend_transpilation.html#iqm.benchmarks.utils.perform_backend_transpilation" title="iqm.benchmarks.utils.perform_backend_transpilation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_backend_transpilation</span></code></a>(qc_list, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.perform_backend_transpilation.html#iqm.benchmarks.utils.perform_backend_transpilation" title="iqm.benchmarks.utils.perform_backend_transpilation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_backend_transpilation</span></code></a>(qc_list, ...)</p></td>
 <td><p>Transpile a list of circuits to backend specifications.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.reduce_to_active_qubits.html#iqm.benchmarks.utils.reduce_to_active_qubits" title="iqm.benchmarks.utils.reduce_to_active_qubits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_to_active_qubits</span></code></a>(circuit[, backend_name])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.reduce_to_active_qubits.html#iqm.benchmarks.utils.reduce_to_active_qubits" title="iqm.benchmarks.utils.reduce_to_active_qubits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_to_active_qubits</span></code></a>(circuit[, backend_name])</p></td>
 <td><p>Reduces a quantum circuit to only its active qubits.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_counts.html#iqm.benchmarks.utils.retrieve_all_counts" title="iqm.benchmarks.utils.retrieve_all_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_all_counts</span></code></a>(iqm_jobs[, identifier])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_counts.html#iqm.benchmarks.utils.retrieve_all_counts" title="iqm.benchmarks.utils.retrieve_all_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_all_counts</span></code></a>(iqm_jobs[, identifier])</p></td>
 <td><p>Retrieve the counts from a list of IQMJob objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html#iqm.benchmarks.utils.retrieve_all_job_metadata" title="iqm.benchmarks.utils.retrieve_all_job_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_all_job_metadata</span></code></a>(iqm_jobs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html#iqm.benchmarks.utils.retrieve_all_job_metadata" title="iqm.benchmarks.utils.retrieve_all_job_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_all_job_metadata</span></code></a>(iqm_jobs)</p></td>
 <td><p>Retrieve the counts from a list of IQMJob objects.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.set_coupling_map.html#iqm.benchmarks.utils.set_coupling_map" title="iqm.benchmarks.utils.set_coupling_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_coupling_map</span></code></a>(qubits, backend[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.set_coupling_map.html#iqm.benchmarks.utils.set_coupling_map" title="iqm.benchmarks.utils.set_coupling_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_coupling_map</span></code></a>(qubits, backend[, ...])</p></td>
 <td><p>Set a coupling map according to the specified physical layout.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.sort_batches_by_final_layout.html#iqm.benchmarks.utils.sort_batches_by_final_layout" title="iqm.benchmarks.utils.sort_batches_by_final_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_batches_by_final_layout</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.sort_batches_by_final_layout.html#iqm.benchmarks.utils.sort_batches_by_final_layout" title="iqm.benchmarks.utils.sort_batches_by_final_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_batches_by_final_layout</span></code></a>(...)</p></td>
 <td><p>Sort batches of circuits according to the final measurement mapping in their corresponding backend.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html#iqm.benchmarks.utils.submit_execute" title="iqm.benchmarks.utils.submit_execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_execute</span></code></a>(sorted_transpiled_qc_list, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html#iqm.benchmarks.utils.submit_execute" title="iqm.benchmarks.utils.submit_execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_execute</span></code></a>(sorted_transpiled_qc_list, ...)</p></td>
 <td><p>Submit for execute a list of quantum circuits on the specified Backend.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.timeit.html#iqm.benchmarks.utils.timeit" title="iqm.benchmarks.utils.timeit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code></a>(f)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.timeit.html#iqm.benchmarks.utils.timeit" title="iqm.benchmarks.utils.timeit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code></a>(f)</p></td>
 <td><p>Calculates the amount of time a function takes to execute</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html#iqm.benchmarks.utils.xrvariable_to_counts" title="iqm.benchmarks.utils.xrvariable_to_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xrvariable_to_counts</span></code></a>(dataset, identifier, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html#iqm.benchmarks.utils.xrvariable_to_counts" title="iqm.benchmarks.utils.xrvariable_to_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xrvariable_to_counts</span></code></a>(dataset, identifier, ...)</p></td>
 <td><p>Retrieve counts from xarray dataset.</p></td>
 </tr>
 </tbody>
@@ -473,11 +477,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.utils.count_2q_layers.html"
+       href="iqm.benchmarks.utils.bootstrap_counts.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.utils.count_2q_layers</p>
+        <p class="prev-next-title">iqm.benchmarks.utils.bootstrap_counts</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -516,7 +520,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-02-20.
+  Last updated on 2025-02-25.
   <br/>
 </p>
   </div>
