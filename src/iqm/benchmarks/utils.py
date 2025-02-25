@@ -660,7 +660,7 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
     return list_couplings, list_fids, topology
 
 
-def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: list[list[int]], station: Optional[str] = None):
+def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
     Creates a visualization of the quantum chip topology where nodes represent qubits
@@ -699,8 +699,9 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: list[list[int]], sta
 
     # Define node colors
     node_colors = ["lightgrey" for _ in range(len(nodes))]
-    for qb in set([qb for layout in qubit_layouts for qb in layout]):
-        node_colors[qb] = "orange"
+    if qubit_layouts is not None:
+        for qb in set([qb for layout in qubit_layouts for qb in layout]):
+            node_colors[qb] = "orange"
 
     # Ensuring weights are in correct order for the plot
     edge_list = graph.edge_list()
