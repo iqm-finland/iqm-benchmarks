@@ -513,6 +513,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )
                 all_rb_jobs["interleaved"].extend(
@@ -523,6 +524,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )
                 qcvv_logger.info(
