@@ -14,15 +14,15 @@ from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import (
     MirrorRandomizedBenchmarking,
     MirrorRBConfiguration,
 )
-
-
-backend = "fakeapollo"
-
+from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
+from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 class TestRB:
+    backend = IQMFakeApollo()
+
     def test_mrb(self):
         EXAMPLE_MRB = MirrorRBConfiguration(
-            qubits_array=[[0, 1], [0, 3]],
+            qubits_array=[[2, 3], [3, 4]],
             depths_array=[[2**m for m in range(4)]],
             num_circuit_samples=2,
             num_pauli_samples=2,
@@ -32,13 +32,13 @@ class TestRB:
             two_qubit_gate_ensemble={"CZGate": 0.8, "iSwapGate": 0.2},
             density_2q_gates=0.25,
         )
-        benchmark = MirrorRandomizedBenchmarking(backend, EXAMPLE_MRB)
+        benchmark = MirrorRandomizedBenchmarking(self.backend, EXAMPLE_MRB)
         benchmark.run()
         benchmark.analyze()
 
     def test_irb(self):
         EXAMPLE_IRB_1Q = InterleavedRBConfiguration(
-            qubits_array=[[0]],
+            qubits_array=[[1]],
             sequence_lengths=[2 ** (m + 1) - 1 for m in range(4)],
             num_circuit_samples=5,
             shots=2**4,
@@ -47,7 +47,7 @@ class TestRB:
             interleaved_gate_params=[np.pi, 0],
             simultaneous_fit=["amplitude", "offset"],
         )
-        benchmark = InterleavedRandomizedBenchmarking(backend, EXAMPLE_IRB_1Q)
+        benchmark = InterleavedRandomizedBenchmarking(self.backend, EXAMPLE_IRB_1Q)
         benchmark.run()
         benchmark.analyze()
 
@@ -60,6 +60,9 @@ class TestRB:
             calset_id=None,
             parallel_execution=False,
         )
-        benchmark = CliffordRandomizedBenchmarking(backend, EXAMPLE_CRB_1Q)
+        benchmark = CliffordRandomizedBenchmarking(self.backend, EXAMPLE_CRB_1Q)
         benchmark.run()
         benchmark.analyze()
+
+class TestRBDeneb(TestRB):
+    backend = IQMFakeDeneb()

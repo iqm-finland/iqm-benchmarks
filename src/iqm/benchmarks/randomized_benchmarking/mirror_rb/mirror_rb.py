@@ -13,7 +13,12 @@ from qiskit_aer import AerSimulator
 from scipy.spatial.distance import hamming
 import xarray as xr
 
-from iqm.benchmarks import BenchmarkAnalysisResult, BenchmarkRunResult
+from iqm.benchmarks import (
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Benchmark, add_counts_to_dataset
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
@@ -331,7 +336,8 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         AnalysisResult corresponding to MRB
     """
     plots = {}
-    observations = {}
+    obs_dict = {}
+    observations: list[BenchmarkObservation] = []
     dataset = run.dataset.copy(deep=True)
 
     # shots = dataset.attrs["shots"]
@@ -439,25 +445,36 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
 
         # Update observations
-        observations.update({qubits_idx: processed_results})
+        obs_dict.update({qubits_idx: processed_results})
 
         # Generate plots
         fig_name, fig = plot_rb_decay(
             "mrb",
             [qubits],
             dataset,
-            observations,
+            obs_dict,
             mrb_2q_density=density_2q_gates,
             mrb_2q_ensemble=two_qubit_gate_ensemble,
         )
         plots[fig_name] = fig
+
+        observations.extend(
+            [
+                BenchmarkObservation(
+                    name="decay_rate",
+                    identifier=BenchmarkObservationIdentifier(qubits),
+                    value=popt["decay_rate"].value,
+                    uncertainty=popt["decay_rate"].stderr,
+                )
+            ]
+        )
 
     # Generate the combined plot
     fig_name, fig = plot_rb_decay(
         "mrb",
         qubits_array,
         dataset,
-        observations,
+        obs_dict,
         mrb_2q_density=density_2q_gates,
         mrb_2q_ensemble=two_qubit_gate_ensemble,
     )

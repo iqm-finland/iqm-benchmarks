@@ -2,6 +2,23 @@
 Changelog
 =========
 
+Version 2.20
+============
+* Standardizes observations for CLOPS and Mirror RB.
+
+Version 2.19
+============
+* All functional tests extended to the fake Deneb backend.
+* Added backend transpilation to REM calibration circuits to fix errors with REM on fake Deneb.
+
+Version 2.18
+============
+* Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.
+
+Version 2.17
+============
+* Update installation command for development mode. `#41 <https://github.com/iqm-finland/iqm-benchmarks/pull/41>`_
+
 Version 2.16
 ============
 * Added readout error mitigation for Qscore benchmark.
