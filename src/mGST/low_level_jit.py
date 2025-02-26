@@ -276,13 +276,15 @@ def dK(X, K, E, rho, J, y, d, r, rK):
         The derivative objective function with respect to the Kraus tensor K,
         reshaped to (d, rK, pdim, pdim), and scaled by 2/m/n_povm.
     """
+    # pylint: disable=too-many-nested-blocks
     K = K.reshape(d, rK, -1)
     pdim = int(np.sqrt(r))
     n_povm = y.shape[0]
     dK_ = np.zeros((d, rK, r))
     dK_ = np.ascontiguousarray(dK_.astype(np.complex128))
     m = len(J)
-    for k in prange(d):
+
+    for k in prange(d):  # pylint: disable=not-an-iterable
         for n in range(m):
             j = J[n][J[n] >= 0]
             for i, j_curr in enumerate(j):
@@ -529,7 +531,7 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
         inner_deriv = contract(X, j) @ rho
         dA_step = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
         for o in range(n_povm):
-            D_ind = E[o].conj()@inner_deriv - y[o,n]
+            D_ind = E[o].conj() @ inner_deriv - y[o, n]
             dA_step[o] += D_ind * A[o].conj() @ inner_deriv.reshape(pdim, pdim).T
         dA_ += dA_step
     return dA_ * 2 / m / n_povm

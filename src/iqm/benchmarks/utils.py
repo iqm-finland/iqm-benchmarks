@@ -32,7 +32,7 @@ from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
 import requests
-from rustworkx import PyGraph, visualization, spring_layout
+from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -646,8 +646,8 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
         i, j = cal_keys["cz_gate_fidelity"]
         topology = "crystal"
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != 'COMP_R' else 0
-        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != 'COMP_R' else 0
+        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
+        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
         if topology == "star":
             list_couplings.append([qb1, qb2])
         else:
@@ -660,7 +660,9 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
     return list_couplings, list_fids, topology
 
 
-def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None):
+def plot_layout_fidelity_graph(
+    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None
+):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
     Creates a visualization of the quantum chip topology where nodes represent qubits
@@ -700,7 +702,7 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[i
     # Define node colors
     node_colors = ["lightgrey" for _ in range(len(nodes))]
     if qubit_layouts is not None:
-        for qb in set([qb for layout in qubit_layouts for qb in layout]):
+        for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
 
     # Ensuring weights are in correct order for the plot
@@ -717,7 +719,7 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[i
     # Get corresponding weights in the same order
     weights_ordered = np.array([weights_dict[edge] for edge in list(edge_pos)])
 
-    fig, _ = plt.subplots(figsize=(6, 6))
+    plt.subplots(figsize=(6, 6))
 
     # Draw the graph
     visualization.mpl_draw(
@@ -742,11 +744,12 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[i
             textcoords="offset points",
             ha="center",
             va="center",
-            bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="none", alpha=0.6),
+            bbox={"boxstyle": "round,pad=0.2", "fc": "white", "ec": "none", "alpha": 0.6},
         )
 
     plt.gca().invert_yaxis()
     plt.title(
-        "Chip layout with selected qubits in orange\n" "and gate errors indicated by edge thickness (thinner is better)"
+        "Chip layout with selected qubits in orange\n"
+        + "and gate errors indicated by edge thickness (thinner is better)"
     )
     plt.show()

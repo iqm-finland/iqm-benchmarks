@@ -421,7 +421,7 @@ def get_edges(
         )  # get rid of > 1 fidelities
         fidelities_patch = []
         for edge in edges_patch:
-            for idx, edge_2 in enumerate(cast(List[int], edges_cal)):
+            for idx, edge_2 in enumerate(edges_cal):
                 if edge == set(edge_2):
                     fidelities_patch.append(fidelities_cal[idx])
         weights = -np.log(np.array(fidelities_patch))
@@ -641,7 +641,7 @@ class GHZBenchmark(Benchmark):
             )
             final_ghz = ghz_native_transpiled
         elif routine == "star":
-            ghz: QuantumCircuit = generate_ghz_star(qubit_count)
+            ghz = generate_ghz_star(qubit_count)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled, _ = perform_backend_transpilation(
                 [ghz],

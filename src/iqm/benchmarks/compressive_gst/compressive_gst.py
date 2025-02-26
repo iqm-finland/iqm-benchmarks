@@ -33,7 +33,6 @@ import numpy as np
 from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
 
-from iqm.benchmarks import BenchmarkCircuit
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Benchmark, BenchmarkObservationIdentifier, add_counts_to_dataset
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
@@ -177,8 +176,12 @@ class CompressiveGST(Benchmark):
                 optimize_sqg=False,
                 drop_final_rz=False,
             )
-        for qubits in self.qubit_layouts:
-            if not self.configuration.parallel_execution:
+            for qubits in self.qubit_layouts:
+                # Saving raw and transpiled circuits in a consistent format with other benchmarks
+                transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
+                untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+        else:
+            for qubits in self.qubit_layouts:
                 coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
                 transpiled_qc_list, _ = perform_backend_transpilation(
                     raw_qc_list,
@@ -189,9 +192,9 @@ class CompressiveGST(Benchmark):
                     optimize_sqg=False,
                     drop_final_rz=False,
                 )
-            # Saving raw and transpiled circuits in a consistent format with other benchmarks
-            transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
-            untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+                # Saving raw and transpiled circuits in a consistent format with other benchmarks
+                transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
+                untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
         return transpiled_circuits, untranspiled_circuits
 
     def add_configuration_to_dataset(self, dataset):  # CHECK
@@ -230,7 +233,7 @@ class CompressiveGST(Benchmark):
             transpiled_circuit_dict = {
                 tuple(range(self.backend.num_qubits)): transpiled_circuits[str(self.qubit_layouts[0])].circuits
             }
-            all_jobs, _ = submit_execute(
+            all_jobs_parallel, _ = submit_execute(
                 transpiled_circuit_dict,
                 backend,
                 self.configuration.shots,
@@ -240,7 +243,7 @@ class CompressiveGST(Benchmark):
             )
             # Retrieve
             qcvv_logger.info(f"Now executing the corresponding circuit batch")
-            counts, _ = retrieve_all_counts(all_jobs)
+            counts, _ = retrieve_all_counts(all_jobs_parallel)
             dataset, _ = add_counts_to_dataset(counts, f"parallel_results", dataset)
         else:
             all_jobs: Dict = {}
