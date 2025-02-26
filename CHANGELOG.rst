@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.22
+============
+* Qiskit on IQM dependency updated to > 17.0.
+
 Version 2.21
 ============
 * Function to bootstrap counts added to utils file.
