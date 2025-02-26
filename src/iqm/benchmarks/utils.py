@@ -35,8 +35,8 @@ from qiskit.transpiler import CouplingMap
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit, IQMFakeDeneb
-from iqm.qiskit_iqm import transpile_to_IQM
+from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
+from iqm.qiskit_iqm import IQMFakeDeneb, transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase

@@ -293,16 +293,16 @@ def update_pauli_expectations(
         # Here by construction they should be ordered as all_pauli_labels,
         # however, this assumed that measurements never got scrambled (which should not happen anyway).
         counts = projected_counts[projected_bit_string]
-        get_exp = lambda label: get_Pauli_expectation(counts, label)
+        get_exp = lambda label, ct=counts: get_Pauli_expectation(ct, label)
         updates = {nonId_pauli_label: get_exp(nonId_pauli_label)}
-        
+
         if nonId_pauli_label == "ZZ":
             updates.update({x: get_exp(x) for x in ["ZI", "IZ", "II"]})
         if nonId_pauli_label[0] == "Z":
             updates[f"I{nonId_pauli_label[1]}"] = get_exp(f"I{nonId_pauli_label[1]}")
         if nonId_pauli_label[1] == "Z":
             updates[f"{nonId_pauli_label[0]}I"] = get_exp(f"{nonId_pauli_label[0]}I")
-            
+
         pauli_expectations[projected_bit_string].update(updates)
 
     return pauli_expectations

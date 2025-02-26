@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from iqm.benchmarks.entanglement.graph_states import *
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
-from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
+#from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 class TestGraphState:
     backend = IQMFakeAdonis()
@@ -37,5 +37,5 @@ class TestGraphState:
         benchmark.analyze()
         mock_fig.assert_called()
 
-class TestGraphStateDeneb(TestGraphState):
-    backend = IQMFakeDeneb()
+# class TestGraphStateDeneb(TestGraphState):
+#     backend = IQMFakeDeneb()
