@@ -10,7 +10,6 @@ on:
 
 jobs:
   e2e_tests:
-    needs: [run_tests]
     if: |
       success() && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
