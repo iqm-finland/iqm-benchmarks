@@ -65,7 +65,7 @@ To install in development mode with all required dependencies, you can instead c
 [repository](https://www.github.com/iqm-finland/iqm-benchmarks) and from the project directory run
 
 ```sh
-uv pip install --constraint requirements.txt iqm-benchmarks
+uv pip install --constraint requirements.txt iqm-benchmarks --editable ."[test, docs, mgst]"
 ```
 
 To run the tests, you can use the following command:

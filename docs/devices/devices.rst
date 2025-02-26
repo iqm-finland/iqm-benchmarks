@@ -6,3 +6,4 @@ This section provides examples and guidance on how to benchmark specific IQM dev
    :maxdepth: 1
 
    spark
+   star

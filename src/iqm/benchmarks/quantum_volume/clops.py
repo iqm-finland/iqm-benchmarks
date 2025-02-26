@@ -30,7 +30,12 @@ import xarray as xr
 
 from iqm.benchmarks import Benchmark
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
-from iqm.benchmarks.benchmark_definition import BenchmarkAnalysisResult, BenchmarkRunResult
+from iqm.benchmarks.benchmark_definition import (
+    BenchmarkAnalysisResult,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (
@@ -232,11 +237,12 @@ def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         AnalysisResult corresponding to CLOPS
     """
     plots: Dict[str, Any] = {}
-    observations = {}
+    obs_dict = {}
     dataset = run.dataset
 
     # Retrieve dataset values
     # backend_name = dataset.attrs["backend_configuration_name"]
+    qubits = dataset.attrs["qubits"]
     num_circuits = dataset.attrs["num_circuits"]
     num_updates = dataset.attrs["num_updates"]
     num_shots = dataset.attrs["num_shots"]
@@ -291,7 +297,7 @@ def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     )
 
     # UPDATE OBSERVATIONS
-    observations.update({1: processed_results})
+    obs_dict.update({1: processed_results})
 
     # PLOT
     # Get all execution elapsed times
@@ -305,13 +311,18 @@ def clops_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             else:
                 qcvv_logger.info(f'\t"{k}": {overall_elapsed[k]:.2f} sec')
 
-        fig_name, fig = plot_times(dataset, observations)
+        fig_name, fig = plot_times(dataset, obs_dict)
         plots[fig_name] = fig
     else:
         qcvv_logger.info("There is no elapsed-time data associated to jobs (e.g., execution on simulator)")
 
     # Sort the final dataset
     dataset.attrs = dict(sorted(dataset.attrs.items()))
+
+    observations = [
+        BenchmarkObservation(name="clops_v", value=int(clops_v), identifier=BenchmarkObservationIdentifier(qubits)),
+        BenchmarkObservation(name="clops_h", value=int(clops_h), identifier=BenchmarkObservationIdentifier(qubits)),
+    ]
 
     return BenchmarkAnalysisResult(dataset=dataset, plots=plots, observations=observations)
 

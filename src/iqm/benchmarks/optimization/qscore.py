@@ -602,6 +602,7 @@ class QScoreBenchmark(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
         self.seed = configuration.seed
+        self.qpu_topology = configuration.qpu_topology
 
         self.graph_physical: Graph
         self.virtual_nodes: List[Tuple[int, int]]
@@ -747,11 +748,16 @@ class QScoreBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
-        if self.max_num_nodes is None or self.max_num_nodes == self.backend.num_qubits + 1:
+        if self.qpu_topology == "star":
+            nqubits = self.backend.num_qubits - 1  # need to leave out the resonator
+        else:
+            nqubits = self.backend.num_qubits
+
+        if self.max_num_nodes is None or self.max_num_nodes == nqubits + 1:
             if self.use_virtual_node:
-                max_num_nodes = self.backend.num_qubits + 1
+                max_num_nodes = nqubits + 1
             else:
-                max_num_nodes = self.backend.num_qubits
+                max_num_nodes = nqubits
         else:
             max_num_nodes = self.max_num_nodes
 
@@ -808,7 +814,6 @@ class QScoreBenchmark(Benchmark):
                     qcvv_logger.debug(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
 
                 # Choose the qubit layout
-
                 if self.choose_qubits_routine.lower() == "naive":
                     qubit_set = self.choose_qubits_naive(updated_num_nodes)
                 elif (
@@ -932,9 +937,11 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is True.
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
                             * Default is "custom".
-        min_num_qubits (int): Minumum number of qubits. 
+        min_num_qubits (int): Minumum number of qubits.
                             * Default is 2
         custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
+                            If virtual_node is set to True, then a given graph with n nodes requires n-1 selected qubits.
+                            If virtual_node is set to False, then a given graph with n nodes requires n selected qubits.
                             * Default is None.
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
                             * Default is 3.
@@ -946,6 +953,8 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is False.
         mit_shots: (int): Number of shots used in readout error mitigation.
                             * Default is 1000.
+        qpu_topology: (str): Topology of the QPU, either "crystal" or "star".
+                            * Default is "crystal".
     """
 
     benchmark: Type[Benchmark] = QScoreBenchmark
@@ -963,3 +972,4 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     seed: int = 1
     REM: bool = False
     mit_shots: int = 1000
+    qpu_topology: str = "crystal"
