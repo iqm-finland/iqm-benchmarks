@@ -653,8 +653,7 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
 
                 bootstrapped_avg_negativities[group_idx][str(qubit_pair)] = {
                     "value": float(np.mean(bootstrapped_negativities[group_idx][str(qubit_pair)])),
-                    "uncertainty": np.std(bootstrapped_negativities[group_idx][str(qubit_pair)])
-                    / np.sqrt(num_bootstraps),
+                    "uncertainty": float(np.std(bootstrapped_negativities[group_idx][str(qubit_pair)])),
                 }
 
                 max_negativity = {
@@ -874,7 +873,8 @@ class GraphStateBenchmark(Benchmark):
         time_transpilation = {}
         all_graph_submit_results = []
 
-        clifford_1q_dict, _ = import_native_gate_cliffords()
+        if self.tomography == "shadow_tomography":
+            clifford_1q_dict, _ = import_native_gate_cliffords()
 
         qcvv_logger.info(f"Performing {self.tomography.replace('_',' ')} of all qubit pairs")
 
