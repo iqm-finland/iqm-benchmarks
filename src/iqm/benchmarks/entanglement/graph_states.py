@@ -59,7 +59,8 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
 def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -> QuantumCircuit:
-    """
+    """Generates a circuit with minimal depth preparing a native graph state for a given backend using given qubits.
+
     Args:
         qubits (Sequence[int]): A list of integers representing the qubits.
         backend (IQMBackendBase): The backend to target the graph state generating circuit.
@@ -89,16 +90,26 @@ def plot_densityt_matrix(
     negativity: Dict[str, float],
     backend_name: str,
     timestamp: str,
-    tomography: str,
+    tomography: Literal["state_tomography", "shadow_tomography"],
     num_RM_samples: Optional[int] = None,
     num_MoMs_samples: Optional[int] = None,
 ) -> Tuple[str, Figure]:
-    """Plot shadow density matrices for corresponding qubit pairs, neighbor qubit projections, and negativities.
+    """Plots a density matrix for corresponding qubit pairs, neighbor qubit projections, and negativities.
 
     Args:
-
+        matrix (np.ndarray): The matrix to plot.
+        qubit_pair (Sequence[int]): The corresponding qubit pair.
+        projection (str): The projection corresponding to the matrix to plot.
+        negativity (Dict[str, float]): A dictionary with keys "value" and "uncertainty" and values being respective negativities.
+        backend_name (str): The name of the backend for the corresponding experiment.
+        timestamp (str): The timestamp for the corresponding experiment.
+        tomography (Literal["state_tomography", "shadow_tomography"]): The type of tomography used to gather the data of the matrix to plot.
+        num_RM_samples (Optional[int] = None): The number of randomized measurement samples if tomography is shadow_tomography.
+            * Default is None if tomography is state_tomography.
+        num_MoMs_samples (Optional[int] = None): The number of Median of Means used per randomized measurement if tomography is shadow_tomography.
+            * Default is None if tomography is state_tomography.
     Returns:
-        Tuple[str, Figure]: The figure label and the shadow matrix plot figure.
+        Tuple[str, Figure]: The figure label and the density matrix plot figure.
     """
 
     fig, ax = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(6, 6))
@@ -164,14 +175,17 @@ def plot_max_negativities(
     """Plots the maximum negativity for each corresponding pair of qubits.
 
     Args:
-        negativities (Dict[str, Dict[str,float]]):
-        backend_name (str):
-        timestamp (str):
-        tomography (Literal["shadow_tomography", "state_tomography"]):
-        num_shots (int):
-        num_bootstraps (Optional[int]):
-        num_RM_samples (Optional[int]):
-        num_MoMs_samples (Optional[int]):
+        negativities (Dict[str, Dict[str, str | float]]): A dictionary (str qubit keys) of dictionaries (keys "value"/"uncertainty") of negativities (float) to plot.
+        backend_name (str): The name of the backend corresponding to negativities.
+        timestamp (str): The timestamp of the corresponding experiment.
+        tomography (Literal["shadow_tomography", "state_tomography"]): The type of tomography that was used.
+        num_shots (int): The number of shots used in the corresponding experiment.
+        num_bootstraps (Optional[int]): The number of bootstraps used if tomography corresponds to state tomography.
+            * Defaults to None if the tomography type is "shadow_tomography".
+        num_RM_samples (Optional[int]): The number of randomized measurement samples used if tomography corresponds to shadow tomography.
+            * Defaults to None if the tomography type is "state_tomography".
+        num_MoMs_samples (Optional[int]): The number of Median of Means samples per randomized measurement used if tomography corresponds to shadow tomography.
+            * Defaults to None if the tomography type is "shadow_tomography".
 
     Returns:
         Tuple[str, Figure]: The figure label and the max negativities plot figure.
@@ -190,9 +204,9 @@ def plot_max_negativities(
     ax = plt.axes()
 
     if tomography == "shadow_tomography":
-        errorbar_labels = rf"$1 \sigma/\sqrt{{N}}$ (N={num_RM_samples*num_MoMs_samples} RMs)"
+        errorbar_labels = rf"$1 \sigma/\sqrt{{N}}$ (N={cast(int, num_RM_samples)*cast(int,num_MoMs_samples)} RMs)"
     else:
-        errorbar_labels = rf"$1 \sigma$ ({num_bootstraps} bootstraps)"
+        errorbar_labels = rf"$1 \sigma$ ({cast(int, num_bootstraps)} bootstraps)"
 
     plt.errorbar(
         x, y, yerr=yerr, capsize=2, color=cmap(0.15), fmt="o", alpha=1, mec="black", markersize=3, label=errorbar_labels
@@ -258,17 +272,20 @@ def update_pauli_expectations(
     pauli_expectations: Dict[str, Dict[str, float]],
     projected_counts: Dict[str, Dict[str, int]],
     all_projection_bit_strings: List[str],
-    non_pauli_label: str,
-):
-    """Helper function that updates the input Pauli expectations dictionary.
+    nonId_pauli_label: str,
+) -> Dict[str, Dict[str, float]]:
+    """Helper function that updates the input Pauli expectations dictionary of dictionaries (projections -> {pauli string: expectation}).
 
     Args:
-         pauli_expectations (Dict[str, Dict[str, float]]):
-        projected_counts (Dict[str, Dict[str, int]]):
-        all_projection_bit_strings (List[str]):
-        non_pauli_label (str):
+        pauli_expectations (Dict[str, Dict[str, float]]): The Pauli expectations dictionary of dictionaries to update.
+            * Outermost keys are projected bitstrings; innermost are pauli strings and values are expectation values.
+        projected_counts (Dict[str, Dict[str, int]]): The corresponding projected counts dictionary of dictionaries.
+        all_projection_bit_strings (List[str]): A list of all possible neighbor projection bitstrings.
+        nonId_pauli_label (str): The Pauli label to update expectations of, that should not contain identities.
+            * Pauli expectations corresponding to I are inferred and updated from counts corresponding to strings containing Z instead.
 
     Returns:
+        Dict[str, Dict[str, float]]: The updated Pauli expectations dictionary of dictionaries (projections -> {pauli string: expectation}).
     """
     # Get the individual Pauli expectations for each projection
     for projected_bit_string in all_projection_bit_strings:
@@ -276,10 +293,10 @@ def update_pauli_expectations(
         # Here by construction they should be ordered as all_pauli_labels,
         # however, this assumed that measurements never got scrambled (which should not happen anyway).
         pauli_expectations[projected_bit_string].update(
-            {non_pauli_label: get_Pauli_expectation(projected_counts[projected_bit_string], non_pauli_label)}
+            {nonId_pauli_label: get_Pauli_expectation(projected_counts[projected_bit_string], nonId_pauli_label)}
         )
         # Add Pauli expectations with identity, inferred from corresponding counts
-        if non_pauli_label == "ZZ":
+        if nonId_pauli_label == "ZZ":
             pauli_expectations[projected_bit_string].update(
                 {"ZI": get_Pauli_expectation(projected_counts[projected_bit_string], "ZI")}
             )
@@ -289,13 +306,13 @@ def update_pauli_expectations(
             pauli_expectations[projected_bit_string].update(
                 {"II": get_Pauli_expectation(projected_counts[projected_bit_string], "II")}
             )
-        if non_pauli_label[0] == "Z":
-            p_string = "I" + non_pauli_label[1]
+        if nonId_pauli_label[0] == "Z":
+            p_string = "I" + nonId_pauli_label[1]
             pauli_expectations[projected_bit_string].update(
                 {p_string: get_Pauli_expectation(projected_counts[projected_bit_string], p_string)}
             )
-        if non_pauli_label[1] == "Z":
-            p_string = non_pauli_label[0] + "I"
+        if nonId_pauli_label[1] == "Z":
+            p_string = nonId_pauli_label[0] + "I"
             pauli_expectations[projected_bit_string].update(
                 {p_string: get_Pauli_expectation(projected_counts[projected_bit_string], p_string)}
             )
@@ -570,7 +587,7 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
                 ]
 
                 sqg_pauli_strings = ("Z", "X", "Y")
-                all_nonid_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=2)]
+                all_nonId_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=2)]
 
                 pauli_expectations: Dict[str, Dict[str, float]] = {
                     projection: {} for projection in all_projection_bit_strings
@@ -590,7 +607,7 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
                         pauli_expectations,
                         projected_counts,
                         all_projection_bit_strings,
-                        non_pauli_label=all_nonid_pauli_labels[pauli_idx],
+                        nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
                     )
 
                 tomography_state[group_idx][str(qubit_pair)] = {
@@ -632,7 +649,7 @@ def negativity_analysis(  # pylint: disable=too-many-statements, too-many-branch
                             bootstrapped_pauli_expectations[bootstrap],
                             projected_counts={max_negativity_bitstring: all_bootstrapped_counts[bootstrap]},
                             all_projection_bit_strings=[max_negativity_bitstring],
-                            non_pauli_label=all_nonid_pauli_labels[pauli_idx],
+                            nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
                         )
 
                 bootstrapped_states[group_idx][str(qubit_pair)] = [
