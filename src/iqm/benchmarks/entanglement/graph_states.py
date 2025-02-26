@@ -219,7 +219,6 @@ def plot_max_negativities(
     )
 
     plt.xticks(rotation=90)
-    # plt.yticks(np.arange(0, 0.51, step=0.1))
     if tomography == "shadow_tomography":
         plt.title(
             f"Max entanglement negativities for qubit pairs in {backend_name}\n{num_RM_samples} local RM samples x {num_MoMs_samples} Median of Means samples\n{timestamp}"
