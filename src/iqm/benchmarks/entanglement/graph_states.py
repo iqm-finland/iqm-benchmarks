@@ -195,16 +195,7 @@ def plot_max_negativities(
         errorbar_labels = rf"$1 \sigma$ ({num_bootstraps} bootstraps)"
 
     plt.errorbar(
-        x,
-        y,
-        yerr=yerr,
-        capsize=2,
-        color=cmap(0.15),
-        fmt="o",
-        alpha=1,
-        mec="black",
-        markersize=3,
-        label=errorbar_labels
+        x, y, yerr=yerr, capsize=2, color=cmap(0.15), fmt="o", alpha=1, mec="black", markersize=3, label=errorbar_labels
     )
     plt.axhline(0.5, color=cmap(1.0), linestyle="dashed")
 
