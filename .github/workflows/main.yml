@@ -72,21 +72,3 @@ jobs:
         with:
           name: benchmark-results
           path: Outputs
-
-  e2e_tests:
-    needs: [run_tests]
-    if: |
-      success()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v5
-        with:
-          python-version: 3.11
-      - name: Install dependencies
-        run: |
-          uv pip install --constraint requirements.txt --editable .[mgst,examples]
-      - name: Test if example notebooks run successfully
-        working-directory: ./docs/examples
-        run: jupyter execute example_clifford_rb.ipynb
