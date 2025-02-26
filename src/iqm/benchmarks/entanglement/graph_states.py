@@ -189,6 +189,11 @@ def plot_max_negativities(
     fig = plt.figure()
     ax = plt.axes()
 
+    if tomography == "shadow_tomography":
+        errorbar_labels = rf"$1 \sigma/\sqrt{{N}}$ (N={num_RM_samples*num_MoMs_samples} RMs)"
+    else:
+        errorbar_labels = rf"$1 \sigma$ ({num_bootstraps} bootstraps)"
+
     plt.errorbar(
         x,
         y,
@@ -199,6 +204,7 @@ def plot_max_negativities(
         alpha=1,
         mec="black",
         markersize=3,
+        label=errorbar_labels
     )
     plt.axhline(0.5, color=cmap(1.0), linestyle="dashed")
 
@@ -231,7 +237,7 @@ def plot_max_negativities(
         plt.title(
             f"Max entanglement negativities for qubit pairs in {backend_name}\nShots per tomography sample: {num_shots}; Bootstraps: {num_bootstraps}\n{timestamp}"
         )
-    # plt.legend(fontsize=8)
+    plt.legend(fontsize=8)
 
     ax.margins(tight=True)
 
