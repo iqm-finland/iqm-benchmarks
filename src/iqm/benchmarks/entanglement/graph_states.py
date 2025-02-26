@@ -292,30 +292,18 @@ def update_pauli_expectations(
         # Ideally the counts should be labeled by Pauli basis measurement!
         # Here by construction they should be ordered as all_pauli_labels,
         # however, this assumed that measurements never got scrambled (which should not happen anyway).
-        pauli_expectations[projected_bit_string].update(
-            {nonId_pauli_label: get_Pauli_expectation(projected_counts[projected_bit_string], nonId_pauli_label)}
-        )
-        # Add Pauli expectations with identity, inferred from corresponding counts
+        counts = projected_counts[projected_bit_string]
+        get_exp = lambda label: get_Pauli_expectation(counts, label)
+        updates = {nonId_pauli_label: get_exp(nonId_pauli_label)}
+        
         if nonId_pauli_label == "ZZ":
-            pauli_expectations[projected_bit_string].update(
-                {"ZI": get_Pauli_expectation(projected_counts[projected_bit_string], "ZI")}
-            )
-            pauli_expectations[projected_bit_string].update(
-                {"IZ": get_Pauli_expectation(projected_counts[projected_bit_string], "IZ")}
-            )
-            pauli_expectations[projected_bit_string].update(
-                {"II": get_Pauli_expectation(projected_counts[projected_bit_string], "II")}
-            )
+            updates.update({x: get_exp(x) for x in ["ZI", "IZ", "II"]})
         if nonId_pauli_label[0] == "Z":
-            p_string = "I" + nonId_pauli_label[1]
-            pauli_expectations[projected_bit_string].update(
-                {p_string: get_Pauli_expectation(projected_counts[projected_bit_string], p_string)}
-            )
+            updates[f"I{nonId_pauli_label[1]}"] = get_exp(f"I{nonId_pauli_label[1]}")
         if nonId_pauli_label[1] == "Z":
-            p_string = nonId_pauli_label[0] + "I"
-            pauli_expectations[projected_bit_string].update(
-                {p_string: get_Pauli_expectation(projected_counts[projected_bit_string], p_string)}
-            )
+            updates[f"{nonId_pauli_label[0]}I"] = get_exp(f"{nonId_pauli_label[0]}I")
+            
+        pauli_expectations[projected_bit_string].update(updates)
 
     return pauli_expectations
 
