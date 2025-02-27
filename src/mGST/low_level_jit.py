@@ -104,7 +104,7 @@ def contract(X, j_vec):
     return res
 
 
-@njit(cache=True, fastmath=True)
+@njit(cache=True, fastmath=True, parallel=True)
 def objf(X, E, rho, J, y):
     """Calculate the objective function value for matrices, POVM elements, and target values.
 
@@ -132,12 +132,14 @@ def objf(X, E, rho, J, y):
     """
     m = len(J)
     n_povm = y.shape[0]
-    objf_ = 0
+    objf_: float = 0
     for i in prange(m):  # pylint: disable=not-an-iterable
         j = J[i][J[i] >= 0]
-        C = contract(X, j)
+        state = rho
+        for ind in j[::-1]:
+            state = X[ind] @ state
         for o in range(n_povm):
-            objf_ += abs(E[o].conj() @ C @ rho - y[o, i]) ** 2
+            objf_ += abs(E[o].conj() @ state - y[o, i]) ** 2
     return objf_ / m / n_povm
 
 
@@ -240,7 +242,7 @@ def Mp_norm_lower(X_true, E_true, rho_true, X, E, rho, J, n_povm, p):
     return dist ** (1 / p) / m / n_povm, max_dist ** (1 / p)
 
 
-@njit(cache=True)
+@njit(cache=True, parallel=True)
 def dK(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivative of the objective function with respect to the Kraus tensor K.
 
@@ -274,26 +276,32 @@ def dK(X, K, E, rho, J, y, d, r, rK):
         The derivative objective function with respect to the Kraus tensor K,
         reshaped to (d, rK, pdim, pdim), and scaled by 2/m/n_povm.
     """
+    # pylint: disable=too-many-nested-blocks
     K = K.reshape(d, rK, -1)
     pdim = int(np.sqrt(r))
     n_povm = y.shape[0]
     dK_ = np.zeros((d, rK, r))
     dK_ = np.ascontiguousarray(dK_.astype(np.complex128))
     m = len(J)
-    for k in range(d):
+
+    for k in prange(d):  # pylint: disable=not-an-iterable
         for n in range(m):
             j = J[n][J[n] >= 0]
             for i, j_curr in enumerate(j):
                 if j_curr == k:
+                    R = rho.copy()
+                    for ind in j[i + 1 :][::-1]:
+                        R = X[ind] @ R
                     for o in range(n_povm):
-                        L = E[o].conj() @ contract(X, j[:i])
-                        R = contract(X, j[i + 1 :]) @ rho
+                        L = E[o].conj()
+                        for ind in j[:i]:
+                            L = L @ X[ind]
                         D_ind = L @ X[k] @ R - y[o, n]
                         dK_[k] += D_ind * K[k].conj() @ np.kron(L.reshape(pdim, pdim).T, R.reshape(pdim, pdim).T)
     return dK_.reshape(d, rK, pdim, pdim) * 2 / m / n_povm
 
 
-@njit(cache=True)
+@njit(cache=True, parallel=False)
 def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivatives of the objective function with respect to K and the
     product of derivatives of the measurement map with respect to K.
@@ -397,7 +405,7 @@ def ddM(X, K, E, rho, J, y, d, r, rK):
     ddK = np.zeros((d**2, rK**2, r, r))
     ddK = np.ascontiguousarray(ddK.astype(np.complex128))
     dconjdK = np.zeros((d**2, rK**2, r, r))
-    dconjdK = np.ascontiguousarray(ddK.astype(np.complex128))
+    dconjdK = np.ascontiguousarray(dconjdK.astype(np.complex128))
     m = len(J)
     for k in range(d**2):
         k1, k2 = local_basis(k, d, 2)
@@ -516,16 +524,17 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
     for k in range(n_povm):
         E[k] = (A[k].T.conj() @ A[k]).reshape(-1)
     rho = (B @ B.T.conj()).reshape(-1)
-    dA_ = np.zeros((n_povm, pdim, pdim))
-    dA_ = dA_.astype(np.complex128)
+    dA_ = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
     m = len(J)
     for n in prange(m):  # pylint: disable=not-an-iterable
-        jE = J[n][J[n] >= 0][0]
-        j = J[n][J[n] >= 0][1:]
+        j = J[n][J[n] >= 0]
         inner_deriv = contract(X, j) @ rho
-        D_ind = E[jE].conj().dot(inner_deriv) - y[n]
-        dA_[jE] += D_ind * A[jE] @ inner_deriv.reshape(pdim, pdim).T.conj()
-    return dA_
+        dA_step = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
+        for o in range(n_povm):
+            D_ind = E[o].conj() @ inner_deriv - y[o, n]
+            dA_step[o] += D_ind * A[o].conj() @ inner_deriv.reshape(pdim, pdim).T
+        dA_ += dA_step
+    return dA_ * 2 / m / n_povm
 
 
 @njit(parallel=True, cache=True)
@@ -615,13 +624,21 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
     for n in prange(m):  # pylint: disable=not-an-iterable
         j = J[n][J[n] >= 0]
         R = contract(X, j) @ rho
+        dA_step = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
+        dMdM_step = np.zeros((n_povm, r, r)).astype(np.complex128)
+        dMconjdM_step = np.zeros((n_povm, r, r)).astype(np.complex128)
+        dconjdA_step = np.zeros((n_povm, r, r)).astype(np.complex128)
         for o in range(n_povm):
             D_ind = E[o].conj() @ R - y[o, n]
             dM = A[o].conj() @ R.reshape(pdim, pdim).T
-            dMdM[o] += np.outer(dM, dM)
-            dMconjdM[o] += np.outer(dM.conj(), dM)
-            dA_[o] += D_ind * dM
-            dconjdA[o] += D_ind * np.kron(np.eye(pdim).astype(np.complex128), R.reshape(pdim, pdim).T)
+            dMdM_step[o] += np.outer(dM, dM)
+            dMconjdM_step[o] += np.outer(dM.conj(), dM)
+            dA_step[o] += D_ind * dM
+            dconjdA_step[o] += D_ind * np.kron(np.eye(pdim).astype(np.complex128), R.reshape(pdim, pdim).T)
+        dA_ += dA_step
+        dMdM += dMdM_step
+        dMconjdM += dMconjdM_step
+        dconjdA += dconjdA_step
     return dA_ * 2 / m / n_povm, dMdM * 2 / m / n_povm, dMconjdM * 2 / m / n_povm, dconjdA * 2 / m / n_povm
 
 

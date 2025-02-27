@@ -339,7 +339,7 @@ def compute_sparsest_Pauli_Hamiltonian(U_set):
     pdim = U_set.shape[1]
     pp_vecs = []
 
-    for num, U in enumerate(U_set):
+    for _, U in enumerate(U_set):
         # Schur decomposition finds the unitary diagonalization of a unitary matrix, which is not always returned by np.linalg.eig
         T, evecs = schur(U)
         evals = np.diag(T)
