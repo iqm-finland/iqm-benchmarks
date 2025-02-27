@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.22
+============
+* Fix for QScore errors when custom_qubits_array is specified.
+
 Version 2.21
 ============
 * Function to bootstrap counts added to utils file.
