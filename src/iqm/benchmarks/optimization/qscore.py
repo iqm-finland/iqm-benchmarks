@@ -753,7 +753,7 @@ class QScoreBenchmark(Benchmark):
 
         if self.custom_qubits_array is not None:
             if self.use_virtual_node:
-                node_numbers = [len(qubit_layout)+1 for qubit_layout in self.custom_qubits_array]
+                node_numbers = [len(qubit_layout) + 1 for qubit_layout in self.custom_qubits_array]
             else:
                 node_numbers = [len(qubit_layout) for qubit_layout in self.custom_qubits_array]
 
