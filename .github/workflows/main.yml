@@ -72,4 +72,3 @@ jobs:
         with:
           name: benchmark-results
           path: Outputs
-
