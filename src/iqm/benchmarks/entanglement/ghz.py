@@ -207,7 +207,8 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset = run.dataset
     routine = dataset.attrs["fidelity_routine"]
     qubit_layouts = dataset.attrs["custom_qubits_array"]
-    backend_name = dataset.attrs["backend_name"]
+    backend_topology = dataset.attrs["backend_topology"]
+    backend_num_qubits = dataset.attrs["backend_num_qubits"]
 
     observation_list: list[BenchmarkObservation] = []
     for qubit_layout in qubit_layouts:
@@ -220,7 +221,7 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 for qc in all_circuits:
                     qc_copy = qc.copy()
                     qc_copy.remove_final_measurements()
-                    deflated_qc = reduce_to_active_qubits(qc_copy, backend_name)
+                    deflated_qc = reduce_to_active_qubits(qc_copy, backend_topology, backend_num_qubits)
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
@@ -709,7 +710,7 @@ class GHZBenchmark(Benchmark):
             else:
                 index_min_depth = np.argmin([c.depth() for c in ghz_native_transpiled])
                 final_ghz = ghz_native_transpiled[index_min_depth]
-                circuit_group.add_circuit([ghz_log[index_min_depth]])
+                circuit_group.add_circuit(ghz_log[index_min_depth])
         self.circuits["untranspiled_circuits"].circuit_groups.append(circuit_group)
         return CircuitGroup(name=f"{qubit_layout}_native_ghz", circuits=[final_ghz[0]])
 
@@ -860,6 +861,8 @@ class GHZBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
+        dataset.attrs[f"backend_topology"] = "star" if "move" in self.backend.operation_names else "crystal"
+        dataset.attrs[f"backend_num_qubits"] = self.backend.num_qubits
         dataset.attrs[f"execution_timestamp"] = self.execution_timestamp
         dataset.attrs["fidelity_routine"] = self.fidelity_routine
 

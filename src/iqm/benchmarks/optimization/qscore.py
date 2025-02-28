@@ -848,7 +848,7 @@ class QScoreBenchmark(Benchmark):
                 else:
                     qcvv_logger.setLevel(logging.WARNING)
                     # Account for all-to-all connected backends like Deneb
-                    if "move" in self.backend.operation_names:
+                    if "move" in backend.architecture.gates:
                         # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
                         active_qubit_set = qubit_set[: len(qc.qubits)]
                         # All-to-all coupling map on the active qubits
