@@ -13,6 +13,7 @@
 # limitations under the License.
 """
 GHZ verifies the generation of Greenberger-Horne-Zeilinger states
+Graph State estimates the amount of bipartite entanglement of native graph states
 """
 
-from . import ghz
+from . import ghz, graph_states
