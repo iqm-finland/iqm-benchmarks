@@ -14,6 +14,7 @@ Below is a list of the benchmarks currently available in the suite:
   - CLOPS [[arXiv:2110.14108 [quant-ph]](https://arxiv.org/abs/2110.14108) (2021)]
 * Entanglement:
   - GHZ State Fidelity [[arXiv:0712.0921 [quant-ph]](https://arxiv.org/abs/0712.0921) (2007)]
+  - Graph State Bipartite Entanglement [[Adv. Quantum Technol., 2100061](https://doi.org/10.1002/qute.202100061) (2021)]
 * Optimization:
   - Q-Score [[IEEE Trans. Quantum Eng., 2](https://doi.org/10.1109/TQE.2021.3090207) (2021)]
 
