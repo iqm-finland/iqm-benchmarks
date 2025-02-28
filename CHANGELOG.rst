@@ -2,9 +2,13 @@
 Changelog
 =========
 
-Version 2.22
+Version 2.23
 ============
 * Qiskit on IQM dependency updated to > 17.0.
+
+Version 2.22
+============
+* Fix for QScore errors when custom_qubits_array is specified.
 
 Version 2.21
 ============
