@@ -411,8 +411,7 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     backend_name = dataset.attrs["backend_name"]
     timestamp = dataset.attrs["execution_timestamp"]
 
-    max_num_nodes = dataset.attrs["max_num_nodes"]
-    min_num_nodes = dataset.attrs["min_num_nodes"]
+    nodes_list = dataset.attrs["node_numbers"]
     num_instances: int = dataset.attrs["num_instances"]
 
     use_virtual_node: bool = dataset.attrs["use_virtual_node"]
@@ -420,7 +419,6 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_qaoa_layers = dataset.attrs["num_qaoa_layers"]
 
     qscore = 0
-    nodes_list = list(range(min_num_nodes, max_num_nodes + 1))
     beta_ratio_list = []
     beta_ratio_std_list = []
     for num_nodes in nodes_list:
@@ -753,17 +751,26 @@ class QScoreBenchmark(Benchmark):
         else:
             nqubits = self.backend.num_qubits
 
-        if self.max_num_nodes is None or self.max_num_nodes == nqubits + 1:
+        if self.custom_qubits_array is not None:
             if self.use_virtual_node:
-                max_num_nodes = nqubits + 1
+                node_numbers = [len(qubit_layout)+1 for qubit_layout in self.custom_qubits_array]
             else:
-                max_num_nodes = nqubits
+                node_numbers = [len(qubit_layout) for qubit_layout in self.custom_qubits_array]
+
         else:
-            max_num_nodes = self.max_num_nodes
+            if self.max_num_nodes is None or self.max_num_nodes == nqubits + 1:
+                if self.use_virtual_node:
+                    max_num_nodes = nqubits + 1
+                else:
+                    max_num_nodes = nqubits
+            else:
+                max_num_nodes = self.max_num_nodes
+            node_numbers = range(self.min_num_nodes, max_num_nodes + 1)
 
-        dataset.attrs.update({"max_num_nodes": max_num_nodes})
+        dataset.attrs.update({"max_num_nodes": node_numbers[-1]})
+        dataset.attrs.update({"node_numbers": node_numbers})
 
-        for num_nodes in range(self.min_num_nodes, max_num_nodes + 1):
+        for num_nodes in node_numbers:
             qc_list = []
             qc_transpiled_list: List[QuantumCircuit] = []
             execution_results = []

@@ -15,15 +15,17 @@ dynamic = ["version"]
 description = "A package for implementation of Quantum Characterization, Verification and Validation (QCVV) techniques on IQM's hardware at gate level abstraction"
 authors = [
     {name="IQM Finland Oy", email="developers@meetiqm.com"},
+    {name="Adrian Auer", email="adrian.auer@meetiqm.com"},
+    {name="Raphael Brieger", email="raphael.brieger@meetiqm.com"},
+    {name="Alessio Calzona", email="alessio.calzona@meetiqm.com"},
+    {name="Pedro Figueroa Romero", email="pedro.romero@meetiqm.com"},
+    {name="Amin Hosseinkhani", email="amin.hosseinkhani@meetiqm.com"},
+    {name="Miikka Koistinen", email="miikka@meetiqm.com"},
+    {name="Nadia Milazzo", email="nadia.milazzo@meetiqm.com"},
+    {name="Vicente Pina Canelles", email="vicente.pina@meetiqm.com"},
     {name="Aniket Rath", email="aniket.rath@meetiqm.com"},
     {name="Jami Rönkkö", email="jami@meetiqm.com"},
-    {name="Pedro Figueroa Romero", email="pedro.romero@meetiqm.com"},
-    {name="Vicente Pina Canelles", email="vicente.pina@meetiqm.com"},
-    {name="Raphael Brieger", email="raphael.brieger@meetiqm.com"},
-    {name="Stefan Seegerer", email="stefan.seegerer@meetiqm.com"},
-    {name="Miikka Koistinen", email="miikka@meetiqm.com"},
-    {name="Adrian Auer", email="adrian.auer@meetiqm.com"},
-    {name="Nadia Milazzo", email="nadia.milazzo@meetiqm.com"},
+    {name="Stefan Seegerer", email="stefan.seegerer@meetiqm.com"}
 ]
 readme = "README.md"
 classifiers = [

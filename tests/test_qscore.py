@@ -1,14 +1,14 @@
 """Tests for Qscore estimation"""
 
 from iqm.benchmarks.optimization.qscore import *
-from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
+from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 
 class TestQScore:
-    backend = IQMFakeAdonis()
+    backend = IQMFakeApollo()
     qpu_topology = "crystal"
-    custom_qubits_array = [[0], [0, 2], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3, 4]]
+    custom_qubits_array = [[0, 1, 3], [0, 1, 2, 3] , [0, 1, 2, 3, 4]]
 
     def test_qscore(self):
         EXAMPLE_QSCORE = QScoreConfiguration(
@@ -17,7 +17,7 @@ class TestQScore:
             shots=4,
             calset_id=None,  # calibration set ID, default is None
             min_num_nodes=2,
-            max_num_nodes=None,
+            max_num_nodes=4,
             use_virtual_node=True,
             use_classically_optimized_angles=True,
             choose_qubits_routine="custom",
@@ -34,4 +34,4 @@ class TestQScore:
 class TestQScoreDeneb(TestQScore):
     backend = IQMFakeDeneb()
     qpu_topology = "star"
-    custom_qubits_array = [[1], [1, 2], [1, 2, 3], [1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5, 6]]
+    custom_qubits_array = [[1], [1, 2], [1, 2, 3, 4], [1, 2, 3, 4, 5]]
