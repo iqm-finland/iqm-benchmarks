@@ -21,9 +21,9 @@ import itertools
 from time import strftime
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
-import networkx as nx
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 from qiskit import QuantumCircuit, transpile
 import xarray as xr
@@ -50,11 +50,12 @@ from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_tra
     median_with_uncertainty,
     retrieve_all_counts,
     retrieve_all_job_metadata,
+    rx_to_nx_graph,
     set_coupling_map,
     split_sequence_in_chunks,
     submit_execute,
     timeit,
-    xrvariable_to_counts, get_iqm_backend, rx_to_nx_graph,
+    xrvariable_to_counts,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -301,10 +302,13 @@ def plot_max_negativities_graph(
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
 
-    qubit_pairs = [tuple(int(num) for num in x.replace('(', '').replace(')', '').replace('...', '').split(', ')) for x in sorted_negativities.keys()]
+    qubit_pairs = [
+        tuple(int(num) for num in x.replace("(", "").replace(")", "").replace("...", "").split(", "))
+        for x in sorted_negativities.keys()
+    ]
     negativity_values = [a["value"] for a in sorted_negativities.values()]
 
-    negativity_edges = {q: n for q, n in zip(qubit_pairs, negativity_values)}
+    negativity_edges = dict(zip(qubit_pairs, negativity_values))
 
     cmap = plt.cm.get_cmap("winter")
 
@@ -312,43 +316,97 @@ def plot_max_negativities_graph(
     ax = plt.axes()
 
     qubit_positions = {
-        5:
-            {
-                2: (0,0), 0:(-1,1), 1: (-1,-1), 3: (1,-1), 4: (1,1)
-            },
-        20:
-            {
-                0: (4, 0), 1: (3, 0),
-                2: (5, 1), 3: (4, 1), 4: (3, 1), 5: (2, 1), 6: (1, 1),
-                7: (5, 2), 8: (4, 2), 9: (3, 2), 10: (2, 2), 11: (1, 2),
-                12: (5, 3), 13: (4, 3), 14: (3, 3), 15: (2, 3), 16: (1, 3),
-                17: (4, 4), 18: (3, 4), 19: (2, 4)
-            },
-        49:
-            {
-                    0: (10, 10), 1: (11, 9), 2: (7, 11), 3: (8, 10), 4: (9, 9), 5: (10, 8), 6: (11, 7),
-                    7: (5, 11), 8: (6, 10), 9: (7, 9), 10: (8, 8), 11: (9, 7), 12: (10, 6), 13: (11, 5),
-                    14: (3, 11), 15: (4, 10), 16: (5, 9), 17: (6, 8), 18: (7, 7), 19: (8, 6),
-                    20: (9, 5), 21: (10, 4), 22: (2, 10), 23: (3, 9), 24: (4, 8), 25: (7, 5), 26: (8, 4),
-                    27: (9, 3), 28: (10, 2), 29: (2, 8), 30: (3, 7), 31: (7, 3), 32: (8, 2), 33: (9, 1),
-                    34: (1, 7), 35: (2, 6), 36: (3, 5), 37: (4, 4), 38: (5, 3), 39: (6, 2), 40: (7, 1),
-                    41: (1, 5), 42: (2, 4), 43: (3, 3), 44: (4, 2), 45: (5, 1), 46: (1, 3), 47: (2, 2), 48: (3, 1)
-            }
+        5: {2: (0, 0), 0: (-1, 1), 1: (-1, -1), 3: (1, -1), 4: (1, 1)},
+        20: {
+            0: (4, 0),
+            1: (3, 0),
+            2: (5, 1),
+            3: (4, 1),
+            4: (3, 1),
+            5: (2, 1),
+            6: (1, 1),
+            7: (5, 2),
+            8: (4, 2),
+            9: (3, 2),
+            10: (2, 2),
+            11: (1, 2),
+            12: (5, 3),
+            13: (4, 3),
+            14: (3, 3),
+            15: (2, 3),
+            16: (1, 3),
+            17: (4, 4),
+            18: (3, 4),
+            19: (2, 4),
+        },
+        49: {
+            0: (10, 10),
+            1: (11, 9),
+            2: (7, 11),
+            3: (8, 10),
+            4: (9, 9),
+            5: (10, 8),
+            6: (11, 7),
+            7: (5, 11),
+            8: (6, 10),
+            9: (7, 9),
+            10: (8, 8),
+            11: (9, 7),
+            12: (10, 6),
+            13: (11, 5),
+            14: (3, 11),
+            15: (4, 10),
+            16: (5, 9),
+            17: (6, 8),
+            18: (7, 7),
+            19: (8, 6),
+            20: (9, 5),
+            21: (10, 4),
+            22: (2, 10),
+            23: (3, 9),
+            24: (4, 8),
+            25: (7, 5),
+            26: (8, 4),
+            27: (9, 3),
+            28: (10, 2),
+            29: (2, 8),
+            30: (3, 7),
+            31: (7, 3),
+            32: (8, 2),
+            33: (9, 1),
+            34: (1, 7),
+            35: (2, 6),
+            36: (3, 5),
+            37: (4, 4),
+            38: (5, 3),
+            39: (6, 2),
+            40: (7, 1),
+            41: (1, 5),
+            42: (2, 4),
+            43: (3, 3),
+            44: (4, 2),
+            45: (5, 1),
+            46: (1, 3),
+            47: (2, 2),
+            48: (3, 1),
+        },
     }
 
     # Normalize negativity values to the range [0, 1] for color mapping
-    norm = plt.Normalize(vmin=min(negativity_values), vmax=max(negativity_values))
+    norm = plt.Normalize(vmin=cast(float, min(negativity_values)), vmax=cast(float, max(negativity_values)))
     edge_colors = [cmap(norm(negativity_edges[edge])) for edge in qubit_pairs]
 
-    nx.draw_networkx(rx_to_nx_graph(backend),
-                     pos=qubit_positions[backend.num_qubits],
-                     nodelist=list(range(backend.num_qubits)),
-                     edgelist=qubit_pairs,
-                     width=4.0,
-                     edge_color=edge_colors,
-                     node_color='k',
-                     font_color='w',
-                     ax=ax)
+    nx.draw_networkx(
+        rx_to_nx_graph(backend),
+        pos=qubit_positions[backend.num_qubits],
+        nodelist=list(range(backend.num_qubits)),
+        edgelist=qubit_pairs,
+        width=4.0,
+        edge_color=edge_colors,
+        node_color="k",
+        font_color="w",
+        ax=ax,
+    )
 
     # Add colorbar
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
