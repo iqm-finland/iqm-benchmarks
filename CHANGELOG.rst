@@ -2,6 +2,23 @@
 Changelog
 =========
 
+Version 2.22
+============
+* Fix for QScore errors when custom_qubits_array is specified.
+
+Version 2.21
+============
+* Function to bootstrap counts added to utils file.
+
+Version 2.20
+============
+* Standardizes observations for CLOPS and Mirror RB.
+
+Version 2.19
+============
+* All functional tests extended to the fake Deneb backend.
+* Added backend transpilation to REM calibration circuits to fix errors with REM on fake Deneb.
+
 Version 2.18
 ============
 * Added notebook to benchmark IQM Star QPUs and bug fixes done for Qscore.

@@ -25,7 +25,7 @@ from mthree.exceptions import M3Error
 from mthree.mitigation import _job_thread
 from mthree.utils import final_measurement_mapping
 from qiskit import transpile  # pylint: disable = no-name-in-module
-from qiskit.providers import Backend, BackendV1, BackendV2
+from qiskit.providers import BackendV1, BackendV2
 
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import get_iqm_backend, timeit
@@ -198,29 +198,20 @@ class M3IQM(mthree.M3Mitigation):
             trans_qcs[(num_jobs - 1) * circ_slice :]
         ]
         # Do job submission here
-        # This Backend check is here for Qiskit direct access.  Should be removed later.
         jobs = []
-        if not isinstance(self.system, Backend):
-            for circs in circs_list:
-                transpiled_circuit = transpile(circs, self.system, optimization_level=0)
+        for circs in circs_list:
+            transpiled_circuit = transpile(circs, self.system, optimization_level=0)
+            if cal_id is None:
                 _job = self.system.run(transpiled_circuit, shots=shots, rep_delay=self.rep_delay)
-                jobs.append(_job)
-
-        # *****************************************
-        else:  # That's what IQM backend do!
-            # *****************************************
-            for circs in circs_list:
-                if cal_id is None:
-                    _job = self.system.run(circs, shots=shots, rep_delay=self.rep_delay)
-                else:
-                    _job = self.system.run(
-                        circs,
-                        shots=shots,
-                        rep_delay=self.rep_delay,
-                        calibration_set_id=cal_id,
-                    )
-                jobs.append(_job)
-                qcvv_logger.info(f"REM: {len(circs)} calibration circuits to be executed!")
+            else:
+                _job = self.system.run(
+                    transpiled_circuit,
+                    shots=shots,
+                    rep_delay=self.rep_delay,
+                    calibration_set_id=cal_id,
+                )
+            jobs.append(_job)
+            qcvv_logger.info(f"REM: {len(circs)} calibration circuits to be executed!")
 
         # Execute job and cal building in new thread.
         self._job_error = None
