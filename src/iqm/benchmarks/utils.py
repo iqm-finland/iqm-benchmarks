@@ -514,7 +514,7 @@ def submit_execute(
         calset_id (Optional[str]): the calibration set ID, uses the latest one if None.
         max_gates_per_batch (int): the maximum number of gates per batch sent to the backend, used to make manageable batches.
         circuit_compilation_options (CircuitCompilationOptions): Ability to pass a compilation options object,
-            enabling execution with dynamical decoupling among other things.
+            enabling execution with dynamical decoupling, among other options - see qiskit-iqm documentation.
     Returns:
         List[IQMJob]: the IQMJob objects of the executed circuits.
 
