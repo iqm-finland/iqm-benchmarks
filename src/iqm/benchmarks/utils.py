@@ -590,36 +590,36 @@ class GraphPositions:
     """
 
     garnet_positions = {
-        0: (5, 7),
-        1: (6, 6),
-        2: (3, 7),
-        3: (4, 6),
-        4: (5, 5),
-        5: (6, 4),
-        6: (7, 3),
-        7: (2, 6),
-        8: (3, 5),
-        9: (4, 4),
-        10: (5, 3),
-        11: (6, 2),
-        12: (1, 5),
-        13: (2, 4),
-        14: (3, 3),
-        15: (4, 2),
-        16: (5, 1),
-        17: (1, 3),
-        18: (2, 2),
-        19: (3, 1),
+        0: (5.0, 7.0),
+        1: (6.0, 6.0),
+        2: (3.0, 7.0),
+        3: (4.0, 6.0),
+        4: (5.0, 5.0),
+        5: (6.0, 4.0),
+        6: (7.0, 3.0),
+        7: (2.0, 6.0),
+        8: (3.0, 5.0),
+        9: (4.0, 4.0),
+        10: (5.0, 3.0),
+        11: (6.0, 2.0),
+        12: (1.0, 5.0),
+        13: (2.0, 4.0),
+        14: (3.0, 3.0),
+        15: (4.0, 2.0),
+        16: (5.0, 1.0),
+        17: (1.0, 3.0),
+        18: (2.0, 2.0),
+        19: (3.0, 1.0),
     }
 
     deneb_positions = {
-        0: (2, 2),
-        1: (1, 1),
-        3: (2, 1),
-        5: (3, 1),
-        2: (1, 3),
-        4: (2, 3),
-        6: (3, 3),
+        0: (2.0, 2.0),
+        1: (1.0, 1.0),
+        3: (2.0, 1.0),
+        5: (3.0, 1.0),
+        2: (1.0, 3.0),
+        4: (2.0, 3.0),
+        6: (3.0, 3.0),
     }
 
     predefined_stations = {
@@ -628,7 +628,7 @@ class GraphPositions:
     }
 
     @staticmethod
-    def create_positions(graph: PyGraph, topology: Literal["star", "crystal"]) -> Dict[int, Tuple[float, float]]:
+    def create_positions(graph: PyGraph, topology: Optional[str] = None) -> Dict[int, Tuple[float, float]]:
         """Generate node positions for a given graph and topology.
 
         Args:
@@ -660,8 +660,10 @@ class GraphPositions:
             fixed_pos = {0: (1.0, 1.0)}  # For more consistent layouts
 
             # Get spring layout with one fixed position
-            pos = spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0})  # keep node 0 fixed
-
+            pos = {
+                int(k): (float(v[0]), float(v[1]))
+                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0}).items()
+            }
         return pos
 
 
@@ -734,7 +736,7 @@ def plot_layout_fidelity_graph(
     graph = PyGraph()
 
     # Add nodes
-    nodes = set()
+    nodes: set[int] = set()
     for edge in edges_graph:
         nodes.update(edge[:2])
     graph.add_nodes_from(list(nodes))
@@ -778,7 +780,7 @@ def plot_layout_fidelity_graph(
         pos=pos,
         labels=lambda node: node,
         width=7 * weights_ordered / np.max(weights_ordered),
-    )
+    )  # type: ignore[call-arg]
 
     # Add edge labels using matplotlib's annotate
     for edge in edges_graph:

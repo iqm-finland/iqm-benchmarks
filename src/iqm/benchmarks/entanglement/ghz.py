@@ -415,7 +415,7 @@ def get_edges(
             if not set(edge) in edges_patch:
                 edges_patch.append(set(edge))
 
-    if fidelities_cal is not None:
+    if fidelities_cal is not None and edges_cal is not None:
         fidelities_cal = list(
             np.minimum(np.array(fidelities_cal), np.ones(len(fidelities_cal)))
         )  # get rid of > 1 fidelities
