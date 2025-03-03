@@ -162,7 +162,10 @@ def count_native_gates(
     else:
         backend = backend_arg
 
-    native_operations = backend.architecture.gates
+    native_operations = backend.operation_names
+    
+    if "move" in backend.architecture.gates:
+        native_operations.append("move")
     # Some backends may not include "barrier" in the operation_names attribute
     if "barrier" not in native_operations:
         native_operations.append("barrier")
