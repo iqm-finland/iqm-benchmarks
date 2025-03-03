@@ -181,7 +181,7 @@ def generate_drb_circuits(
 
 
 @timeit
-def generate_fixed_depth_parallel_drb_circuits( #pylint: disable=too-many-branches, too-many-statements
+def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-branches, too-many-statements
     qubits_array: Sequence[Sequence[int]],
     depth: int,
     num_circuit_samples: int,
@@ -244,7 +244,7 @@ def generate_fixed_depth_parallel_drb_circuits( #pylint: disable=too-many-branch
 
     # Get the keys of the Clifford dictionaries
     clifford_1q_keys = list(cliffords_1q.keys())
-    #clifford_2q_keys = list(cliffords_2q.keys())
+    # clifford_2q_keys = list(cliffords_2q.keys())
 
     # Generate the circuit samples
     # Initialize the list of circuits
