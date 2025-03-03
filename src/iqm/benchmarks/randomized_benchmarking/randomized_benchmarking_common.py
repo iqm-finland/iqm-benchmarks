@@ -299,11 +299,11 @@ def fit_decay_lmfit(
         "offset": offset_guess,
         "amplitude": amplitude_guess + offset_guess,
     }
-    constraints = {
-        "depolarization_probability": {"min": 0.0, "max": 1.0},
-        "offset": {"min": 0.0, "max": 1.0},
-        "amplitude": {"min": 0.0, "max": 1.0},
-    }
+    # constraints = {
+    #     "depolarization_probability": {"min": 0.0, "max": 1.0},
+    #     "offset": {"min": 0.0, "max": 1.0},
+    #     "amplitude": {"min": 0.0, "max": 1.0},
+    # }
     if rb_identifier in ("clifford", "mrb", "drb"):
         fit_data = np.array([np.mean(data, axis=1)])
         if rb_identifier == "clifford":
@@ -766,8 +766,8 @@ def plot_rb_decay(
     shade_meanerror: bool = False,
     logscale: bool = True,
     interleaved_gate: Optional[str] = None,
-    mrb_2q_density: Optional[float] = None,
-    mrb_2q_ensemble: Optional[Dict[str, float]] = None,
+    mrb_2q_density: Optional[float | Dict[str, float]] = None,
+    mrb_2q_ensemble: Optional[Dict[str, Dict[str, float]]] = None,
 ) -> Tuple[str, Figure]:
     """Plot the fidelity decay and the fit to the model.
 
@@ -1062,8 +1062,8 @@ def plot_rb_decay(
         ax.set_title(f"{identifier.capitalize()} experiment {on_qubits}\nbackend: {backend_name} --- {timestamp}")
     else:
         if identifier == "drb" and len(qubits_array) == 1:
-            density = cast(float, mrb_2q_density[str(qubits_array[0])])
-            ensemble = cast(Dict[str, float], mrb_2q_ensemble[str(qubits_array[0])])
+            density = cast(dict, mrb_2q_density)[str(qubits_array[0])]
+            ensemble = cast(dict, mrb_2q_ensemble)[str(qubits_array[0])]
         else:
             density = mrb_2q_density
             ensemble = mrb_2q_ensemble

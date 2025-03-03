@@ -15,7 +15,6 @@
 """
 General utility functions
 """
-
 from collections import defaultdict
 from functools import wraps
 from math import floor
@@ -46,12 +45,12 @@ from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
 
 
 def timeit(f):
-    """Calculates the amount of time a function takes to execute
+    """Calculates the amount of time a function takes to execute.
 
     Args:
-        f: The function to add the timing attribute to
+        f: The function to add the timing attribute to.
     Returns:
-        The decorated function execution with logger statement of elapsed time in execution
+        The decorated function execution with logger statement of elapsed time in execution.
     """
 
     @wraps(f)
@@ -240,7 +239,7 @@ def evaluate_hamiltonian_paths(
     resonance_url_name: str,
     token: str,
     max_tries: int = 10,
-) -> Dict[int, List[Tuple[int]]]:
+) -> Dict[int, List[Tuple[int, int]]]:
     """Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.
 
     Args:
@@ -249,10 +248,10 @@ def evaluate_hamiltonian_paths(
         backend_arg (str | IQMBackendBase): the backend to evaluate the Hamiltonian paths on with respect to fidelity.
         resonance_url_name (str): the name of the backend in the Resonance URL address.
         token (str): the token to access the Resonance API.
-        max_tries: int = 10
+        max_tries (int): the maximum number of tries to generate a Hamiltonian path.
 
     Returns:
-        Dict[int, List[Tuple[int]]]: A dictionary with keys being fidelity products and values being the respective Hamiltonian paths.
+        Dict[int, List[Tuple[int, int]]]: A dictionary with keys being fidelity products and values being the respective Hamiltonian paths.
     """
     if isinstance(backend_arg, str):
         backend = get_iqm_backend(backend_arg)
@@ -269,12 +268,14 @@ def evaluate_hamiltonian_paths(
         if not h_path:
             tries += 1
             continue
-        else:
-            all_paths.append(h_path)
-            tries = 0
-            sample_counter += 1
+
+        all_paths.append(h_path)
+        tries = 0
+        sample_counter += 1
     if tries == max_tries - 1:
-        raise Exception(f"Max tries to generate a Hamiltonian path with {N} vertices reached - try with less vertices!")
+        raise RecursionError(
+            f"Max tries to generate a Hamiltonian path with {N} vertices reached - try with less vertices!"
+        )
 
     # Get scores for all paths
     # Retrieve fidelity data
@@ -300,9 +301,10 @@ def evaluate_hamiltonian_paths(
     for h_path in all_paths:
         total_cost = 1
         for edge in h_path:
-            total_cost *= two_qubit_fidelity[
-                str([backend.index_to_qubit_name(edge[0]), backend.index_to_qubit_name(edge[1])])
-            ]
+            if len(edge) == 2:
+                total_cost *= two_qubit_fidelity[
+                    str([backend.index_to_qubit_name(edge[0]), backend.index_to_qubit_name(edge[1])])
+                ]
         path_costs[total_cost] = h_path
 
     return path_costs
@@ -407,14 +409,13 @@ def perform_backend_transpilation(
     return transpiled_qc_list
 
 
-def random_hamiltonian_path(G: nx.Graph, N: int) -> List[Tuple[int]]:
+def random_hamiltonian_path(G: nx.Graph, N: int) -> List[Tuple[int, int]]:
     """
     Generates a random Hamiltonian path with N vertices from a given NetworkX graph.
-    If a Hamiltonian path isn't possible, it returns the longest valid path found.
 
     Args:
-        G (networkx.Graph): The input graph
-        N (int): The desired number of vertices in the Hamiltonian path
+        G (networkx.Graph): The input graph.
+        N (int): The desired number of vertices in the Hamiltonian path.
 
     Returns:
         list: A list of edges (tuples of nodes) representing the Hamiltonian path, or an empty list if not possible.
@@ -439,7 +440,7 @@ def random_hamiltonian_path(G: nx.Graph, N: int) -> List[Tuple[int]]:
                 break  # Dead end, stop trying this path
 
             next_node = random.choice(neighbors)
-            edges.append((path[-1], next_node))
+            edges.append((int(path[-1]), int(next_node)))
             path.append(next_node)
             visited.add(next_node)
 

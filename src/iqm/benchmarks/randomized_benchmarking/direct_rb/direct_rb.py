@@ -181,7 +181,7 @@ def generate_drb_circuits(
 
 
 @timeit
-def generate_fixed_depth_parallel_drb_circuits(
+def generate_fixed_depth_parallel_drb_circuits( #pylint: disable=too-many-branches, too-many-statements
     qubits_array: Sequence[Sequence[int]],
     depth: int,
     num_circuit_samples: int,
@@ -244,7 +244,7 @@ def generate_fixed_depth_parallel_drb_circuits(
 
     # Get the keys of the Clifford dictionaries
     clifford_1q_keys = list(cliffords_1q.keys())
-    clifford_2q_keys = list(cliffords_2q.keys())
+    #clifford_2q_keys = list(cliffords_2q.keys())
 
     # Generate the circuit samples
     # Initialize the list of circuits
@@ -307,8 +307,8 @@ def generate_fixed_depth_parallel_drb_circuits(
                     rand_key = random.choice(clifford_1q_keys)
                     rand_clif_1q = cast(dict, cliffords_1q)[rand_key]
                     # rand_clif = random_clifford(1)
-                    circ.compose(rand_clif_1q.to_instruction(), qubits=[i], inplace=True)
-                    local_circs[str(q)].compose(rand_clif_1q.to_instruction(), qubits=[idx], inplace=True)
+                    circ.compose(rand_clif_1q, qubits=[i], inplace=True)
+                    local_circs[str(q)].compose(rand_clif_1q, qubits=[idx], inplace=True)
             circ.barrier()
 
             for q in shuffled_qubits_array:
@@ -319,9 +319,6 @@ def generate_fixed_depth_parallel_drb_circuits(
         # Add the inverse Clifford
         for q in shuffled_qubits_array:
             clifford_dict = cliffords_1q if len(q) == 1 else cliffords_2q
-            # circ.compose(
-            #     Clifford(local_circs[str(q)].to_instruction().inverse()).to_instruction(), qubits=q, inplace=True
-            # )
             circ.compose(
                 compute_inverse_clifford(local_circs[str(q)], clifford_dict),
                 qubits=q,
@@ -747,8 +744,8 @@ class DirectRandomizedBenchmarking(Benchmark):
                     assigned_two_qubit_gate_ensembles=assigned_two_qubit_gate_ensembles,
                     assigned_clifford_sqg_probabilities=assigned_clifford_sqg_probabilities,
                     assigned_sqg_gate_ensembles=assigned_sqg_gate_ensembles,
-                    cliffords_1q_dict=clifford_1q_dict,
-                    cliffords_2q_dict=clifford_2q_dict,
+                    cliffords_1q=clifford_1q_dict,
+                    cliffords_2q=clifford_2q_dict,
                     qiskit_optim_level=self.qiskit_optim_level,
                     routing_method=self.routing_method,
                     eplg=self.eplg,
