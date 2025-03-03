@@ -700,8 +700,6 @@ class QuantumVolumeBenchmark(Benchmark):
             max_gates_per_batch=self.max_gates_per_batch,
             circuit_compilation_options=self.circuit_compilation_options,
         )
-        # else:
-        # DD IN DIQE VERSION PREVENTS SUBMITTING JOBS DYNAMICALLY:
         # I.E., IT AUTOMATICALLY RETRIEVES COUNTS
         # TODO: change this when job manager for DD in Pulla is updated! # pylint: disable=fixme
         # raise ValueError("Dynamical decoupling is not yet enabled in the new base")
