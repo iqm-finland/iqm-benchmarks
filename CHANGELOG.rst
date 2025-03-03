@@ -4,7 +4,7 @@ Changelog
 
 Version 2.23
 ============
-* Added options for dynamical decoupling to benchmark configurations of all benchmarks.
+* Added dynamical decoupling parameter option to configurations of all benchmarks.
 * Added visual aid plot for qubit selection; see GHZ example notebook.
 * Included option to run GST in parallel if the specified qubits don't overlap
 * Small runtime improvements in the GST benchmark.
