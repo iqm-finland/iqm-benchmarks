@@ -226,7 +226,7 @@ class CompressiveGST(Benchmark):
 
         self.circuits = Circuits()
         # Generate circuits
-        transpiled_circuits, untranspiled_circuits = self.generate_meas_circuits()[0]
+        (transpiled_circuits, untranspiled_circuits), _ = self.generate_meas_circuits()
 
         # Submit all
         if self.configuration.parallel_execution:
