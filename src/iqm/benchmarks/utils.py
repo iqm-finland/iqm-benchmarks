@@ -654,7 +654,7 @@ class GraphPositions:
                     y = radius * np.sin(angle)
                     pos[i] = (x, y)
 
-        # crstal and other topologies
+        # Crystal and other topologies
         else:
             # Fix first node position in bottom right
             fixed_pos = {0: (1.0, 1.0)}  # For more consistent layouts
