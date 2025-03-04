@@ -16,7 +16,6 @@
 General utility functions
 """
 from collections import defaultdict
-from dataclasses import dataclass
 from functools import wraps
 import itertools
 from math import floor
@@ -25,10 +24,8 @@ from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
 import warnings
 
-import matplotlib.pyplot as plt
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
-import networkx as nx
 import numpy as np
 from numpy.random import Generator
 from qiskit import ClassicalRegister, transpile
@@ -36,7 +33,6 @@ from qiskit.converters import circuit_to_dag
 from qiskit.quantum_info import Pauli
 from qiskit.transpiler import CouplingMap
 import requests
-from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
@@ -195,102 +191,6 @@ def count_native_gates(
     )
 
     return avg_native_operations
-
-
-def find_edges_with_disjoint_neighbors(
-    graph: Sequence[Sequence[int]],
-) -> List[List[Sequence[int]]]:
-    """Finds sets of edges with non-overlapping neighboring nodes.
-
-    Args:
-        graph (Sequence[Sequence[int]]): The input graph specified as a sequence of edges (Sequence[int]).
-    Returns:
-        List[List[Tuple[int]]]: A list of lists of edges (Tuple[int]) from the original graph with non-overlapping neighboring nodes.
-    """
-    # Build adjacency list representation of the graph
-    adjacency = defaultdict(set)
-    for u, v in graph:
-        adjacency[u].add(v)
-        adjacency[v].add(u)
-
-    # Function to get neighboring nodes of an edge
-    def get_edge_neighbors(edge):
-        u, v = edge
-        return (adjacency[u] | adjacency[v]) - {u, v}
-
-    remaining_edges = set(graph)  # Keep track of remaining edges
-    iterations = []  # Store the edges chosen in each iteration
-
-    while remaining_edges:
-        current_iteration = set()  # Edges chosen in this iteration
-        used_nodes = set()  # Nodes already used in this iteration
-
-        for edge in list(remaining_edges):
-            u, v = edge
-            # Check if the edge is disconnected from already chosen edges
-            if u in used_nodes or v in used_nodes:
-                continue
-
-            # Get neighboring nodes of this edge
-            edge_neighbors = get_edge_neighbors(edge)
-
-            # Check if any neighbor belongs to an edge already in this iteration
-            if any(neighbor in used_nodes for neighbor in edge_neighbors):
-                continue
-
-            # Add the edge to the current iteration
-            current_iteration.add(edge)
-            used_nodes.update([u, v])
-
-        # Add the chosen edges to the result
-        iterations.append(list(current_iteration))
-        remaining_edges -= current_iteration  # Remove chosen edges from the remaining edges
-
-    return iterations
-
-
-def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int]]]:
-    """Sorts the edges of a coupling map, arranging them in a dictionary with values being subsets of the coupling map with no overlapping nodes.
-    Each item will correspond to a layer of pairs of qubits in which parallel 2Q gates can be applied.
-
-    Args:
-        cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
-    Returns:
-        Dict[int, List[List[int]]]: A dictionary with values being subsets of the coupling map with no overlapping nodes.
-    """
-    # Build a conflict graph - Treat the input list as a graph
-    # where each sublist is a node, and an edge exists between nodes if they share any integers
-    undirect_cp_map_list = remove_directed_duplicates_to_list(cp_map)
-
-    n = len(undirect_cp_map_list)
-    graph: Dict[int, Set] = {i: set() for i in range(n)}
-
-    for i in range(n):
-        for j in range(i + 1, n):
-            if set(undirect_cp_map_list[i]) & set(undirect_cp_map_list[j]):  # Check for shared integers
-                graph[i].add(j)
-                graph[j].add(i)
-
-    # Reduce to a graph coloring problem;
-    # each color represents a group in the dictionary
-    colors: Dict[int, int] = {}
-    for node in range(n):
-        # Find all used colors among neighbors
-        neighbor_colors = {colors[neighbor] for neighbor in graph[node] if neighbor in colors}
-        # Assign the smallest unused color
-        color = 0
-        while color in neighbor_colors:
-            color += 1
-        colors[node] = color
-
-    # Group by colors - minimize the number of groups
-    groups: Dict[int, List[List[int]]] = {}
-    for idx, color in colors.items():
-        if color not in groups:
-            groups[color] = []
-        groups[color].append(undirect_cp_map_list[idx])
-
-    return groups
 
 
 @timeit
@@ -757,31 +657,6 @@ def retrieve_all_job_metadata(
     return all_meta
 
 
-def rx_to_nx_graph(backend_arg: str | IQMBackendBase) -> nx.Graph:
-    """Convert the Rustworkx graph returned by a backend to a Networkx graph.
-
-    Args:
-        backend_arg (str | IQMBackendBase): The backend, either specified as str or as IQMBackendBase.
-
-    Returns:
-        networkx.Graph: The Networkx Graph corresponding to the backend graph.
-
-    """
-    if isinstance(backend_arg, str):
-        backend = get_iqm_backend(backend_arg)
-    else:
-        backend = backend_arg
-
-    # Generate a Networkx graph
-    graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
-    backend_egdes, backend_nodes = (list(graph_backend.edge_list()), list(graph_backend.node_indices()))
-    backend_nx_graph = nx.Graph()
-    backend_nx_graph.add_nodes_from(backend_nodes)
-    backend_nx_graph.add_edges_from(backend_egdes)
-
-    return backend_nx_graph
-
-
 def set_coupling_map(
     qubits: Sequence[int], backend: IQMBackendBase, physical_layout: Literal["fixed", "batching"] = "fixed"
 ) -> CouplingMap:
@@ -953,97 +828,6 @@ def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int
     ]
 
 
-@dataclass
-class GraphPositions:
-    """A class to store and generate graph positions for different chip layouts.
-
-    This class contains predefined node positions for various quantum chip topologies and
-    provides methods to generate positions for different layout types.
-
-    Attributes:
-        garnet_positions (Dict[int, Tuple[int, int]]): Mapping of node indices to (x,y) positions for Garnet chip.
-        deneb_positions (Dict[int, Tuple[int, int]]): Mapping of node indices to (x,y) positions for Deneb chip.
-        predefined_stations (Dict[str, Dict[int, Tuple[int, int]]]): Mapping of chip names to their position dictionaries.
-    """
-
-    garnet_positions = {
-        0: (5.0, 7.0),
-        1: (6.0, 6.0),
-        2: (3.0, 7.0),
-        3: (4.0, 6.0),
-        4: (5.0, 5.0),
-        5: (6.0, 4.0),
-        6: (7.0, 3.0),
-        7: (2.0, 6.0),
-        8: (3.0, 5.0),
-        9: (4.0, 4.0),
-        10: (5.0, 3.0),
-        11: (6.0, 2.0),
-        12: (1.0, 5.0),
-        13: (2.0, 4.0),
-        14: (3.0, 3.0),
-        15: (4.0, 2.0),
-        16: (5.0, 1.0),
-        17: (1.0, 3.0),
-        18: (2.0, 2.0),
-        19: (3.0, 1.0),
-    }
-
-    deneb_positions = {
-        0: (2.0, 2.0),
-        1: (1.0, 1.0),
-        3: (2.0, 1.0),
-        5: (3.0, 1.0),
-        2: (1.0, 3.0),
-        4: (2.0, 3.0),
-        6: (3.0, 3.0),
-    }
-
-    predefined_stations = {
-        "Garnet": garnet_positions,
-        "Deneb": deneb_positions,
-    }
-
-    @staticmethod
-    def create_positions(graph: PyGraph, topology: Optional[str] = None) -> Dict[int, Tuple[float, float]]:
-        """Generate node positions for a given graph and topology.
-
-        Args:
-            graph: The graph to generate positions for.
-            topology: The type of layout to generate. Must be either "star" or "crystal".
-
-        Returns:
-            A dictionary mapping node indices to (x,y) coordinates.
-        """
-        n_nodes = len(graph.node_indices())
-
-        if topology == "star":
-            # Place center node at (0,0)
-            pos = {0: (0.0, 0.0)}
-
-            if n_nodes > 1:
-                # Place other nodes in a circle around the center
-                angles = np.linspace(0, 2 * np.pi, n_nodes - 1, endpoint=False)
-                radius = 1.0
-
-                for i, angle in enumerate(angles, start=1):
-                    x = radius * np.cos(angle)
-                    y = radius * np.sin(angle)
-                    pos[i] = (x, y)
-
-        # Crystal and other topologies
-        else:
-            # Fix first node position in bottom right
-            fixed_pos = {0: (1.0, 1.0)}  # For more consistent layouts
-
-            # Get spring layout with one fixed position
-            pos = {
-                int(k): (float(v[0]), float(v[1]))
-                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0}).items()
-            }
-        return pos
-
-
 def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]:
     """Returns couplings and CZ-fidelities from calibration data URL
 
@@ -1086,98 +870,3 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
     list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
 
     return list_couplings, list_fids, topology
-
-
-def plot_layout_fidelity_graph(
-    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None
-):
-    """Plot a graph showing the quantum chip layout with fidelity information.
-
-    Creates a visualization of the quantum chip topology where nodes represent qubits
-    and edges represent connections between qubits. Edge thickness indicates gate errors
-    (thinner edges mean better fidelity) and selected qubits are highlighted in orange.
-
-    Args:
-        cal_url: URL to retrieve calibration data from
-        qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
-        station: Name of the quantum computing station to use predefined positions for.
-                If None, positions will be generated algorithmically.
-
-    Returns:
-        matplotlib.figure.Figure: The generated figure object containing the graph visualization
-    """
-    edges_cal, fidelities_cal, topology = extract_fidelities(cal_url)
-    weights = -np.log(np.array(fidelities_cal))
-    edges_graph = [tuple(edge) + (weight,) for edge, weight in zip(edges_cal, weights)]
-
-    graph = PyGraph()
-
-    # Add nodes
-    nodes: set[int] = set()
-    for edge in edges_graph:
-        nodes.update(edge[:2])
-    graph.add_nodes_from(list(nodes))
-
-    # Add edges
-    graph.add_edges_from(edges_graph)
-
-    # Define qubit positions in plot
-    if station in GraphPositions.predefined_stations:
-        pos = GraphPositions.predefined_stations[station]
-    else:
-        pos = GraphPositions.create_positions(graph, topology)
-
-    # Define node colors
-    node_colors = ["lightgrey" for _ in range(len(nodes))]
-    if qubit_layouts is not None:
-        for qb in {qb for layout in qubit_layouts for qb in layout}:
-            node_colors[qb] = "orange"
-
-    # Ensuring weights are in correct order for the plot
-    edge_list = graph.edge_list()
-    weights_dict = {}
-    edge_pos = set()
-
-    # Create a mapping between edge positions as defined in rustworkx and their weights
-    for e, w in zip(edge_list, weights):
-        pos_tuple = (tuple(pos[e[0]]), tuple(pos[e[1]]))
-        weights_dict[pos_tuple] = w
-        edge_pos.add(pos_tuple)
-
-    # Get corresponding weights in the same order
-    weights_ordered = np.array([weights_dict[edge] for edge in list(edge_pos)])
-
-    plt.subplots(figsize=(6, 6))
-
-    # Draw the graph
-    visualization.mpl_draw(
-        graph,
-        with_labels=True,
-        node_color=node_colors,
-        pos=pos,
-        labels=lambda node: node,
-        width=7 * weights_ordered / np.max(weights_ordered),
-    )  # type: ignore[call-arg]
-
-    # Add edge labels using matplotlib's annotate
-    for edge in edges_graph:
-        x1, y1 = pos[edge[0]]
-        x2, y2 = pos[edge[1]]
-        x = (x1 + x2) / 2
-        y = (y1 + y2) / 2
-        plt.annotate(
-            f"{edge[2]:.1e}",
-            xy=(x, y),
-            xytext=(0, 0),
-            textcoords="offset points",
-            ha="center",
-            va="center",
-            bbox={"boxstyle": "round,pad=0.2", "fc": "white", "ec": "none", "alpha": 0.6},
-        )
-
-    plt.gca().invert_yaxis()
-    plt.title(
-        "Chip layout with selected qubits in orange\n"
-        + "and gate errors indicated by edge thickness (thinner is better)"
-    )
-    plt.show()

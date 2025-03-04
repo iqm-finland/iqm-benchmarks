@@ -17,15 +17,17 @@
 """
 Graph states benchmark
 """
+from collections import defaultdict
 import itertools
 from time import strftime
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
+from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple, Type, cast
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 from qiskit import QuantumCircuit, transpile
+from qiskit.transpiler import CouplingMap
 import xarray as xr
 
 from iqm.benchmarks import Benchmark, BenchmarkCircuit, BenchmarkRunResult, CircuitGroup, Circuits
@@ -38,26 +40,121 @@ from iqm.benchmarks.benchmark_definition import (
 )
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
-from iqm.benchmarks.shadow_utils import get_local_shadow, get_negativity, local_shadow_tomography
 from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_transpilation,
     bootstrap_counts,
-    find_edges_with_disjoint_neighbors,
-    generate_minimal_edge_layers,
     generate_state_tomography_circuits,
     get_neighbors_of_edges,
     get_Pauli_expectation,
     get_tomography_matrix,
     median_with_uncertainty,
+    remove_directed_duplicates_to_list,
     retrieve_all_counts,
     retrieve_all_job_metadata,
-    rx_to_nx_graph,
     set_coupling_map,
     split_sequence_in_chunks,
     submit_execute,
     timeit,
     xrvariable_to_counts,
 )
+from iqm.benchmarks.utils_plots import rx_to_nx_graph
+from iqm.benchmarks.utils_shadows import get_local_shadow, get_negativity, local_shadow_tomography
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
+
+
+def find_edges_with_disjoint_neighbors(
+    graph: Sequence[Sequence[int]],
+) -> List[List[Sequence[int]]]:
+    """Finds sets of edges with non-overlapping neighboring nodes.
+
+    Args:
+        graph (Sequence[Sequence[int]]): The input graph specified as a sequence of edges (Sequence[int]).
+    Returns:
+        List[List[Tuple[int]]]: A list of lists of edges (Tuple[int]) from the original graph with non-overlapping neighboring nodes.
+    """
+    # Build adjacency list representation of the graph
+    adjacency = defaultdict(set)
+    for u, v in graph:
+        adjacency[u].add(v)
+        adjacency[v].add(u)
+
+    # Function to get neighboring nodes of an edge
+    def get_edge_neighbors(edge):
+        u, v = edge
+        return (adjacency[u] | adjacency[v]) - {u, v}
+
+    remaining_edges = set(graph)  # Keep track of remaining edges
+    iterations = []  # Store the edges chosen in each iteration
+
+    while remaining_edges:
+        current_iteration = set()  # Edges chosen in this iteration
+        used_nodes = set()  # Nodes already used in this iteration
+
+        for edge in list(remaining_edges):
+            u, v = edge
+            # Check if the edge is disconnected from already chosen edges
+            if u in used_nodes or v in used_nodes:
+                continue
+
+            # Get neighboring nodes of this edge
+            edge_neighbors = get_edge_neighbors(edge)
+
+            # Check if any neighbor belongs to an edge already in this iteration
+            if any(neighbor in used_nodes for neighbor in edge_neighbors):
+                continue
+
+            # Add the edge to the current iteration
+            current_iteration.add(edge)
+            used_nodes.update([u, v])
+
+        # Add the chosen edges to the result
+        iterations.append(list(current_iteration))
+        remaining_edges -= current_iteration  # Remove chosen edges from the remaining edges
+
+    return iterations
+
+
+def generate_minimal_edge_layers(cp_map: CouplingMap) -> Dict[int, List[List[int]]]:
+    """Sorts the edges of a coupling map, arranging them in a dictionary with values being subsets of the coupling map with no overlapping nodes.
+    Each item will correspond to a layer of pairs of qubits in which parallel 2Q gates can be applied.
+
+    Args:
+        cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
+    Returns:
+        Dict[int, List[List[int]]]: A dictionary with values being subsets of the coupling map with no overlapping nodes.
+    """
+    # Build a conflict graph - Treat the input list as a graph
+    # where each sublist is a node, and an edge exists between nodes if they share any integers
+    undirect_cp_map_list = remove_directed_duplicates_to_list(cp_map)
+
+    n = len(undirect_cp_map_list)
+    graph: Dict[int, Set] = {i: set() for i in range(n)}
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            if set(undirect_cp_map_list[i]) & set(undirect_cp_map_list[j]):  # Check for shared integers
+                graph[i].add(j)
+                graph[j].add(i)
+
+    # Reduce to a graph coloring problem;
+    # each color represents a group in the dictionary
+    colors: Dict[int, int] = {}
+    for node in range(n):
+        # Find all used colors among neighbors
+        neighbor_colors = {colors[neighbor] for neighbor in graph[node] if neighbor in colors}
+        # Assign the smallest unused color
+        color = 0
+        while color in neighbor_colors:
+            color += 1
+        colors[node] = color
+
+    # Group by colors - minimize the number of groups
+    groups: Dict[int, List[List[int]]] = {}
+    for idx, color in colors.items():
+        if color not in groups:
+            groups[color] = []
+        groups[color].append(undirect_cp_map_list[idx])
+
+    return groups
 
 
 def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -> QuantumCircuit:
