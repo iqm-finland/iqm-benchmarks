@@ -23,6 +23,7 @@ from typing import Dict, Literal, Optional, OrderedDict, Type
 from matplotlib.figure import Figure
 from pydantic import BaseModel
 
+from iqm.iqm_client.models import DDStrategy
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -99,6 +100,8 @@ class BenchmarkConfigurationBase(BaseModel):
                 - "fixed": physical layout is constrained during transpilation to the selected initial physical qubits.
                 - "batching": physical layout is allowed to use any other physical qubits, and circuits are batched according to final measured qubits.
                 * Default for all benchmarks is "fixed".
+        use_DD (bool): Boolean flag determining if dynamical decoupling is enabled during circuit execution
+            * Default: False
     """
 
     benchmark: Type[BenchmarkBase]
@@ -107,3 +110,5 @@ class BenchmarkConfigurationBase(BaseModel):
     calset_id: Optional[str] = None
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "sabre"
     physical_layout: Literal["fixed", "batching"] = "fixed"
+    use_dd: Optional[bool] = False
+    dd_strategy: Optional[DDStrategy] = None

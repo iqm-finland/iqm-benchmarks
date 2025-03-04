@@ -30,7 +30,9 @@ import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, Circuits
+from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import get_iqm_backend, timeit
+from iqm.iqm_client.models import CircuitCompilationOptions, DDMode
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_provider import IQMBackend, IQMFacadeBackend
 
@@ -244,6 +246,18 @@ class Benchmark(ABC):
         self.options = copy.copy(self.default_options) if self.default_options else {}
         self.options.update(kwargs)
         self.runs: list[BenchmarkRunResult] = []
+
+        # Circuit compilation options
+        if self.configuration.use_dd:
+            if self.name in ["compressive_GST", "mirror_rb", "interleaved_clifford_rb", "clifford_rb"]:
+                qcvv_logger.warning(
+                    f"Beware that activating dynamical decoupling will change fidelities, error models and their interpretation."
+                )
+            self.circuit_compilation_options = CircuitCompilationOptions(
+                dd_mode=DDMode.ENABLED, dd_strategy=self.configuration.dd_strategy
+            )
+        else:
+            self.circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.DISABLED)
 
     @classmethod
     @abstractmethod

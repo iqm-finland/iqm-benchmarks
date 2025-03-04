@@ -16,9 +16,7 @@
 GHZ state benchmark
 """
 
-from io import BytesIO
 from itertools import chain
-import json
 from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
 
@@ -27,7 +25,6 @@ import matplotlib.pyplot as plt
 import networkx
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
-import pycurl
 from qiskit import QuantumRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
@@ -48,6 +45,7 @@ from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Ci
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
+    extract_fidelities,
     perform_backend_transpilation,
     reduce_to_active_qubits,
     retrieve_all_counts,
@@ -387,47 +385,6 @@ def generate_ghz_spanning_tree(
     return qc, list(participating_qubits)
 
 
-def extract_fidelities(cal_url: str, qubit_layout: List[int]) -> Tuple[List[List[int]], List[float]]:
-    """Returns couplings and CZ-fidelities from calibration data URL
-
-    Args:
-        cal_url: str
-            The url under which the calibration data for the backend can be found
-        qubit_layout: List[int]
-            The subset of system-qubits used in the protocol, indexed from 0
-    Returns:
-        list_couplings: List[List[int]]
-            A list of pairs, each of which is a qubit coupling for which the calibration
-            data contains a fidelity.
-        list_fids: List[float]
-            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
-    """
-
-    byteobj = BytesIO()  # buffer creation
-    curlobj = pycurl.Curl()  # pylint: disable=c-extension-no-member
-    curlobj.setopt(curlobj.URL, f"{cal_url}")  # type: ignore
-    curlobj.setopt(curlobj.WRITEDATA, byteobj)  # type: ignore
-    curlobj.perform()  # perform file transfer
-    curlobj.close()  # end of session
-    body = byteobj.getvalue()
-    res = json.loads(body.decode())
-
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(qubit_layout)}
-    list_couplings = []
-    list_fids = []
-    for key in res["metrics"]:
-        if "irb.cz" in key:
-            idx_1 = key.index(".QB")
-            idx_2 = key.index("__QB")
-            idx_3 = key.index(".fidelity")
-            qb1 = int(key[idx_1 + 3 : idx_2]) - 1
-            qb2 = int(key[idx_2 + 4 : idx_3]) - 1
-            if all([qb1 in qubit_layout, qb2 in qubit_layout]):
-                list_couplings.append([qubit_mapping[qb1], qubit_mapping[qb2]])
-                list_fids.append(float(res["metrics"][key]["value"]))
-    return list_couplings, list_fids
-
-
 def get_edges(
     coupling_map: CouplingMap,
     qubit_layout: List[int],
@@ -454,16 +411,17 @@ def get_edges(
     edges_patch = []
     for idx, edge in enumerate(coupling_map):
         if edge[0] in qubit_layout and edge[1] in qubit_layout:
-            edges_patch.append([edge[0], edge[1]])
+            if not set(edge) in edges_patch:
+                edges_patch.append(set(edge))
 
-    if fidelities_cal is not None:
+    if fidelities_cal is not None and edges_cal is not None:
         fidelities_cal = list(
             np.minimum(np.array(fidelities_cal), np.ones(len(fidelities_cal)))
         )  # get rid of > 1 fidelities
         fidelities_patch = []
         for edge in edges_patch:
-            for idx, edge_2 in enumerate(cast(List[int], edges_cal)):
-                if edge == edge_2:
+            for idx, edge_2 in enumerate(edges_cal):
+                if edge == set(edge_2):
                     fidelities_patch.append(fidelities_cal[idx])
         weights = -np.log(np.array(fidelities_patch))
     else:
@@ -666,7 +624,7 @@ class GHZBenchmark(Benchmark):
             else:
                 effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
-                edges_cal, fidelities_cal = extract_fidelities(self.cal_url, qubit_layout)
+                edges_cal, fidelities_cal, _ = extract_fidelities(self.cal_url)
                 graph = get_edges(effective_coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
                 graph = get_edges(effective_coupling_map, qubit_layout)
@@ -893,6 +851,7 @@ class GHZBenchmark(Benchmark):
                 self.shots,
                 self.calset_id,
                 max_gates_per_batch=self.max_gates_per_batch,
+                circuit_compilation_options=self.circuit_compilation_options,
             )
 
         # Retrieve all

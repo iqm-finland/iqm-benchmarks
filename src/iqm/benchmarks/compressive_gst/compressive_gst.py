@@ -102,10 +102,9 @@ class CompressiveGST(Benchmark):
 
         # Circuit format used by mGST
         self.J = np.empty((self.configuration.num_circuits, self.num_povm))
-        self.bootstrap_results = List[Tuple[np.ndarray]]  # List of GST outcomes from bootstrapping
 
     @timeit
-    def generate_meas_circuits(self) -> None:
+    def generate_meas_circuits(self) -> tuple[BenchmarkCircuit, BenchmarkCircuit]:
         """Generate random circuits from the gate set
 
         The random circuits are distributed among different depths ranging from L_MIN
@@ -115,10 +114,17 @@ class CompressiveGST(Benchmark):
         meaningful results
 
         Returns:
+            transpiled_circuits: BenchmarkCircuit
+                The transpiled circuits
+            untranspiled_circuits: BenchmarkCircuit
+                The untranspiled circuits
             circuit_gen_transp_time: float
                 The time it took to generate and transpile the circuits
-
         """
+
+        transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
+        untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
+
         # Calculate number of short and long circuits
         N_short = int(np.ceil(self.configuration.num_circuits / 2))
         N_long = int(np.floor(self.configuration.num_circuits / 2))
@@ -142,25 +148,54 @@ class CompressiveGST(Benchmark):
                 f"Transpilation on star-architectures currently allows move gates to transit barriers, "
                 f"leading to context-dependent gates which GST can not accurately resolve."
             )
-        for qubits in self.qubit_layouts:
-            coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
 
-            # Perform transpilation to backend
-            qcvv_logger.info(
-                f"Will transpile all {self.configuration.num_circuits} circuits according to fixed physical layout"
-            )
+        # Perform transpilation to backend
+        qcvv_logger.info(
+            f"Will transpile all {self.configuration.num_circuits} circuits according to fixed physical layout"
+        )
+        if self.configuration.parallel_execution:
+            all_qubits = [qubit for layout in self.qubit_layouts for qubit in layout]
+            if len(all_qubits) != len(set(all_qubits)):
+                raise ValueError(
+                    "Qubit layouts can't overlap when parallel_execution is enabled, please choose non-overlapping layouts."
+                )
+            raw_qc_list_parallel = []
+            for circ in raw_qc_list:
+                circ_parallel = QuantumCircuit(self.backend.num_qubits, len(set(all_qubits)))
+                clbits = np.arange(self.num_qubits)
+                for qubit_layout in self.qubit_layouts:
+                    circ_parallel.compose(circ, qubits=qubit_layout, clbits=clbits, inplace=True)
+                    clbits += self.num_qubits
+                raw_qc_list_parallel.append(circ_parallel)
             transpiled_qc_list, _ = perform_backend_transpilation(
-                raw_qc_list,
+                raw_qc_list_parallel,
                 self.backend,
-                qubits,
-                coupling_map=coupling_map,
+                qubits=np.arange(self.backend.num_qubits),
+                coupling_map=self.backend.coupling_map,
                 qiskit_optim_level=0,
                 optimize_sqg=False,
                 drop_final_rz=False,
             )
-            # Saving raw and transpiled circuits in a consistent format with other benchmarks
-            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
-            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+            for qubits in self.qubit_layouts:
+                # Saving raw and transpiled circuits in a consistent format with other benchmarks
+                transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
+                untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+        else:
+            for qubits in self.qubit_layouts:
+                coupling_map = set_coupling_map(qubits, self.backend, physical_layout="fixed")
+                transpiled_qc_list, _ = perform_backend_transpilation(
+                    raw_qc_list,
+                    self.backend,
+                    qubits,
+                    coupling_map=coupling_map,
+                    qiskit_optim_level=0,
+                    optimize_sqg=False,
+                    drop_final_rz=False,
+                )
+                # Saving raw and transpiled circuits in a consistent format with other benchmarks
+                transpiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=transpiled_qc_list))
+                untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(qubits), circuits=raw_qc_list))
+        return transpiled_circuits, untranspiled_circuits
 
     def add_configuration_to_dataset(self, dataset):  # CHECK
         """
@@ -190,30 +225,45 @@ class CompressiveGST(Benchmark):
         qcvv_logger.info(f"Now generating {self.configuration.num_circuits} random GST circuits...")
 
         self.circuits = Circuits()
-        self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
-        self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
         # Generate circuits
-        self.generate_meas_circuits()
+        (transpiled_circuits, untranspiled_circuits), _ = self.generate_meas_circuits()
 
         # Submit all
-        all_jobs: Dict = {}
-        for qubit_layout in self.qubit_layouts:
-            transpiled_circuit_dict = {tuple(qubit_layout): self.transpiled_circuits[str(qubit_layout)].circuits}
-            all_jobs[str(qubit_layout)], _ = submit_execute(
+        if self.configuration.parallel_execution:
+            transpiled_circuit_dict = {
+                tuple(range(self.backend.num_qubits)): transpiled_circuits[str(self.qubit_layouts[0])].circuits
+            }
+            all_jobs_parallel, _ = submit_execute(
                 transpiled_circuit_dict,
                 backend,
                 self.configuration.shots,
                 self.calset_id,
                 max_gates_per_batch=self.configuration.max_gates_per_batch,
+                circuit_compilation_options=self.circuit_compilation_options,
             )
-        # Retrieve all
-        qcvv_logger.info(f"Now executing the corresponding circuit batch")
-        for qubit_layout in self.qubit_layouts:
-            counts, _ = retrieve_all_counts(all_jobs[str(qubit_layout)])
-            dataset, _ = add_counts_to_dataset(counts, str(qubit_layout), dataset)
+            # Retrieve
+            qcvv_logger.info(f"Now executing the corresponding circuit batch")
+            counts, _ = retrieve_all_counts(all_jobs_parallel)
+            dataset, _ = add_counts_to_dataset(counts, f"parallel_results", dataset)
+        else:
+            all_jobs: Dict = {}
+            for qubit_layout in self.qubit_layouts:
+                transpiled_circuit_dict = {tuple(qubit_layout): transpiled_circuits[str(qubit_layout)].circuits}
+                all_jobs[str(qubit_layout)], _ = submit_execute(
+                    transpiled_circuit_dict,
+                    backend,
+                    self.configuration.shots,
+                    self.calset_id,
+                    max_gates_per_batch=self.configuration.max_gates_per_batch,
+                )
+            # Retrieve all
+            qcvv_logger.info(f"Now executing the corresponding circuit batch")
+            for qubit_layout in self.qubit_layouts:
+                counts, _ = retrieve_all_counts(all_jobs[str(qubit_layout)])
+                dataset, _ = add_counts_to_dataset(counts, str(qubit_layout), dataset)
 
+        self.circuits.benchmark_circuits = [transpiled_circuits, untranspiled_circuits]
         self.add_configuration_to_dataset(dataset)
-        self.circuits.benchmark_circuits = [self.transpiled_circuits, self.untranspiled_circuits]
         return dataset
 
 
@@ -270,6 +320,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
             * Default: "auto"
         bootstrap_samples (int): The number of times the optimization algorithm is repeated on fake data to estimate
             the uncertainty via bootstrapping.
+        parallel_execution (bool): Whether to run the circuits for all layouts in parallel on the backend.
     """
 
     benchmark: Type[Benchmark] = CompressiveGST
@@ -288,6 +339,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
     testing: bool = False
+    parallel_execution: bool = False
 
 
 def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List[int]]:
