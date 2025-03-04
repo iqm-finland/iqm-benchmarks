@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.entanglement.ghz.extract_fidelities &#8212; IQM Benchmarks 2.22 documentation</title>
+    <title>iqm.benchmarks.utils.plot_layout_fidelity_graph &#8212; IQM Benchmarks 2.23 documentation</title>
   
   
   
@@ -41,20 +41,20 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=614c4035"></script>
+    <script src="../_static/documentation_options.js?v=dab0c228"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.entanglement.ghz.extract_fidelities';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.utils.plot_layout_fidelity_graph';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.entanglement.ghz.fidelity_analysis" href="iqm.benchmarks.entanglement.ghz.fidelity_analysis.html" />
-    <link rel="prev" title="iqm.benchmarks.entanglement.ghz" href="iqm.benchmarks.entanglement.ghz.html" />
+    <link rel="next" title="iqm.benchmarks.utils.reduce_to_active_qubits" href="iqm.benchmarks.utils.reduce_to_active_qubits.html" />
+    <link rel="prev" title="iqm.benchmarks.utils.perform_backend_transpilation" href="iqm.benchmarks.utils.perform_backend_transpilation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.22" />
-    <meta name="docbuild:last-update" content="2025-02-27"/>
+  <meta name="docsearch:version" content="2.23" />
+    <meta name="docbuild:last-update" content="2025-03-04"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.22 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.22 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.23 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.23 documentation - Home"/>
   
   
 </a></div>
@@ -203,8 +203,8 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.compressive_gst.gst_analysis.html">iqm.benchmarks.compressive_gst.gst_analysis</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4 current active"><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
@@ -231,13 +231,15 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">iqm.benchmarks.utils.plot_layout_fidelity_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
@@ -246,6 +248,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.GraphPositions.html">iqm.benchmarks.utils.GraphPositions</a></li>
 </ul>
 </details></li>
 </ul>
@@ -315,7 +318,7 @@
       
       
       
-      <li><a href="../_sources/api/iqm.benchmarks.entanglement.ghz.extract_fidelities.rst" target="_blank"
+      <li><a href="../_sources/api/iqm.benchmarks.utils.plot_layout_fidelity_graph.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -391,7 +394,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>iqm.benchmarks.entanglement.ghz.extract_fidelities</h1>
+    <h1>iqm.benchmarks.utils.plot_layout_fidelity_graph</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -401,7 +404,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.extract_fidelities"><code class="docutils literal notranslate"><span class="pre">extract_fidelities()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.plot_layout_fidelity_graph"><code class="docutils literal notranslate"><span class="pre">plot_layout_fidelity_graph()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -413,33 +416,29 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="iqm-benchmarks-entanglement-ghz-extract-fidelities">
-<h1>iqm.benchmarks.entanglement.ghz.extract_fidelities<a class="headerlink" href="#iqm-benchmarks-entanglement-ghz-extract-fidelities" title="Link to this heading">#</a></h1>
+  <section id="iqm-benchmarks-utils-plot-layout-fidelity-graph">
+<h1>iqm.benchmarks.utils.plot_layout_fidelity_graph<a class="headerlink" href="#iqm-benchmarks-utils-plot-layout-fidelity-graph" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="iqm.benchmarks.entanglement.ghz.extract_fidelities">
-<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.entanglement.ghz.</span></span><span class="sig-name descname"><span class="pre">extract_fidelities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cal_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.entanglement.ghz.extract_fidelities" title="Link to this definition">#</a></dt>
-<dd><p>Returns couplings and CZ-fidelities from calibration data URL</p>
+<dt class="sig sig-object py" id="iqm.benchmarks.utils.plot_layout_fidelity_graph">
+<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.utils.</span></span><span class="sig-name descname"><span class="pre">plot_layout_fidelity_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cal_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_layouts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.utils.plot_layout_fidelity_graph" title="Link to this definition">#</a></dt>
+<dd><p>Plot a graph showing the quantum chip layout with fidelity information.</p>
+<p>Creates a visualization of the quantum chip topology where nodes represent qubits
+and edges represent connections between qubits. Edge thickness indicates gate errors
+(thinner edges mean better fidelity) and selected qubits are highlighted in orange.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cal_url</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – str
-The url under which the calibration data for the backend can be found</p></li>
-<li><p><strong>qubit_layout</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – List[int]
-The subset of system-qubits used in the protocol, indexed from 0</p></li>
+<li><p><strong>cal_url</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – URL to retrieve calibration data from</p></li>
+<li><p><strong>qubit_layouts</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – List of qubit layouts where each layout is a list of qubit indices</p></li>
+<li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – Name of the quantum computing station to use predefined positions for.
+If None, positions will be generated algorithmically.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>List[List[int]]</dt><dd><p>A list of pairs, each of which is a qubit coupling for which the calibration
-data contains a fidelity.</p>
-</dd>
-<dt>list_fids: List[float]</dt><dd><p>A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>The generated figure object containing the graph visualization</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list_couplings</p>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
 </dd></dl>
@@ -458,20 +457,20 @@ data contains a fidelity.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iqm.benchmarks.entanglement.ghz.html"
+       href="iqm.benchmarks.utils.perform_backend_transpilation.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">iqm.benchmarks.entanglement.ghz</p>
+        <p class="prev-next-title">iqm.benchmarks.utils.perform_backend_transpilation</p>
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.entanglement.ghz.fidelity_analysis.html"
+       href="iqm.benchmarks.utils.reduce_to_active_qubits.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.entanglement.ghz.fidelity_analysis</p>
+        <p class="prev-next-title">iqm.benchmarks.utils.reduce_to_active_qubits</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -492,7 +491,7 @@ data contains a fidelity.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.entanglement.ghz.extract_fidelities"><code class="docutils literal notranslate"><span class="pre">extract_fidelities()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.plot_layout_fidelity_graph"><code class="docutils literal notranslate"><span class="pre">plot_layout_fidelity_graph()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -526,7 +525,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-02-27.
+  Last updated on 2025-03-04.
   <br/>
 </p>
   </div>

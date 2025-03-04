@@ -29,6 +29,8 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb.MirrorRBConfigurat
       ~MirrorRBConfiguration.calset_id
       ~MirrorRBConfiguration.routing_method
       ~MirrorRBConfiguration.physical_layout
+      ~MirrorRBConfiguration.use_dd
+      ~MirrorRBConfiguration.dd_strategy
    
    
 

@@ -37,6 +37,8 @@ iqm.benchmarks.optimization.qscore.QScoreConfiguration
       ~QScoreConfiguration.calset_id
       ~QScoreConfiguration.routing_method
       ~QScoreConfiguration.physical_layout
+      ~QScoreConfiguration.use_dd
+      ~QScoreConfiguration.dd_strategy
    
    
 

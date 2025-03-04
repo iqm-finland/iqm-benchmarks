@@ -32,10 +32,13 @@ iqm.benchmarks.compressive\_gst.compressive\_gst.GSTConfiguration
       ~GSTConfiguration.batch_size
       ~GSTConfiguration.bootstrap_samples
       ~GSTConfiguration.testing
+      ~GSTConfiguration.parallel_execution
       ~GSTConfiguration.max_gates_per_batch
       ~GSTConfiguration.calset_id
       ~GSTConfiguration.routing_method
       ~GSTConfiguration.physical_layout
+      ~GSTConfiguration.use_dd
+      ~GSTConfiguration.dd_strategy
    
    
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration &#8212; IQM Benchmarks 2.22 documentation</title>
+    <title>iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration &#8212; IQM Benchmarks 2.23 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=614c4035"></script>
+    <script src="../_static/documentation_options.js?v=dab0c228"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.clifford_rb_analysis" href="iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.clifford_rb_analysis.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.22" />
-    <meta name="docbuild:last-update" content="2025-02-27"/>
+  <meta name="docsearch:version" content="2.23" />
+    <meta name="docbuild:last-update" content="2025-03-04"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.22 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.22 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.23 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.23 documentation - Home"/>
   
   
 </a></div>
@@ -235,9 +235,11 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.plot_layout_fidelity_graph.html">iqm.benchmarks.utils.plot_layout_fidelity_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
@@ -246,6 +248,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.GraphPositions.html">iqm.benchmarks.utils.GraphPositions</a></li>
 </ul>
 </details></li>
 </ul>
@@ -428,7 +431,7 @@
 <h1>iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration<a class="headerlink" href="#iqm-benchmarks-randomized-benchmarking-clifford-rb-clifford-rb-cliffordrbconfiguration" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.</span></span><span class="sig-name descname"><span class="pre">CliffordRBConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking'&gt;,</span> <span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre',</span> <span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed',</span> <span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed',</span> <span class="pre">qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]],</span> <span class="pre">sequence_lengths:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">num_circuit_samples:</span> <span class="pre">int,</span> <span class="pre">parallel_execution:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.</span></span><span class="sig-name descname"><span class="pre">CliffordRBConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking'&gt;,</span> <span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre',</span> <span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed',</span> <span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed',</span> <span class="pre">use_dd:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">dd_strategy:</span> <span class="pre">~iqm.iqm_client.models.DDStrategy</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]],</span> <span class="pre">sequence_lengths:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">num_circuit_samples:</span> <span class="pre">int,</span> <span class="pre">parallel_execution:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase" title="iqm.benchmarks.benchmark.BenchmarkConfigurationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfigurationBase</span></code></a></p>
 <p>Clifford RB configuration.</p>
 <dl class="field-list simple">
@@ -440,6 +443,8 @@
 <li><p><strong>calset_id</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>routing_method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'basic'</em><em>, </em><em>'lookahead'</em><em>, </em><em>'stochastic'</em><em>, </em><em>'sabre'</em><em>, </em><em>'none'</em><em>]</em>) – </p></li>
 <li><p><strong>physical_layout</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'fixed'</em><em>, </em><em>'batching'</em><em>]</em>) – </p></li>
+<li><p><strong>use_dd</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>dd_strategy</strong> (<em>DDStrategy</em><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>qubits_array</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – </p></li>
 <li><p><strong>sequence_lengths</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – </p></li>
 <li><p><strong>num_circuit_samples</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
@@ -556,6 +561,12 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">physical_layout</span></code></p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_dd</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dd_strategy</span></code></p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -579,7 +590,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'benchmark':</span> <span class="pre">FieldInfo(annotation=Type[Benchmark],</span> <span class="pre">required=False,</span> <span class="pre">default=&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking'&gt;),</span> <span class="pre">'calset_id':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_gates_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'num_circuit_samples':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'parallel_execution':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=False),</span> <span class="pre">'physical_layout':</span> <span class="pre">FieldInfo(annotation=Literal['fixed',</span> <span class="pre">'batching'],</span> <span class="pre">required=False,</span> <span class="pre">default='fixed'),</span> <span class="pre">'qubits_array':</span> <span class="pre">FieldInfo(annotation=Sequence[Sequence[int]],</span> <span class="pre">required=True),</span> <span class="pre">'routing_method':</span> <span class="pre">FieldInfo(annotation=Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none'],</span> <span class="pre">required=False,</span> <span class="pre">default='sabre'),</span> <span class="pre">'sequence_lengths':</span> <span class="pre">FieldInfo(annotation=Sequence[int],</span> <span class="pre">required=True),</span> <span class="pre">'shots':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=256)}</span></em><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.model_fields" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'benchmark':</span> <span class="pre">FieldInfo(annotation=Type[Benchmark],</span> <span class="pre">required=False,</span> <span class="pre">default=&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking'&gt;),</span> <span class="pre">'calset_id':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'dd_strategy':</span> <span class="pre">FieldInfo(annotation=Union[DDStrategy,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_gates_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'num_circuit_samples':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'parallel_execution':</span> <span class="pre">FieldInfo(annotation=bool,</span> <span class="pre">required=False,</span> <span class="pre">default=False),</span> <span class="pre">'physical_layout':</span> <span class="pre">FieldInfo(annotation=Literal['fixed',</span> <span class="pre">'batching'],</span> <span class="pre">required=False,</span> <span class="pre">default='fixed'),</span> <span class="pre">'qubits_array':</span> <span class="pre">FieldInfo(annotation=Sequence[Sequence[int]],</span> <span class="pre">required=True),</span> <span class="pre">'routing_method':</span> <span class="pre">FieldInfo(annotation=Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none'],</span> <span class="pre">required=False,</span> <span class="pre">default='sabre'),</span> <span class="pre">'sequence_lengths':</span> <span class="pre">FieldInfo(annotation=Sequence[int],</span> <span class="pre">required=True),</span> <span class="pre">'shots':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=256),</span> <span class="pre">'use_dd':</span> <span class="pre">FieldInfo(annotation=Union[bool,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=False)}</span></em><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.model_fields" title="Link to this definition">#</a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
@@ -680,7 +691,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-02-27.
+  Last updated on 2025-03-04.
   <br/>
 </p>
   </div>

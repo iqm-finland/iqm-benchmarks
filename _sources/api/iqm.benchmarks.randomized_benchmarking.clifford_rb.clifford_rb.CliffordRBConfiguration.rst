@@ -26,6 +26,8 @@ iqm.benchmarks.randomized\_benchmarking.clifford\_rb.clifford\_rb.CliffordRBConf
       ~CliffordRBConfiguration.calset_id
       ~CliffordRBConfiguration.routing_method
       ~CliffordRBConfiguration.physical_layout
+      ~CliffordRBConfiguration.use_dd
+      ~CliffordRBConfiguration.dd_strategy
    
    
 

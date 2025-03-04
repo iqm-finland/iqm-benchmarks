@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.22 documentation</title>
+    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.23 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=614c4035"></script>
+    <script src="../_static/documentation_options.js?v=dab0c228"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Greenberger–Horne–Zeilinger (GHZ) State Fidelity" href="example_ghz.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.22" />
-    <meta name="docbuild:last-update" content="2025-02-27"/>
+  <meta name="docsearch:version" content="2.23" />
+    <meta name="docbuild:last-update" content="2025-03-04"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.22 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.22 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.23 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.23 documentation - Home"/>
   
   
 </a></div>
@@ -237,9 +237,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.plot_layout_fidelity_graph.html">iqm.benchmarks.utils.plot_layout_fidelity_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
@@ -248,6 +250,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.GraphPositions.html">iqm.benchmarks.utils.GraphPositions</a></li>
 </ul>
 </details></li>
 </ul>
@@ -438,6 +441,9 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.ghz</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
 <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;deneb&quot;</span>
 </pre></div>
 </div>
@@ -447,8 +453,7 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 <h2>Set IQM Token if using Resonance.<a class="headerlink" href="#set-iqm-token-if-using-resonance" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -465,9 +470,39 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 <li><p><code class="docutils literal notranslate"><span class="pre">mit_shots</span></code>: Whenever rem=True, this parameter controls the total number of shots used to calibrate readout error mitgation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">num_RMs</span></code>: The number of randomized measurement settings (only necessary when choosing <code class="docutils literal notranslate"><span class="pre">fidelity_routine=randomized_measurements</span></code>)</p></li>
 </ul>
+<p>For thinking about which qubit layouts to use, the following visualization of the connectivity and CZ fidelities is helpful.</p>
+<p>Requirements:</p>
+<ul class="simple">
+<li><p>Access to the backend, in this example IQM Garnet.</p></li>
+<li><p>An access token environment variable needs to be set via <code class="docutils literal notranslate"><span class="pre">os.environ[&quot;IQM_TOKEN&quot;]</span> <span class="pre">=</span> <span class="pre">&lt;your_token&gt;</span></code>.</p></li>
+</ul>
+<p>Use of the plot:</p>
+<ul class="simple">
+<li><p>If the <code class="docutils literal notranslate"><span class="pre">qubit_layouts</span></code> argument is provided, the selected qubits are marked in orange.</p></li>
+<li><p>CZ errors are indicated with edge width, <strong>thinner is better</strong>, where the edge width is given by <span class="math notranslate nohighlight">\(w_{ij} = - \mathrm{log}(\mathcal{F}_{\mathrm{CZ}}^{ij})\)</span>.</p></li>
+<li><p>Each edge is also labeled with the width value.</p></li>
+<li><p>Some graph layouts are predefined to match the layout as shown in IQM-Resonance, if you want a predefined layout set the argument <code class="docutils literal notranslate"><span class="pre">station</span> <span class="pre">=</span> <span class="pre">&quot;station_name&quot;</span></code>. If the name is not set or not recognized, a graph in grid or star layout will be automatically generated, dependeing on the backend.</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">7</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_layout_fidelity_graph</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check if access token environment variable is set: </span><span class="si">{</span><span class="s1">&#39;IQM_TOKEN&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">cal_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://api.resonance.meetiqm.com/quantum-computers/v1/deneb/calibrations&quot;</span> 
+<span class="n">qubit_layouts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_layout_fidelity_graph</span><span class="p">(</span><span class="n">cal_url</span><span class="p">,</span> <span class="n">qubit_layouts</span> <span class="o">=</span> <span class="n">qubit_layouts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Check if access token environment variable is set: True
+</pre></div>
+</div>
+<img alt="../_images/3fdb04d63ebbfbfed163b5a4c52358826ce064e8845c0de47709be519ecfb5eb.png" src="../_images/3fdb04d63ebbfbfed163b5a4c52358826ce064e8845c0de47709be519ecfb5eb.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="n">MINIMAL_GHZ</span> <span class="o">=</span> <span class="n">GHZConfiguration</span><span class="p">(</span>
     <span class="n">state_generation_routine</span><span class="o">=</span><span class="s2">&quot;star&quot;</span><span class="p">,</span>
             <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[</span>
@@ -477,6 +512,7 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
     <span class="n">fidelity_routine</span><span class="o">=</span><span class="s2">&quot;coherences&quot;</span><span class="p">,</span> 
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">use_dd</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -493,47 +529,39 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-04 14:11:31,352 - iqm.benchmarks.logging_config - INFO - Now generating a 2-qubit GHZ state on qubits [1, 2]
-2025-02-04 14:11:31,356 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:31,704 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:31,776 - iqm.benchmarks.logging_config - INFO - Submitting batch with 7 circuits corresponding to qubits [1, 2]
-/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;}
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-27 10:18:45,510 - iqm.benchmarks.logging_config - INFO - Now generating a 2-qubit GHZ state on qubits [1, 2]
+2025-02-27 10:18:45,510 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:46,112 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:46,281 - iqm.benchmarks.logging_config - INFO - Submitting batch with 7 circuits corresponding to qubits [1, 2]
+C:\Users\RaphaelBrieger\miniconda3\envs\iqm-benchmarks\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;}
   warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-02-04 14:11:32,204 - iqm.benchmarks.logging_config - INFO - Now generating a 3-qubit GHZ state on qubits [1, 2, 3]
-2025-02-04 14:11:32,205 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:32,219 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:32,339 - iqm.benchmarks.logging_config - INFO - Submitting batch with 9 circuits corresponding to qubits [1, 2, 3]
-2025-02-04 14:11:32,723 - iqm.benchmarks.logging_config - INFO - Now generating a 4-qubit GHZ state on qubits [1, 2, 3, 4]
-2025-02-04 14:11:32,724 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:32,740 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:32,919 - iqm.benchmarks.logging_config - INFO - Submitting batch with 11 circuits corresponding to qubits [1, 2, 3, 4]
-2025-02-04 14:11:33,276 - iqm.benchmarks.logging_config - INFO - Now generating a 5-qubit GHZ state on qubits [1, 2, 3, 4, 5]
-2025-02-04 14:11:33,278 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:33,308 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:33,543 - iqm.benchmarks.logging_config - INFO - Submitting batch with 13 circuits corresponding to qubits [1, 2, 3, 4, 5]
-2025-02-04 14:11:34,078 - iqm.benchmarks.logging_config - INFO - Now generating a 6-qubit GHZ state on qubits [1, 2, 3, 4, 5, 6]
-2025-02-04 14:11:34,081 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:34,125 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
-2025-02-04 14:11:34,441 - iqm.benchmarks.logging_config - INFO - Submitting batch with 15 circuits corresponding to qubits [1, 2, 3, 4, 5, 6]
-2025-02-04 14:11:34,927 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-02-04 14:14:20,649 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+2025-02-27 10:18:46,718 - iqm.benchmarks.logging_config - INFO - Now generating a 3-qubit GHZ state on qubits [1, 2, 3]
+2025-02-27 10:18:46,718 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:46,762 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:47,010 - iqm.benchmarks.logging_config - INFO - Submitting batch with 9 circuits corresponding to qubits [1, 2, 3]
+2025-02-27 10:18:47,446 - iqm.benchmarks.logging_config - INFO - Now generating a 4-qubit GHZ state on qubits [1, 2, 3, 4]
+2025-02-27 10:18:47,463 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:47,491 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:47,873 - iqm.benchmarks.logging_config - INFO - Submitting batch with 11 circuits corresponding to qubits [1, 2, 3, 4]
+2025-02-27 10:18:48,338 - iqm.benchmarks.logging_config - INFO - Now generating a 5-qubit GHZ state on qubits [1, 2, 3, 4, 5]
+2025-02-27 10:18:48,341 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:48,386 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method and SQG optimization all circuits
+2025-02-27 10:18:48,872 - iqm.benchmarks.logging_config - INFO - Submitting batch with 13 circuits corresponding to qubits [1, 2, 3, 4, 5]
+2025-02-27 10:18:49,381 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-27 10:18:55,428 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+C:\Users\RaphaelBrieger\miniconda3\envs\iqm-benchmarks\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
   warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-02-04 14:14:52,548 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-02-04 14:14:52,872 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+2025-02-27 10:19:36,741 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-27 10:19:37,240 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+C:\Users\RaphaelBrieger\miniconda3\envs\iqm-benchmarks\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
   warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-02-04 14:14:58,455 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-02-04 14:14:58,912 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+2025-02-27 10:20:47,715 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-27 10:20:48,385 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+C:\Users\RaphaelBrieger\miniconda3\envs\iqm-benchmarks\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
   warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-02-04 14:15:04,339 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-02-04 14:15:04,805 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-02-04 14:15:10,102 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-02-04 14:15:10,595 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-/opt/anaconda3/envs/iqm-benchmarks/lib/python3.11/site-packages/iqm/qiskit_iqm/iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
+2025-02-27 10:20:53,779 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-02-27 10:20:54,441 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+C:\Users\RaphaelBrieger\miniconda3\envs\iqm-benchmarks\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:170: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;, &#39;rep_delay&#39;}
   warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
 </pre></div>
 </div>
@@ -547,7 +575,7 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/749f8e7f4c8f15b0e73a88590bdc530124745d075bc93aceca4f5484241dccbd.png" src="../_images/749f8e7f4c8f15b0e73a88590bdc530124745d075bc93aceca4f5484241dccbd.png" />
+<img alt="../_images/564a0bf2a7815e09bb9c3db454e7e36ed013e7ce916f812197caae9e68daad7b.png" src="../_images/564a0bf2a7815e09bb9c3db454e7e36ed013e7ce916f812197caae9e68daad7b.png" />
 </div>
 </div>
 </section>
@@ -557,7 +585,7 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 <p>The plot allows a comparison of all layout results with and without REM, where the data point description labels “L0”, “L1”, … enumerate the layouts in the order defined in the configuration.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">observation</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">observation</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">string_identifier</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">qubit_layout</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -565,8 +593,8 @@ Thus, for consistent comparisons, one of the first two methods should be chosen,
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>fidelity: 0.9430881954317198 +/- None
-fidelity_rem: 0.9742741960417851 +/- None
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>fidelity: 0.8606413415449893 +/- None
+fidelity_rem: 0.8995408735543517 +/- None
 </pre></div>
 </div>
 </div>
@@ -657,7 +685,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-02-27.
+  Last updated on 2025-03-04.
   <br/>
 </p>
   </div>

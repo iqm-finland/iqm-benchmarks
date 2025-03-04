@@ -29,6 +29,8 @@ iqm.benchmarks.randomized\_benchmarking.interleaved\_rb.interleaved\_rb.Interlea
       ~InterleavedRBConfiguration.calset_id
       ~InterleavedRBConfiguration.routing_method
       ~InterleavedRBConfiguration.physical_layout
+      ~InterleavedRBConfiguration.use_dd
+      ~InterleavedRBConfiguration.dd_strategy
    
    
 

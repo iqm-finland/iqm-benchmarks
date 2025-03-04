@@ -30,6 +30,8 @@ iqm.benchmarks.quantum\_volume.quantum\_volume.QuantumVolumeConfiguration
       ~QuantumVolumeConfiguration.calset_id
       ~QuantumVolumeConfiguration.routing_method
       ~QuantumVolumeConfiguration.physical_layout
+      ~QuantumVolumeConfiguration.use_dd
+      ~QuantumVolumeConfiguration.dd_strategy
    
    
 

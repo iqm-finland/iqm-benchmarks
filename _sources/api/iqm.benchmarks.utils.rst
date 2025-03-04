@@ -17,9 +17,11 @@ iqm.benchmarks.utils
       bootstrap_counts
       count_2q_layers
       count_native_gates
+      extract_fidelities
       get_iqm_backend
       marginal_distribution
       perform_backend_transpilation
+      plot_layout_fidelity_graph
       reduce_to_active_qubits
       retrieve_all_counts
       retrieve_all_job_metadata
@@ -33,6 +35,14 @@ iqm.benchmarks.utils
 
    
    
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: autosummary-class-template.rst
+   
+      GraphPositions
+   
    
 
    
@@ -44,4 +54,9 @@ iqm.benchmarks.utils
 
 
 
+
+.. rubric:: Inheritance
+
+.. inheritance-diagram:: iqm.benchmarks.utils
+   :parts: 1
 

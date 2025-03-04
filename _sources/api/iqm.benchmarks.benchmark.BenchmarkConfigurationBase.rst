@@ -22,6 +22,8 @@ iqm.benchmarks.benchmark.BenchmarkConfigurationBase
       ~BenchmarkConfigurationBase.calset_id
       ~BenchmarkConfigurationBase.routing_method
       ~BenchmarkConfigurationBase.physical_layout
+      ~BenchmarkConfigurationBase.use_dd
+      ~BenchmarkConfigurationBase.dd_strategy
    
    
 

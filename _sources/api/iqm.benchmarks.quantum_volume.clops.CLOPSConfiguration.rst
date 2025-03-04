@@ -29,6 +29,8 @@ iqm.benchmarks.quantum\_volume.clops.CLOPSConfiguration
       ~CLOPSConfiguration.calset_id
       ~CLOPSConfiguration.routing_method
       ~CLOPSConfiguration.physical_layout
+      ~CLOPSConfiguration.use_dd
+      ~CLOPSConfiguration.dd_strategy
    
    
 

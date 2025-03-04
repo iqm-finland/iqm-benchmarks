@@ -32,6 +32,8 @@ iqm.benchmarks.entanglement.ghz.GHZConfiguration
       ~GHZConfiguration.calset_id
       ~GHZConfiguration.routing_method
       ~GHZConfiguration.physical_layout
+      ~GHZConfiguration.use_dd
+      ~GHZConfiguration.dd_strategy
    
    
 

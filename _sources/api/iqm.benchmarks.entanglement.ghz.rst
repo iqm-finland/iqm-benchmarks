@@ -14,7 +14,6 @@ iqm.benchmarks.entanglement.ghz
    .. autosummary::
       :toctree:
    
-      extract_fidelities
       fidelity_analysis
       fidelity_ghz_coherences
       fidelity_ghz_randomized_measurements
