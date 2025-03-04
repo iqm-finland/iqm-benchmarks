@@ -49,7 +49,7 @@ dependencies = [
     "uncertainties >= 3.2.2, < 3.3.0",
     "pycurl >= 7.45.3, < 8.0",
     "xarray >= 2024.6.0, < 2025.0.0",
-    "types-pycurl",
+    "types-requests",
     "myst-nb == 1.1.0",
 ]
 

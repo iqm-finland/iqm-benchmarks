@@ -31,7 +31,7 @@ def qiskit_gate_to_operator(gate_set):
     numpy.ndarray
         An array of process matrices. Each element in the array is a 2D NumPy array.
     """
-    return np.array([[Operator(gate).to_matrix()] for gate in gate_set])
+    return np.array([[Operator(gate).reverse_qargs().to_matrix()] for gate in gate_set])
 
 
 def add_idle_gates(gate_set, active_qubits, gate_qubits):
