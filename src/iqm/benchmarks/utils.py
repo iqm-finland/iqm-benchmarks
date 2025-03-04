@@ -19,8 +19,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from functools import wraps
 from math import floor
-import random
 import os
+import random
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple, Union, cast
 
@@ -35,7 +35,6 @@ from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
 import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
-import requests
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
