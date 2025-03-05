@@ -74,8 +74,8 @@ class GraphPositions:
     }
 
     predefined_stations = {
-        "Garnet": garnet_positions,
-        "Deneb": deneb_positions,
+        "garnet": garnet_positions,
+        "deneb": deneb_positions,
     }
 
     @staticmethod
@@ -152,8 +152,8 @@ def plot_layout_fidelity_graph(
     graph.add_edges_from(edges_graph)
 
     # Define qubit positions in plot
-    if station in GraphPositions.predefined_stations:
-        pos = GraphPositions.predefined_stations[station]
+    if station.lower() in GraphPositions.predefined_stations:
+        pos = GraphPositions.predefined_stations[station.lower()]
     else:
         pos = GraphPositions.create_positions(graph, topology)
 
