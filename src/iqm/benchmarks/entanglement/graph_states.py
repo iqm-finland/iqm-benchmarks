@@ -182,7 +182,7 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     return qc_t
 
 
-def plot_densityt_matrix(
+def plot_density_matrix(
     matrix: np.ndarray,
     qubit_pair: Sequence[int],
     projection: str,
@@ -427,7 +427,11 @@ def plot_max_negativities_graph(
             qubit_positions = GraphPositions.create_positions(graph_backend)
     else:
         graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
-        qubit_positions = GraphPositions.create_positions(graph_backend)
+        if backend.num_qubits in (20, 49):
+            station = "garnet" if backend.num_qubits == 20 else "emerald"
+            qubit_positions = GraphPositions.predefined_stations[station]
+        else:
+            qubit_positions = GraphPositions.create_positions(graph_backend, station)
 
     # Normalize negativity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(negativity_values)), vmax=cast(float, max(negativity_values)))
@@ -473,7 +477,6 @@ def plot_max_negativities_graph(
 def update_pauli_expectations(
     pauli_expectations: Dict[str, Dict[str, float]],
     projected_counts: Dict[str, Dict[str, int]],
-    all_projection_bit_strings: List[str],
     nonId_pauli_label: str,
 ) -> Dict[str, Dict[str, float]]:
     """Helper function that updates the input Pauli expectations dictionary of dictionaries (projections -> {pauli string: expectation}).
@@ -482,7 +485,6 @@ def update_pauli_expectations(
         pauli_expectations (Dict[str, Dict[str, float]]): The Pauli expectations dictionary of dictionaries to update.
             * Outermost keys are projected bitstrings; innermost are pauli strings and values are expectation values.
         projected_counts (Dict[str, Dict[str, int]]): The corresponding projected counts dictionary of dictionaries.
-        all_projection_bit_strings (List[str]): A list of all possible neighbor projection bitstrings.
         nonId_pauli_label (str): The Pauli label to update expectations of, that should not contain identities.
             * Pauli expectations corresponding to I are inferred and updated from counts corresponding to strings containing Z instead.
 
@@ -490,7 +492,7 @@ def update_pauli_expectations(
         Dict[str, Dict[str, float]]: The updated Pauli expectations dictionary of dictionaries (projections -> {pauli string: expectation}).
     """
     # Get the individual Pauli expectations for each projection
-    for projected_bit_string in all_projection_bit_strings:
+    for projected_bit_string in projected_counts.keys():
         # Ideally the counts should be labeled by Pauli basis measurement!
         # Here by construction they should be ordered as all_pauli_labels,
         # however, this assumed that measurements never got scrambled (which should not happen anyway).
@@ -686,7 +688,7 @@ def shadow_tomography_analysis(
             )
             max_negativities[str(qubit_pair)].update(max_negativity)
 
-            fig_name, fig = plot_densityt_matrix(
+            fig_name, fig = plot_density_matrix(
                 matrix=MoMs_shadows[str(qubit_pair)][all_projection_bit_strings[max_negativity_projection]],
                 qubit_pair=qubit_pair,
                 projection=all_projection_bit_strings[max_negativity_projection],
@@ -805,35 +807,41 @@ def state_tomography_analysis(
                         b_s[-2:]: b_c for b_s, b_c in counts.items() if b_s[:neighbor_bit_strings_length] == projection
                     }
                     for projection in all_projection_bit_strings
+                    if projection in [c[:neighbor_bit_strings_length] for c in counts.keys()]
                 }
 
                 pauli_expectations = update_pauli_expectations(
                     pauli_expectations,
                     projected_counts,
-                    all_projection_bit_strings,
                     nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
                 )
 
+            # Remove projections with empty values for pauli_expectations
+            # This will happen if certain projection bitstrings were just not measured
+            pauli_expectations = {
+                projection: expectations for projection, expectations in pauli_expectations.items() if expectations
+            }
+
             tomography_state[group_idx][str(qubit_pair)] = {
                 projection: get_tomography_matrix(pauli_expectations=pauli_expectations[projection])
-                for projection in all_projection_bit_strings
+                for projection in pauli_expectations.keys()
             }
 
             tomography_negativities[group_idx][str(qubit_pair)] = {
                 projected_bit_string: get_negativity(
                     tomography_state[group_idx][str(qubit_pair)][projected_bit_string], 1, 1
                 )
-                for projected_bit_string in all_projection_bit_strings
+                for projected_bit_string in pauli_expectations.keys()
             }
 
             # Extract the max negativity and the corresponding projection - save in dictionary
             all_negativities_list = [
                 tomography_negativities[group_idx][str(qubit_pair)][projected_bit_string]
-                for projected_bit_string in all_projection_bit_strings
+                for projected_bit_string in pauli_expectations.keys()
             ]
 
-            max_negativity_projection = np.argmax(all_negativities_list)
-            max_negativity_bitstring = all_projection_bit_strings[max_negativity_projection]
+            max_negativity_projection_idx = np.argmax(all_negativities_list)
+            max_negativity_bitstring = all_projection_bit_strings[max_negativity_projection_idx]
 
             # Bootstrapping - do only for max projection bitstring
             bootstrapped_pauli_expectations: List[Dict[str, Dict[str, float]]] = [
@@ -852,7 +860,6 @@ def state_tomography_analysis(
                     bootstrapped_pauli_expectations[bootstrap] = update_pauli_expectations(
                         bootstrapped_pauli_expectations[bootstrap],
                         projected_counts={max_negativity_bitstring: all_bootstrapped_counts[bootstrap]},
-                        all_projection_bit_strings=[max_negativity_bitstring],
                         nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
                     )
 
@@ -874,7 +881,7 @@ def state_tomography_analysis(
             }
 
             max_negativity = {
-                "value": all_negativities_list[max_negativity_projection],
+                "value": all_negativities_list[max_negativity_projection_idx],
                 "boostrapped_average": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["value"],
                 "uncertainty": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["uncertainty"],
             }
@@ -887,7 +894,7 @@ def state_tomography_analysis(
             )
             max_negativities[str(qubit_pair)].update(max_negativity)
 
-            fig_name, fig = plot_densityt_matrix(
+            fig_name, fig = plot_density_matrix(
                 matrix=tomography_state[group_idx][str(qubit_pair)][max_negativity_bitstring],
                 qubit_pair=qubit_pair,
                 projection=max_negativity_bitstring,
@@ -925,7 +932,6 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset = run.dataset.copy(deep=True)
     qcvv_logger.info("Dataset imported OK")
     backend = dataset.attrs["backend"]
-    backend_configuration_name = dataset.attrs["backend_configuration_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     tomography = dataset.attrs["tomography"]
     num_bootstraps = dataset.attrs["num_bootstraps"]
@@ -968,11 +974,10 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         backend,
         execution_timestamp,
         tomography,
-        backend_configuration_name,
-        num_shots,
-        num_bootstraps,
-        num_RMs,
-        num_MoMs,
+        num_shots=num_shots,
+        num_bootstraps=num_bootstraps,
+        num_RM_samples=num_RMs,
+        num_MoMs_samples=num_MoMs,
     )
     plots[fig_name] = fig
 
