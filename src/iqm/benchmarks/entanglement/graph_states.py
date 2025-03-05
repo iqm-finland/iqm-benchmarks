@@ -56,7 +56,7 @@ from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_tra
     timeit,
     xrvariable_to_counts,
 )
-from iqm.benchmarks.utils_plots import rx_to_nx_graph
+from iqm.benchmarks.utils_plots import GraphPositions, rx_to_nx_graph
 from iqm.benchmarks.utils_shadows import get_local_shadow, get_negativity, local_shadow_tomography
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -297,7 +297,7 @@ def plot_max_negativities(
     y = [a["value"] for a in sorted_negativities.values()]
     yerr = [a["uncertainty"] for a in sorted_negativities.values()]
 
-    cmap = plt.cm.get_cmap("winter")
+    cmap = plt.get_cmap("winter")
 
     fig = plt.figure()
     ax = plt.axes()
@@ -372,7 +372,8 @@ def plot_max_negativities_graph(
     backend: IQMBackendBase,
     timestamp: str,
     tomography: Literal["shadow_tomography", "state_tomography"],
-    num_shots: int,
+    station: Optional[str] = None,
+    num_shots: Optional[int] = None,
     num_bootstraps: Optional[int] = None,
     num_RM_samples: Optional[int] = None,
     num_MoMs_samples: Optional[int] = None,
@@ -384,7 +385,9 @@ def plot_max_negativities_graph(
         backend (IQMBackendBase): The name of the backend corresponding to negativities.
         timestamp (str): The timestamp of the corresponding experiment.
         tomography (Literal["shadow_tomography", "state_tomography"]): The type of tomography that was used.
-        num_shots (int): The number of shots used in the corresponding experiment.
+        station (str): The name of the station to use for the graph layout.
+        num_shots (Optional[int]): The number of shots used in the corresponding experiment.
+            * Defaults to None: won't be displayed in title.
         num_bootstraps (Optional[int]): The number of bootstraps used if tomography corresponds to state tomography.
             * Defaults to None if the tomography type is "shadow_tomography".
         num_RM_samples (Optional[int]): The number of randomized measurement samples used if tomography corresponds to shadow tomography.
@@ -395,7 +398,11 @@ def plot_max_negativities_graph(
     Returns:
         Tuple[str, Figure]: The figure label and the max negativities plot figure.
     """
-    fig_name = f"max_negativities_graph_{backend.name}_{timestamp}"
+    fig_name = (
+        f"max_negativities_graph_{station}_{timestamp}"
+        if station is not None
+        else f"max_negativities_graph_{timestamp}"
+    )
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
 
@@ -412,82 +419,15 @@ def plot_max_negativities_graph(
     fig = plt.figure()
     ax = plt.axes()
 
-    qubit_positions = {
-        5: {2: (0, 0), 0: (-1, 1), 1: (-1, -1), 3: (1, -1), 4: (1, 1)},
-        20: {
-            0: (4, 0),
-            1: (3, 0),
-            2: (5, 1),
-            3: (4, 1),
-            4: (3, 1),
-            5: (2, 1),
-            6: (1, 1),
-            7: (5, 2),
-            8: (4, 2),
-            9: (3, 2),
-            10: (2, 2),
-            11: (1, 2),
-            12: (5, 3),
-            13: (4, 3),
-            14: (3, 3),
-            15: (2, 3),
-            16: (1, 3),
-            17: (4, 4),
-            18: (3, 4),
-            19: (2, 4),
-        },
-        49: {
-            0: (10, 10),
-            1: (11, 9),
-            2: (7, 11),
-            3: (8, 10),
-            4: (9, 9),
-            5: (10, 8),
-            6: (11, 7),
-            7: (5, 11),
-            8: (6, 10),
-            9: (7, 9),
-            10: (8, 8),
-            11: (9, 7),
-            12: (10, 6),
-            13: (11, 5),
-            14: (3, 11),
-            15: (4, 10),
-            16: (5, 9),
-            17: (6, 8),
-            18: (7, 7),
-            19: (8, 6),
-            20: (9, 5),
-            21: (10, 4),
-            22: (2, 10),
-            23: (3, 9),
-            24: (4, 8),
-            25: (7, 5),
-            26: (8, 4),
-            27: (9, 3),
-            28: (10, 2),
-            29: (2, 8),
-            30: (3, 7),
-            31: (7, 3),
-            32: (8, 2),
-            33: (9, 1),
-            34: (1, 7),
-            35: (2, 6),
-            36: (3, 5),
-            37: (4, 4),
-            38: (5, 3),
-            39: (6, 2),
-            40: (7, 1),
-            41: (1, 5),
-            42: (2, 4),
-            43: (3, 3),
-            44: (4, 2),
-            45: (5, 1),
-            46: (1, 3),
-            47: (2, 2),
-            48: (3, 1),
-        },
-    }
+    if station is not None:
+        if station.lower() in GraphPositions.predefined_stations:
+            qubit_positions = GraphPositions.predefined_stations[station.lower()]
+        else:
+            graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
+            qubit_positions = GraphPositions.create_positions(graph_backend)
+    else:
+        graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
+        qubit_positions = GraphPositions.create_positions(graph_backend)
 
     # Normalize negativity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(negativity_values)), vmax=cast(float, max(negativity_values)))
@@ -495,7 +435,7 @@ def plot_max_negativities_graph(
 
     nx.draw_networkx(
         rx_to_nx_graph(backend),
-        pos=qubit_positions[backend.num_qubits],
+        pos=qubit_positions,
         nodelist=list(range(backend.num_qubits)),
         edgelist=qubit_pairs,
         width=4.0,
@@ -510,13 +450,19 @@ def plot_max_negativities_graph(
     sm.set_array([])
     fig.colorbar(sm, ax=ax, shrink=0.5)
 
+    shots_string = "" if num_shots is None else f"Shots per tomography sample: {num_shots}"
+    station_string = "IQM Backend" if station is None else station
     if tomography == "shadow_tomography":
         plt.title(
-            f"Max entanglement negativities for qubit pairs in {backend.name}\n{num_RM_samples} local RM samples x {num_MoMs_samples} Median of Means samples\n{timestamp}"
+            f"Max entanglement negativities for qubit pairs in {station_string}\n"
+            f"{num_RM_samples} local RM samples x {num_MoMs_samples} Median of Means samples\n"
+            f"{shots_string}; {timestamp}"
         )
     else:
         plt.title(
-            f"Max entanglement negativities for qubit pairs in {backend.name}\nShots per tomography sample: {num_shots}; Bootstraps: {num_bootstraps}\n{timestamp}"
+            f"Max entanglement negativities for qubit pairs in {station_string}\n"
+            f"{shots_string}; Bootstraps: {num_bootstraps}"
+            f"\n{timestamp}"
         )
 
     plt.close()
@@ -978,7 +924,8 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     qcvv_logger.info("Fetching dataset")
     dataset = run.dataset.copy(deep=True)
     qcvv_logger.info("Dataset imported OK")
-    backend_name = dataset.attrs["backend_name"]
+    backend = dataset.attrs["backend"]
+    backend_configuration_name = dataset.attrs["backend_configuration_name"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     tomography = dataset.attrs["tomography"]
     num_bootstraps = dataset.attrs["num_bootstraps"]
@@ -996,7 +943,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             all_qubit_pairs_per_group,
             all_qubit_neighbors_per_group,
             all_unprojected_qubits,
-            backend_name,
+            backend.name,
             execution_timestamp,
         )
     else:
@@ -1005,14 +952,27 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             all_qubit_pairs_per_group,
             all_qubit_neighbors_per_group,
             all_unprojected_qubits,
-            backend_name,
+            backend.name,
             execution_timestamp,
         )
 
     dataset.attrs.update({"max_negativities": max_negativities})
 
     fig_name, fig = plot_max_negativities(
-        max_negativities, backend_name, execution_timestamp, tomography, num_shots, num_bootstraps, num_RMs, num_MoMs
+        max_negativities, backend.name, execution_timestamp, tomography, num_shots, num_bootstraps, num_RMs, num_MoMs
+    )
+    plots[fig_name] = fig
+
+    fig_name, fig = plot_max_negativities_graph(
+        max_negativities,
+        backend,
+        execution_timestamp,
+        tomography,
+        backend_configuration_name,
+        num_shots,
+        num_bootstraps,
+        num_RMs,
+        num_MoMs,
     )
     plots[fig_name] = fig
 
@@ -1064,6 +1024,7 @@ class GraphStateBenchmark(Benchmark):
         dataset.attrs["session_timestamp"] = self.session_timestamp
         dataset.attrs["execution_timestamp"] = self.execution_timestamp
         dataset.attrs["backend_configuration_name"] = self.backend_configuration_name
+        dataset.attrs["backend"] = self.backend
         dataset.attrs["backend_name"] = self.backend.name
 
         for key, value in self.configuration:

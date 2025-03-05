@@ -16,7 +16,7 @@
 Plotting and visualization utility functions
 """
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Literal
+from typing import Dict, Literal, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -79,7 +79,9 @@ class GraphPositions:
     }
 
     @staticmethod
-    def create_positions(graph: PyGraph, topology: Optional[Literal["star", "crystal"]] = None) -> Dict[int, Tuple[float, float]]:
+    def create_positions(
+        graph: PyGraph, topology: Optional[Literal["star", "crystal"]] = None
+    ) -> Dict[int, Tuple[float, float]]:
         """Generate node positions for a given graph and topology.
 
         Args:
