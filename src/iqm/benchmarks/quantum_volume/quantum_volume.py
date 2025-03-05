@@ -26,7 +26,7 @@ from mthree.classes import QuasiCollection
 from mthree.utils import expval
 import numpy as np
 from qiskit.circuit.library import QuantumVolume
-from qiskit_aer import Aer
+from qiskit_aer import StatevectorSimulator
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
@@ -38,10 +38,6 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkRunResult,
     add_counts_to_dataset,
 )
-
-# import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
-# from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
-# from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
@@ -119,7 +115,7 @@ def get_ideal_heavy_outputs(
     """
     simulable_circuits = deepcopy(qc_list)
     ideal_heavy_outputs: List[Dict[str, float]] = []
-    ideal_simulator = Aer.get_backend("statevector_simulator")
+    ideal_simulator = StatevectorSimulator()
 
     # Separate according to sorted indices
     circuit_batches = {
@@ -677,12 +673,13 @@ class QuantumVolumeBenchmark(Benchmark):
         sorted_transpiled_qc_list: Dict[Tuple[int, ...], List[QuantumCircuit]],
     ) -> Dict[str, Any]:
         """
-        Submit jobs for execution in the specified IQMBackend.
+        Submit a single set of QV jobs for execution in the specified IQMBackend:
+         Organizes the results in a dictionary with the qubit layout, the submitted job objects, the type of QV results and submission time.
 
         Args:
             backend (IQMBackendBase): the IQM backend to submit the job.
             qubits (List[int]): the qubits to identify the submitted job.
-            sorted_transpiled_qc_list (Dict[str, List[QuantumCircuit]]): qubits to submit jobs to.
+            sorted_transpiled_qc_list (Dict[Tuple[int, ...] | str, List[QuantumCircuit]]): A dictionary of Lists of quantum circuits.
         Returns:
             Dict with qubit layout, submitted job objects, type (vanilla/DD) and submission time.
         """
