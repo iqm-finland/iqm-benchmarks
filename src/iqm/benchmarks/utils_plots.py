@@ -16,7 +16,7 @@
 Plotting and visualization utility functions
 """
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Literal
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -79,15 +79,15 @@ class GraphPositions:
     }
 
     @staticmethod
-    def create_positions(graph: PyGraph, topology: Optional[str] = None) -> Dict[int, Tuple[float, float]]:
+    def create_positions(graph: PyGraph, topology: Optional[Literal["star", "crystal"]] = None) -> Dict[int, Tuple[float, float]]:
         """Generate node positions for a given graph and topology.
 
         Args:
-            graph: The graph to generate positions for.
-            topology: The type of layout to generate. Must be either "star" or "crystal".
+            graph (PyGraph): The graph to generate positions for.
+            topology (Optional[Literal["star", "crystal"]]): The type of layout to generate. Must be either "star" or "crystal".
 
         Returns:
-            A dictionary mapping node indices to (x,y) coordinates.
+            Dict[int, Tuple[float, float]]: A dictionary mapping node indices to (x,y) coordinates.
         """
         n_nodes = len(graph.node_indices())
 
@@ -152,7 +152,7 @@ def plot_layout_fidelity_graph(
     graph.add_edges_from(edges_graph)
 
     # Define qubit positions in plot
-    if station.lower() in GraphPositions.predefined_stations:
+    if station is not None and station.lower() in GraphPositions.predefined_stations:
         pos = GraphPositions.predefined_stations[station.lower()]
     else:
         pos = GraphPositions.create_positions(graph, topology)
