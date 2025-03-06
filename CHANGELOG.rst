@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.24
+============
+* Added rustworkx dependency range to fix wrong edge thickness assignment in qubit selection plot.
+
 Version 2.23
 ============
 * Added dynamical decoupling parameter option to configurations of all benchmarks.
