@@ -36,6 +36,7 @@ from .randomized_benchmarking.interleaved_rb.interleaved_rb import (
     InterleavedRBConfiguration,
 )
 from .randomized_benchmarking.mirror_rb.mirror_rb import MirrorRandomizedBenchmarking, MirrorRBConfiguration
+from .randomized_benchmarking.direct_rb.direct_rb import DirectRandomizedBenchmarking, DirectRBConfiguration
 
 
 AVAILABLE_BENCHMARKS = {
@@ -45,6 +46,7 @@ AVAILABLE_BENCHMARKS = {
     CliffordRandomizedBenchmarking.name: CliffordRandomizedBenchmarking,
     InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
     MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
+    DirectRandomizedBenchmarking.name: DirectRandomizedBenchmarking,
     QScoreBenchmark.name: QScoreBenchmark,
 }
 
