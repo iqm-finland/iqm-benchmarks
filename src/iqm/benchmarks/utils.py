@@ -241,8 +241,7 @@ def evaluate_hamiltonian_paths(
     N: int,
     path_samples: int,
     backend_arg: str | IQMBackendBase,
-    resonance_url_name: str,
-    token: str,
+    url: str,
     max_tries: int = 10,
 ) -> Dict[int, List[Tuple[int, int]]]:
     """Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.
@@ -251,8 +250,7 @@ def evaluate_hamiltonian_paths(
         N (int): the number of vertices in the Hamiltonian paths to evaluate.
         path_samples (int): the number of Hamiltonian paths to evaluate.
         backend_arg (str | IQMBackendBase): the backend to evaluate the Hamiltonian paths on with respect to fidelity.
-        resonance_url_name (str): the name of the backend in the Resonance URL address.
-        token (str): the token to access the Resonance API.
+        url (str): the URL address for the backend to retrieve calibration data from.
         max_tries (int): the maximum number of tries to generate a Hamiltonian path.
 
     Returns:
@@ -286,9 +284,8 @@ def evaluate_hamiltonian_paths(
     # Retrieve fidelity data
     two_qubit_fidelity = {}
 
-    url = f"https://api.resonance.meetiqm.com/quantum-computers/v1/{resonance_url_name}/calibrations"
-    headers = {"Accept": "application/json", "Authorization": f"Bearer {token}"}
-    r = requests.get(url, headers=headers, timeout=5)
+    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
+    r = requests.get(url, headers=headers, timeout=60)
     calibration = r.json()
 
     edge_dictionary = {}
