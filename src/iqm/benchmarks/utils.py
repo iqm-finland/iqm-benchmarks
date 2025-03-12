@@ -163,7 +163,7 @@ def count_native_gates(
         backend = backend_arg
 
     native_operations = backend.operation_names
-    
+
     if "move" in backend.architecture.gates:
         native_operations.append("move")
     # Some backends may not include "barrier" in the operation_names attribute
@@ -290,13 +290,6 @@ def perform_backend_transpilation(
     # Helper function considering whether optimize_sqg is done,
     # and whether the coupling map is reduced (whether final physical layout must be fixed onto an auxiliary QC)
     def transpile_and_optimize(qc, aux_qc=None):
-        # transpiled = transpile(
-        #     qc,
-        #     backend=backend,
-        #     optimization_level=qiskit_optim_level,
-        #     routing_method=routing_method,
-        #     initial_layout=list(qubits)
-        # )
         transpiled = transpile(
             qc,
             basis_gates=basis_gates,
@@ -305,21 +298,22 @@ def perform_backend_transpilation(
             initial_layout=qubits if aux_qc is None else None,
             routing_method=routing_method,
         )
-        # if optimize_sqg:
-        #     transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
         if "move" in backend.architecture.gates:
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
             if "move" in backend.architecture.gates:
-                # if 0 in qubits:
-                #     raise ValueError(
-                #         "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
-                #     )
+                if backend.num_qubits in qubits:
+                    raise ValueError(
+                        f"Label {backend.num_qubits} is reserved for Resonator - "
+                        f"Please specify computational qubit labels {np.arange(backend.num_qubits)}"
+                    )
                 backend_topology = "star"
                 transpiled = reduce_to_active_qubits(transpiled, backend_topology, backend.num_qubits)
-                transpiled = aux_qc.compose(transpiled, qubits=qubits + [backend.num_qubits], clbits=list(range(qc.num_clbits)))
+                transpiled = aux_qc.compose(
+                    transpiled, qubits=qubits + [backend.num_qubits], clbits=list(range(qc.num_clbits))
+                )
             else:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
 
@@ -334,7 +328,7 @@ def perform_backend_transpilation(
         transpiled_qc_list = [transpile_and_optimize(qc) for qc in qc_list]
     else:  # The coupling map will be reduced if the physical layout is to be fixed
         if "move" in backend.architecture.gates:
-            aux_qc_list = [QuantumCircuit(backend.num_qubits+1, q.num_clbits) for q in qc_list]
+            aux_qc_list = [QuantumCircuit(backend.num_qubits + 1, q.num_clbits) for q in qc_list]
         else:
             aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]
@@ -342,7 +336,9 @@ def perform_backend_transpilation(
     return transpiled_qc_list
 
 
-def reduce_to_active_qubits(circuit: QuantumCircuit, backend_topology: str = None, backend_num_qubits = None) -> QuantumCircuit:
+def reduce_to_active_qubits(
+    circuit: QuantumCircuit, backend_topology: str = None, backend_num_qubits=None
+) -> QuantumCircuit:
     """
     Reduces a quantum circuit to only its active qubits.
 
@@ -359,7 +355,7 @@ def reduce_to_active_qubits(circuit: QuantumCircuit, backend_topology: str = Non
     for instruction in circuit.data:
         for qubit in instruction.qubits:
             active_qubits.add(circuit.find_bit(qubit).index)
-    if backend_topology=="star" and backend_num_qubits not in active_qubits:
+    if backend_topology == "star" and backend_num_qubits not in active_qubits:
         # For star systems, the resonator must always be there, regardless of whether it MOVE gates on it or not
         active_qubits.add(backend_num_qubits)
 
