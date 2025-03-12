@@ -2,9 +2,21 @@
 Changelog
 =========
 
-Version 2.23
+Version 2.25
 ============
 * Qiskit on IQM dependency updated to > 17.0.
+
+Version 2.24
+============
+* Added rustworkx dependency range to fix wrong edge thickness assignment in qubit selection plot.
+
+Version 2.23
+============
+* Added dynamical decoupling parameter option to configurations of all benchmarks.
+* Added visual aid plot for qubit selection (see, e.g., GHZ example notebook).
+* Included option to run GST in parallel if the specified qubits don't overlap
+* Small runtime improvements in the GST benchmark.
+* Changed tensor order in GST outputs from Qiskit (bottom to top) to standard (top to bottom) order.
 
 Version 2.22
 ============

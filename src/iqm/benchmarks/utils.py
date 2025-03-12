@@ -17,11 +17,14 @@ General utility functions
 """
 
 from collections import defaultdict
+from dataclasses import dataclass
 from functools import wraps
 from math import floor
+import os
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Tuple, Union, cast
 
+import matplotlib.pyplot as plt
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
 import numpy as np
@@ -29,9 +32,12 @@ from numpy.random import Generator
 from qiskit import ClassicalRegister, transpile
 from qiskit.converters import circuit_to_dag
 from qiskit.transpiler import CouplingMap
+import requests
+from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
+from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
@@ -505,8 +511,9 @@ def submit_execute(
     sorted_transpiled_qc_list: Dict[Tuple, List[QuantumCircuit]],
     backend: IQMBackendBase,
     shots: int,
-    calset_id: Optional[str],
-    max_gates_per_batch: Optional[int],
+    calset_id: Optional[str] = None,
+    max_gates_per_batch: Optional[int] = None,
+    circuit_compilation_options: Optional[CircuitCompilationOptions] = None,
 ) -> List[IQMJob]:
     """Submit for execute a list of quantum circuits on the specified Backend.
 
@@ -516,8 +523,11 @@ def submit_execute(
         shots (int): the number of shots per circuit.
         calset_id (Optional[str]): the calibration set ID, uses the latest one if None.
         max_gates_per_batch (int): the maximum number of gates per batch sent to the backend, used to make manageable batches.
+        circuit_compilation_options (CircuitCompilationOptions): Ability to pass a compilation options object,
+            enabling execution with dynamical decoupling, among other options - see qiskit-iqm documentation.
     Returns:
         List[IQMJob]: the IQMJob objects of the executed circuits.
+
     """
     final_jobs = []
     for k in sorted(
@@ -548,7 +558,12 @@ def submit_execute(
                 qcvv_logger.info(
                     f"max_gates_per_batch restriction: submitting subbatch #{index+1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
                 )
-                batch_jobs = backend.run(qc_batch, shots=shots, calibration_set_id=calset_id)
+                batch_jobs = backend.run(
+                    qc_batch,
+                    shots=shots,
+                    calibration_set_id=calset_id,
+                    circuit_compilation_options=circuit_compilation_options,
+                )
                 final_batch_jobs.append(batch_jobs)
             final_jobs.extend(final_batch_jobs)
 
@@ -569,3 +584,233 @@ def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int
         dict(zip(list(dataset[f"{identifier}_state_{u}"].data), dataset[f"{identifier}_counts_{u}"].data))
         for u in range(counts_range)
     ]
+
+
+@dataclass
+class GraphPositions:
+    """A class to store and generate graph positions for different chip layouts.
+
+    This class contains predefined node positions for various quantum chip topologies and
+    provides methods to generate positions for different layout types.
+
+    Attributes:
+        garnet_positions (Dict[int, Tuple[int, int]]): Mapping of node indices to (x,y) positions for Garnet chip.
+        deneb_positions (Dict[int, Tuple[int, int]]): Mapping of node indices to (x,y) positions for Deneb chip.
+        predefined_stations (Dict[str, Dict[int, Tuple[int, int]]]): Mapping of chip names to their position dictionaries.
+    """
+
+    garnet_positions = {
+        0: (5.0, 7.0),
+        1: (6.0, 6.0),
+        2: (3.0, 7.0),
+        3: (4.0, 6.0),
+        4: (5.0, 5.0),
+        5: (6.0, 4.0),
+        6: (7.0, 3.0),
+        7: (2.0, 6.0),
+        8: (3.0, 5.0),
+        9: (4.0, 4.0),
+        10: (5.0, 3.0),
+        11: (6.0, 2.0),
+        12: (1.0, 5.0),
+        13: (2.0, 4.0),
+        14: (3.0, 3.0),
+        15: (4.0, 2.0),
+        16: (5.0, 1.0),
+        17: (1.0, 3.0),
+        18: (2.0, 2.0),
+        19: (3.0, 1.0),
+    }
+
+    deneb_positions = {
+        0: (2.0, 2.0),
+        1: (1.0, 1.0),
+        3: (2.0, 1.0),
+        5: (3.0, 1.0),
+        2: (1.0, 3.0),
+        4: (2.0, 3.0),
+        6: (3.0, 3.0),
+    }
+
+    predefined_stations = {
+        "Garnet": garnet_positions,
+        "Deneb": deneb_positions,
+    }
+
+    @staticmethod
+    def create_positions(graph: PyGraph, topology: Optional[str] = None) -> Dict[int, Tuple[float, float]]:
+        """Generate node positions for a given graph and topology.
+
+        Args:
+            graph: The graph to generate positions for.
+            topology: The type of layout to generate. Must be either "star" or "crystal".
+
+        Returns:
+            A dictionary mapping node indices to (x,y) coordinates.
+        """
+        n_nodes = len(graph.node_indices())
+
+        if topology == "star":
+            # Place center node at (0,0)
+            pos = {0: (0.0, 0.0)}
+
+            if n_nodes > 1:
+                # Place other nodes in a circle around the center
+                angles = np.linspace(0, 2 * np.pi, n_nodes - 1, endpoint=False)
+                radius = 1.0
+
+                for i, angle in enumerate(angles, start=1):
+                    x = radius * np.cos(angle)
+                    y = radius * np.sin(angle)
+                    pos[i] = (x, y)
+
+        # Crystal and other topologies
+        else:
+            # Fix first node position in bottom right
+            fixed_pos = {0: (1.0, 1.0)}  # For more consistent layouts
+
+            # Get spring layout with one fixed position
+            pos = {
+                int(k): (float(v[0]), float(v[1]))
+                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0}).items()
+            }
+        return pos
+
+
+def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]:
+    """Returns couplings and CZ-fidelities from calibration data URL
+
+    Args:
+        cal_url: str
+            The url under which the calibration data for the backend can be found
+    Returns:
+        list_couplings: List[List[int]]
+            A list of pairs, each of which is a qubit coupling for which the calibration
+            data contains a fidelity.
+        list_fids: List[float]
+            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
+        topology: str
+            Name of the chip topology layout, currently either "star" or "crystal"
+    """
+    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
+    r = requests.get(cal_url, headers=headers, timeout=60)
+    calibration = r.json()
+    cal_keys = {
+        el2["key"]: (i, j) for i, el1 in enumerate(calibration["calibrations"]) for j, el2 in enumerate(el1["metrics"])
+    }
+    list_couplings = []
+    list_fids = []
+    if "double_move_gate_fidelity" in cal_keys.keys():
+        i, j = cal_keys["double_move_gate_fidelity"]
+        topology = "star"
+    else:
+        i, j = cal_keys["cz_gate_fidelity"]
+        topology = "crystal"
+    for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
+        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
+        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
+        if topology == "star":
+            list_couplings.append([qb1, qb2])
+        else:
+            list_couplings.append([qb1 - 1, qb2 - 1])
+        list_fids.append(float(item["value"]))
+    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
+    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
+
+    return list_couplings, list_fids, topology
+
+
+def plot_layout_fidelity_graph(
+    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None
+):
+    """Plot a graph showing the quantum chip layout with fidelity information.
+
+    Creates a visualization of the quantum chip topology where nodes represent qubits
+    and edges represent connections between qubits. Edge thickness indicates gate errors
+    (thinner edges mean better fidelity) and selected qubits are highlighted in orange.
+
+    Args:
+        cal_url: URL to retrieve calibration data from
+        qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
+        station: Name of the quantum computing station to use predefined positions for.
+                If None, positions will be generated algorithmically.
+
+    Returns:
+        matplotlib.figure.Figure: The generated figure object containing the graph visualization
+    """
+    edges_cal, fidelities_cal, topology = extract_fidelities(cal_url)
+    weights = -np.log(np.array(fidelities_cal))
+    edges_graph = [tuple(edge) + (weight,) for edge, weight in zip(edges_cal, weights)]
+
+    graph = PyGraph()
+
+    # Add nodes
+    nodes: set[int] = set()
+    for edge in edges_graph:
+        nodes.update(edge[:2])
+    graph.add_nodes_from(list(nodes))
+
+    # Add edges
+    graph.add_edges_from(edges_graph)
+
+    # Define qubit positions in plot
+    if station in GraphPositions.predefined_stations:
+        pos = GraphPositions.predefined_stations[station]
+    else:
+        pos = GraphPositions.create_positions(graph, topology)
+
+    # Define node colors
+    node_colors = ["lightgrey" for _ in range(len(nodes))]
+    if qubit_layouts is not None:
+        for qb in {qb for layout in qubit_layouts for qb in layout}:
+            node_colors[qb] = "orange"
+
+    # Ensuring weights are in correct order for the plot
+    edge_list = graph.edge_list()
+    weights_dict = {}
+    edge_pos = set()
+
+    # Create a mapping between edge positions as defined in rustworkx and their weights
+    for e, w in zip(edge_list, weights):
+        pos_tuple = (tuple(pos[e[0]]), tuple(pos[e[1]]))
+        weights_dict[pos_tuple] = w
+        edge_pos.add(pos_tuple)
+
+    # Get corresponding weights in the same order
+    weights_ordered = np.array([weights_dict[edge] for edge in list(edge_pos)])
+
+    plt.subplots(figsize=(6, 6))
+
+    # Draw the graph
+    visualization.mpl_draw(
+        graph,
+        with_labels=True,
+        node_color=node_colors,
+        pos=pos,
+        labels=lambda node: node,
+        width=7 * weights_ordered / np.max(weights_ordered),
+    )  # type: ignore[call-arg]
+
+    # Add edge labels using matplotlib's annotate
+    for edge in edges_graph:
+        x1, y1 = pos[edge[0]]
+        x2, y2 = pos[edge[1]]
+        x = (x1 + x2) / 2
+        y = (y1 + y2) / 2
+        plt.annotate(
+            f"{edge[2]:.1e}",
+            xy=(x, y),
+            xytext=(0, 0),
+            textcoords="offset points",
+            ha="center",
+            va="center",
+            bbox={"boxstyle": "round,pad=0.2", "fc": "white", "ec": "none", "alpha": 0.6},
+        )
+
+    plt.gca().invert_yaxis()
+    plt.title(
+        "Chip layout with selected qubits in orange\n"
+        + "and gate errors indicated by edge thickness (thinner is better)"
+    )
+    plt.show()

@@ -881,6 +881,7 @@ class QScoreBenchmark(Benchmark):
                         self.shots,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        circuit_compilation_options=self.circuit_compilation_options,
                     )
                     qc_transpiled_list.append(transpiled_qc)
                     qcvv_logger.setLevel(logging.INFO)
