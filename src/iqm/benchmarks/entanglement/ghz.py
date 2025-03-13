@@ -375,12 +375,11 @@ def generate_ghz_spanning_tree(
     participating_qubits = set(qubit for pair in cx_map[: n_state - 1] for qubit in pair)
 
     relabeling = {idx_old: idx_new for idx_new, idx_old in enumerate(participating_qubits)}
-    n_state_register = QuantumRegister(n_state)
-    qc = QuantumCircuit(n_state_register, name="ghz")
+    qc = QuantumCircuit(n_state, name="ghz")
     qc.h([relabeling[cx_map[0][0]]])
     for _, pair in zip(np.arange(n_state - 1), cx_map):
         relabeled_pair = [relabeling[pair[0]], relabeling[pair[1]]]
-        qc.barrier(relabeled_pair)
+        # qc.barrier(relabeled_pair)
         qc.cx(*relabeled_pair)
     qc.measure_active()
     return qc, list(participating_qubits)
