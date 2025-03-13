@@ -100,7 +100,7 @@ class BenchmarkConfigurationBase(BaseModel):
                 - "fixed": physical layout is constrained during transpilation to the selected initial physical qubits.
                 - "batching": physical layout is allowed to use any other physical qubits, and circuits are batched according to final measured qubits.
                 * Default for all benchmarks is "fixed".
-        use_DD (bool): Boolean flag determining if dynamical decoupling is enabled during circuit execution
+        use_dd (bool): Boolean flag determining if dynamical decoupling is enabled during circuit execution
             * Default: False
     """
 
