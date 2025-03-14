@@ -764,9 +764,62 @@ class GraphPositions:
         6: (3.0, 3.0),
     }
 
+    emerald_positions = {
+        0: (10.0, 10.0),
+        1: (11.0, 9.0),
+        2: (7.0, 11.0),
+        3: (8.0, 10.0),
+        4: (9.0, 9.0),
+        5: (10.0, 8.0),
+        6: (11.0, 7.0),
+        7: (5.0, 11.0),
+        8: (6.0, 10.0),
+        9: (7.0, 9.0),
+        10: (8.0, 8.0),
+        11: (9.0, 7.0),
+        12: (10.0, 6.0),
+        13: (11.0, 5.0),
+        14: (3.0, 11.0),
+        15: (4.0, 10.0),
+        16: (5.0, 9.0),
+        17: (6.0, 8.0),
+        18: (7.0, 7.0),
+        19: (8.0, 6.0),
+        20: (9.0, 5.0),
+        21: (10.0, 4.0),
+        22: (2.0, 10.0),
+        23: (3.0, 9.0),
+        24: (4.0, 8.0),
+        25: (7.0, 5.0),
+        26: (8.0, 4.0),
+        27: (9.0, 3.0),
+        28: (10.0, 2.0),
+        29: (2.0, 8.0),
+        30: (3.0, 7.0),
+        31: (7.0, 3.0),
+        32: (8.0, 2.0),
+        33: (9.0, 1.0),
+        34: (1.0, 7.0),
+        35: (2.0, 6.0),
+        36: (3.0, 5.0),
+        37: (4.0, 4.0),
+        38: (5.0, 3.0),
+        39: (6.0, 2.0),
+        40: (7.0, 1.0),
+        41: (1.0, 5.0),
+        42: (2.0, 4.0),
+        43: (3.0, 3.0),
+        44: (4.0, 2.0),
+        45: (5.0, 1.0),
+        46: (1.0, 3.0),
+        47: (2.0, 2.0),
+        48: (3.0, 1.0),
+    }
+
     predefined_stations = {
-        "Garnet": garnet_positions,
-        "Deneb": deneb_positions,
+        "garnet": garnet_positions,
+        "deneb": deneb_positions,
+        "emerald": emerald_positions,
     }
 
     @staticmethod
@@ -887,7 +940,7 @@ def plot_layout_fidelity_graph(
     graph.add_edges_from(edges_graph)
 
     # Define qubit positions in plot
-    if station in GraphPositions.predefined_stations:
+    if station.lower() in GraphPositions.predefined_stations:
         pos = GraphPositions.predefined_stations[station]
     else:
         pos = GraphPositions.create_positions(graph, topology)
