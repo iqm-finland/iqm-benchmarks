@@ -26,6 +26,8 @@ from pydantic import BaseModel
 from iqm.iqm_client.models import DDStrategy
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
+from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
+
 
 class BenchmarkBase(ABC):
     """
@@ -54,6 +56,10 @@ class BenchmarkBase(ABC):
 
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
+
+        self.import_native_cliffords = self.configuration.import_native_cliffords
+        if self.import_native_cliffords:
+            self.clifford_1q_dict, self.clifford_2q_dict = import_native_gate_cliffords()
 
         self.raw_data: Dict = {}
         self.job_meta: Dict = {}
@@ -112,3 +118,4 @@ class BenchmarkConfigurationBase(BaseModel):
     physical_layout: Literal["fixed", "batching"] = "fixed"
     use_dd: Optional[bool] = False
     dd_strategy: Optional[DDStrategy] = None
+    import_native_cliffords: Optional[bool] = False
