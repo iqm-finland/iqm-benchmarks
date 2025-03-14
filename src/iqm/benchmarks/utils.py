@@ -45,7 +45,6 @@ from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
-from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
 
 
 def timeit(f):
@@ -623,13 +622,13 @@ class GraphPositions:
     }
 
     deneb_positions = {
-        0: (2.0, 2.0),
-        1: (1.0, 1.0),
-        3: (2.0, 1.0),
-        5: (3.0, 1.0),
-        2: (1.0, 3.0),
+        6: (2.0, 2.0),
+        0: (1.0, 1.0),
+        1: (2.0, 1.0),
+        2: (3.0, 1.0),
+        3: (1.0, 3.0),
         4: (2.0, 3.0),
-        6: (3.0, 3.0),
+        5: (3.0, 3.0),
     }
 
     predefined_stations = {
@@ -651,15 +650,15 @@ class GraphPositions:
         n_nodes = len(graph.node_indices())
 
         if topology == "star":
-            # Place center node at (0,0)
-            pos = {0: (0.0, 0.0)}
+            # Place resonator node with index n_nodes-1 at (0,0)
+            pos = {n_nodes-1: (0.0, 0.0)}
 
             if n_nodes > 1:
                 # Place other nodes in a circle around the center
-                angles = np.linspace(0, 2 * np.pi, n_nodes - 1, endpoint=False)
+                angles = np.linspace(0, 2 * np.pi, n_nodes-1, endpoint=False)
                 radius = 1.0
 
-                for i, angle in enumerate(angles, start=1):
+                for i, angle in enumerate(angles):
                     x = radius * np.cos(angle)
                     y = radius * np.sin(angle)
                     pos[i] = (x, y)
@@ -672,7 +671,7 @@ class GraphPositions:
             # Get spring layout with one fixed position
             pos = {
                 int(k): (float(v[0]), float(v[1]))
-                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0}).items()
+                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=500, k=0.15, fixed={0}).items()
             }
         return pos
 
@@ -707,23 +706,22 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
         i, j = cal_keys["cz_gate_fidelity"]
         topology = "crystal"
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
-        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
-        if topology == "star":
-            list_couplings.append([qb1, qb2])
-        else:
-            list_couplings.append([qb1 - 1, qb2 - 1])
+        qb1 = int(item["locus"][0][2:]) if "COMP" not in item["locus"][0] else 0
+        qb2 = int(item["locus"][1][2:]) if "COMP" not in item["locus"][1] else 0
+        list_couplings.append([qb1 - 1, qb2 - 1])
         list_fids.append(float(item["value"]))
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    qubit_mapping = {}
+    if topology == "star":
+        qubit_mapping.update({-1: len(calibrated_qubits)}) # Place resonator qubit as last qubit
+    qubit_mapping.update({qubit: idx for idx, qubit in enumerate(calibrated_qubits)})
     list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
 
     return list_couplings, list_fids, topology
 
 
 def plot_layout_fidelity_graph(
-    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None
-):
+    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
     Creates a visualization of the quantum chip topology where nodes represent qubits
@@ -733,8 +731,6 @@ def plot_layout_fidelity_graph(
     Args:
         cal_url: URL to retrieve calibration data from
         qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
-        station: Name of the quantum computing station to use predefined positions for.
-                If None, positions will be generated algorithmically.
 
     Returns:
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
@@ -754,6 +750,10 @@ def plot_layout_fidelity_graph(
     # Add edges
     graph.add_edges_from(edges_graph)
 
+    # Extract station name from URL
+    parts = cal_url.strip('/').split('/')
+    station = parts[-2].capitalize()
+
     # Define qubit positions in plot
     if station in GraphPositions.predefined_stations:
         pos = GraphPositions.predefined_stations[station]
@@ -766,7 +766,7 @@ def plot_layout_fidelity_graph(
         for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
 
-    plt.subplots(figsize=(6, 6))
+    plt.subplots(figsize=(1.5*np.sqrt(len(nodes)), 1.5*np.sqrt(len(nodes))))
 
     # Draw the graph
     visualization.mpl_draw(
@@ -775,7 +775,7 @@ def plot_layout_fidelity_graph(
         node_color=node_colors,
         pos=pos,
         labels=lambda node: node,
-        width=7 * weights / np.max(weights),
+        width=5 * weights / np.max(weights),
     )  # type: ignore[call-arg]
 
     # Add edge labels using matplotlib's annotate
