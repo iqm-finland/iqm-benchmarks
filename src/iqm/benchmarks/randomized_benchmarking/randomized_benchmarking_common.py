@@ -458,7 +458,12 @@ def submit_parallel_rb_job(
     # Send to execute on backend
     # pylint: disable=unbalanced-tuple-unpacking
     execution_jobs, time_submit = submit_execute(
-        sorted_transpiled_circuit_dicts, backend_arg, shots, calset_id, max_gates_per_batch=max_gates_per_batch,max_circuits_per_batch=max_circuits_per_batch
+        sorted_transpiled_circuit_dicts,
+        backend_arg,
+        shots,
+        calset_id,
+        max_gates_per_batch=max_gates_per_batch,
+        max_circuits_per_batch=max_circuits_per_batch,
     )
     rb_submit_results = {
         "qubits": qubits_array,
