@@ -239,6 +239,7 @@ class CompressiveGST(Benchmark):
                 self.configuration.shots,
                 self.calset_id,
                 max_gates_per_batch=self.configuration.max_gates_per_batch,
+                max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
             # Retrieve
@@ -255,6 +256,7 @@ class CompressiveGST(Benchmark):
                     self.configuration.shots,
                     self.calset_id,
                     max_gates_per_batch=self.configuration.max_gates_per_batch,
+                    max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 )
             # Retrieve all
             qcvv_logger.info(f"Now executing the corresponding circuit batch")
