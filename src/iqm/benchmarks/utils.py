@@ -539,47 +539,47 @@ def submit_execute(
         if max_gates_per_batch is None and max_circuits_per_batch is None:
             jobs = backend.run(sorted_transpiled_qc_list[k], shots=shots, calibration_set_id=calset_id)
             final_jobs.append(jobs)
-            return final_jobs
 
-        if max_gates_per_batch is None:
-            restriction = "max_circuits_per_batch"
-            batching_size = max_circuits_per_batch
-
-        elif max_circuits_per_batch is None:
-            restriction = "max_gates_per_batch"
-            # Calculate average gate count per quantum circuit
-            avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
-                sorted_transpiled_qc_list[k]
-            )
-            batching_size = max(1, floor(max_gates_per_batch / avg_gates_per_qc))
-
-        else:  # Both are not None - select the one rendering the smallest batches.
-            # Calculate average gate count per quantum circuit
-            avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
-                sorted_transpiled_qc_list[k]
-            )
-            qcvv_logger.warning(
-                "Both max_gates_per_batch and max_circuits_per_batch are not None. Selecting the one giving the smallest batches."
-            )
-            batching_size = min(max_circuits_per_batch, max(1, floor(max_gates_per_batch / avg_gates_per_qc)))
-            if batching_size == max_circuits_per_batch:
+        else:
+            if max_gates_per_batch is None:
                 restriction = "max_circuits_per_batch"
-            else:
-                restriction = "max_gates_per_batch"
+                batching_size = max_circuits_per_batch
 
-        final_batch_jobs = []
-        for index, qc_batch in enumerate(chunked(sorted_transpiled_qc_list[k], batching_size)):
-            qcvv_logger.info(
-                f"{restriction} restriction: submitting subbatch #{index + 1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
-            )
-            batch_jobs = backend.run(
-                qc_batch,
-                shots=shots,
-                calibration_set_id=calset_id,
-                circuit_compilation_options=circuit_compilation_options,
-            )
-            final_batch_jobs.append(batch_jobs)
-        final_jobs.extend(final_batch_jobs)
+            elif max_circuits_per_batch is None:
+                restriction = "max_gates_per_batch"
+                # Calculate average gate count per quantum circuit
+                avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
+                    sorted_transpiled_qc_list[k]
+                )
+                batching_size = max(1, floor(max_gates_per_batch / avg_gates_per_qc))
+
+            else:  # Both are not None - select the one rendering the smallest batches.
+                # Calculate average gate count per quantum circuit
+                avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
+                    sorted_transpiled_qc_list[k]
+                )
+                qcvv_logger.warning(
+                    "Both max_gates_per_batch and max_circuits_per_batch are not None. Selecting the one giving the smallest batches."
+                )
+                batching_size = min(max_circuits_per_batch, max(1, floor(max_gates_per_batch / avg_gates_per_qc)))
+                if batching_size == max_circuits_per_batch:
+                    restriction = "max_circuits_per_batch"
+                else:
+                    restriction = "max_gates_per_batch"
+
+            final_batch_jobs = []
+            for index, qc_batch in enumerate(chunked(sorted_transpiled_qc_list[k], batching_size)):
+                qcvv_logger.info(
+                    f"{restriction} restriction: submitting subbatch #{index + 1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
+                )
+                batch_jobs = backend.run(
+                    qc_batch,
+                    shots=shots,
+                    calibration_set_id=calset_id,
+                    circuit_compilation_options=circuit_compilation_options,
+                )
+                final_batch_jobs.append(batch_jobs)
+            final_jobs.extend(final_batch_jobs)
 
     return final_jobs
 
