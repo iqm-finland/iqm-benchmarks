@@ -26,7 +26,7 @@ from mthree.classes import QuasiCollection
 from mthree.utils import expval
 import numpy as np
 from qiskit.circuit.library import QuantumVolume
-from qiskit_aer import Aer
+from qiskit_aer import StatevectorSimulator
 import xarray as xr
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
@@ -119,7 +119,7 @@ def get_ideal_heavy_outputs(
     """
     simulable_circuits = deepcopy(qc_list)
     ideal_heavy_outputs: List[Dict[str, float]] = []
-    ideal_simulator = Aer.get_backend("statevector_simulator")
+    ideal_simulator = StatevectorSimulator()
 
     # Separate according to sorted indices
     circuit_batches = {
