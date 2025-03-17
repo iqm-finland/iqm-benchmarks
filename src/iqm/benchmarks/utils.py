@@ -541,11 +541,11 @@ def submit_execute(
             final_jobs.append(jobs)
 
         else:
-            if max_gates_per_batch is None:
+            if max_gates_per_batch is None and max_circuits_per_batch is not None:
                 restriction = "max_circuits_per_batch"
                 batching_size = max_circuits_per_batch
 
-            elif max_circuits_per_batch is None:
+            elif max_circuits_per_batch is None and max_gates_per_batch is not None:
                 restriction = "max_gates_per_batch"
                 # Calculate average gate count per quantum circuit
                 avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
