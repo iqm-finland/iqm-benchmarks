@@ -379,7 +379,8 @@ def generate_ghz_spanning_tree(
     qc.h([relabeling[cx_map[0][0]]])
     for _, pair in zip(np.arange(n_state - 1), cx_map):
         relabeled_pair = [relabeling[pair[0]], relabeling[pair[1]]]
-        # qc.barrier(relabeled_pair)
+        # This barrier prevents Hadamards from being put at the beginning of the circuit, which would make it more susceptible to phase errors
+        qc.barrier(relabeled_pair)
         qc.cx(*relabeled_pair)
     qc.measure_active()
     return qc, list(participating_qubits)

@@ -651,11 +651,11 @@ class GraphPositions:
 
         if topology == "star":
             # Place resonator node with index n_nodes-1 at (0,0)
-            pos = {n_nodes-1: (0.0, 0.0)}
+            pos = {n_nodes - 1: (0.0, 0.0)}
 
             if n_nodes > 1:
                 # Place other nodes in a circle around the center
-                angles = np.linspace(0, 2 * np.pi, n_nodes-1, endpoint=False)
+                angles = np.linspace(0, 2 * np.pi, n_nodes - 1, endpoint=False)
                 radius = 1.0
 
                 for i, angle in enumerate(angles):
@@ -713,15 +713,14 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
     qubit_mapping = {}
     if topology == "star":
-        qubit_mapping.update({-1: len(calibrated_qubits)}) # Place resonator qubit as last qubit
+        qubit_mapping.update({-1: len(calibrated_qubits)})  # Place resonator qubit as last qubit
     qubit_mapping.update({qubit: idx for idx, qubit in enumerate(calibrated_qubits)})
     list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
 
     return list_couplings, list_fids, topology
 
 
-def plot_layout_fidelity_graph(
-    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None):
+def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[int]]] = None):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
     Creates a visualization of the quantum chip topology where nodes represent qubits
@@ -766,7 +765,7 @@ def plot_layout_fidelity_graph(
         for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
 
-    plt.subplots(figsize=(1.5*np.sqrt(len(nodes)), 1.5*np.sqrt(len(nodes))))
+    plt.subplots(figsize=(1.5 * np.sqrt(len(nodes)), 1.5 * np.sqrt(len(nodes))))
 
     # Draw the graph
     visualization.mpl_draw(

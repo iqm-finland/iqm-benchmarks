@@ -20,6 +20,7 @@ class TestGST:
             rank=4,
             bootstrap_samples=2,
             max_iterations=[1, 1],
+            parallel_execution=True,
         )
         benchmark = CompressiveGST(self.backend, minimal_1Q_config)
         benchmark.run()
