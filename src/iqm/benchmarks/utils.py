@@ -513,14 +513,14 @@ def submit_execute(
         backend (IQMBackendBase): the backend to execute the circuits on.
         shots (int): the number of shots per circuit.
         calset_id (Optional[str]): the calibration set ID.
-                * Default is None: uses the latest calibration ID.
+            * Default is None: uses the latest calibration ID.
         max_gates_per_batch (Optional[int]): the maximum number of gates per batch sent to the backend, used to make manageable batches.
-                * Default is None.
+            * Default is None.
         max_circuits_per_batch (Optional[int]): the maximum number of circuits per batch sent to the backend, used to make manageable batches.
-                * Default is None.
+            * Default is None.
         circuit_compilation_options (CircuitCompilationOptions): Ability to pass a compilation options object,
             enabling execution with dynamical decoupling, among other options - see qiskit-iqm documentation.
-                * Default is None.
+            * Default is None.
     Returns:
         List[IQMJob]: the IQMJob objects of the executed circuits.
 
