@@ -727,7 +727,7 @@ def run_mGST(
         qcvv_logger.info(f"Convergence criterion satisfied")
     else:
         qcvv_logger.info(
-            f"Convergence criterion not satisfied,inspect results and consider increasing max_iter or using new initializations.",
+            f"Convergence criterion not satisfied, inspect results and consider increasing max_iter or using new initializations.",
         )
     qcvv_logger.info(
         f"Final objective {Decimal(res_list[-1]):.2e} in time {(time.time() - t0):.2f}s",

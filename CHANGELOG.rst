@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.25
+============
+* Qiskit on IQM dependency updated to > 17.0.
+
 Version 2.24
 ============
 * Added rustworkx dependency range to fix wrong edge thickness assignment in qubit selection plot.

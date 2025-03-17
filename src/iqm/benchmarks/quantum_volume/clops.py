@@ -514,7 +514,7 @@ class CLOPSBenchmark(Benchmark):
                 parameters = self.generate_random_parameters()
 
                 # Star can't use optimize_sqg as is, yet -> complains about MOVE gate not being IQM native!
-                if optimize_sqg and "move" not in self.backend.operation_names:
+                if optimize_sqg and "move" not in self.backend.architecture.gates:
                     sorted_dict_parametrized[k].append(
                         optimize_single_qubit_gates(  # Optimize SQG seems worth it AFTER assignment
                             qc.assign_parameters(
