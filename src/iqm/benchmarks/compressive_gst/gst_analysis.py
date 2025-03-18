@@ -2,6 +2,7 @@
 Data analysis code for compressive gate set tomography
 """
 
+import ast
 from itertools import product
 from time import perf_counter
 from typing import Any, List, Tuple, Union
@@ -11,7 +12,6 @@ import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 from numpy import ndarray
 import numpy as np
-import ast
 from pandas import DataFrame
 from pygsti.models.model import Model
 from pygsti.tools import change_basis
@@ -823,9 +823,11 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
         plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
 
-        observations.extend(pandas_results_to_observations(
-            dataset, df_g_final, df_o_final, BenchmarkObservationIdentifier(qubit_layout)
-        ))
+        observations.extend(
+            pandas_results_to_observations(
+                dataset, df_g_final, df_o_final, BenchmarkObservationIdentifier(qubit_layout)
+            )
+        )
 
         dataset.attrs["results_layout_" + identifier].update(
             {"full_metrics": {"Gates": df_g_final.to_dict(), "Outcomes and SPAM": df_o_final.to_dict()}}

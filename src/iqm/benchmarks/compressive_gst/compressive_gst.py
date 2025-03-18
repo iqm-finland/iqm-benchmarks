@@ -81,7 +81,7 @@ class CompressiveGST(Benchmark):
         if configuration.opt_method not in ["GD", "SFN", "auto"]:
             raise ValueError("Invalid optimization method, valid options are: GD, SFN, auto")
         if configuration.opt_method == "auto":
-            self.opt_method = "GD" # Currently the fastest method in all cases
+            self.opt_method = "GD"  # Currently the fastest method in all cases
         else:
             self.opt_method = configuration.opt_method
 
@@ -158,8 +158,8 @@ class CompressiveGST(Benchmark):
                 )
             raw_qc_list_parallel = []
             if "move" in self.backend.operation_names:
-                backend_qubits = np.arange(1,self.backend.num_qubits)
-                qubit_layouts = [[q-1 for q in layout] for layout in self.qubit_layouts]
+                backend_qubits = np.arange(1, self.backend.num_qubits)
+                qubit_layouts = [[q - 1 for q in layout] for layout in self.qubit_layouts]
             else:
                 backend_qubits = np.arange(self.backend.num_qubits)
                 qubit_layouts = self.qubit_layouts

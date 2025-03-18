@@ -766,7 +766,7 @@ class QScoreBenchmark(Benchmark):
                     max_num_nodes = nqubits
             else:
                 max_num_nodes = self.max_num_nodes
-            node_numbers = range(self.min_num_nodes, max_num_nodes + 1)
+            node_numbers = list(range(self.min_num_nodes, max_num_nodes + 1))
 
         dataset.attrs.update({"max_num_nodes": node_numbers[-1]})
         dataset.attrs.update({"node_numbers": node_numbers})
