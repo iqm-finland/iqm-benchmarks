@@ -142,7 +142,7 @@ EXAMPLE_MRB = MirrorRBConfiguration(
 )
 
 EXAMPLE_QV = QuantumVolumeConfiguration(
-    num_circuits=500,
+    num_circuits=800,
     shots=2**8,
     calset_id=None,
     num_sigmas=2,
@@ -152,7 +152,8 @@ EXAMPLE_QV = QuantumVolumeConfiguration(
     optimize_sqg=True,
     routing_method="sabre",
     physical_layout="fixed",
-    max_gates_per_batch=60_000,
+    max_circuits_per_batch=500,
+    max_gates_per_batch=60_000, # Will be used if it renders a smaller max batch size than max_circuits_per_batch
     rem=True,
     mit_shots=1_000,
 )

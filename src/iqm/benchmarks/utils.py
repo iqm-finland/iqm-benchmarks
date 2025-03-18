@@ -752,6 +752,7 @@ def submit_execute(
     shots: int,
     calset_id: Optional[str] = None,
     max_gates_per_batch: Optional[int] = None,
+    max_circuits_per_batch: Optional[int] = None,
     circuit_compilation_options: Optional[CircuitCompilationOptions] = None,
 ) -> List[IQMJob]:
     """Submit function to execute lists of quantum circuits on the specified backend,
@@ -764,10 +765,15 @@ def submit_execute(
             * The values (List[QuantumCircuit]) should be the corresponding list (batch) of quantum circuits.
         backend (IQMBackendBase): the backend to execute the circuits on.
         shots (int): the number of shots per circuit.
-        calset_id (Optional[str]): the calibration set ID, uses the latest one if None.
-        max_gates_per_batch (int): the maximum number of gates per batch sent to the backend, used to make manageable batches.
+        calset_id (Optional[str]): the calibration set ID.
+            * Default is None: uses the latest calibration ID.
+        max_gates_per_batch (Optional[int]): the maximum number of gates per batch sent to the backend, used to make manageable batches.
+            * Default is None.
+        max_circuits_per_batch (Optional[int]): the maximum number of circuits per batch sent to the backend, used to make manageable batches.
+            * Default is None.
         circuit_compilation_options (CircuitCompilationOptions): Ability to pass a compilation options object,
             enabling execution with dynamical decoupling, among other options - see qiskit-iqm documentation.
+            * Default is None.
     Returns:
         List[IQMJob]: a list of IQMJob objects corresponding to the submitted circuits.
     """
@@ -782,23 +788,41 @@ def submit_execute(
             f"Submitting batch with {len(sorted_transpiled_qc_list[k])} circuits corresponding to qubits {list(k)}"
         )
         # Divide into batches according to maximum gate count per batch
-        if max_gates_per_batch is None:
+        if max_gates_per_batch is None and max_circuits_per_batch is None:
             jobs = backend.run(sorted_transpiled_qc_list[k], shots=shots, calibration_set_id=calset_id)
             final_jobs.append(jobs)
+
         else:
-            # Calculate average gate count per quantum circuit
-            avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
-                sorted_transpiled_qc_list[k]
-            )
-            final_batch_jobs = []
-            for index, qc_batch in enumerate(
-                chunked(
-                    sorted_transpiled_qc_list[k],
-                    max(1, floor(max_gates_per_batch / avg_gates_per_qc)),
+            if max_gates_per_batch is None and max_circuits_per_batch is not None:
+                restriction = "max_circuits_per_batch"
+                batching_size = max_circuits_per_batch
+
+            elif max_circuits_per_batch is None and max_gates_per_batch is not None:
+                restriction = "max_gates_per_batch"
+                # Calculate average gate count per quantum circuit
+                avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
+                    sorted_transpiled_qc_list[k]
                 )
-            ):
+                batching_size = max(1, floor(max_gates_per_batch / avg_gates_per_qc))
+
+            else:  # Both are not None - select the one rendering the smallest batches.
+                # Calculate average gate count per quantum circuit
+                avg_gates_per_qc = sum(sum(qc.count_ops().values()) for qc in sorted_transpiled_qc_list[k]) / len(
+                    sorted_transpiled_qc_list[k]
+                )
+                qcvv_logger.warning(
+                    "Both max_gates_per_batch and max_circuits_per_batch are not None. Selecting the one giving the smallest batches."
+                )
+                batching_size = min(max_circuits_per_batch, max(1, floor(max_gates_per_batch / avg_gates_per_qc)))
+                if batching_size == max_circuits_per_batch:
+                    restriction = "max_circuits_per_batch"
+                else:
+                    restriction = "max_gates_per_batch"
+
+            final_batch_jobs = []
+            for index, qc_batch in enumerate(chunked(sorted_transpiled_qc_list[k], batching_size)):
                 qcvv_logger.info(
-                    f"max_gates_per_batch restriction: submitting subbatch #{index+1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
+                    f"{restriction} restriction: submitting subbatch #{index + 1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
                 )
                 batch_jobs = backend.run(
                     qc_batch,

@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 2.25
+============
+* Added optional configuration parameter (`max_circuits_per_batch`) to specify the maximum amount of circuits per batch.
+
+Version 2.24
+============
+* Added rustworkx dependency range to fix wrong edge thickness assignment in qubit selection plot.
+
 Version 2.23
 ============
 * Added dynamical decoupling parameter option to configurations of all benchmarks.
