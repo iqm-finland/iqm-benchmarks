@@ -9,17 +9,23 @@ from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 import networkx as nx
 import numpy as np
-import xarray as xr
 from uncertainties import ufloat
+import xarray as xr
 
-from iqm.benchmarks import Benchmark, BenchmarkCircuit, BenchmarkRunResult, BenchmarkAnalysisResult, \
-    BenchmarkObservation, BenchmarkObservationIdentifier
+from iqm.benchmarks import (
+    Benchmark,
+    BenchmarkAnalysisResult,
+    BenchmarkCircuit,
+    BenchmarkObservation,
+    BenchmarkObservationIdentifier,
+    BenchmarkRunResult,
+)
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb import (
     DirectRandomizedBenchmarking,
     DirectRBConfiguration,
-    direct_rb_analysis
+    direct_rb_analysis,
 )
 from iqm.benchmarks.utils import GraphPositions, evaluate_hamiltonian_paths, rx_to_nx_graph
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
@@ -138,7 +144,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         BenchmarkObservation(
             name="EPLG",
             identifier=BenchmarkObservationIdentifier(f"n_qubits={num_qubits}"),
-            value=(1-LF**(1/num_edges)),
+            value=(1 - LF ** (1 / num_edges)),
             uncertainty=LF.std_dev,
         )
     )
@@ -266,9 +272,7 @@ class EPLGBenchmark(Benchmark):
                 max_gates_per_batch=self.max_gates_per_batch,
             )
 
-            benchmarks_direct_rb = DirectRandomizedBenchmarking(
-                backend, drb_config
-            )
+            benchmarks_direct_rb = DirectRandomizedBenchmarking(backend, drb_config)
 
             run_direct_rb = benchmarks_direct_rb.run()
 

@@ -456,24 +456,25 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
             }
 
-            dataset.attrs[q_array_idx].update({qubits_idx:
+            dataset.attrs[q_array_idx].update(
                 {
-                    "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
-                    "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
-                    "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
-                    "polarizations": polarizations[str(qubits)],
-                    "avg_polarization_nominal_values": average_polarizations,
-                    "avg_polatization_stderr": stddevs_from_mean,
-                    "fitting_method": str(rb_fit_results.method),
-                    "num_function_evals": int(rb_fit_results.nfev),
-                    "data_points": int(rb_fit_results.ndata),
-                    "num_variables": int(rb_fit_results.nvarys),
-                    "chi_square": float(rb_fit_results.chisqr),
-                    "reduced_chi_square": float(rb_fit_results.redchi),
-                    "Akaike_info_crit": float(rb_fit_results.aic),
-                    "Bayesian_info_crit": float(rb_fit_results.bic),
+                    qubits_idx: {
+                        "decay_rate": {"value": popt["decay_rate"].value, "uncertainty": popt["decay_rate"].stderr},
+                        "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
+                        "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
+                        "polarizations": polarizations[str(qubits)],
+                        "avg_polarization_nominal_values": average_polarizations,
+                        "avg_polatization_stderr": stddevs_from_mean,
+                        "fitting_method": str(rb_fit_results.method),
+                        "num_function_evals": int(rb_fit_results.nfev),
+                        "data_points": int(rb_fit_results.ndata),
+                        "num_variables": int(rb_fit_results.nvarys),
+                        "chi_square": float(rb_fit_results.chisqr),
+                        "reduced_chi_square": float(rb_fit_results.redchi),
+                        "Akaike_info_crit": float(rb_fit_results.aic),
+                        "Bayesian_info_crit": float(rb_fit_results.bic),
+                    }
                 }
-            }
             )
 
             obs_dict.update({qubits_idx: processed_results})
@@ -803,7 +804,9 @@ class DirectRandomizedBenchmarking(Benchmark):
                     )
                 qubit_idx.update({str(loop_qubits_sequence): qubits_seq_idx})
                 dataset.attrs[f"parallel_all_{qubits_seq_idx}"] = {"qubits": loop_qubits_sequence}
-                dataset.attrs.update({qubits_seq_idx: {q_idx: {"qubits": q} for q_idx, q in enumerate(loop_qubits_sequence)}})
+                dataset.attrs.update(
+                    {qubits_seq_idx: {q_idx: {"qubits": q} for q_idx, q in enumerate(loop_qubits_sequence)}}
+                )
             else:  # if sequential
                 for qubits_idx, qubits in enumerate(loop_qubits_sequence):
                     qubit_idx[str(qubits)] = qubits_idx
