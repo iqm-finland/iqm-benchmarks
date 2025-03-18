@@ -19,6 +19,7 @@ iqm.benchmarks.benchmark.BenchmarkConfigurationBase
       ~BenchmarkConfigurationBase.benchmark
       ~BenchmarkConfigurationBase.shots
       ~BenchmarkConfigurationBase.max_gates_per_batch
+      ~BenchmarkConfigurationBase.max_circuits_per_batch
       ~BenchmarkConfigurationBase.calset_id
       ~BenchmarkConfigurationBase.routing_method
       ~BenchmarkConfigurationBase.physical_layout

@@ -34,6 +34,7 @@ iqm.benchmarks.optimization.qscore.QScoreConfiguration
       ~QScoreConfiguration.qpu_topology
       ~QScoreConfiguration.shots
       ~QScoreConfiguration.max_gates_per_batch
+      ~QScoreConfiguration.max_circuits_per_batch
       ~QScoreConfiguration.calset_id
       ~QScoreConfiguration.routing_method
       ~QScoreConfiguration.physical_layout

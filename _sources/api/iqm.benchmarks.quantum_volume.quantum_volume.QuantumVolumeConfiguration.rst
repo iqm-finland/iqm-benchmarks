@@ -27,6 +27,7 @@ iqm.benchmarks.quantum\_volume.quantum\_volume.QuantumVolumeConfiguration
       ~QuantumVolumeConfiguration.mit_shots
       ~QuantumVolumeConfiguration.shots
       ~QuantumVolumeConfiguration.max_gates_per_batch
+      ~QuantumVolumeConfiguration.max_circuits_per_batch
       ~QuantumVolumeConfiguration.calset_id
       ~QuantumVolumeConfiguration.routing_method
       ~QuantumVolumeConfiguration.physical_layout

@@ -29,6 +29,7 @@ iqm.benchmarks.entanglement.ghz.GHZConfiguration
       ~GHZConfiguration.mit_shots
       ~GHZConfiguration.cal_url
       ~GHZConfiguration.max_gates_per_batch
+      ~GHZConfiguration.max_circuits_per_batch
       ~GHZConfiguration.calset_id
       ~GHZConfiguration.routing_method
       ~GHZConfiguration.physical_layout

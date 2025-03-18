@@ -23,6 +23,7 @@ iqm.benchmarks.randomized\_benchmarking.clifford\_rb.clifford\_rb.CliffordRBConf
       ~CliffordRBConfiguration.parallel_execution
       ~CliffordRBConfiguration.shots
       ~CliffordRBConfiguration.max_gates_per_batch
+      ~CliffordRBConfiguration.max_circuits_per_batch
       ~CliffordRBConfiguration.calset_id
       ~CliffordRBConfiguration.routing_method
       ~CliffordRBConfiguration.physical_layout

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>IQM Benchmarks &#8212; IQM Benchmarks 2.24 documentation</title>
+    <title>IQM Benchmarks &#8212; IQM Benchmarks 2.25 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=4fa540f9"></script>
+    <script src="_static/documentation_options.js?v=f459c2e4"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="IQM Benchmarks" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.24" />
-    <meta name="docbuild:last-update" content="2025-03-07"/>
+  <meta name="docsearch:version" content="2.25" />
+    <meta name="docbuild:last-update" content="2025-03-18"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.24 documentation - Home"/>
-    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.24 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.25 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.25 documentation - Home"/>
   
   
 </a></div>
@@ -561,7 +561,7 @@ dependencies are deliberately not upgraded automatically.</p>
 <span class="p">)</span>
 
 <span class="n">EXAMPLE_QV</span> <span class="o">=</span> <span class="n">QuantumVolumeConfiguration</span><span class="p">(</span>
-    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
     <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">num_sigmas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -571,7 +571,8 @@ dependencies are deliberately not upgraded automatically.</p>
     <span class="n">optimize_sqg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">routing_method</span><span class="o">=</span><span class="s2">&quot;sabre&quot;</span><span class="p">,</span>
     <span class="n">physical_layout</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
-    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">60_000</span><span class="p">,</span>
+    <span class="n">max_circuits_per_batch</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">60_000</span><span class="p">,</span> <span class="c1"># Will be used if it renders a smaller max batch size than max_circuits_per_batch</span>
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
 <span class="p">)</span>
@@ -689,7 +690,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-03-07.
+  Last updated on 2025-03-18.
   <br/>
 </p>
   </div>

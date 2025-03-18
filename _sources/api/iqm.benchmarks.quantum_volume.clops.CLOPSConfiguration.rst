@@ -26,6 +26,7 @@ iqm.benchmarks.quantum\_volume.clops.CLOPSConfiguration
       ~CLOPSConfiguration.optimize_sqg
       ~CLOPSConfiguration.shots
       ~CLOPSConfiguration.max_gates_per_batch
+      ~CLOPSConfiguration.max_circuits_per_batch
       ~CLOPSConfiguration.calset_id
       ~CLOPSConfiguration.routing_method
       ~CLOPSConfiguration.physical_layout

@@ -26,6 +26,7 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb.MirrorRBConfigurat
       ~MirrorRBConfiguration.density_2q_gates
       ~MirrorRBConfiguration.shots
       ~MirrorRBConfiguration.max_gates_per_batch
+      ~MirrorRBConfiguration.max_circuits_per_batch
       ~MirrorRBConfiguration.calset_id
       ~MirrorRBConfiguration.routing_method
       ~MirrorRBConfiguration.physical_layout
