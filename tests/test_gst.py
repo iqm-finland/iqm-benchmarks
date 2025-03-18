@@ -13,13 +13,14 @@ class TestGST:
     @patch('matplotlib.pyplot.figure')
     def test_1q(self, mock_fig):
         minimal_1Q_config = GSTConfiguration(
-            qubit_layouts=[[5], [1]],
+            qubit_layouts=[[4], [1]],
             gate_set="1QXYI",
             num_circuits=10,
             shots=10,
             rank=4,
             bootstrap_samples=2,
             max_iterations=[1, 1],
+            parallel_execution=True,
         )
         benchmark = CompressiveGST(self.backend, minimal_1Q_config)
         benchmark.run()

@@ -81,10 +81,7 @@ class CompressiveGST(Benchmark):
         if configuration.opt_method not in ["GD", "SFN", "auto"]:
             raise ValueError("Invalid optimization method, valid options are: GD, SFN, auto")
         if configuration.opt_method == "auto":
-            if (self.num_qubits == 2 and configuration.rank > 2) or self.num_qubits > 2:
-                self.opt_method = "GD"
-            else:
-                self.opt_method = "SFN"
+            self.opt_method = "GD" # Currently the fastest method in all cases
         else:
             self.opt_method = configuration.opt_method
 
@@ -160,17 +157,23 @@ class CompressiveGST(Benchmark):
                     "Qubit layouts can't overlap when parallel_execution is enabled, please choose non-overlapping layouts."
                 )
             raw_qc_list_parallel = []
+            if "move" in self.backend.operation_names:
+                backend_qubits = np.arange(1,self.backend.num_qubits)
+                qubit_layouts = [[q-1 for q in layout] for layout in self.qubit_layouts]
+            else:
+                backend_qubits = np.arange(self.backend.num_qubits)
+                qubit_layouts = self.qubit_layouts
             for circ in raw_qc_list:
-                circ_parallel = QuantumCircuit(self.backend.num_qubits, len(set(all_qubits)))
+                circ_parallel = QuantumCircuit(len(backend_qubits), len(set(all_qubits)))
                 clbits = np.arange(self.num_qubits)
-                for qubit_layout in self.qubit_layouts:
+                for qubit_layout in qubit_layouts:
                     circ_parallel.compose(circ, qubits=qubit_layout, clbits=clbits, inplace=True)
                     clbits += self.num_qubits
                 raw_qc_list_parallel.append(circ_parallel)
             transpiled_qc_list, _ = perform_backend_transpilation(
                 raw_qc_list_parallel,
                 self.backend,
-                qubits=np.arange(self.backend.num_qubits),
+                qubits=backend_qubits,
                 coupling_map=self.backend.coupling_map,
                 qiskit_optim_level=0,
                 optimize_sqg=False,
@@ -386,7 +389,7 @@ def parse_gate_set(
         gate_set: List[QuantumCircuit]
             A list of gates defined as quantum circuit objects
         gate_labels_dict: Dict[str, Dict[int, str]]
-            The names of gates, i.e. "Rx(pi/2)" for a pi/2 rotation around the x-axis.
+            The names of gates, i.e. "Rx_pi_2" for a pi/2 rotation around the x-axis.
         num_gates: int
             The number of gates in the gate set
 
@@ -445,7 +448,7 @@ def create_predefined_gate_set(
         gates: List[QuantumCircuit]
             The gate set as a list of circuits
         gate_labels_dict: Dict[str, Dict[int, str]]
-            The names of gates, i.e. "Rx(pi/2)" for a pi/2 rotation around the x-axis.
+            The names of gates, i.e. "Rx_pi_2" for a pi/2 rotation around the x-axis.
         num_gates: int
             The number of gates in the gate set
 
@@ -458,7 +461,7 @@ def create_predefined_gate_set(
         gate_qubits = [[0], [0], [0]]
         for i, gate in enumerate(gate_list):
             gates[i].append(gate, gate_qubits[i])
-        gate_labels = ["Idle", "Rx(pi/2)", "Ry(pi/2)"]
+        gate_labels = ["Idle", "Rx_pi_2", "Ry_pi_2"]
     elif gate_set == "2QXYCZ":
         gate_qubits = [[0], [1], [0], [1], [0, 1]]
         gates = [QuantumCircuit(num_qubits, 0) for _ in range(5)]
@@ -467,7 +470,7 @@ def create_predefined_gate_set(
         gates[2].append(RGate(0.5 * np.pi, np.pi / 2), [0])
         gates[3].append(RGate(0.5 * np.pi, np.pi / 2), [1])
         gates[4].append(CZGate(), [0, 1])
-        gate_labels = ["Rx(pi/2)", "Rx(pi/2)", "Ry(pi/2)", "Ry(pi/2)", "CZ"]
+        gate_labels = ["Rx_pi_2", "Rx_pi_2", "Ry_pi_2", "Ry_pi_2", "cz"]
     elif gate_set == "2QXYCZ_extended":
         gate_qubits = [[0], [1], [0], [1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
         gates = [QuantumCircuit(num_qubits, 0) for _ in range(9)]
@@ -485,14 +488,14 @@ def create_predefined_gate_set(
         gates[7].append(RGate(0.5 * np.pi, np.pi / 2), [1])
         gates[8].append(CZGate(), [[0], [1]])
         gate_labels = [
-            "Rx(pi/2)",
-            "Rx(pi/2)",
-            "Ry(pi/2)",
-            "Ry(pi/2)",
-            "Rx(pi/2)-Rx(pi/2)",
-            "Rx(pi/2)-Ry(pi/2)",
-            "Ry(pi/2)-Rx(pi/2)",
-            "Ry(pi/2)-Ry(pi/2)",
+            "Rx_pi_2",
+            "Rx_pi_2",
+            "Ry_pi_2",
+            "Ry_pi_2",
+            "Rx_pi_2-Rx_pi_2",
+            "Rx_pi_2-Ry_pi_2",
+            "Ry_pi_2-Rx_pi_2",
+            "Ry_pi_2-Ry_pi_2",
             "CZ",
         ]
     elif gate_set == "3QXYCZ":
@@ -510,7 +513,7 @@ def create_predefined_gate_set(
         gate_qubits = [[0], [1], [2], [0], [1], [2], [0, 1], [0, 2]]
         for i, gate in enumerate(gate_list):
             gates[i].append(gate, gate_qubits[i])
-        gate_labels = ["Rx(pi/2)", "Rx(pi/2)", "Rx(pi/2)", "Ry(pi/2)", "Ry(pi/2)", "Ry(pi/2)", "CZ", "CZ"]
+        gate_labels = ["Rx_pi_2", "Rx_pi_2", "Rx_pi_2", "Ry_pi_2", "Ry_pi_2", "Ry_pi_2", "cz", "cz"]
     else:
         raise ValueError(
             f"Invalid gate set, choose among 1QXYI, 2QXYCZ, 2QXYCZ_extended,"
@@ -526,6 +529,6 @@ def create_predefined_gate_set(
         iqm_qubits = [f"QB{q + 1}" for q in qubit_layout]
         gate_qubits_iqm = [(iqm_qubits[q] for q in qubits) for qubits in gate_qubits]
         for key, value in layout_label_dict.items():
-            layout_label_dict[key] = value + ":" + "-".join(gate_qubits_iqm[key])
+            layout_label_dict[key] = value + ":" + "__".join(gate_qubits_iqm[key])
         gate_label_dict.update({BenchmarkObservationIdentifier(qubit_layout).string_identifier: layout_label_dict})
     return gates, gate_label_dict, len(gates)

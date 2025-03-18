@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 from numpy import ndarray
 import numpy as np
+import ast
 from pandas import DataFrame
 from pygsti.models.model import Model
 from pygsti.tools import change_basis
@@ -218,16 +219,16 @@ def generate_non_gate_results(
         percentiles_o_low, percentiles_o_high = np.nanpercentile(df_o_array, [2.5, 97.5], axis=0)
         df_o_final = DataFrame(
             {
-                f"Mean TVD: estimate - data": reporting.number_to_str(
+                f"mean_absolute_error_estimate_data": reporting.number_to_str(
                     df_o.values[0, 1].copy(), [percentiles_o_high[0, 1], percentiles_o_low[0, 1]], precision=5
                 ),
-                f"Mean TVD: target - data": reporting.number_to_str(
+                f"mean_absolute_error_target_data": reporting.number_to_str(
                     df_o.values[0, 2].copy(), [percentiles_o_high[0, 2], percentiles_o_low[0, 2]], precision=5
                 ),
-                f"POVM - diamond dist.": reporting.number_to_str(
+                f"povm_diamond_distance": reporting.number_to_str(
                     df_o.values[0, 3].copy(), [percentiles_o_high[0, 3], percentiles_o_low[0, 3]], precision=5
                 ),
-                f"State - trace dist.": reporting.number_to_str(
+                f"state_trace_distance": reporting.number_to_str(
                     df_o.values[0, 4].copy(), [percentiles_o_high[0, 4], percentiles_o_low[0, 4]], precision=5
                 ),
             },
@@ -236,10 +237,10 @@ def generate_non_gate_results(
     else:
         df_o_final = DataFrame(
             {
-                f"Mean TVD: estimate - data": reporting.number_to_str(df_o.values[0, 1].copy(), precision=5),
-                f"Mean TVD: target - data": reporting.number_to_str(df_o.values[0, 2].copy(), precision=5),
-                f"POVM - diamond dist.": reporting.number_to_str(df_o.values[0, 3].copy(), precision=5),
-                f"State - trace dist.": reporting.number_to_str(df_o.values[0, 4].copy(), precision=5),
+                f"mean_absolute_error_estimate_data": reporting.number_to_str(df_o.values[0, 1].copy(), precision=5),
+                f"mean_absolute_error_target_data": reporting.number_to_str(df_o.values[0, 2].copy(), precision=5),
+                f"povm_diamond_distance": reporting.number_to_str(df_o.values[0, 3].copy(), precision=5),
+                f"state_trace_distance": reporting.number_to_str(df_o.values[0, 4].copy(), precision=5),
             },
             index=[""],
         )
@@ -290,13 +291,13 @@ def generate_unit_rank_gate_results(
 
         df_g_final = DataFrame(
             {
-                r"Avg. gate fidelity": [
+                r"average_gate_fidelity": [
                     reporting.number_to_str(
                         df_g.values[i, 0], [percentiles_g_high[i, 0], percentiles_g_low[i, 0]], precision=5
                     )
                     for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
-                r"Diamond distance": [
+                r"diamond_distance": [
                     reporting.number_to_str(
                         df_g.values[i, 1], [percentiles_g_high[i, 1], percentiles_g_low[i, 1]], precision=5
                     )
@@ -338,10 +339,10 @@ def generate_unit_rank_gate_results(
     else:
         df_g_final = DataFrame(
             {
-                "Avg. gate fidelity": [
+                "average_gate_fidelity": [
                     reporting.number_to_str(df_g.values[i, 0], precision=5) for i in range(dataset.attrs["num_gates"])
                 ],
-                "Diamond distance": [
+                "diamond_distance": [
                     reporting.number_to_str(df_g.values[i, 1], precision=5) for i in range(dataset.attrs["num_gates"])
                 ],
             }
@@ -442,19 +443,19 @@ def generate_gate_results(
 
         df_g_final = DataFrame(
             {
-                r"Avg. gate fidelity": [
+                r"average_gate_fidelity": [
                     reporting.number_to_str(
                         df_g.values[i, 0], [percentiles_g_high[i, 0], percentiles_g_low[i, 0]], precision=5
                     )
                     for i in range(dataset.attrs["num_gates"])
                 ],
-                r"Diamond distance": [
+                r"diamond_distance": [
                     reporting.number_to_str(
                         df_g.values[i, 1], [percentiles_g_high[i, 1], percentiles_g_low[i, 1]], precision=5
                     )
                     for i in range(dataset.attrs["num_gates"])
                 ],
-                r"Unitarity": [
+                r"unitarity": [
                     reporting.number_to_str(
                         reporting.unitarities(X_opt_pp)[i],
                         [percentiles_u_high[i], percentiles_u_low[i]],
@@ -468,15 +469,15 @@ def generate_gate_results(
     else:
         df_g_final = DataFrame(
             {
-                "Avg. gate fidelity": [
+                "average_gate_fidelity": [
                     reporting.number_to_str(df_g.values[i, 0].copy(), precision=5)
                     for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
-                "Diamond distance": [
+                "diamond_distance": [
                     reporting.number_to_str(df_g.values[i, 1].copy(), precision=5)
                     for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
-                "Unitarity": [
+                "unitarity": [
                     reporting.number_to_str(reporting.unitarities(X_opt_pp)[i], precision=5)
                     for i in range(len(dataset.attrs["gate_labels"][identifier]))
                 ],
@@ -574,12 +575,13 @@ def pandas_results_to_observations(
     """
     observation_list: list[BenchmarkObservation] = []
     err = dataset.attrs["bootstrap_samples"] > 0
+    qubits = "__".join([f"QB{i}" for i in ast.literal_eval(identifier.string_identifier)])
     for idx, gate_label in enumerate(dataset.attrs["gate_labels"][identifier.string_identifier].values()):
         observation_list.extend(
             [
                 BenchmarkObservation(
-                    name=f"{name} - {gate_label}",
-                    identifier=identifier,
+                    name=f"{name}_{gate_label.split(':')[0]}:crosstalk_components={qubits}",
+                    identifier=BenchmarkObservationIdentifier(qubit_indices=gate_label.split(':')[1]),
                     value=result_str_to_floats(df_g[name].iloc[idx], err)[0],
                     uncertainty=result_str_to_floats(df_g[name].iloc[idx], err)[1],
                 )
@@ -590,7 +592,7 @@ def pandas_results_to_observations(
         [
             BenchmarkObservation(
                 name=f"{name}",
-                identifier=identifier,
+                identifier=BenchmarkObservationIdentifier(qubit_indices=qubits),
                 value=result_str_to_floats(df_o[name].iloc[0], err)[0],
                 uncertainty=result_str_to_floats(df_o[name].iloc[0], err)[1],
             )
@@ -754,6 +756,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset = run.dataset
     pdim = dataset.attrs["pdim"]
     plots = {}
+    observations = []
     for i, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
         identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
@@ -820,9 +823,9 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
         plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
 
-        observation_list = pandas_results_to_observations(
+        observations.extend(pandas_results_to_observations(
             dataset, df_g_final, df_o_final, BenchmarkObservationIdentifier(qubit_layout)
-        )
+        ))
 
         dataset.attrs["results_layout_" + identifier].update(
             {"full_metrics": {"Gates": df_g_final.to_dict(), "Outcomes and SPAM": df_o_final.to_dict()}}
@@ -865,4 +868,4 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
         plt.close("all")
 
-    return BenchmarkAnalysisResult(dataset=dataset, observations=observation_list, plots=plots)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
