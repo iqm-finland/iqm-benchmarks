@@ -627,11 +627,11 @@ def plot_rb_decay(
                 str(q): dataset.attrs[q_idx]["polarizations"] for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_polarization_nominal_values"]
+                str(q): dataset.attrs[q_idx]["average_polarization_nominal_values"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_polatization_stderr"]
+                str(q): dataset.attrs[q_idx]["average_polatization_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
         else:  # identifier == "clifford"
@@ -643,28 +643,28 @@ def plot_rb_decay(
                 str(q): dataset.attrs[q_idx]["fidelities"] for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_fidelities_nominal_values"]
+                str(q): dataset.attrs[q_idx]["average_fidelities_nominal_values"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset.attrs[q_idx]["avg_fidelities_stderr"]
+                str(q): dataset.attrs[q_idx]["average_fidelities_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_native1q_value[identifier] = {
-                str(q): observations[q_idx]["avg_native_gate_fidelity"]["value"] if len(q) == 1 else np.nan
+                str(q): observations[q_idx]["average_native_gate_fidelity"]["value"] if len(q) == 1 else np.nan
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_native1q_stderr[identifier] = {
-                str(q): observations[q_idx]["avg_native_gate_fidelity"]["uncertainty"] if len(q) == 1 else np.nan
+                str(q): observations[q_idx]["average_native_gate_fidelity"]["uncertainty"] if len(q) == 1 else np.nan
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
         # These are common to both MRB and standard Clifford
         fidelity_value[identifier] = {
-            str(q): observations[q_idx]["avg_gate_fidelity"]["value"]
+            str(q): observations[q_idx]["average_gate_fidelity"]["value"]
             for q_idx, q in enumerate(qubits_array, qubits_index)
         }
         fidelity_stderr[identifier] = {
-            str(q): observations[q_idx]["avg_gate_fidelity"]["uncertainty"]
+            str(q): observations[q_idx]["average_gate_fidelity"]["uncertainty"]
             for q_idx, q in enumerate(qubits_array, qubits_index)
         }
         decay_rate[identifier] = {
@@ -689,19 +689,19 @@ def plot_rb_decay(
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["avg_fidelities_nominal_values"]
+                str(q): dataset.attrs[q_idx][rb_type]["average_fidelities_nominal_values"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[rb_type] = {
-                str(q): dataset.attrs[q_idx][rb_type]["avg_fidelities_stderr"]
+                str(q): dataset.attrs[q_idx][rb_type]["average_fidelities_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_value[rb_type] = {
-                str(q): observations[q_idx][rb_type]["avg_gate_fidelity"]["value"]
+                str(q): observations[q_idx][rb_type]["average_gate_fidelity"]["value"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_stderr[rb_type] = {
-                str(q): observations[q_idx][rb_type]["avg_gate_fidelity"]["uncertainty"]
+                str(q): observations[q_idx][rb_type]["average_gate_fidelity"]["uncertainty"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             decay_rate[rb_type] = {

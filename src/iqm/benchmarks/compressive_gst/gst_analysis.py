@@ -575,13 +575,13 @@ def pandas_results_to_observations(
     """
     observation_list: list[BenchmarkObservation] = []
     err = dataset.attrs["bootstrap_samples"] > 0
-    qubits = "__".join([f"QB{i}" for i in ast.literal_eval(identifier.string_identifier)])
+    qubits = "__".join([f"QB{i+1}" for i in ast.literal_eval(identifier.string_identifier)])
     for idx, gate_label in enumerate(dataset.attrs["gate_labels"][identifier.string_identifier].values()):
         observation_list.extend(
             [
                 BenchmarkObservation(
-                    name=f"{name}_{gate_label.split(':')[0]}:crosstalk_components={qubits}",
-                    identifier=BenchmarkObservationIdentifier(qubit_indices=gate_label.split(':')[1]),
+                    name=f"{name}_{gate_label}:crosstalk_components={qubits}",
+                    identifier=identifier,
                     value=result_str_to_floats(df_g[name].iloc[idx], err)[0],
                     uncertainty=result_str_to_floats(df_g[name].iloc[idx], err)[1],
                 )
@@ -592,7 +592,7 @@ def pandas_results_to_observations(
         [
             BenchmarkObservation(
                 name=f"{name}",
-                identifier=BenchmarkObservationIdentifier(qubit_indices=qubits),
+                identifier=identifier,
                 value=result_str_to_floats(df_o[name].iloc[0], err)[0],
                 uncertainty=result_str_to_floats(df_o[name].iloc[0], err)[1],
             )
