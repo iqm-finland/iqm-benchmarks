@@ -219,10 +219,10 @@ def generate_non_gate_results(
         percentiles_o_low, percentiles_o_high = np.nanpercentile(df_o_array, [2.5, 97.5], axis=0)
         df_o_final = DataFrame(
             {
-                f"mean_absolute_error_estimate_data": reporting.number_to_str(
+                f"mean_total_variation_distance_estimate_data": reporting.number_to_str(
                     df_o.values[0, 1].copy(), [percentiles_o_high[0, 1], percentiles_o_low[0, 1]], precision=5
                 ),
-                f"mean_absolute_error_target_data": reporting.number_to_str(
+                f"mean_total_variation_distance_target_data": reporting.number_to_str(
                     df_o.values[0, 2].copy(), [percentiles_o_high[0, 2], percentiles_o_low[0, 2]], precision=5
                 ),
                 f"povm_diamond_distance": reporting.number_to_str(
@@ -237,8 +237,8 @@ def generate_non_gate_results(
     else:
         df_o_final = DataFrame(
             {
-                f"mean_absolute_error_estimate_data": reporting.number_to_str(df_o.values[0, 1].copy(), precision=5),
-                f"mean_absolute_error_target_data": reporting.number_to_str(df_o.values[0, 2].copy(), precision=5),
+                f"mean_total_variation_distance_estimate_data": reporting.number_to_str(df_o.values[0, 1].copy(), precision=5),
+                f"mean_total_variation_distance_target_data": reporting.number_to_str(df_o.values[0, 2].copy(), precision=5),
                 f"povm_diamond_distance": reporting.number_to_str(df_o.values[0, 3].copy(), precision=5),
                 f"state_trace_distance": reporting.number_to_str(df_o.values[0, 4].copy(), precision=5),
             },
