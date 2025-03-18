@@ -117,7 +117,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     result_direct_rb = direct_rb_analysis(run)
 
     dataset = result_direct_rb.dataset.copy(deep=True)
-    observations = dataset.observations.copy(deep=True)
+    observations = result_direct_rb.observations
     plots = {}
 
     num_edges = len(observations)
@@ -134,7 +134,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     observations.append(
         BenchmarkObservation(
             name="Layer Fidelity",
-            identifier=BenchmarkObservationIdentifier(f"n_qubits={num_qubits}"),
+            identifier=BenchmarkObservationIdentifier(f"(n_qubits={num_qubits})"),
             value=LF.nominal_value,
             uncertainty=LF.std_dev,
         )
@@ -143,8 +143,8 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     observations.append(
         BenchmarkObservation(
             name="EPLG",
-            identifier=BenchmarkObservationIdentifier(f"n_qubits={num_qubits}"),
-            value=(1 - LF ** (1 / num_edges)),
+            identifier=BenchmarkObservationIdentifier(f"(n_qubits={num_qubits})"),
+            value=(1 - LF ** (1 / num_edges)).nominal_value,
             uncertainty=LF.std_dev,
         )
     )
@@ -154,6 +154,8 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
 class EPLGBenchmark(Benchmark):
     """EPLG estimates the layer fidelity of native 2Q gate layers"""
+
+    analysis_function = staticmethod(eplg_analysis)
 
     name: str = "EPLG"
 
