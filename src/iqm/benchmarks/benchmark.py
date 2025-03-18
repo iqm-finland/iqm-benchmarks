@@ -51,6 +51,7 @@ class BenchmarkBase(ABC):
         self.shots = self.configuration.shots
         self.calset_id = self.configuration.calset_id
         self.max_gates_per_batch = self.configuration.max_gates_per_batch
+        self.max_circuits_per_batch = self.configuration.max_circuits_per_batch
 
         self.routing_method = self.configuration.routing_method
         self.physical_layout = self.configuration.physical_layout
@@ -92,6 +93,8 @@ class BenchmarkConfigurationBase(BaseModel):
                 * Default for all benchmarks is 2**8.
         max_gates_per_batch (Optional[int]): the maximum number of gates per circuit batch.
                 * Default for all benchmarks is None.
+        max_circuits_per_batch (Optional[int]): the maximum number of circuits per batch.
+                * Default for all benchmarks is None.
         calset_id (Optional[str]): the calibration ID to use in circuit execution.
                 * Default for all benchmarks is None (uses last available calibration ID).
         routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): the Qiskit routing method to use in transpilation.
@@ -100,13 +103,14 @@ class BenchmarkConfigurationBase(BaseModel):
                 - "fixed": physical layout is constrained during transpilation to the selected initial physical qubits.
                 - "batching": physical layout is allowed to use any other physical qubits, and circuits are batched according to final measured qubits.
                 * Default for all benchmarks is "fixed".
-        use_dd (bool): Boolean flag determining if dynamical decoupling is enabled during circuit execution
+        use_dd (bool): Boolean flag determining whether to enable dynamical decoupling during circuit execution.
             * Default: False
     """
 
     benchmark: Type[BenchmarkBase]
     shots: int = 2**8
     max_gates_per_batch: Optional[int] = None
+    max_circuits_per_batch: Optional[int] = None
     calset_id: Optional[str] = None
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "sabre"
     physical_layout: Literal["fixed", "batching"] = "fixed"

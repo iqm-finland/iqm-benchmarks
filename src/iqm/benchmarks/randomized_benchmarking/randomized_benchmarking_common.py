@@ -644,6 +644,7 @@ def submit_parallel_rb_job(
     shots: int,
     calset_id: Optional[str],
     max_gates_per_batch: Optional[str],
+    max_circuits_per_batch: Optional[int],
 ) -> Dict[str, Any]:
     """Submit fixed-depth parallel MRB jobs for execution in the specified IQMBackend
     Args:
@@ -654,6 +655,7 @@ def submit_parallel_rb_job(
         shots (int): the number of shots to submit the job
         calset_id (Optional[str]): the calibration identifier
         max_gates_per_batch (Optional[str]): the maximum number of gates per batch to submit the job
+        max_circuits_per_batch (Optional[int]): the maximum number of circuits per batch to submit the job.
     Returns:
         Dict with qubit layout, submitted job objects, type (vanilla/DD) and submission time
     """
@@ -661,7 +663,12 @@ def submit_parallel_rb_job(
     # Send to execute on backend
     # pylint: disable=unbalanced-tuple-unpacking
     execution_jobs, time_submit = submit_execute(
-        sorted_transpiled_circuit_dicts, backend_arg, shots, calset_id, max_gates_per_batch=max_gates_per_batch
+        sorted_transpiled_circuit_dicts,
+        backend_arg,
+        shots,
+        calset_id,
+        max_gates_per_batch=max_gates_per_batch,
+        max_circuits_per_batch=max_circuits_per_batch,
     )
     rb_submit_results = {
         "qubits": qubits_array,
@@ -679,6 +686,7 @@ def submit_sequential_rb_jobs(
     backend_arg: str | IQMBackendBase,
     calset_id: Optional[str] = None,
     max_gates_per_batch: Optional[int] = None,
+    max_circuits_per_batch: Optional[int] = None,
     circuit_compilation_options: Optional[CircuitCompilationOptions] = None,
 ) -> List[Dict[str, Any]]:
     """Submit sequential RB jobs for execution in the specified IQMBackend
@@ -689,6 +697,7 @@ def submit_sequential_rb_jobs(
         backend_arg (IQMBackendBase): the IQM backend to submit the job
         calset_id (Optional[str]): the calibration identifier
         max_gates_per_batch (Optional[int]): the maximum number of gates per batch
+        max_circuits_per_batch (Optional[int]): the maximum number of circuits per batch
         circuit_compilation_options (Optional[CircuitCompilationOptions]): Compilation options passed to submit_execute
     Returns:
         Dict with qubit layout, submitted job objects, type (vanilla/DD) and submission time
@@ -709,6 +718,7 @@ def submit_sequential_rb_jobs(
             shots,
             calset_id,
             max_gates_per_batch,
+            max_circuits_per_batch=max_circuits_per_batch,
             circuit_compilation_options=circuit_compilation_options,
         )
         rb_submit_results[depth] = {

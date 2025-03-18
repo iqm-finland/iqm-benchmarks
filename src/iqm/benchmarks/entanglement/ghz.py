@@ -851,6 +851,7 @@ class GHZBenchmark(Benchmark):
                 self.shots,
                 self.calset_id,
                 max_gates_per_batch=self.max_gates_per_batch,
+                max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
 
