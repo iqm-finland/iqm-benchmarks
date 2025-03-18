@@ -142,7 +142,7 @@ class TestSubmitExecute(unittest.TestCase):
 
         # For large circuits:
         # - max_gates_per_batch=15 would allow 1 circuit per batch (12 operations each)
-        # - max_circuits_per_batch=4 would allow 3 circuits per batch
+        # - max_circuits_per_batch=2 would allow 2 circuits per batch
         # Should use the more restrictive: 1 circuit per batch
 
         # For small circuits:
@@ -151,7 +151,7 @@ class TestSubmitExecute(unittest.TestCase):
         # Should use the more restrictive: 2 circuits per batch
 
         expected_batch_sizes_large = [1, 1, 1, 1, 1]  # 5 batches of 1 circuit
-        expected_batch_sizes_small = [2, 2, 2, 2, 2]  # 3 batches of 3 circuits, 1 batch of 1
+        expected_batch_sizes_small = [2, 2, 2, 2, 2]  # 5 batches of 2 circuits
 
         actual_batch_sizes = [len(args[0]) for args, _ in self.mock_backend.run.call_args_list]
 
