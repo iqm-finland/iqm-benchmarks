@@ -747,7 +747,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                 # Take the whole loop_qubits_sequence and do DRB in parallel on each loop_qubits_sequence element
                 parallel_drb_circuits = {}
                 qcvv_logger.info(
-                    f"Executing parallel Direct RB on qubits {loop_qubits_sequence}."
+                    f"Executing parallel Direct RB on qubits {loop_qubits_sequence} (group {qubits_seq_idx+1})/{len(wrapped_qubits_array)})."
                     f" Will generate and submit all {self.num_circuit_samples} DRB circuits"
                     f" for each depth {self.depths}"
                 )
