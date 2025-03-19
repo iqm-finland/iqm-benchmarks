@@ -27,8 +27,7 @@ from iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb import (
     DirectRBConfiguration,
     direct_rb_analysis,
 )
-from iqm.benchmarks.utils import evaluate_hamiltonian_paths
-from iqm.benchmarks.utils_plots import GraphPositions, rx_to_nx_graph
+from iqm.benchmarks.utils_plots import GraphPositions, evaluate_hamiltonian_paths, rx_to_nx_graph
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -125,13 +124,18 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_qubits = dataset.attrs["chain_length"]
 
     total_mean = []
-    fid_product = [1, 0]
+    # fid_product = [1, 0]
+    fid_product = ufloat(1, 0)
     for obs in observations:
-        fid_product[0] *= obs.value
-        fid_product[1] += obs.uncertainty
-        total_mean.append(ufloat(obs.value, obs.uncertainty))
+        fid_product *= ufloat(obs.value, obs.uncertainty)
+        total_mean.append(fid_product)
+        # fid_product[0] *= obs.value
+        # fid_product[1] += obs.uncertainty
+        # total_mean.append(ufloat(obs.value, obs.uncertainty))
 
-    LF = ufloat(fid_product[0], fid_product[1])
+    LF = fid_product
+    EPLG = 1 - LF ** (1 / num_edges)
+
     observations.append(
         BenchmarkObservation(
             name="Layer Fidelity",
@@ -145,8 +149,8 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         BenchmarkObservation(
             name="EPLG",
             identifier=BenchmarkObservationIdentifier(f"(n_qubits={num_qubits})"),
-            value=(1 - LF ** (1 / num_edges)).nominal_value,
-            uncertainty=LF.std_dev,
+            value=EPLG.nominal_value,
+            uncertainty=EPLG.std_dev,
         )
     )
 
@@ -256,7 +260,7 @@ class EPLGBenchmark(Benchmark):
 
         self.add_all_meta_to_dataset(dataset_eplg)
 
-        if self.custom_qubits_array:
+        if self.custom_qubits_array is not None:
             self.validate_custom_qubits_array()
             all_disjoint = [
                 self.custom_qubits_array[i :: self.num_disjoint_layers]

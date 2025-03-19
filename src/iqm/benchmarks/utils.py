@@ -35,7 +35,6 @@ import requests
 import xarray as xr
 
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.utils_plots import rx_to_nx_graph
 from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm import transpile_to_IQM
@@ -193,6 +192,50 @@ def count_native_gates(
     return avg_native_operations
 
 
+def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]:
+    """Returns couplings and CZ-fidelities from calibration data URL
+
+    Args:
+        cal_url: str
+            The url under which the calibration data for the backend can be found
+    Returns:
+        list_couplings: List[List[int]]
+            A list of pairs, each of which is a qubit coupling for which the calibration
+            data contains a fidelity.
+        list_fids: List[float]
+            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
+        topology: str
+            Name of the chip topology layout, currently either "star" or "crystal"
+    """
+    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
+    r = requests.get(cal_url, headers=headers, timeout=60)
+    calibration = r.json()
+    cal_keys = {
+        el2["key"]: (i, j) for i, el1 in enumerate(calibration["calibrations"]) for j, el2 in enumerate(el1["metrics"])
+    }
+    list_couplings = []
+    list_fids = []
+    if "double_move_gate_fidelity" in cal_keys.keys():
+        i, j = cal_keys["double_move_gate_fidelity"]
+        topology = "star"
+    else:
+        i, j = cal_keys["cz_gate_fidelity"]
+        topology = "crystal"
+    for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
+        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
+        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
+        if topology == "star":
+            list_couplings.append([qb1, qb2])
+        else:
+            list_couplings.append([qb1 - 1, qb2 - 1])
+        list_fids.append(float(item["value"]))
+    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
+    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
+
+    return list_couplings, list_fids, topology
+
+
 # pylint: disable=too-many-branches
 def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     """Get the IQM backend object from a backend name (str).
@@ -233,81 +276,6 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
         raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis' or 'fakeapollo'.")
 
     return backend_object
-
-
-def evaluate_hamiltonian_paths(
-    N: int,
-    path_samples: int,
-    backend_arg: str | IQMBackendBase,
-    url: str,
-    max_tries: int = 10,
-) -> Dict[int, List[Tuple[int, int]]]:
-    """Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.
-
-    Args:
-        N (int): the number of vertices in the Hamiltonian paths to evaluate.
-        path_samples (int): the number of Hamiltonian paths to evaluate.
-        backend_arg (str | IQMBackendBase): the backend to evaluate the Hamiltonian paths on with respect to fidelity.
-        url (str): the URL address for the backend to retrieve calibration data from.
-        max_tries (int): the maximum number of tries to generate a Hamiltonian path.
-
-    Returns:
-        Dict[int, List[Tuple[int, int]]]: A dictionary with keys being fidelity products and values being the respective Hamiltonian paths.
-    """
-    if isinstance(backend_arg, str):
-        backend = get_iqm_backend(backend_arg)
-    else:
-        backend = backend_arg
-
-    backend_nx_graph = rx_to_nx_graph(backend_arg)
-
-    all_paths = []
-    sample_counter = 0
-    tries = 0
-    while sample_counter < path_samples and tries < max_tries:
-        h_path = random_hamiltonian_path(backend_nx_graph, N)
-        if not h_path:
-            tries += 1
-            continue
-
-        all_paths.append(h_path)
-        tries = 0
-        sample_counter += 1
-    if tries == max_tries - 1:
-        raise RecursionError(
-            f"Max tries to generate a Hamiltonian path with {N} vertices reached - try with less vertices!"
-        )
-
-    # Get scores for all paths
-    # Retrieve fidelity data
-    two_qubit_fidelity = {}
-
-    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
-    r = requests.get(url, headers=headers, timeout=60)
-    calibration = r.json()
-
-    edge_dictionary = {}
-    for iq in calibration["calibrations"][0]["metrics"][0]["metrics"]:
-        temp = list(iq.values())
-        two_qubit_fidelity[str(temp[0])] = temp[1]
-        two_qubit_fidelity[str([temp[0][1], temp[0][0]])] = temp[1]
-        edge_dictionary[str([temp[0][1], temp[0][0]])] = (
-            backend.qubit_name_to_index(temp[0][1]),
-            backend.qubit_name_to_index(temp[0][0]),
-        )
-
-    # Rate all the paths
-    path_costs = {}  # keys are costs, values are edge paths
-    for h_path in all_paths:
-        total_cost = 1
-        for edge in h_path:
-            if len(edge) == 2:
-                total_cost *= two_qubit_fidelity[
-                    str([backend.index_to_qubit_name(edge[0]), backend.index_to_qubit_name(edge[1])])
-                ]
-        path_costs[total_cost] = h_path
-
-    return path_costs
 
 
 def marginal_distribution(prob_dist: Dict[str, float], indices: Iterable[int]) -> Dict[str, float]:
@@ -715,47 +683,3 @@ def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int
         dict(zip(list(dataset[f"{identifier}_state_{u}"].data), dataset[f"{identifier}_counts_{u}"].data))
         for u in range(counts_range)
     ]
-
-
-def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]:
-    """Returns couplings and CZ-fidelities from calibration data URL
-
-    Args:
-        cal_url: str
-            The url under which the calibration data for the backend can be found
-    Returns:
-        list_couplings: List[List[int]]
-            A list of pairs, each of which is a qubit coupling for which the calibration
-            data contains a fidelity.
-        list_fids: List[float]
-            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
-        topology: str
-            Name of the chip topology layout, currently either "star" or "crystal"
-    """
-    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
-    r = requests.get(cal_url, headers=headers, timeout=60)
-    calibration = r.json()
-    cal_keys = {
-        el2["key"]: (i, j) for i, el1 in enumerate(calibration["calibrations"]) for j, el2 in enumerate(el1["metrics"])
-    }
-    list_couplings = []
-    list_fids = []
-    if "double_move_gate_fidelity" in cal_keys.keys():
-        i, j = cal_keys["double_move_gate_fidelity"]
-        topology = "star"
-    else:
-        i, j = cal_keys["cz_gate_fidelity"]
-        topology = "crystal"
-    for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
-        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
-        if topology == "star":
-            list_couplings.append([qb1, qb2])
-        else:
-            list_couplings.append([qb1 - 1, qb2 - 1])
-        list_fids.append(float(item["value"]))
-    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
-    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
-
-    return list_couplings, list_fids, topology
