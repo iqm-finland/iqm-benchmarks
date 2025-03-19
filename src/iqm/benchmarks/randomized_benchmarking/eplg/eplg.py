@@ -327,7 +327,7 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
     benchmark: Type[Benchmark] = EPLGBenchmark
     drb_depths: Sequence[int]
     drb_circuit_samples: int
-    custom_qubits_array: Optional[Sequence[int]] = None
+    custom_qubits_array: Optional[Sequence[Sequence[int]]] = None
     chain_length: Optional[int] = None
     chain_path_samples: Optional[int] = None
     num_disjoint_layers: Optional[int] = None
