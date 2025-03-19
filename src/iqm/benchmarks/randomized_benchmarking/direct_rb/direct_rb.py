@@ -701,6 +701,7 @@ class DirectRandomizedBenchmarking(Benchmark):
             self.shots,
             self.calset_id,
             max_gates_per_batch=self.max_gates_per_batch,
+            max_circuits_per_batch=self.configuration.max_circuits_per_batch,
         )
         drb_submit_results = {
             "qubits": qubits,
@@ -741,7 +742,9 @@ class DirectRandomizedBenchmarking(Benchmark):
             # If the qubits_array is a single qubit layout, wrap it in a list (so that the loop below proceeds at the right level)
             wrapped_qubits_array = [self.qubits_array]
         else:
-            wrapped_qubits_array = self.qubits_array
+            wrapped_qubits_array = cast(
+                List[Sequence[Sequence[int]] | Sequence[Sequence[Sequence[int]]]], [self.qubits_array]
+            )
 
         for qubits_seq_idx, loop_qubits_sequence in enumerate(wrapped_qubits_array):
             if self.parallel_execution:
@@ -783,9 +786,10 @@ class DirectRandomizedBenchmarking(Benchmark):
                             loop_qubits_sequence,
                             depth,
                             sorted_transpiled_qc_list,
-                            self.shots,
-                            self.calset_id,
-                            self.max_gates_per_batch,
+                            shots=self.shots,
+                            calset_id=self.calset_id,
+                            max_gates_per_batch=self.max_gates_per_batch,
+                            max_circuits_per_batch=self.configuration.max_gates_per_batch,
                         )
                     )
                     qcvv_logger.info(f"Job for depth {depth} submitted successfully!")
@@ -841,9 +845,16 @@ class DirectRandomizedBenchmarking(Benchmark):
                         drb_untranspiled_circuits_lists[depth] = drb_circuits[depth]["untranspiled"]
 
                         # Submit
-                        sorted_transpiled_qc_list = {tuple(qubits): drb_transpiled_circuits_lists[depth]}
+                        sorted_transpiled_qc_list = {
+                            cast(Tuple[int, ...], tuple(qubits)): drb_transpiled_circuits_lists[depth]
+                        }
                         all_drb_jobs.append(
-                            self.submit_single_drb_job(backend, qubits, depth, sorted_transpiled_qc_list)
+                            self.submit_single_drb_job(
+                                backend,
+                                cast(Sequence[int], qubits),
+                                depth,
+                                cast(dict[tuple[int, ...], list[Any]], sorted_transpiled_qc_list),
+                            )
                         )
 
                         qcvv_logger.info(f"Job for layout {qubits} & depth {depth} submitted successfully!")

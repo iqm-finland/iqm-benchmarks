@@ -676,7 +676,9 @@ def submit_execute(
                 qcvv_logger.warning(
                     "Both max_gates_per_batch and max_circuits_per_batch are not None. Selecting the one giving the smallest batches."
                 )
-                batching_size = min(cast(int, max_circuits_per_batch), max(1, floor(cast(int, max_gates_per_batch) / avg_gates_per_qc)))
+                batching_size = min(
+                    cast(int, max_circuits_per_batch), max(1, floor(cast(int, max_gates_per_batch) / avg_gates_per_qc))
+                )
                 if batching_size == max_circuits_per_batch:
                     restriction = "max_circuits_per_batch"
                 else:

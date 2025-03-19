@@ -3,7 +3,7 @@ Error Per Layered Gate (EPLG).
 """
 
 from time import strftime
-from typing import Optional, Sequence, Tuple, Type
+from typing import Dict, Optional, Sequence, Tuple, Type, cast
 
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
@@ -27,7 +27,8 @@ from iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb import (
     DirectRBConfiguration,
     direct_rb_analysis,
 )
-from iqm.benchmarks.utils import GraphPositions, evaluate_hamiltonian_paths, rx_to_nx_graph
+from iqm.benchmarks.utils import evaluate_hamiltonian_paths
+from iqm.benchmarks.utils_plots import GraphPositions, rx_to_nx_graph
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -89,7 +90,7 @@ def draw_linear_chain_graph(
 
     else:
         num_disjoint_layers = len(disjoint_layers)
-        colors = plt.cm.rainbow(np.linspace(0, 1, num_disjoint_layers))
+        colors = plt.colormaps["rainbow"](np.linspace(0, 1, num_disjoint_layers))
         all_edge_colors = [[colors[i]] * len(l) for i, l in enumerate(disjoint_layers)]  # Flatten below
         nx.draw_networkx(
             rx_to_nx_graph(backend),
@@ -118,7 +119,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     dataset = result_direct_rb.dataset.copy(deep=True)
     observations = result_direct_rb.observations
-    plots = {}
+    plots: Dict[str, Figure] = {}
 
     num_edges = len(observations)
     num_qubits = dataset.attrs["chain_length"]
@@ -206,21 +207,27 @@ class EPLGBenchmark(Benchmark):
         # Defined outside configuration - if any
 
     def validate_custom_qubits_array(self):
-        """Validates that the custom qubits array input forms a linear chain (Hamiltonian path).
-
-        Raises:
-        """
+        """Validates that the custom qubits array input forms a linear chain (Hamiltonian path)."""
         if self.custom_qubits_array is not None:
-            # TODO: Implement custom qubits array - have to validate that the qubits constitute a linear chain (Hamiltonian path).
-            raise NotImplementedError
+            # TODO: Validate that the qubits constitute a linear chain (Hamiltonian path)! # pylint: disable=fixme
+            qcvv_logger.info(
+                "WARNING: custom_qubits_array validation not yet implemented! Make sure it forms a linear chain."
+            )
+
+        if self.num_disjoint_layers is None:
+            self.num_disjoint_layers = 2
+        elif self.num_disjoint_layers < 1:
+            raise ValueError("The number of disjoint layers must be a positive integer.")
 
     def validate_random_chain_inputs(self):
         """Validates inputs for chain sampling.
 
         Raises:
+            ValueError: If the chain inputs are beyond general or EPLG criteria.
         """
         # Check chain length
         if self.chain_length is None:
+            qcvv_logger.warning("chain_length input was None: will assign backend.num_qubits!")
             self.chain_length = self.backend.num_qubits
         elif self.chain_length > self.backend.num_qubits:
             raise ValueError("The chain length cannot exceed the number of qubits in the backend.")
@@ -245,13 +252,17 @@ class EPLGBenchmark(Benchmark):
 
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
-        dataset = xr.Dataset()
         dataset_eplg = xr.Dataset()
 
         self.add_all_meta_to_dataset(dataset_eplg)
 
         if self.custom_qubits_array:
             self.validate_custom_qubits_array()
+            all_disjoint = [
+                self.custom_qubits_array[i :: self.num_disjoint_layers]
+                for i in range(cast(int, self.num_disjoint_layers))
+            ]
+
         else:
             self.validate_random_chain_inputs()
 
@@ -262,25 +273,28 @@ class EPLGBenchmark(Benchmark):
             qcvv_logger.info("Extracting the path that maximizes total 2Q calibration fidelity")
             max_cost_path = h_path_costs[max(h_path_costs.keys())]
 
-            all_disjoint = [max_cost_path[i :: self.num_disjoint_layers] for i in range(self.num_disjoint_layers)]
+            all_disjoint = [
+                max_cost_path[i :: self.num_disjoint_layers] for i in range(cast(int, self.num_disjoint_layers))
+            ]
 
-            # Execute parallel DRB in all disjoint layers
-            drb_config = DirectRBConfiguration(
-                qubits_array=all_disjoint,
-                is_eplg=True,
-                depths=self.drb_depths,
-                num_circuit_samples=self.drb_circuit_samples,
-                shots=self.shots,
-                max_gates_per_batch=self.max_gates_per_batch,
-            )
+        # Execute parallel DRB in all disjoint layers
+        drb_config = DirectRBConfiguration(
+            qubits_array=all_disjoint,
+            is_eplg=True,
+            depths=self.drb_depths,
+            num_circuit_samples=self.drb_circuit_samples,
+            shots=self.shots,
+            max_gates_per_batch=self.max_gates_per_batch,
+            max_circuits_per_batch=self.configuration.max_circuits_per_batch,
+        )
 
-            benchmarks_direct_rb = DirectRandomizedBenchmarking(backend, drb_config)
+        benchmarks_direct_rb = DirectRandomizedBenchmarking(backend, drb_config)
 
-            run_direct_rb = benchmarks_direct_rb.run()
+        run_direct_rb = benchmarks_direct_rb.run()
 
-            dataset = run_direct_rb.dataset
+        dataset = run_direct_rb.dataset
 
-            dataset.attrs.update(dataset_eplg.attrs)
+        dataset.attrs.update(dataset_eplg.attrs)
 
         return dataset
 
@@ -295,7 +309,7 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
                 * If not specified, will proceed to generate linear chains at random, selecting the one with the highest total 2Q gate fidelity.
                 * Default is None.
         chain_length (Optional[int]): The length of the linear chain of 2Q gates to consider, corresponding to the number of qubits, if custom_qubits_array not specified.
-                * Default is None: assigns the number of qubits in the backend, lowering by 1 each time a chain is not successfuly found.
+                * Default is None: assigns the number of qubits in the backend minus one.
         chain_path_samples (int): The number of chain path samples to consider, if custom_qubits_array not specified.
                 * Default is None: assigns 20 path samples (arbitrary).
         calibration_url (Optional[str]): The URL of the IQM station to retrieve calibration data from.
