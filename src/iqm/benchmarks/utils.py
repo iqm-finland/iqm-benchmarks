@@ -387,7 +387,7 @@ def get_Pauli_expectation(counts: Dict[str, int], pauli_label: str) -> float:
     all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
 
     if pauli_label not in all_pauli_labels:
-        raise ValueError("pauli_label must be specified as a string made up of characters  'X', 'Y', or 'Z'.")
+        raise ValueError("pauli_label must be specified as a string made up of characters 'I', 'X', 'Y', or 'Z'.")
 
     expect = 0
     if "I" not in pauli_label:
