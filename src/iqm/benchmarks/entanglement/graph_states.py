@@ -172,7 +172,7 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     layers = generate_minimal_edge_layers(coupling_map)
     # Add all H
     for q in range(num_qubits):
-        qc.h(q)
+        qc.r(np.pi/2, np.pi/2, q)
     # Add all CZ
     for layer in layers.values():
         for edge in layer:
