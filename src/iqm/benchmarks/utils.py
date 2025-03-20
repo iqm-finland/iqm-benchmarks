@@ -369,7 +369,7 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
     return neighboring_nodes
 
 
-def get_Pauli_expectation(counts: Dict[str, int], pauli_label: str) -> float:
+def get_Pauli_expectation(counts: Dict[str, int], pauli_label: Literal["I","X","Y","Z"]) -> float:
     """Gets an estimate of a Pauli expectation value for a given set of counts and a Pauli measurement label.
 
     Args:
