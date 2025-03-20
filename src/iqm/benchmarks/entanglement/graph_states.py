@@ -431,7 +431,7 @@ def plot_max_negativities_graph(
             station = "garnet" if backend.num_qubits == 20 else "emerald"
             qubit_positions = GraphPositions.predefined_stations[station]
         else:
-            qubit_positions = GraphPositions.create_positions(graph_backend, station)
+            qubit_positions = GraphPositions.create_positions(graph_backend)
 
     # Normalize negativity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(negativity_values)), vmax=cast(float, max(negativity_values)))
