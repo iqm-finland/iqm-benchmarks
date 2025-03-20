@@ -382,7 +382,7 @@ def plot_max_negativities_graph(
 
     Args:
         negativities (Dict[str, Dict[str, str | float]]): A dictionary (str qubit keys) of dictionaries (keys "value"/"uncertainty") of negativities (float) to plot.
-        backend (IQMBackendBase): The name of the backend corresponding to negativities.
+        backend (IQMBackendBase): The backend object corresponding to negativities.
         timestamp (str): The timestamp of the corresponding experiment.
         tomography (Literal["shadow_tomography", "state_tomography"]): The type of tomography that was used.
         station (str): The name of the station to use for the graph layout.
