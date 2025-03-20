@@ -422,7 +422,7 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         fidelity = rb_fit_results.params["fidelity_mrb"]
 
         processed_results = {
-            "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
+            "average_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
         }
 
         dataset.attrs[qubits_idx].update(
@@ -431,8 +431,8 @@ def mrb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
                 "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                 "polarizations": polarizations,
-                "avg_polarization_nominal_values": average_polarizations,
-                "avg_polatization_stderr": stddevs_from_mean,
+                "average_polarization_nominal_values": average_polarizations,
+                "average_polatization_stderr": stddevs_from_mean,
                 "fitting_method": str(rb_fit_results.method),
                 "num_function_evals": int(rb_fit_results.nfev),
                 "data_points": int(rb_fit_results.ndata),
