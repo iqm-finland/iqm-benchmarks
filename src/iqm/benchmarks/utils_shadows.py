@@ -56,7 +56,7 @@ def local_shadow_tomography(
     cliffords_1q: Optional[Dict[str, QuantumCircuit]] = None,
 ) -> Tuple[np.ndarray | Dict[str, List[str]], List[QuantumCircuit]]:
     """
-    Prepares the circuits to perform Haar shadow tomography.
+    Prepares the circuits to perform local Haar or Clifford shadow tomography.
 
     Args:
         qc (QuantumCircuit): The quantum circuit to which random unitaries are appended.
