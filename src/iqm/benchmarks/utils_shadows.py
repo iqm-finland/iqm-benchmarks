@@ -72,7 +72,7 @@ def local_shadow_tomography(
 
     Raises:
         ValueError: If clifford_or_haar is not "clifford" or "haar".
-        Exception: If cliffords_1q is None and clifford_or_haar is "clifford".
+        ValueError: If cliffords_1q is None and clifford_or_haar is "clifford".
 
     Returns:
         Tuple[np.ndarray | Dict[str, List[str]], List[QuantumCircuit]]:
