@@ -324,7 +324,7 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
-def get_measurement_mapping(circuit: QuantumCircuit):
+def get_measurement_mapping(circuit: QuantumCircuit) -> Dict[int, int]:
     """
     Extracts the final measurement mapping (qubits to bits) of a quantum circuit.
 
@@ -348,7 +348,7 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
 
     Args:
         edges (Sequence[Sequence[int]]): A sequence of pairs of integers, representing edges of a graph.
-        graph (Sequence[Sequence[int]]): The input graph specified either as a sequence of edges (Sequence[int]).
+        graph (Sequence[Sequence[int]]): The input graph specified as a sequence of edges (Sequence[int]).
     Returns:
         Sequence[int]: list of all neighboring nodes of the input edges.
     """
@@ -369,7 +369,7 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
     return neighboring_nodes
 
 
-def get_Pauli_expectation(counts: Dict[str, int], pauli_label: Literal["I","X","Y","Z"]) -> float:
+def get_Pauli_expectation(counts: Dict[str, int], pauli_label: Literal["I", "X", "Y", "Z"]) -> float:
     """Gets an estimate of a Pauli expectation value for a given set of counts and a Pauli measurement label.
 
     Args:
@@ -414,7 +414,7 @@ def get_tomography_matrix(pauli_expectations: Dict[str, float]) -> np.ndarray:
     Args:
         pauli_expectations (Dict[str, float]): A dictionary of Pauli expectations, with keys being Pauli strings.
     Raises:
-        ValueError: If Pauli not all 4**n expectations are specified.
+        ValueError: If not all 4**n Pauli expectations are specified.
     Returns:
         np.ndarray: A tomographically reconstructed density matrix.
     """
@@ -423,7 +423,7 @@ def get_tomography_matrix(pauli_expectations: Dict[str, float]) -> np.ndarray:
     all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
     if set(list(pauli_expectations.keys())) != set(all_pauli_labels):
         raise ValueError(
-            f"Pauli expectations is incomplete ({len(list(pauli_expectations.values()))} out of {len(all_pauli_labels)} expectations)"
+            f"Pauli expectations are incomplete ({len(list(pauli_expectations.keys()))} out of {len(all_pauli_labels)} expectations)"
         )
 
     rho = np.zeros([2**num_qubits, 2**num_qubits], dtype=complex)

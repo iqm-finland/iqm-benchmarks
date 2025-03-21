@@ -172,7 +172,7 @@ def generate_graph_state(qubits: Sequence[int], backend: IQMBackendBase | str) -
     layers = generate_minimal_edge_layers(coupling_map)
     # Add all H
     for q in range(num_qubits):
-        qc.r(np.pi/2, np.pi/2, q)
+        qc.r(np.pi / 2, np.pi / 2, q)
     # Add all CZ
     for layer in layers.values():
         for edge in layer:
@@ -441,6 +441,8 @@ def plot_max_negativities_graph(
         rx_to_nx_graph(backend),
         pos=qubit_positions,
         nodelist=list(range(backend.num_qubits)),
+        labels={x: backend.index_to_qubit_name(x) for x in range(backend.num_qubits)},
+        font_size=6.5,
         edgelist=qubit_pairs,
         width=4.0,
         edge_color=edge_colors,
@@ -455,7 +457,7 @@ def plot_max_negativities_graph(
     fig.colorbar(sm, ax=ax, shrink=0.5)
 
     shots_string = "" if num_shots is None else f"Shots per tomography sample: {num_shots}"
-    station_string = "IQM Backend" if station is None else station
+    station_string = "IQM Backend" if station is None else station.capitalize()
     if tomography == "shadow_tomography":
         plt.title(
             f"Max entanglement negativities for qubit pairs in {station_string}\n"
