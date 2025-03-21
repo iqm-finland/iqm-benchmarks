@@ -592,7 +592,7 @@ def remove_directed_duplicates_to_list(cp_map: CouplingMap) -> List[List[int]]:
     """Remove duplicate edges from a coupling map and returns as a list of edges (as a list of pairs of vertices).
 
     Args:
-        cp_map (CouplingMap): A list of lists of pairs of integers, representing a coupling map.
+        cp_map (CouplingMap): A list of pairs of integers, representing a coupling map.
     Returns:
         List[List[int]]: the edges of the coupling map.
     """
