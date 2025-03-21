@@ -348,7 +348,7 @@ def get_neighbors_of_edges(edges: Sequence[Sequence[int]], graph: Sequence[Seque
 
     Args:
         edges (Sequence[Sequence[int]]): A sequence of pairs of integers, representing edges of a graph.
-        graph (Sequence[Sequence[int]]): The input graph specified either as a sequence of edges (Sequence[int]).
+        graph (Sequence[Sequence[int]]): The input graph specified as a sequence of edges (Sequence[int]).
     Returns:
         Sequence[int]: list of all neighboring nodes of the input edges.
     """
