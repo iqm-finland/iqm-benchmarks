@@ -703,7 +703,7 @@ def split_sequence_in_chunks(sequence_in: Sequence[Any], split_size: int) -> Lis
     """
     if split_size > len(sequence_in):
         raise ValueError("The split size should be smaller or equal than the list length")
-    if len(sequence_in) % split_size != 0 and (split_size != 1 or split_size != len(sequence_in)):
+    if len(sequence_in) % split_size != 0 and (split_size != 1 and split_size != len(sequence_in)):
         qcvv_logger.debug(
             f"Since len(input_list) = {len(sequence_in)} and split_size = {split_size}, the input list will be split into chunks of uneven size!"
         )
