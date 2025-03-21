@@ -549,7 +549,7 @@ def shadow_tomography_analysis(
     num_MoMs = dataset.attrs["n_median_of_means"]
 
     qcvv_logger.info("Fetching Clifford dictionary")
-    clifford_1q_dict, _ = import_native_gate_cliffords()
+    clifford_1q_dict = import_native_gate_cliffords("1q")
     all_unitaries = dataset.attrs["all_unitaries"]
 
     shadows_per_projection: Dict[str, Dict[int, Dict[str, List[np.ndarray]]]] = {}
