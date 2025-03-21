@@ -692,7 +692,7 @@ def set_coupling_map(
 
 
 def split_sequence_in_chunks(sequence_in: Sequence[Any], split_size: int) -> List[Sequence[Any]]:
-    """Split a given Sequence into a given split size, return as a List of Sequences.
+    """Split a given Sequence into chunks of a given split size, return as a List of Sequences.
 
     Args:
         sequence_in (Sequence[Any]): The input list.
