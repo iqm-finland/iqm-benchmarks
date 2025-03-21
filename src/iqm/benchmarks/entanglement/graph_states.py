@@ -441,6 +441,8 @@ def plot_max_negativities_graph(
         rx_to_nx_graph(backend),
         pos=qubit_positions,
         nodelist=list(range(backend.num_qubits)),
+        labels={x: backend.index_to_qubit_name(x) for x in range(backend.num_qubits)},
+        font_size=6.5,
         edgelist=qubit_pairs,
         width=4.0,
         edge_color=edge_colors,
@@ -472,7 +474,6 @@ def plot_max_negativities_graph(
     plt.close()
 
     return fig_name, fig
-
 
 def update_pauli_expectations(
     pauli_expectations: Dict[str, Dict[str, float]],
