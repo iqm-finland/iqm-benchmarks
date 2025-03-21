@@ -38,10 +38,6 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkRunResult,
     add_counts_to_dataset,
 )
-
-# import iqm.diqe.executors.dynamical_decoupling.dd_high_level as dd
-# from iqm.diqe.executors.dynamical_decoupling.dynamical_decoupling_core import DDStrategy
-# from iqm.diqe.mapomatic import evaluate_costs, get_calibration_fidelities, get_circuit, matching_layouts
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
@@ -677,12 +673,13 @@ class QuantumVolumeBenchmark(Benchmark):
         sorted_transpiled_qc_list: Dict[Tuple[int, ...], List[QuantumCircuit]],
     ) -> Dict[str, Any]:
         """
-        Submit jobs for execution in the specified IQMBackend.
+        Submit a single set of QV jobs for execution in the specified IQMBackend:
+         Organizes the results in a dictionary with the qubit layout, the submitted job objects, the type of QV results and submission time.
 
         Args:
             backend (IQMBackendBase): the IQM backend to submit the job.
             qubits (List[int]): the qubits to identify the submitted job.
-            sorted_transpiled_qc_list (Dict[str, List[QuantumCircuit]]): qubits to submit jobs to.
+            sorted_transpiled_qc_list (Dict[Tuple[int, ...] | str, List[QuantumCircuit]]): A dictionary of Lists of quantum circuits.
         Returns:
             Dict with qubit layout, submitted job objects, type (vanilla/DD) and submission time.
         """

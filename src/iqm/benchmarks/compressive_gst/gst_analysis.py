@@ -237,8 +237,12 @@ def generate_non_gate_results(
     else:
         df_o_final = DataFrame(
             {
-                f"mean_total_variation_distance_estimate_data": reporting.number_to_str(df_o.values[0, 1].copy(), precision=5),
-                f"mean_total_variation_distance_target_data": reporting.number_to_str(df_o.values[0, 2].copy(), precision=5),
+                f"mean_total_variation_distance_estimate_data": reporting.number_to_str(
+                    df_o.values[0, 1].copy(), precision=5
+                ),
+                f"mean_total_variation_distance_target_data": reporting.number_to_str(
+                    df_o.values[0, 2].copy(), precision=5
+                ),
                 f"povm_diamond_distance": reporting.number_to_str(df_o.values[0, 3].copy(), precision=5),
                 f"state_trace_distance": reporting.number_to_str(df_o.values[0, 4].copy(), precision=5),
             },
