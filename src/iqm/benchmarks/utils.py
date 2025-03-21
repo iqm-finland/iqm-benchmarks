@@ -324,7 +324,7 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     return backend_object
 
 
-def get_measurement_mapping(circuit: QuantumCircuit):
+def get_measurement_mapping(circuit: QuantumCircuit) -> Dict[int, int]:
     """
     Extracts the final measurement mapping (qubits to bits) of a quantum circuit.
 
