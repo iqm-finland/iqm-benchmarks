@@ -423,7 +423,7 @@ def get_tomography_matrix(pauli_expectations: Dict[str, float]) -> np.ndarray:
     all_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=num_qubits)]
     if set(list(pauli_expectations.keys())) != set(all_pauli_labels):
         raise ValueError(
-            f"Pauli expectations is incomplete ({len(list(pauli_expectations.values()))} out of {len(all_pauli_labels)} expectations)"
+            f"Pauli expectations are incomplete ({len(list(pauli_expectations.keys()))} out of {len(all_pauli_labels)} expectations)"
         )
 
     rho = np.zeros([2**num_qubits, 2**num_qubits], dtype=complex)
