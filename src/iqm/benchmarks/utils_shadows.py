@@ -198,8 +198,8 @@ def get_local_shadow(
 
 
 def get_negativity(rho: np.ndarray, NA: int, NB: int) -> float:
-    """Computes the negativity of a given density matrix.
-
+    """Computes the negativity of a given density matrix. 
+    Note that a negativity >0 is only a necessary and sufficient condition for entanglement if NA = NB = 1. For more    qubits per subsystems it is merely a necessary condition. 
     Args:
         rho (np.ndarray): Density matrix.
         NA (int): Number of qubits for subsystem A.
