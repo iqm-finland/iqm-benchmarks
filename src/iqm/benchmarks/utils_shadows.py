@@ -141,7 +141,7 @@ def get_local_shadow(
 
     Args:
         counts (Dict[str, int]): a dictionary of bit-string counts.
-        unitary_arg (np.ndrray | Sequence[str]): local random unitaries used for a given initialisation, either specified as
+        unitary_arg (np.ndarray | Sequence[str]): local random unitaries used for a given initialisation, either specified as
                     - a numpy array, or
                     - a Sequence of Clifford labels.
         subsystem_bit_indices (Sequence[int]): Bit indices in the counts of the subsystem to construct the shadow of.
