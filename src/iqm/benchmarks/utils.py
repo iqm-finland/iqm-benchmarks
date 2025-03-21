@@ -414,7 +414,7 @@ def get_tomography_matrix(pauli_expectations: Dict[str, float]) -> np.ndarray:
     Args:
         pauli_expectations (Dict[str, float]): A dictionary of Pauli expectations, with keys being Pauli strings.
     Raises:
-        ValueError: If Pauli not all 4**n expectations are specified.
+        ValueError: If not all 4**n Pauli expectations are specified.
     Returns:
         np.ndarray: A tomographically reconstructed density matrix.
     """
