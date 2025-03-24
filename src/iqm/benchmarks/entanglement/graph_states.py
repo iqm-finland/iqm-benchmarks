@@ -1014,7 +1014,7 @@ class GraphStateBenchmark(Benchmark):
 
         Args:
             backend_arg (IQMBackendBase): the backend to execute the benchmark on
-            configuration (QuantumVolumeConfiguration): the configuration of the benchmark
+            configuration (GraphStateConfiguration): the configuration of the benchmark
         """
         super().__init__(backend_arg, configuration)
 
