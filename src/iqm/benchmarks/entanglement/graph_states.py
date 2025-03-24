@@ -551,7 +551,7 @@ def shadow_tomography_analysis(
         execution_timestamp (str): The timestamp of the experiment execution.
 
     Returns:
-        Tuple[Dict[str, Any], List[BenchmarkObservation], Dict[str, Dict[str, float]], xr.Dataset]:
+        Tuple[Dict[str, Any], List[BenchmarkObservation], Dict[str, Dict[str, str | float]], xr.Dataset]:
         A tuple containing:
             - A dictionary of plots.
             - A list of benchmark observations.
