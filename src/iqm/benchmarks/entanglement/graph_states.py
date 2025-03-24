@@ -290,7 +290,7 @@ def plot_max_negativities(
         Tuple[str, Figure]: The figure label and the max negativities plot figure.
     """
     backend_name = backend.name
-    fig_name = f"max_negativities_{backend_name}_{timestamp}"
+    fig_name = f"max_negativities_{backend_name}_{timestamp}".replace(" ", "_")
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
     qcvv_logger.info(print(sorted_negativities.keys()))
