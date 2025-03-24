@@ -791,7 +791,7 @@ def state_tomography_analysis(
             f"Retrieving tomography-reconstructed states with {num_bootstraps} for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
         )
 
-        # Assume only pairs and nearest-neighbors were measured, and each pair in the group user num_RMs randomized measurements:
+        # Assume only pairs and nearest-neighbors were measured, and each pair in the group used num_RMs randomized measurements:
         execution_results[group_idx] = xrvariable_to_counts(
             dataset, str(all_unprojected_qubits[group_idx]), num_tomo_samples * len(group)
         )
