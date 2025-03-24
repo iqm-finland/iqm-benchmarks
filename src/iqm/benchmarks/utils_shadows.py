@@ -37,11 +37,11 @@ def CUE(random_gen: RandomState, n: int) -> np.ndarray:
     Returns:
         np.ndarray: an n x n CUE matrix
     """
-    U = (random_gen.randn(n, n) + 1j * random_gen.randn(n, n)) / np.sqrt(2)
+    U = (random_gen.randn(n, n) + 1j * random_gen.randn(n, n))
     q, r = spl.qr(U)
     d = np.diagonal(r)
-    ph = d / np.absolute(d)
-    U = np.multiply(q, ph, q)
+    ph = d / np.abs(d)
+    U = q @ ph @ q 
     return U
 
 
