@@ -901,7 +901,7 @@ def state_tomography_analysis(
 
             max_negativity = {
                 "value": all_negativities_list[max_negativity_projection_idx],
-                "boostrapped_average": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["value"],
+                "bootstrapped_average": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["value"],
                 "uncertainty": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["uncertainty"],
             }
 
