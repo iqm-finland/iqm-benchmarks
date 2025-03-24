@@ -825,7 +825,7 @@ def plot_rb_decay(
         config_qubits_array = dataset.attrs["qubits_array"]
         if isinstance(config_qubits_array[0][0], int):
             qubits_index = config_qubits_array.index(qubits_array[0])
-            dataset_attrs = dataset.attrs
+            # dataset_attrs = dataset.attrs
         else:
             # Find the subarray that contains the qubits_array
             for c_idx, c in enumerate(config_qubits_array):
@@ -862,11 +862,11 @@ def plot_rb_decay(
                 str(q): dataset_attrs[q_idx]["polarizations"] for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[identifier] = {
-                str(q): dataset_attrs[q_idx]["avg_polarization_nominal_values"]
+                str(q): dataset_attrs[q_idx]["average_polarization_nominal_values"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset_attrs[q_idx]["avg_polatization_stderr"]
+                str(q): dataset_attrs[q_idx]["average_polatization_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
         else:  # identifier == "clifford"
@@ -878,11 +878,11 @@ def plot_rb_decay(
                 str(q): dataset_attrs[q_idx]["fidelities"] for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[identifier] = {
-                str(q): dataset_attrs[q_idx]["avg_fidelities_nominal_values"]
+                str(q): dataset_attrs[q_idx]["average_fidelities_nominal_values"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset_attrs[q_idx]["avg_fidelities_stderr"]
+                str(q): dataset_attrs[q_idx]["average_fidelities_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_native1q_value[identifier] = {
@@ -924,11 +924,11 @@ def plot_rb_decay(
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             average_polarizations[rb_type] = {
-                str(q): dataset_attrs[q_idx][rb_type]["avg_fidelities_nominal_values"]
+                str(q): dataset_attrs[q_idx][rb_type]["average_fidelities_nominal_values"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[rb_type] = {
-                str(q): dataset_attrs[q_idx][rb_type]["avg_fidelities_stderr"]
+                str(q): dataset_attrs[q_idx][rb_type]["average_fidelities_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             fidelity_value[rb_type] = {
