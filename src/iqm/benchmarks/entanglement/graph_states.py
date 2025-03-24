@@ -1169,7 +1169,7 @@ class GraphStateBenchmark(Benchmark):
         all_graph_submit_results = []
 
         if self.tomography == "shadow_tomography":
-            clifford_1q_dict, _ = import_native_gate_cliffords()
+            clifford_1q_dict = import_native_gate_cliffords("1q")
 
         qcvv_logger.info(f"Performing {self.tomography.replace('_',' ')} of all qubit pairs")
 
