@@ -263,7 +263,7 @@ def plot_density_matrix(
 
 def plot_max_negativities(
     negativities: Dict[str, Dict[str, str | float]],
-    backend_name: str,
+    backend: IQMBackendBase,
     timestamp: str,
     tomography: Literal["shadow_tomography", "state_tomography"],
     num_shots: int,
@@ -275,7 +275,7 @@ def plot_max_negativities(
 
     Args:
         negativities (Dict[str, Dict[str, str | float]]): A dictionary (str qubit keys) of dictionaries (keys "value"/"uncertainty") of negativities (float) to plot.
-        backend_name (str): The name of the backend corresponding to negativities.
+        backend (IQMBackendBase): The backend object corresponding to negativities.
         timestamp (str): The timestamp of the corresponding experiment.
         tomography (Literal["shadow_tomography", "state_tomography"]): The type of tomography that was used.
         num_shots (int): The number of shots used in the corresponding experiment.
@@ -289,11 +289,19 @@ def plot_max_negativities(
     Returns:
         Tuple[str, Figure]: The figure label and the max negativities plot figure.
     """
+    backend_name = backend.name
     fig_name = f"max_negativities_{backend_name}_{timestamp}"
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
+    qcvv_logger.info(print(sorted_negativities.keys()))
 
     x = [x.replace("(", "").replace(")", "").replace(", ", "-") for x in list(sorted_negativities.keys())]
+    x_updated = [
+        f"{backend.index_to_qubit_name(int(a))[2:]}-{backend.index_to_qubit_name(int(b))[2:]}"
+        for edge in x
+        for a, b in [edge.split("-")]
+    ]  ## reindexes the edges label as in the QPU graph.
+
     y = [a["value"] for a in sorted_negativities.values()]
     yerr = [a["uncertainty"] for a in sorted_negativities.values()]
 
@@ -308,7 +316,16 @@ def plot_max_negativities(
         errorbar_labels = rf"$1 \sigma$ ({cast(int, num_bootstraps)} bootstraps)"
 
     plt.errorbar(
-        x, y, yerr=yerr, capsize=2, color=cmap(0.15), fmt="o", alpha=1, mec="black", markersize=3, label=errorbar_labels
+        x_updated,
+        y,
+        yerr=yerr,
+        capsize=2,
+        color=cmap(0.15),
+        fmt="o",
+        alpha=1,
+        mec="black",
+        markersize=3,
+        label=errorbar_labels,
     )
     plt.axhline(0.5, color=cmap(1.0), linestyle="dashed")
 
@@ -967,7 +984,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset.attrs.update({"max_negativities": max_negativities})
 
     fig_name, fig = plot_max_negativities(
-        max_negativities, backend.name, execution_timestamp, tomography, num_shots, num_bootstraps, num_RMs, num_MoMs
+        max_negativities, backend, execution_timestamp, tomography, num_shots, num_bootstraps, num_RMs, num_MoMs
     )
     plots[fig_name] = fig
 
