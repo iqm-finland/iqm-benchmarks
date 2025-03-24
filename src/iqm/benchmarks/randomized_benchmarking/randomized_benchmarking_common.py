@@ -735,15 +735,19 @@ def submit_sequential_rb_jobs(
 def survival_probabilities_parallel(
     qubits_array: List[List[int]], counts: List[Dict[str, int]], separate_registers: bool = False
 ) -> Dict[str, List[float]]:
-    """Estimates marginalized survival probabilities from a parallel RB execution (at fixed depth)
+    """
+    Estimates marginalized survival probabilities from a parallel RB execution (at fixed depth).
+
     Args:
         qubits_array (List[int]): List of qubits in which the experiment was performed
         counts (Dict[str, int]): The measurement counts for corresponding bitstrings
         separate_registers (bool): Whether the clbits were generated in separate registers
-                        * If True, the bit strings will be separated by a space, e.g., '00 10' means '00' belongs to one register and '10' to another.
-                        * Default is False.
+            * If True, the bit strings will be separated by a space, e.g., '00 10' means '00' belongs to one register and '10' to another.
+            * Default is False.
+
     Returns:
-        Dict[str, List[float]]: The survival probabilities for each qubit
+        Dict[str, List[float]]: The survival probabilities for each qubit.
+
     """
     # Global probability estimations
     global_probabilities = [{k: v / sum(c.values()) for k, v in c.items()} for c in counts]

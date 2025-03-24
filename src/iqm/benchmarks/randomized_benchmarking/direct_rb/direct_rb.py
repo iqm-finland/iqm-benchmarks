@@ -917,11 +917,11 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
             each either in parallel or sequence, according to the (bool) value of parallel_execution.
         is_eplg (bool): Whether the DRB experiment is executed as a EPLG subroutine.
             * If True:
-                - default parallel_execution below is override to True.
-                - default two_qubit_gate_ensembles is {"CZGate": 1.0}.
-                - default densities_2q_gates is 0.5 (probability of sampling 2Q gates is 1).
-                - default clifford_sqg_probabilities is 0.0.
-                - default sqg_gate_ensembles is {"IGate": 1.0}.
+            - default parallel_execution below is override to True.
+            - default two_qubit_gate_ensembles is {"CZGate": 1.0}.
+            - default densities_2q_gates is 0.5 (probability of sampling 2Q gates is 1).
+            - default clifford_sqg_probabilities is 0.0.
+            - default sqg_gate_ensembles is {"IGate": 1.0}.
             * Default is False.
         parallel_execution (bool): Whether DRB is executed in parallel for all qubit layouts in qubits_array.
             * If is_eplg is False, it executes parallel DRB with MRB gate ensemble and density defaults.
