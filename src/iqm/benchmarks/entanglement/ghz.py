@@ -205,7 +205,8 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset = run.dataset
     routine = dataset.attrs["fidelity_routine"]
     qubit_layouts = dataset.attrs["custom_qubits_array"]
-    backend_name = dataset.attrs["backend_name"]
+    backend_topology = dataset.attrs["backend_topology"]
+    backend_num_qubits = dataset.attrs["backend_num_qubits"]
 
     observation_list: list[BenchmarkObservation] = []
     for qubit_layout in qubit_layouts:
@@ -218,7 +219,7 @@ def fidelity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 for qc in all_circuits:
                     qc_copy = qc.copy()
                     qc_copy.remove_final_measurements()
-                    deflated_qc = reduce_to_active_qubits(qc_copy, backend_name)
+                    deflated_qc = reduce_to_active_qubits(qc_copy, backend_topology, backend_num_qubits)
                     ideal_probabilities.append(
                         dict(sorted(ideal_simulator.run(deflated_qc).result().get_counts().items()))
                     )
@@ -374,11 +375,11 @@ def generate_ghz_spanning_tree(
     participating_qubits = set(qubit for pair in cx_map[: n_state - 1] for qubit in pair)
 
     relabeling = {idx_old: idx_new for idx_new, idx_old in enumerate(participating_qubits)}
-    n_state_register = QuantumRegister(n_state)
-    qc = QuantumCircuit(n_state_register, name="ghz")
+    qc = QuantumCircuit(n_state, name="ghz")
     qc.h([relabeling[cx_map[0][0]]])
     for _, pair in zip(np.arange(n_state - 1), cx_map):
         relabeled_pair = [relabeling[pair[0]], relabeling[pair[1]]]
+        # This barrier prevents Hadamards from being put at the beginning of the circuit, which would make it more susceptible to phase errors
         qc.barrier(relabeled_pair)
         qc.cx(*relabeled_pair)
     qc.measure_active()
@@ -620,14 +621,11 @@ class GHZBenchmark(Benchmark):
                 qcvv_logger.warning(
                     f"The current backend is a star architecture for which a suboptimal state generation routine is chosen. Consider setting state_generation_routine={routine}."
                 )
-                effective_coupling_map = [[x, y] for x in qubit_layout for y in qubit_layout if x != y]
-            else:
-                effective_coupling_map = self.backend.coupling_map
             if self.cal_url:
                 edges_cal, fidelities_cal, _ = extract_fidelities(self.cal_url)
-                graph = get_edges(effective_coupling_map, qubit_layout, edges_cal, fidelities_cal)
+                graph = get_edges(self.backend.coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
-                graph = get_edges(effective_coupling_map, qubit_layout)
+                graph = get_edges(self.backend.coupling_map, qubit_layout)
             ghz, _ = generate_ghz_spanning_tree(graph, qubit_layout, qubit_count)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled, _ = perform_backend_transpilation(
@@ -670,7 +668,7 @@ class GHZBenchmark(Benchmark):
             else:
                 index_min_depth = np.argmin([c.depth() for c in ghz_native_transpiled])
                 final_ghz = ghz_native_transpiled[index_min_depth]
-                circuit_group.add_circuit([ghz_log[index_min_depth]])
+                circuit_group.add_circuit(ghz_log[index_min_depth])
         self.circuits["untranspiled_circuits"].circuit_groups.append(circuit_group)
         return CircuitGroup(name=f"{qubit_layout}_native_ghz", circuits=[final_ghz[0]])
 
@@ -821,6 +819,8 @@ class GHZBenchmark(Benchmark):
             else:
                 dataset.attrs[key] = value
         dataset.attrs[f"backend_name"] = self.backend.name
+        dataset.attrs[f"backend_topology"] = "star" if "move" in self.backend.operation_names else "crystal"
+        dataset.attrs[f"backend_num_qubits"] = self.backend.num_qubits
         dataset.attrs[f"execution_timestamp"] = self.execution_timestamp
         dataset.attrs["fidelity_routine"] = self.fidelity_routine
 

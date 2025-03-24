@@ -45,7 +45,6 @@ from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
-from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
 
 
 def timeit(f):
@@ -169,6 +168,9 @@ def count_native_gates(
         backend = backend_arg
 
     native_operations = backend.operation_names
+
+    if "move" in backend.architecture.gates:
+        native_operations.append("move")
     # Some backends may not include "barrier" in the operation_names attribute
     if "barrier" not in native_operations:
         native_operations.append("barrier")
@@ -301,21 +303,22 @@ def perform_backend_transpilation(
             initial_layout=qubits if aux_qc is None else None,
             routing_method=routing_method,
         )
-        if optimize_sqg:
-            transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
-        if "move" in backend.operation_names:
+        if "move" in backend.architecture.gates:
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
-            if "move" in backend.operation_names:
-                if 0 in qubits:
+            if "move" in backend.architecture.gates:
+                if backend.num_qubits in qubits:
                     raise ValueError(
-                        "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
+                        f"Label {backend.num_qubits} is reserved for Resonator - "
+                        f"Please specify computational qubit labels {np.arange(backend.num_qubits)}"
                     )
-                backend_name = "IQMNdonisBackend"
-                transpiled = reduce_to_active_qubits(transpiled, backend_name)
-                transpiled = aux_qc.compose(transpiled, qubits=[0] + qubits, clbits=list(range(qc.num_clbits)))
+                backend_topology = "star"
+                transpiled = reduce_to_active_qubits(transpiled, backend_topology, backend.num_qubits)
+                transpiled = aux_qc.compose(
+                    transpiled, qubits=qubits + [backend.num_qubits], clbits=list(range(qc.num_clbits))
+                )
             else:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
 
@@ -323,25 +326,31 @@ def perform_backend_transpilation(
 
     qcvv_logger.info(
         f"Transpiling for backend {backend.name} with optimization level {qiskit_optim_level}, "
-        f"{routing_method} routing method{' and SQG optimization' if optimize_sqg else ''} all circuits"
+        f"{routing_method} routing method{' including SQG optimization' if qiskit_optim_level>0 else ''} all circuits"
     )
 
     if coupling_map == backend.coupling_map:
         transpiled_qc_list = [transpile_and_optimize(qc) for qc in qc_list]
     else:  # The coupling map will be reduced if the physical layout is to be fixed
-        aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
+        if "move" in backend.architecture.gates:
+            aux_qc_list = [QuantumCircuit(backend.num_qubits + 1, q.num_clbits) for q in qc_list]
+        else:
+            aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]
 
     return transpiled_qc_list
 
 
-def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str] = None) -> QuantumCircuit:
+def reduce_to_active_qubits(
+    circuit: QuantumCircuit, backend_topology: Optional[str] = None, backend_num_qubits=None
+) -> QuantumCircuit:
     """
     Reduces a quantum circuit to only its active qubits.
 
     Args:
-        backend_name (Optional[str]): The backend name, if any, in which the circuits are defined.
+        backend_topology (Optional[str]): The backend topology to execute the benchmark on.
         circuit (QuantumCircuit): The original quantum circuit.
+        backend_num_qubits (int): The number of qubits in the backend.
 
     Returns:
         QuantumCircuit: A new quantum circuit containing only active qubits.
@@ -351,9 +360,9 @@ def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str]
     for instruction in circuit.data:
         for qubit in instruction.qubits:
             active_qubits.add(circuit.find_bit(qubit).index)
-    if backend_name is not None and backend_name == "IQMNdonisBackend" and 0 not in active_qubits:
+    if backend_topology == "star" and backend_num_qubits not in active_qubits:
         # For star systems, the resonator must always be there, regardless of whether it MOVE gates on it or not
-        active_qubits.add(0)
+        active_qubits.add(backend_num_qubits)
 
     # Create a mapping from old qubits to new qubits
     active_qubits = set(sorted(active_qubits))
@@ -453,12 +462,12 @@ def set_coupling_map(
         ValueError: if the physical layout is not "fixed" or "batching".
     """
     if physical_layout == "fixed":
-        if "move" in backend.operation_names:
-            if 0 in qubits:
-                raise ValueError(
-                    "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
-                )
-            return backend.coupling_map.reduce(mapping=[0] + list(qubits))
+        # if "move" in backend.architecture.gates:
+        #     if 0 in qubits:
+        #         raise ValueError(
+        #             "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
+        #         )
+        #     return backend.coupling_map.reduce(mapping=[0] + list(qubits))
         return backend.coupling_map.reduce(mapping=qubits)
     if physical_layout == "batching":
         return backend.coupling_map
@@ -637,13 +646,13 @@ class GraphPositions:
     }
 
     deneb_positions = {
-        0: (2.0, 2.0),
-        1: (1.0, 1.0),
-        3: (2.0, 1.0),
-        5: (3.0, 1.0),
-        2: (1.0, 3.0),
+        6: (2.0, 2.0),
+        0: (1.0, 1.0),
+        1: (2.0, 1.0),
+        2: (3.0, 1.0),
+        3: (1.0, 3.0),
         4: (2.0, 3.0),
-        6: (3.0, 3.0),
+        5: (3.0, 3.0),
     }
 
     predefined_stations = {
@@ -665,15 +674,15 @@ class GraphPositions:
         n_nodes = len(graph.node_indices())
 
         if topology == "star":
-            # Place center node at (0,0)
-            pos = {0: (0.0, 0.0)}
+            # Place resonator node with index n_nodes-1 at (0,0)
+            pos = {n_nodes - 1: (0.0, 0.0)}
 
             if n_nodes > 1:
                 # Place other nodes in a circle around the center
                 angles = np.linspace(0, 2 * np.pi, n_nodes - 1, endpoint=False)
                 radius = 1.0
 
-                for i, angle in enumerate(angles, start=1):
+                for i, angle in enumerate(angles):
                     x = radius * np.cos(angle)
                     y = radius * np.sin(angle)
                     pos[i] = (x, y)
@@ -686,7 +695,7 @@ class GraphPositions:
             # Get spring layout with one fixed position
             pos = {
                 int(k): (float(v[0]), float(v[1]))
-                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0}).items()
+                for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=500, k=0.15, fixed={0}).items()
             }
         return pos
 
@@ -721,23 +730,21 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
         i, j = cal_keys["cz_gate_fidelity"]
         topology = "crystal"
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
-        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
-        if topology == "star":
-            list_couplings.append([qb1, qb2])
-        else:
-            list_couplings.append([qb1 - 1, qb2 - 1])
+        qb1 = int(item["locus"][0][2:]) if "COMP" not in item["locus"][0] else 0
+        qb2 = int(item["locus"][1][2:]) if "COMP" not in item["locus"][1] else 0
+        list_couplings.append([qb1 - 1, qb2 - 1])
         list_fids.append(float(item["value"]))
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    qubit_mapping = {}
+    if topology == "star":
+        qubit_mapping.update({-1: len(calibrated_qubits)})  # Place resonator qubit as last qubit
+    qubit_mapping.update({qubit: idx for idx, qubit in enumerate(calibrated_qubits)})
     list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
 
     return list_couplings, list_fids, topology
 
 
-def plot_layout_fidelity_graph(
-    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None
-):
+def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[int]]] = None):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
     Creates a visualization of the quantum chip topology where nodes represent qubits
@@ -747,8 +754,6 @@ def plot_layout_fidelity_graph(
     Args:
         cal_url: URL to retrieve calibration data from
         qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
-        station: Name of the quantum computing station to use predefined positions for.
-                If None, positions will be generated algorithmically.
 
     Returns:
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
@@ -768,6 +773,10 @@ def plot_layout_fidelity_graph(
     # Add edges
     graph.add_edges_from(edges_graph)
 
+    # Extract station name from URL
+    parts = cal_url.strip("/").split("/")
+    station = parts[-2].capitalize()
+
     # Define qubit positions in plot
     if station in GraphPositions.predefined_stations:
         pos = GraphPositions.predefined_stations[station]
@@ -780,21 +789,7 @@ def plot_layout_fidelity_graph(
         for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
 
-    # Ensuring weights are in correct order for the plot
-    edge_list = graph.edge_list()
-    weights_dict = {}
-    edge_pos = set()
-
-    # Create a mapping between edge positions as defined in rustworkx and their weights
-    for e, w in zip(edge_list, weights):
-        pos_tuple = (tuple(pos[e[0]]), tuple(pos[e[1]]))
-        weights_dict[pos_tuple] = w
-        edge_pos.add(pos_tuple)
-
-    # Get corresponding weights in the same order
-    weights_ordered = np.array([weights_dict[edge] for edge in list(edge_pos)])
-
-    plt.subplots(figsize=(6, 6))
+    plt.subplots(figsize=(1.5 * np.sqrt(len(nodes)), 1.5 * np.sqrt(len(nodes))))
 
     # Draw the graph
     visualization.mpl_draw(
@@ -803,7 +798,7 @@ def plot_layout_fidelity_graph(
         node_color=node_colors,
         pos=pos,
         labels=lambda node: node,
-        width=7 * weights_ordered / np.max(weights_ordered),
+        width=5 * weights / np.max(weights),
     )  # type: ignore[call-arg]
 
     # Add edge labels using matplotlib's annotate
