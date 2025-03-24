@@ -13,7 +13,7 @@ class TestGST:
     @patch('matplotlib.pyplot.figure')
     def test_1q(self, mock_fig):
         minimal_1Q_config = GSTConfiguration(
-            qubit_layouts=[[5], [1]],
+            qubit_layouts=[[4], [1]],
             gate_set="1QXYI",
             num_circuits=10,
             shots=10,

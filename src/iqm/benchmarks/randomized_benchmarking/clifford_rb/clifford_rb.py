@@ -125,13 +125,18 @@ def clifford_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         fidelity = rb_fit_results.params["fidelity_per_clifford"]
 
         processed_results = {
-            "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
+            "average_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
         }
 
         if len(qubits) == 1:
             fidelity_native = rb_fit_results.params["fidelity_per_native_sqg"]
             processed_results.update(
-                {"avg_native_gate_fidelity": {"value": fidelity_native.value, "uncertainty": fidelity_native.stderr}}
+                {
+                    "average_native_gate_fidelity": {
+                        "value": fidelity_native.value,
+                        "uncertainty": fidelity_native.stderr,
+                    }
+                }
             )
 
         dataset.attrs[qubits_idx].update(
@@ -140,8 +145,8 @@ def clifford_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
                 "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                 "fidelities": fidelities[str(qubits)],
-                "avg_fidelities_nominal_values": average_fidelities,
-                "avg_fidelities_stderr": stddevs_from_mean,
+                "average_fidelities_nominal_values": average_fidelities,
+                "average_fidelities_stderr": stddevs_from_mean,
                 "fitting_method": str(rb_fit_results.method),
                 "num_function_evals": int(rb_fit_results.nfev),
                 "data_points": int(rb_fit_results.ndata),
@@ -294,6 +299,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         self.shots,
                         self.calset_id,
                         self.max_gates_per_batch,
+                        self.configuration.max_circuits_per_batch,
                     )
                 )
                 qcvv_logger.info(f"Job for sequence length {seq_length} submitted successfully!")
@@ -353,6 +359,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         self.backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                         circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )

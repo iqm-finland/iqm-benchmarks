@@ -173,14 +173,14 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             )
 
             processed_results[rb_type] = {
-                "avg_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
+                "average_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
             }
 
             if len(qubits) == 1 and rb_type == "clifford":
                 fidelity_native = rb_fit_results.params["fidelity_per_native_sqg"]
                 processed_results[rb_type].update(
                     {
-                        "avg_gate_fidelity_native": {
+                        "average_gate_fidelity_native": {
                             "value": fidelity_native.value,
                             "uncertainty": fidelity_native.stderr,
                         }
@@ -190,7 +190,7 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 fidelity_native_sqg = rb_fit_results.params["fidelity_per_native_sqg"]
                 processed_results[rb_type].update(
                     {
-                        "avg_gate_fidelity_native_sqg": {
+                        "average_gate_fidelity_native_sqg": {
                             "value": fidelity_native_sqg.value,
                             "uncertainty": fidelity_native_sqg.stderr,
                         }
@@ -200,7 +200,7 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             observations.extend(
                 [
                     BenchmarkObservation(
-                        name=f"{key}_{rb_type}" if "native" not in key else f"{key}",
+                        name=f"{key}_{interleaved_gate}" if "native" not in key else f"{key}",
                         identifier=BenchmarkObservationIdentifier(qubits),
                         value=values["value"],
                         uncertainty=values["uncertainty"],
@@ -216,8 +216,8 @@ def interleaved_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                         "fit_amplitude": {"value": popt["amplitude"].value, "uncertainty": popt["amplitude"].stderr},
                         "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                         "fidelities": fidelities[str(qubits)][rb_type],
-                        "avg_fidelities_nominal_values": average_fidelities,
-                        "avg_fidelities_stderr": stddevs_from_mean,
+                        "average_fidelities_nominal_values": average_fidelities,
+                        "average_fidelities_stderr": stddevs_from_mean,
                         "fitting_method": str(rb_fit_results.method),
                         "num_function_evals": int(rb_fit_results.nfev),
                         "data_points": int(rb_fit_results.ndata),
@@ -407,6 +407,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         self.shots,
                         self.calset_id,
                         self.max_gates_per_batch,
+                        self.configuration.max_circuits_per_batch,
                     )
                 )
                 all_rb_jobs["interleaved"].append(
@@ -418,6 +419,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         self.shots,
                         self.calset_id,
                         self.max_gates_per_batch,
+                        self.configuration.max_circuits_per_batch,
                     )
                 )
                 qcvv_logger.info(f"Both jobs for sequence length {seq_length} submitted successfully!")
@@ -513,6 +515,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                         circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )
@@ -524,6 +527,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         backend,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                         circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )

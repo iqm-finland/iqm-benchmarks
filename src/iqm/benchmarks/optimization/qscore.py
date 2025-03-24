@@ -475,23 +475,24 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             qcvv_logger.info(
                 f"Q-Score = {num_nodes} failed with approximation ratio (Beta) {approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
             )
+        qubit_indices = dataset.attrs[num_nodes]["qubit_set"][0]
         observations.extend(
             [
                 BenchmarkObservation(
                     name="mean_approximation_ratio",
                     value=approximation_ratio,
                     uncertainty=std_of_approximation_ratio,
-                    identifier=BenchmarkObservationIdentifier(num_nodes),
+                    identifier=BenchmarkObservationIdentifier(qubit_indices),
                 ),
                 BenchmarkObservation(
                     name="is_succesful",
                     value=str(success),
-                    identifier=BenchmarkObservationIdentifier(num_nodes),
+                    identifier=BenchmarkObservationIdentifier(qubit_indices),
                 ),
                 BenchmarkObservation(
                     name="Qscore_result",
                     value=qscore if success else 1,
-                    identifier=BenchmarkObservationIdentifier(num_nodes),
+                    identifier=BenchmarkObservationIdentifier(qubit_indices),
                 ),
             ]
         )
@@ -751,7 +752,7 @@ class QScoreBenchmark(Benchmark):
         else:
             nqubits = self.backend.num_qubits
 
-        if self.custom_qubits_array is not None:
+        if self.choose_qubits_routine == "custom":
             if self.use_virtual_node:
                 node_numbers = [len(qubit_layout) + 1 for qubit_layout in self.custom_qubits_array]
             else:
@@ -765,7 +766,7 @@ class QScoreBenchmark(Benchmark):
                     max_num_nodes = nqubits
             else:
                 max_num_nodes = self.max_num_nodes
-            node_numbers = range(self.min_num_nodes, max_num_nodes + 1)
+            node_numbers = list(range(self.min_num_nodes, max_num_nodes + 1))
 
         dataset.attrs.update({"max_num_nodes": node_numbers[-1]})
         dataset.attrs.update({"node_numbers": node_numbers})
@@ -881,6 +882,7 @@ class QScoreBenchmark(Benchmark):
                         self.shots,
                         self.calset_id,
                         max_gates_per_batch=self.max_gates_per_batch,
+                        max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                         circuit_compilation_options=self.circuit_compilation_options,
                     )
                     qc_transpiled_list.append(transpiled_qc)

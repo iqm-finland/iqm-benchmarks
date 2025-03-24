@@ -2,9 +2,17 @@
 Changelog
 =========
 
-Version 2.25
+Version 2.27
 ============
 * Qiskit on IQM dependency updated to > 17.0.
+
+Version 2.26
+============
+* Changed benchmark observation names and identifiers to be more consistent with guidelines.
+
+Version 2.25
+============
+* Added optional configuration parameter (`max_circuits_per_batch`) to specify the maximum amount of circuits per batch.
 
 Version 2.24
 ============
