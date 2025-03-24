@@ -342,7 +342,7 @@ def perform_backend_transpilation(
 
 
 def reduce_to_active_qubits(
-    circuit: QuantumCircuit, backend_topology: str = None, backend_num_qubits=None
+    circuit: QuantumCircuit, backend_topology: Optional[str] = None, backend_num_qubits=None
 ) -> QuantumCircuit:
     """
     Reduces a quantum circuit to only its active qubits.
@@ -774,7 +774,7 @@ def plot_layout_fidelity_graph(cal_url: str, qubit_layouts: Optional[list[list[i
     graph.add_edges_from(edges_graph)
 
     # Extract station name from URL
-    parts = cal_url.strip('/').split('/')
+    parts = cal_url.strip("/").split("/")
     station = parts[-2].capitalize()
 
     # Define qubit positions in plot
