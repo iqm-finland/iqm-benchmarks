@@ -910,43 +910,43 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     Attributes:
         benchmark (Type[Benchmark]): DirectRandomizedBenchmarking.
         qubits_array (Sequence[Sequence[int]] | Sequence[Sequence[Sequence[int]]]): The array of physical qubits in which to execute DRB.
-                            * It can be specified as a Sequence (e.g. list or tuple) of qubit-index registers, e.g., [[0, 1], [2, 3]],
-                              or as Sequences of such Sequences, e.g., [[[0, 1], [2, 3]], [[0, 2], [1, 3]]].
-                              In the second case, each Sequence[Sequence[int]] will execute sequentially, i.e.,
-                              execution will be done for [[0, 1], [2, 3]] first, then for [[0, 2], [1, 3]],
-                              each either in parallel or sequence, according to the (bool) value of parallel_execution.
+            * It can be specified as a Sequence (e.g. list or tuple) of qubit-index registers, e.g., [[0, 1], [2, 3]],
+            or as Sequences of such Sequences, e.g., [[[0, 1], [2, 3]], [[0, 2], [1, 3]]].
+            In the second case, each Sequence[Sequence[int]] will execute sequentially, i.e.,
+            execution will be done for [[0, 1], [2, 3]] first, then for [[0, 2], [1, 3]],
+            each either in parallel or sequence, according to the (bool) value of parallel_execution.
         is_eplg (bool): Whether the DRB experiment is executed as a EPLG subroutine.
-                            * If True:
-                                - default parallel_execution below is override to True.
-                                - default two_qubit_gate_ensembles is {"CZGate": 1.0}.
-                                - default densities_2q_gates is 0.5 (probability of sampling 2Q gates is 1).
-                                - default clifford_sqg_probabilities is 0.0.
-                                - default sqg_gate_ensembles is {"IGate": 1.0}.
-                            * Default is False.
+            * If True:
+                - default parallel_execution below is override to True.
+                - default two_qubit_gate_ensembles is {"CZGate": 1.0}.
+                - default densities_2q_gates is 0.5 (probability of sampling 2Q gates is 1).
+                - default clifford_sqg_probabilities is 0.0.
+                - default sqg_gate_ensembles is {"IGate": 1.0}.
+            * Default is False.
         parallel_execution (bool): Whether DRB is executed in parallel for all qubit layouts in qubits_array.
-                            * If is_eplg is False, it executes parallel DRB with MRB gate ensemble and density defaults.
-                            * Default is False.
+            * If is_eplg is False, it executes parallel DRB with MRB gate ensemble and density defaults.
+            * Default is False.
         depths (Sequence[int]): The list of layer depths in which to execute DRB for all qubit layouts in qubits_array.
         num_circuit_samples (int): The number of random-layer DRB circuits to generate.
         shots (int): The number of measurement shots to execute per circuit.
         qiskit_optim_level (int): The Qiskit-level of optimization to use in transpilation.
-                            * Default is 1.
+            * Default is 1.
         routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): The routing method to use in transpilation.
-                            * Default is "sabre".
+            * Default is "sabre".
         two_qubit_gate_ensembles (Optional[Sequence[Dict[str, float]]]): The two-qubit gate ensembles to use in the random DRB circuits.
-                            * Keys correspond to str names of qiskit circuit library gates, e.g., "CZGate" or "CXGate".
-                            * Values correspond to the probability for the respective gate to be sampled.
-                            * Each Dict[str,float] corresponds to each qubit layout in qubits_array.
-                            * If len(two_qubit_gate_ensembles) != len(qubits_array), the first Dict is assinged by default.
-                            * Default is None, which assigns {str(q): {"CZGate": 1.0} for q in qubits_array}.
+            * Keys correspond to str names of qiskit circuit library gates, e.g., "CZGate" or "CXGate".
+            * Values correspond to the probability for the respective gate to be sampled.
+            * Each Dict[str,float] corresponds to each qubit layout in qubits_array.
+            * If len(two_qubit_gate_ensembles) != len(qubits_array), the first Dict is assinged by default.
+            * Default is None, which assigns {str(q): {"CZGate": 1.0} for q in qubits_array}.
         densities_2q_gates (Optional[Sequence[float]]): The expected densities of 2-qubit gates in the final circuits per qubit layout.
-                            * If len(densities_2q_gates) != len(qubits_array), the first density value is assinged by default.
-                            * Default is None, which assigns 0.25 to all qubit layouts.
+            * If len(densities_2q_gates) != len(qubits_array), the first density value is assinged by default.
+            * Default is None, which assigns 0.25 to all qubit layouts.
         clifford_sqg_probabilities (Optional[Sequence[float]]): Probability with which to uniformly sample Clifford 1Q gates per qubit layout.
-                            * Default is None, which assigns 1.0 to all qubit layouts.
+            * Default is None, which assigns 1.0 to all qubit layouts.
         sqg_gate_ensembles (Optional[Sequence[Dict[str, float]]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
-                            * If len(sqg_gate_ensembles) != len(qubits_array), the first ensemble is assinged by default.
-                            * Default is None, which leaves only uniform sampling of 1Q Clifford gates.
+            * If len(sqg_gate_ensembles) != len(qubits_array), the first ensemble is assinged by default.
+            * Default is None, which leaves only uniform sampling of 1Q Clifford gates.
 
     """
 
