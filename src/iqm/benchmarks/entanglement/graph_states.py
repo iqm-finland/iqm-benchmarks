@@ -659,7 +659,7 @@ def shadow_tomography_analysis(
 
                 # Compute the negativity of the shadow of each projection
                 qcvv_logger.info(
-                    f"Computing the negativity of all shadow projections for qubit pair {qubit_pair} ({pair_idx+1}/{len(group)} and median of means sample {MoMs+1}/{num_MoMs}"
+                    f"Computing the negativity of all shadow projections for qubit pair {qubit_pair} ({pair_idx+1}/{len(group)}) and median of means sample {MoMs+1}/{num_MoMs}"
                 )
                 all_negativities[str(qubit_pair)][MoMs] = {
                     projected_bit_string: get_negativity(
