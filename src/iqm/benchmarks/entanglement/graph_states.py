@@ -1031,7 +1031,7 @@ class GraphStateBenchmark(Benchmark):
         self.graph_state_circuit = generate_graph_state(self.qubits, self.backend)
         self.coupling_map = set_coupling_map(self.qubits, self.backend, physical_layout="fixed")
 
-        # Initialize the variable to contain the QV circuits of each layout
+        # Initialize the variable to contain the benchmark circuits of each layout
         self.circuits = Circuits()
         self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
         self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
