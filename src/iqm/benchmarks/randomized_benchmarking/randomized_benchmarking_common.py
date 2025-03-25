@@ -380,7 +380,9 @@ def get_survival_probabilities(num_qubits: int, counts: List[Dict[str, int]]) ->
     return [c["0" * num_qubits] / sum(c.values()) if "0" * num_qubits in c.keys() else 0 for c in counts]
 
 
-def import_native_gate_cliffords(system_size: str = None) -> Dict[str, QuantumCircuit] | Tuple[Dict[str, QuantumCircuit], Dict[str, QuantumCircuit]]:
+def import_native_gate_cliffords(
+    system_size: str = None,
+) -> Dict[str, QuantumCircuit] | Tuple[Dict[str, QuantumCircuit], Dict[str, QuantumCircuit]]:
     """Import native gate Clifford dictionaries
 
     Args:
