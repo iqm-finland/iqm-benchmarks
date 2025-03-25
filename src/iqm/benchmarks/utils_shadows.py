@@ -46,7 +46,7 @@ def CUE(random_gen: RandomState, n: int) -> np.ndarray:
     # Create the diagonal matrix Lambda
     Lambda = np.diag(R.diagonal() / np.abs(R.diagonal()))
 
-    # Compute Q' = Q * Lambda, which is Haar-distributed
+    # Compute U = Q * Lambda, which is Haar-distributed
     U = Q @ Lambda
 
     return U
