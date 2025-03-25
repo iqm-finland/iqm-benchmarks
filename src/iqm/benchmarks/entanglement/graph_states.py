@@ -311,7 +311,7 @@ def plot_max_negativities(
     ax = plt.axes()
 
     if tomography == "shadow_tomography":
-        errorbar_labels = rf"$1 \sigma/\sqrt{{N}}$ (N={cast(int, num_RM_samples)*cast(int,num_MoMs_samples)} RMs)"
+        errorbar_labels = rf"$1 \mathrm{{SEM}}$ (N={cast(int, num_RM_samples)*cast(int,num_MoMs_samples)} RMs)"
     else:
         errorbar_labels = rf"$1 \sigma$ ({cast(int, num_bootstraps)} bootstraps)"
 
