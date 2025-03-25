@@ -398,6 +398,9 @@ def import_native_gate_cliffords(
     if system_size is not None and system_size not in ["1q", "2q"]:
         raise ValueError('system_size must be either "1q", "2q", or None')
 
+    clifford_1q_dict = {}
+    clifford_2q_dict = {}
+
     if system_size is None or system_size == "1q":
         with open(os.path.join(os.path.dirname(__file__), "clifford_1q.pkl"), "rb") as f1q:
             clifford_1q_dict = pickle.load(f1q)
@@ -410,10 +413,10 @@ def import_native_gate_cliffords(
 
     if system_size == "1q":
         return clifford_1q_dict
-    elif system_size == "2q":
+    if system_size == "2q":
         return clifford_2q_dict
-    else:
-        return clifford_1q_dict, clifford_2q_dict
+
+    return clifford_1q_dict, clifford_2q_dict
 
 
 def lmfit_minimizer(
