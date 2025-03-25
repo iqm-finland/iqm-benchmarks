@@ -37,11 +37,18 @@ def CUE(random_gen: RandomState, n: int) -> np.ndarray:
     Returns:
         np.ndarray: an n x n CUE matrix
     """
-    U = (random_gen.randn(n, n) + 1j * random_gen.randn(n, n))
-    q, r = spl.qr(U)
-    d = np.diagonal(r)
-    ph = d / np.abs(d)
-    U = q @ ph @ q 
+    # Generate an N × N complex matrix Z with standard normal entries
+    Z = (random_gen.randn(n, n) + 1j * random_gen.randn(n, n)) / np.sqrt(2.0)
+
+    # Perform QR decomposition, Z = QR
+    Q, R = spl.qr(Z)
+
+    # Create the diagonal matrix Lambda
+    Lambda = np.diag(R.diagonal() / np.abs(R.diagonal()))
+
+    # Compute Q' = Q * Lambda, which is Haar-distributed
+    U = Q @ Lambda
+
     return U
 
 
@@ -198,8 +205,8 @@ def get_local_shadow(
 
 
 def get_negativity(rho: np.ndarray, NA: int, NB: int) -> float:
-    """Computes the negativity of a given density matrix. 
-    Note that a negativity >0 is only a necessary and sufficient condition for entanglement if NA = NB = 1. For more    qubits per subsystems it is merely a necessary condition. 
+    """Computes the negativity of a given density matrix.
+    Note that a negativity >0 is only a necessary and sufficient condition for entanglement if NA = NB = 1. For more    qubits per subsystems it is merely a necessary condition.
     Args:
         rho (np.ndarray): Density matrix.
         NA (int): Number of qubits for subsystem A.
