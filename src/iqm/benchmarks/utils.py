@@ -44,7 +44,6 @@ from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
-from iqm.qiskit_iqm.iqm_transpilation import optimize_single_qubit_gates
 
 
 def timeit(f):
@@ -168,6 +167,9 @@ def count_native_gates(
         backend = backend_arg
 
     native_operations = backend.operation_names
+
+    if "move" in backend.architecture.gates:
+        native_operations.append("move")
     # Some backends may not include "barrier" in the operation_names attribute
     if "barrier" not in native_operations:
         native_operations.append("barrier")
@@ -515,21 +517,22 @@ def perform_backend_transpilation(
             initial_layout=qubits if aux_qc is None else None,
             routing_method=routing_method,
         )
-        if optimize_sqg:
-            transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
-        if "move" in backend.operation_names:
+        if "move" in backend.architecture.gates:
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
-            if "move" in backend.operation_names:
-                if 0 in qubits:
+            if "move" in backend.architecture.gates:
+                if backend.num_qubits in qubits:
                     raise ValueError(
-                        "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
+                        f"Label {backend.num_qubits} is reserved for Resonator - "
+                        f"Please specify computational qubit labels {np.arange(backend.num_qubits)}"
                     )
-                backend_name = "IQMNdonisBackend"
-                transpiled = reduce_to_active_qubits(transpiled, backend_name)
-                transpiled = aux_qc.compose(transpiled, qubits=[0] + qubits, clbits=list(range(qc.num_clbits)))
+                backend_topology = "star"
+                transpiled = reduce_to_active_qubits(transpiled, backend_topology, backend.num_qubits)
+                transpiled = aux_qc.compose(
+                    transpiled, qubits=qubits + [backend.num_qubits], clbits=list(range(qc.num_clbits))
+                )
             else:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
 
@@ -537,35 +540,43 @@ def perform_backend_transpilation(
 
     qcvv_logger.info(
         f"Transpiling for backend {backend.name} with optimization level {qiskit_optim_level}, "
-        f"{routing_method} routing method{' and SQG optimization' if optimize_sqg else ''} all circuits"
+        f"{routing_method} routing method{' including SQG optimization' if qiskit_optim_level>0 else ''} all circuits"
     )
 
     if coupling_map == backend.coupling_map:
         transpiled_qc_list = [transpile_and_optimize(qc) for qc in qc_list]
     else:  # The coupling map will be reduced if the physical layout is to be fixed
-        aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
+        if "move" in backend.architecture.gates:
+            aux_qc_list = [QuantumCircuit(backend.num_qubits + 1, q.num_clbits) for q in qc_list]
+        else:
+            aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]
 
     return transpiled_qc_list
 
 
-def reduce_to_active_qubits(circuit: QuantumCircuit, backend_name: Optional[str] = None) -> QuantumCircuit:
+def reduce_to_active_qubits(
+    circuit: QuantumCircuit, backend_topology: Optional[str] = None, backend_num_qubits=None
+) -> QuantumCircuit:
     """
     Reduces a quantum circuit to only its active qubits.
 
     Args:
-        backend_name (Optional[str]): The backend name, if any, in which the circuits are defined.
+        backend_topology (Optional[str]): The backend topology to execute the benchmark on.
         circuit (QuantumCircuit): The original quantum circuit.
+        backend_num_qubits (int): The number of qubits in the backend.
 
     Returns:
         QuantumCircuit: A new quantum circuit containing only active qubits.
     """
     # Identify active qubits
-    active_qubits = get_active_qubits(circuit)
-    if backend_name is not None and backend_name == "IQMNdonisBackend" and 0 not in active_qubits:
-        # For star systems, the resonator must always be there, regardless of whether there are MOVE gates on it or not
-        active_qubits.append(0)
-        active_qubits.sort()
+    active_qubits = set()
+    for instruction in circuit.data:
+        for qubit in instruction.qubits:
+            active_qubits.add(circuit.find_bit(qubit).index)
+    if backend_topology == "star" and backend_num_qubits not in active_qubits:
+        # For star systems, the resonator must always be there, regardless of whether it MOVE gates on it or not
+        active_qubits.add(backend_num_qubits)
 
     # Create a mapping from old qubits to new qubits
     active_qubits = list(set(sorted(active_qubits)))
@@ -679,12 +690,12 @@ def set_coupling_map(
         ValueError: if the physical layout is not "fixed" or "batching".
     """
     if physical_layout == "fixed":
-        if "move" in backend.operation_names:
-            if 0 in qubits:
-                raise ValueError(
-                    "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
-                )
-            return backend.coupling_map.reduce(mapping=[0] + list(qubits))
+        # if "move" in backend.architecture.gates:
+        #     if 0 in qubits:
+        #         raise ValueError(
+        #             "Label 0 is reserved for Resonator - Please specify computational qubit labels (1,2,...)"
+        #         )
+        #     return backend.coupling_map.reduce(mapping=[0] + list(qubits))
         return backend.coupling_map.reduce(mapping=qubits)
     if physical_layout == "batching":
         return backend.coupling_map
@@ -882,15 +893,15 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
         i, j = cal_keys["cz_gate_fidelity"]
         topology = "crystal"
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
-        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
-        if topology == "star":
-            list_couplings.append([qb1, qb2])
-        else:
-            list_couplings.append([qb1 - 1, qb2 - 1])
+        qb1 = int(item["locus"][0][2:]) if "COMP" not in item["locus"][0] else 0
+        qb2 = int(item["locus"][1][2:]) if "COMP" not in item["locus"][1] else 0
+        list_couplings.append([qb1 - 1, qb2 - 1])
         list_fids.append(float(item["value"]))
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    qubit_mapping = {}
+    if topology == "star":
+        qubit_mapping.update({-1: len(calibrated_qubits)})  # Place resonator qubit as last qubit
+    qubit_mapping.update({qubit: idx for idx, qubit in enumerate(calibrated_qubits)})
     list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
 
     return list_couplings, list_fids, topology

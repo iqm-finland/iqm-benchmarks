@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.27
+============
+* Qiskit on IQM dependency updated to > 17.0.
+
 Version 2.26
 ============
 * Changed benchmark observation names and identifiers to be more consistent with guidelines.
