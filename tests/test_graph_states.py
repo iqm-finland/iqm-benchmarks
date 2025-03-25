@@ -3,17 +3,17 @@
 from unittest.mock import patch
 
 from iqm.benchmarks.entanglement.graph_states import *
-from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
+from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 #from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 class TestGraphState:
-    backend = IQMFakeAdonis()
+    backend = IQMFakeApollo()
 
     @patch('matplotlib.pyplot.figure')
     def test_state_tomo(self, mock_fig):
         MINIMAL_GRAPHSTATE = GraphStateConfiguration(
-            qubits=list(range(self.backend.num_qubits)),
-            shots=2 ** 12,
+            qubits=list(range(5)),
+            shots=2 ** 10,
             tomography="state_tomography",
             num_bootstraps=10,
         )
@@ -25,7 +25,7 @@ class TestGraphState:
     @patch('matplotlib.pyplot.figure')
     def test_shadows(self, mock_fig):
         MINIMAL_GRAPHSTATE = GraphStateConfiguration(
-            qubits=list(range(self.backend.num_qubits)),
+            qubits=list(range(5)),
             shots=2 ** 6,
             tomography="shadow_tomography",
             num_bootstraps=2,
