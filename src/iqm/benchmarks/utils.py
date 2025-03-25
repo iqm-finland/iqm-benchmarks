@@ -570,13 +570,13 @@ def reduce_to_active_qubits(
         QuantumCircuit: A new quantum circuit containing only active qubits.
     """
     # Identify active qubits
-    active_qubits = set()
+    active_qubits: list | set = set()
     for instruction in circuit.data:
         for qubit in instruction.qubits:
-            active_qubits.add(circuit.find_bit(qubit).index)
+            cast(set, active_qubits).add(circuit.find_bit(qubit).index)
     if backend_topology == "star" and backend_num_qubits not in active_qubits:
         # For star systems, the resonator must always be there, regardless of whether it MOVE gates on it or not
-        active_qubits.add(backend_num_qubits)
+        cast(set, active_qubits).add(backend_num_qubits)
 
     # Create a mapping from old qubits to new qubits
     active_qubits = list(set(sorted(active_qubits)))

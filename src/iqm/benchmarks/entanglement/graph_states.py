@@ -296,7 +296,7 @@ def plot_max_negativities(
 
     x = [x.replace("(", "").replace(")", "").replace(", ", "-") for x in list(sorted_negativities.keys())]
     x_updated = [
-        f"{backend.index_to_qubit_name(int(a))[2:]}-{backend.index_to_qubit_name(int(b))[2:]}"
+        f"{cast(str, backend.index_to_qubit_name(int(a)))[2:]}-{cast(str, backend.index_to_qubit_name(int(b)))[2:]}"
         for edge in x
         for a, b in [edge.split("-")]
     ]  ## reindexes the edges label as in the QPU graph.

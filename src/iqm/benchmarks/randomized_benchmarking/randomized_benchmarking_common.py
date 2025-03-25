@@ -381,7 +381,7 @@ def get_survival_probabilities(num_qubits: int, counts: List[Dict[str, int]]) ->
 
 
 def import_native_gate_cliffords(
-    system_size: str = None,
+    system_size: Optional[str] = None,
 ) -> Dict[str, QuantumCircuit] | Tuple[Dict[str, QuantumCircuit], Dict[str, QuantumCircuit]]:
     """Import native gate Clifford dictionaries
 
