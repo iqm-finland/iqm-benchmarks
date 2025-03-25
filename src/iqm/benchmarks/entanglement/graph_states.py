@@ -293,7 +293,6 @@ def plot_max_negativities(
     fig_name = f"max_negativities_{backend_name}_{timestamp}".replace(" ", "_")
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
-    qcvv_logger.info(print(sorted_negativities.keys()))
 
     x = [x.replace("(", "").replace(")", "").replace(", ", "-") for x in list(sorted_negativities.keys())]
     x_updated = [
