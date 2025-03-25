@@ -859,7 +859,7 @@ def state_tomography_analysis(
             ]
 
             max_negativity_projection_idx = np.argmax(all_negativities_list)
-            max_negativity_bitstring = all_projection_bit_strings[max_negativity_projection_idx]
+            max_negativity_bitstring = list(pauli_expectations.keys())[max_negativity_projection_idx]
 
             # Bootstrapping - do only for max projection bitstring
             bootstrapped_pauli_expectations: List[Dict[str, Dict[str, float]]] = [
