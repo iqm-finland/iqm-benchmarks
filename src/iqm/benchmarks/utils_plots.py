@@ -125,7 +125,7 @@ class GraphPositions:
         48: (3.0, 1.0),
     }
 
-    predefined_stations = {"garnet": garnet_positions, "deneb": deneb_positions, "emerald": emerald_positions}
+    predefined_stations = {"garnet": garnet_positions, "deneb": deneb_positions}
 
     @staticmethod
     def create_positions(
