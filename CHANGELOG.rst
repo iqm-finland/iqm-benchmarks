@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 2.29
+============
+* Fixed header levels in `example_graphstate` notebook for correct pages rendering.
+
+Version 2.28
+============
+* Added graph state (bipartite entanglement negativity) benchmark.
+
+Version 2.27
+============
+* Qiskit on IQM dependency updated to > 17.0.
+
 Version 2.26
 ============
 * Changed benchmark observation names and identifiers to be more consistent with guidelines.

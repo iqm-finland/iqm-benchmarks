@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import requests
+from qiskit.transpiler import CouplingMap
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 
 from iqm.benchmarks.utils import extract_fidelities, get_iqm_backend, random_hamiltonian_path
@@ -341,23 +342,19 @@ def plot_layout_fidelity_graph(
     plt.show()
 
 
-def rx_to_nx_graph(backend_arg: str | IQMBackendBase) -> nx.Graph:
+def rx_to_nx_graph(backend_coupling_map: CouplingMap) -> nx.Graph:
     """Convert the Rustworkx graph returned by a backend to a Networkx graph.
 
     Args:
-        backend_arg (str | IQMBackendBase): The backend, either specified as str or as IQMBackendBase.
+        backend_coupling_map (CouplingMap): The coupling map of the backend.
 
     Returns:
         networkx.Graph: The Networkx Graph corresponding to the backend graph.
 
     """
-    if isinstance(backend_arg, str):
-        backend = get_iqm_backend(backend_arg)
-    else:
-        backend = backend_arg
 
     # Generate a Networkx graph
-    graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
+    graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
     backend_egdes, backend_nodes = (list(graph_backend.edge_list()), list(graph_backend.node_indices()))
     backend_nx_graph = nx.Graph()
     backend_nx_graph.add_nodes_from(backend_nodes)

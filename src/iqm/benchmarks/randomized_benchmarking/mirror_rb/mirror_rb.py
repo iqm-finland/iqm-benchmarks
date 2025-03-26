@@ -213,7 +213,7 @@ def generate_pauli_dressed_mrb_circuits(
 
         # Add measurements to transpiled - before!
         circ.measure_all()
-        if "move" in retrieved_backend.operation_names:
+        if "move" in retrieved_backend.architecture.gates:
             # All-to-all coupling map on the active qubits
             effective_coupling_map = [[x, y] for x in qubits for y in qubits if x != y]
         else:

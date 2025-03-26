@@ -27,6 +27,7 @@ from .benchmark_definition import (
 )
 from .circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from .entanglement.ghz import GHZBenchmark, GHZConfiguration
+from .entanglement.graph_states import GraphStateBenchmark, GraphStateConfiguration
 from .optimization.qscore import QScoreBenchmark, QScoreConfiguration
 from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
@@ -50,6 +51,7 @@ AVAILABLE_BENCHMARKS = {
     DirectRandomizedBenchmarking.name: DirectRandomizedBenchmarking,
     EPLGBenchmark.name: EPLGBenchmark,
     QScoreBenchmark.name: QScoreBenchmark,
+    GraphStateBenchmark.name: GraphStateBenchmark,
 }
 
 try:
