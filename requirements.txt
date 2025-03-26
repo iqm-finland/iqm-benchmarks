@@ -766,9 +766,9 @@ ipykernel==6.29.5 \
 ipython==8.31.0 \
     --hash=sha256:46ec58f8d3d076a61d128fe517a51eb730e3aaf0c184ea8c17d16e366660c6a6 \
     --hash=sha256:b6a2274606bec6166405ff05e54932ed6e5cfecaca1fc05f2cacde7bb074d70b
-iqm-client==22.10 \
-    --hash=sha256:11dc26a8afa8a727b7d145d9ceb579cacf818ab9172f21c4c08009e9075c1ba2 \
-    --hash=sha256:7907a5dc40df09d3b2b9d21ebe235a058ad28f24e3ed221e8f9d3da5e5b904a6
+iqm-client==22.11 \
+    --hash=sha256:68d9756eb4e1d37a67a526823ef31ba7f2ddad476db2e9b5f7a0e8709c18beb5 \
+    --hash=sha256:c1bd600be7b98bd0035bcb1df1e2554a03ad5c7d0345b92eb0bfb9ca51503c16
 isoduration==20.11.0 \
     --hash=sha256:ac2f9015137935279eac671f94f89eb00584f940f5dc49462a0c4ee692ba1bd9 \
     --hash=sha256:b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042
