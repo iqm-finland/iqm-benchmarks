@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Graph State Benchmark Example &#8212; IQM Benchmarks 2.28 documentation</title>
+    <title>Graph State Benchmark Example &#8212; IQM Benchmarks 2.29 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=12774161"></script>
+    <script src="../_static/documentation_options.js?v=a98bc37c"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Mirror Randomized Benchmarking (MRB)" href="example_mirror_rb.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.28" />
+  <meta name="docsearch:version" content="2.29" />
     <meta name="docbuild:last-update" content="2025-03-26"/>
   </head>
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.28 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.28 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.29 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.29 documentation - Home"/>
   
   
 </a></div>
@@ -155,8 +155,6 @@
 <li class="toctree-l2"><a class="reference internal" href="example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Graph State Benchmark Example</a></li>
-
-
 <li class="toctree-l2"><a class="reference internal" href="example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_quantum_volume.html">Quantum Volume (QV)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_quantum_volume_deneb.html">QV on Deneb</a></li>
@@ -428,11 +426,18 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Graph State Benchmark Example</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-state-configuration">Graph State Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-state-configuration">Graph State Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-analysis">Perform Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#display-the-maximum-negativity-for-all-qubit-pairs">Display the maximum negativity for all qubit pairs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-the-available-plots">Inspect the available plots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#display-all-available-dataset-attributes">Display all available dataset attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#if-using-state-tomography-inspect-the-bootstrap-bias-difference-between-each-bootstrap-mean-and-the-measured-sample">If using state tomography: inspect the bootstrap bias (difference between each bootstrap mean and the measured sample)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-a-graph-state-for-some-particular-pauli-measurement">Inspect a graph state for some particular Pauli measurement</a></li>
 </ul>
-
+</li>
+</ul>
             </nav>
         </div>
     </div>
@@ -453,9 +458,8 @@
 </div>
 </div>
 </div>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="choose-or-define-a-backend">
-<h1>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h1>
+<section id="choose-or-define-a-backend">
+<h2>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#backend = &quot;fakeadonis&quot;</span>
@@ -492,8 +496,8 @@
 </div>
 </div>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="graph-state-configuration">
-<h1>Graph State Configuration<a class="headerlink" href="#graph-state-configuration" title="Link to this heading">#</a></h1>
+<section id="graph-state-configuration">
+<h2>Graph State Configuration<a class="headerlink" href="#graph-state-configuration" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.graph_states</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
@@ -516,6 +520,9 @@
 </div>
 </div>
 </div>
+</section>
+<section id="run-the-experiment">
+<h2>Run the experiment<a class="headerlink" href="#run-the-experiment" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_graphstate</span> <span class="o">=</span> <span class="n">GraphStateBenchmark</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">EXAMPLE_GRAPHSTATE</span><span class="p">)</span>
@@ -603,6 +610,9 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 </div>
 </div>
 </div>
+</section>
+<section id="perform-analysis">
+<h2>Perform Analysis<a class="headerlink" href="#perform-analysis" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span> <span class="o">=</span> <span class="n">benchmark_graphstate</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
@@ -647,7 +657,8 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 </div>
 </div>
 </div>
-<p><strong>Displaying the maximum negativity for all qubit pairs</strong></p>
+<section id="display-the-maximum-negativity-for-all-qubit-pairs">
+<h3>Display the maximum negativity for all qubit pairs<a class="headerlink" href="#display-the-maximum-negativity-for-all-qubit-pairs" title="Link to this heading">#</a></h3>
 <p>The negativity is shown as a percentage of the ideal maximum value of 0.5 (which would be achieved on a noiseless backend).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -696,7 +707,9 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 </div>
 </div>
 </div>
-<p><strong>Inspect the available plots</strong></p>
+</section>
+<section id="inspect-the-available-plots">
+<h3>Inspect the available plots<a class="headerlink" href="#inspect-the-available-plots" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -761,7 +774,9 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 <img alt="../_images/6f374ddd56e3ea8b5f726a059cd4c7d6bd8d89898a573195ad2ce17b372836a3.png" src="../_images/6f374ddd56e3ea8b5f726a059cd4c7d6bd8d89898a573195ad2ce17b372836a3.png" />
 </div>
 </div>
-<p><strong>All available dataset attributes</strong></p>
+</section>
+<section id="display-all-available-dataset-attributes">
+<h3>Display all available dataset attributes<a class="headerlink" href="#display-all-available-dataset-attributes" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -774,7 +789,9 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 </div>
 </div>
 </div>
-<p><strong>Inspect the bootstrap bias (difference between each bootstrap mean and the measured sample)</strong></p>
+</section>
+<section id="if-using-state-tomography-inspect-the-bootstrap-bias-difference-between-each-bootstrap-mean-and-the-measured-sample">
+<h3>If using state tomography: inspect the bootstrap bias (difference between each bootstrap mean and the measured sample)<a class="headerlink" href="#if-using-state-tomography-inspect-the-bootstrap-bias-difference-between-each-bootstrap-mean-and-the-measured-sample" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">qubits</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_graphstate</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;max_negativities&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -870,7 +887,9 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 </div>
 </div>
 </div>
-<p><strong>Inspect a graph state for some particular Pauli measurement</strong></p>
+</section>
+<section id="inspect-a-graph-state-for-some-particular-pauli-measurement">
+<h3>Inspect a graph state for some particular Pauli measurement<a class="headerlink" href="#inspect-a-graph-state-for-some-particular-pauli-measurement" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_graphstate</span><span class="o">.</span><span class="n">circuits</span><span class="o">.</span><span class="n">benchmark_circuits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">circuit_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">circuits</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;iqp&#39;</span><span class="p">)</span>
@@ -970,6 +989,8 @@ tomo_qubits: 2/═════════════════════�
 «                                     0  1  2  3  4 </pre></div></div>
 </div>
 </section>
+</section>
+</section>
 
 
                 </article>
@@ -1017,11 +1038,18 @@ tomo_qubits: 2/═════════════════════�
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Graph State Benchmark Example</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-state-configuration">Graph State Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-state-configuration">Graph State Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-analysis">Perform Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#display-the-maximum-negativity-for-all-qubit-pairs">Display the maximum negativity for all qubit pairs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-the-available-plots">Inspect the available plots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#display-all-available-dataset-attributes">Display all available dataset attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#if-using-state-tomography-inspect-the-bootstrap-bias-difference-between-each-bootstrap-mean-and-the-measured-sample">If using state tomography: inspect the bootstrap bias (difference between each bootstrap mean and the measured sample)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-a-graph-state-for-some-particular-pauli-measurement">Inspect a graph state for some particular Pauli measurement</a></li>
 </ul>
-
+</li>
+</ul>
   </nav></div>
 
 </div></div>
