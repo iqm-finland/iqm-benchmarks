@@ -600,6 +600,7 @@ def perform_backend_transpilation(
 
     return transpiled_qc_list
 
+
 def random_hamiltonian_path(G: nx.Graph, N: int) -> List[Tuple[int, int]]:
     """
     Generates a random Hamiltonian path with N vertices from a given NetworkX graph.

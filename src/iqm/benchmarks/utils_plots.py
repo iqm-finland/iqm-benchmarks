@@ -22,8 +22,8 @@ from typing import Dict, List, Literal, Optional, Tuple
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import requests
 from qiskit.transpiler import CouplingMap
+import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 
 from iqm.benchmarks.utils import extract_fidelities, get_iqm_backend, random_hamiltonian_path
