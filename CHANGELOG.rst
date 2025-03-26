@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.29
+============
+* Fixed header levels in `example_graphstate` notebook for correct pages rendering.
+
 Version 2.28
 ============
 * Added graph state (bipartite entanglement negativity) benchmark.
