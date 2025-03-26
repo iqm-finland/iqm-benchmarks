@@ -380,17 +380,42 @@ def get_survival_probabilities(num_qubits: int, counts: List[Dict[str, int]]) ->
     return [c["0" * num_qubits] / sum(c.values()) if "0" * num_qubits in c.keys() else 0 for c in counts]
 
 
-def import_native_gate_cliffords() -> Tuple[Dict[str, QuantumCircuit], Dict[str, QuantumCircuit]]:
+def import_native_gate_cliffords(
+    system_size: Optional[str] = None,
+) -> Dict[str, QuantumCircuit] | Tuple[Dict[str, QuantumCircuit], Dict[str, QuantumCircuit]]:
     """Import native gate Clifford dictionaries
+
+    Args:
+        system_size (str, optional): System size to load, either "1q" or "2q". If None, load both dictionaries.
+
     Returns:
-        Dictionaries of 1Q and 2Q Clifford gates
+        If system_size is specified, returns the dictionary for that system size.
+        If system_size is None, returns a tuple of (1q_dict, 2q_dict).
+
+    Raises:
+        ValueError: If system_size is not None, "1q", or "2q".
     """
-    # Import the native-gate Cliffords
-    with open(os.path.join(os.path.dirname(__file__), "clifford_1q.pkl"), "rb") as f1q:
-        clifford_1q_dict = pickle.load(f1q)
-    with open(os.path.join(os.path.dirname(__file__), "clifford_2q.pkl"), "rb") as f2q:
-        clifford_2q_dict = pickle.load(f2q)
-    qcvv_logger.info("Clifford dictionaries imported successfully !")
+    if system_size is not None and system_size not in ["1q", "2q"]:
+        raise ValueError('system_size must be either "1q", "2q", or None')
+
+    clifford_1q_dict = {}
+    clifford_2q_dict = {}
+
+    if system_size is None or system_size == "1q":
+        with open(os.path.join(os.path.dirname(__file__), "clifford_1q.pkl"), "rb") as f1q:
+            clifford_1q_dict = pickle.load(f1q)
+
+    if system_size is None or system_size == "2q":
+        with open(os.path.join(os.path.dirname(__file__), "clifford_2q.pkl"), "rb") as f2q:
+            clifford_2q_dict = pickle.load(f2q)
+
+    qcvv_logger.info(f"Clifford dictionaries for {system_size or 'both systems'} imported successfully!")
+
+    if system_size == "1q":
+        return clifford_1q_dict
+    if system_size == "2q":
+        return clifford_2q_dict
+
     return clifford_1q_dict, clifford_2q_dict
 
 
