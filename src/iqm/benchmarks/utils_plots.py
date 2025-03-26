@@ -73,7 +73,6 @@ class GraphPositions:
         6: (3.0, 3.0),
     }
 
-
     predefined_stations = {"garnet": garnet_positions, "deneb": deneb_positions}
 
     @staticmethod
