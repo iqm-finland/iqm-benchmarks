@@ -787,7 +787,7 @@ def state_tomography_analysis(
     tomography_negativities: Dict[int, Dict[str, Dict[str, float]]] = {}
     bootstrapped_negativities: Dict[int, Dict[str, List[float]]] = {}
     bootstrapped_avg_negativities: Dict[int, Dict[str, Dict[str, float]]] = {}
-    num_tomo_samples = 3**2  # In general 3**n samples suffice (assuming trace-preservation and unitality)
+    num_tomo_samples = 3**2  # In general 3**n samples suffice (assuming trace-preservation and unitality for the Pauli measurements)
     for group_idx, group in all_qubit_pairs_per_group.items():
         qcvv_logger.info(
             f"Retrieving tomography-reconstructed states with {num_bootstraps} for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
