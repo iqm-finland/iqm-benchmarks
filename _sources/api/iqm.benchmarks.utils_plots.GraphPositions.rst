@@ -1,7 +1,7 @@
-iqm.benchmarks.utils.GraphPositions
-===================================
+iqm.benchmarks.utils\_plots.GraphPositions
+==========================================
 
-.. currentmodule:: iqm.benchmarks.utils
+.. currentmodule:: iqm.benchmarks.utils_plots
 
 .. autoclass:: GraphPositions
    :members:

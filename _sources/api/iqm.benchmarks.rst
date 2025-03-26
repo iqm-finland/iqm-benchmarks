@@ -39,6 +39,8 @@
    ~iqm.benchmarks.randomized_benchmarking
    ~iqm.benchmarks.readout_mitigation
    ~iqm.benchmarks.utils
+   ~iqm.benchmarks.utils_plots
+   ~iqm.benchmarks.utils_shadows
 
 
 

@@ -1,0 +1,1081 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Graph State Benchmark Example &#8212; IQM Benchmarks 2.28 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=12774161"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/example_graphstate';</script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Compressive Gate Set Tomography (GST)" href="example_gst.html" />
+    <link rel="prev" title="Mirror Randomized Benchmarking (MRB)" href="example_mirror_rb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.28" />
+    <meta name="docbuild:last-update" content="2025-03-26"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.28 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.28 documentation - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">IQM Benchmarks</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Graph State Benchmark Example</a></li>
+
+
+<li class="toctree-l2"><a class="reference internal" href="example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_quantum_volume.html">Quantum Volume (QV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_quantum_volume_deneb.html">QV on Deneb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_ghz_deneb.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_qscore.html">Q-Score</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../devices/devices.html">Devices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../devices/spark.html">Benchmarking IQM Spark</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../devices/star.html">Benchmarking IQM Star</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../development/development.html">Development</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/how_to_make_your_own_benchmark.html">How to make your own benchmark?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/generate_2qubit_cliffords.html">2-Qubit Clifford Group Decomposition</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../API.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/iqm.benchmarks.html">iqm.benchmarks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.html">iqm.benchmarks.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.BenchmarkBase.html">iqm.benchmarks.benchmark.BenchmarkBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html">iqm.benchmarks.benchmark.BenchmarkConfigurationBase</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.html">iqm.benchmarks.benchmark_definition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.add_counts_to_dataset.html">iqm.benchmarks.benchmark_definition.add_counts_to_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.default_analysis_function.html">iqm.benchmarks.benchmark_definition.default_analysis_function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.merge_datasets_dac.html">iqm.benchmarks.benchmark_definition.merge_datasets_dac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.show_figure.html">iqm.benchmarks.benchmark_definition.show_figure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.Benchmark.html">iqm.benchmarks.benchmark_definition.Benchmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html">iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.html">iqm.benchmarks.circuit_containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.BenchmarkCircuit.html">iqm.benchmarks.circuit_containers.BenchmarkCircuit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.CircuitGroup.html">iqm.benchmarks.circuit_containers.CircuitGroup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.Circuits.html">iqm.benchmarks.circuit_containers.Circuits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.html">iqm.benchmarks.compressive_gst</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.compressive_gst.html">iqm.benchmarks.compressive_gst.compressive_gst</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.gst_analysis.html">iqm.benchmarks.compressive_gst.gst_analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.graph_states.html">iqm.benchmarks.entanglement.graph_states</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.optimization.html">iqm.benchmarks.optimization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.optimization.qscore.html">iqm.benchmarks.optimization.qscore</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.html">iqm.benchmarks.quantum_volume</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.clops.html">iqm.benchmarks.quantum_volume.clops</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.quantum_volume.html">iqm.benchmarks.quantum_volume.quantum_volume</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.html">iqm.benchmarks.readout_mitigation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation.html">iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.readout_error_m3.html">iqm.benchmarks.readout_mitigation.readout_error_m3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.generate_state_tomography_circuits.html">iqm.benchmarks.utils.generate_state_tomography_circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_Pauli_expectation.html">iqm.benchmarks.utils.get_Pauli_expectation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_active_qubits.html">iqm.benchmarks.utils.get_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_measurement_mapping.html">iqm.benchmarks.utils.get_measurement_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_neighbors_of_edges.html">iqm.benchmarks.utils.get_neighbors_of_edges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_tomography_matrix.html">iqm.benchmarks.utils.get_tomography_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.median_with_uncertainty.html">iqm.benchmarks.utils.median_with_uncertainty</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.remove_directed_duplicates_to_list.html">iqm.benchmarks.utils.remove_directed_duplicates_to_list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.split_sequence_in_chunks.html">iqm.benchmarks.utils.split_sequence_in_chunks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.rx_to_nx_graph.html">iqm.benchmarks.utils_plots.rx_to_nx_graph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.GraphPositions.html">iqm.benchmarks.utils_plots.GraphPositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.html">iqm.benchmarks.utils_shadows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.CUE.html">iqm.benchmarks.utils_shadows.CUE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.get_local_shadow.html">iqm.benchmarks.utils_shadows.get_local_shadow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.get_negativity.html">iqm.benchmarks.utils_shadows.get_negativity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.local_shadow_tomography.html">iqm.benchmarks.utils_shadows.local_shadow_tomography</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/example_graphstate.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Graph State Benchmark Example</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Graph State Benchmark Example</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-state-configuration">Graph State Configuration</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="graph-state-benchmark-example">
+<h1>Graph State Benchmark Example<a class="headerlink" href="#graph-state-benchmark-example" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="choose-or-define-a-backend">
+<h1>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#backend = &quot;fakeadonis&quot;</span>
+<span class="c1">#backend = &quot;fakeapollo&quot;</span>
+<span class="c1">#backend = &quot;garnet&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Set IQM Token if using Resonance.</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;xxxxxxxxxxxxxxxx&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_iqm_backend</span>
+<span class="n">backend</span><span class="o">=</span><span class="n">get_iqm_backend</span><span class="p">(</span><span class="s2">&quot;garnet&quot;</span><span class="p">)</span>
+
+<span class="c1"># from iqm.qiskit_iqm.iqm_provider import IQMProvider</span>
+<span class="c1"># iqm_url=&quot;https://cocos.resonance.meetiqm.com/garnet&quot;</span>
+<span class="c1"># provider = IQMProvider(iqm_url)</span>
+<span class="c1"># backend = provider.get_backend()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="graph-state-configuration">
+<h1>Graph State Configuration<a class="headerlink" href="#graph-state-configuration" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.graph_states</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EXAMPLE_GRAPHSTATE</span> <span class="o">=</span> <span class="n">GraphStateConfiguration</span><span class="p">(</span>
+    <span class="n">qubits</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">)),</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">tomography</span><span class="o">=</span><span class="s2">&quot;state_tomography&quot;</span><span class="p">,</span>
+    <span class="n">num_bootstraps</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
+    <span class="c1"># n_random_unitaries=25,</span>
+    <span class="c1"># n_median_of_means=4,</span>
+    <span class="c1">#max_gates_per_batch=40_000,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_graphstate</span> <span class="o">=</span> <span class="n">GraphStateBenchmark</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">EXAMPLE_GRAPHSTATE</span><span class="p">)</span>
+<span class="n">run_graphstate</span> <span class="o">=</span> <span class="n">benchmark_graphstate</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-25 16:08:33,747 - iqm.benchmarks.logging_config - INFO - Identifying qubit pairs and neighbor groups for the Graph State benchmark
+2025-03-25 16:08:33,748 - iqm.benchmarks.logging_config - INFO - Performing state tomography of all qubit pairs
+2025-03-25 16:08:33,749 - iqm.benchmarks.logging_config - INFO - Now on group 1/10
+2025-03-25 16:08:33,750 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (11, 10) and neighbors {5, 6, 9, 15, 16}
+2025-03-25 16:08:33,753 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (18, 17) and neighbors {13, 14, 19}
+2025-03-25 16:08:33,755 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (7, 12) and neighbors {2, 8, 13}
+2025-03-25 16:08:33,758 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (3, 4) and neighbors {0, 1, 2, 5, 8, 9}
+2025-03-25 16:08:33,761 - iqm.benchmarks.logging_config - INFO - Submitting batch with 36 circuits corresponding to qubits [11, 10, 18, 17, 7, 12, 3, 4]
+C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-03-25 16:08:34,395 - iqm.benchmarks.logging_config - INFO - Now on group 2/10
+2025-03-25 16:08:34,396 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (13, 8) and neighbors {3, 7, 9, 12, 14, 17}
+2025-03-25 16:08:34,398 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (11, 16) and neighbors {6, 10, 15}
+2025-03-25 16:08:34,400 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (5, 4) and neighbors {1, 3, 6, 9, 10}
+2025-03-25 16:08:34,402 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (18, 19) and neighbors {14, 15, 17}
+2025-03-25 16:08:34,405 - iqm.benchmarks.logging_config - INFO - Submitting batch with 36 circuits corresponding to qubits [13, 8, 11, 16, 5, 4, 18, 19]
+2025-03-25 16:08:35,195 - iqm.benchmarks.logging_config - INFO - Now on group 3/10
+2025-03-25 16:08:35,195 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (1, 0) and neighbors {3, 4}
+2025-03-25 16:08:35,197 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (13, 14) and neighbors {8, 9, 12, 15, 17, 18}
+2025-03-25 16:08:35,200 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (5, 10) and neighbors {4, 6, 9, 11, 15}
+2025-03-25 16:08:35,202 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (7, 2) and neighbors {3, 8, 12}
+2025-03-25 16:08:35,205 - iqm.benchmarks.logging_config - INFO - Submitting batch with 36 circuits corresponding to qubits [1, 0, 13, 14, 5, 10, 7, 2]
+2025-03-25 16:08:35,816 - iqm.benchmarks.logging_config - INFO - Now on group 4/10
+2025-03-25 16:08:35,816 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (15, 16) and neighbors {10, 11, 14, 19}
+2025-03-25 16:08:35,819 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (5, 6) and neighbors {4, 10, 11}
+2025-03-25 16:08:35,821 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (9, 8) and neighbors {3, 4, 7, 10, 13, 14}
+2025-03-25 16:08:35,824 - iqm.benchmarks.logging_config - INFO - Submitting batch with 27 circuits corresponding to qubits [15, 16, 5, 6, 9, 8]
+2025-03-25 16:08:36,584 - iqm.benchmarks.logging_config - INFO - Now on group 5/10
+2025-03-25 16:08:36,585 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (11, 6) and neighbors {5, 10, 16}
+2025-03-25 16:08:36,587 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (9, 14) and neighbors {4, 8, 10, 13, 15, 18}
+2025-03-25 16:08:36,590 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (3, 0) and neighbors {1, 2, 4, 8}
+2025-03-25 16:08:36,592 - iqm.benchmarks.logging_config - INFO - Submitting batch with 27 circuits corresponding to qubits [11, 6, 9, 14, 3, 0]
+2025-03-25 16:08:37,324 - iqm.benchmarks.logging_config - INFO - Now on group 6/10
+2025-03-25 16:08:37,326 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (15, 19) and neighbors {10, 14, 16, 18}
+2025-03-25 16:08:37,330 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (13, 17) and neighbors {8, 12, 14, 18}
+2025-03-25 16:08:37,332 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (9, 4) and neighbors {1, 3, 5, 8, 10, 14}
+2025-03-25 16:08:37,334 - iqm.benchmarks.logging_config - INFO - Submitting batch with 27 circuits corresponding to qubits [15, 19, 13, 17, 9, 4]
+2025-03-25 16:08:38,011 - iqm.benchmarks.logging_config - INFO - Now on group 7/10
+2025-03-25 16:08:38,012 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (3, 2) and neighbors {0, 4, 7, 8}
+2025-03-25 16:08:38,017 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (15, 14) and neighbors {9, 10, 13, 16, 18, 19}
+2025-03-25 16:08:38,020 - iqm.benchmarks.logging_config - INFO - Submitting batch with 18 circuits corresponding to qubits [3, 2, 15, 14]
+2025-03-25 16:08:38,558 - iqm.benchmarks.logging_config - INFO - Now on group 8/10
+2025-03-25 16:08:38,559 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (9, 10) and neighbors {4, 5, 8, 11, 14, 15}
+2025-03-25 16:08:38,562 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (13, 12) and neighbors {7, 8, 14, 17}
+2025-03-25 16:08:38,566 - iqm.benchmarks.logging_config - INFO - Submitting batch with 18 circuits corresponding to qubits [9, 10, 13, 12]
+2025-03-25 16:08:39,150 - iqm.benchmarks.logging_config - INFO - Now on group 9/10
+2025-03-25 16:08:39,151 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (15, 10) and neighbors {5, 9, 11, 14, 16, 19}
+2025-03-25 16:08:39,155 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (3, 8) and neighbors {0, 2, 4, 7, 9, 13}
+2025-03-25 16:08:39,159 - iqm.benchmarks.logging_config - INFO - Submitting batch with 18 circuits corresponding to qubits [15, 10, 3, 8]
+2025-03-25 16:08:39,704 - iqm.benchmarks.logging_config - INFO - Now on group 10/10
+2025-03-25 16:08:39,705 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (7, 8) and neighbors {2, 3, 9, 12, 13}
+2025-03-25 16:08:39,708 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (1, 4) and neighbors {0, 3, 5, 9}
+2025-03-25 16:08:39,711 - iqm.benchmarks.logging_config - INFO - Now on qubit pair (18, 14) and neighbors {9, 13, 15, 17, 19}
+2025-03-25 16:08:39,714 - iqm.benchmarks.logging_config - INFO - Submitting batch with 27 circuits corresponding to qubits [7, 8, 1, 4, 18, 14]
+2025-03-25 16:08:40,303 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [11, 10, 18, 17, 7, 12, 3, 4]
+2025-03-25 16:09:42,125 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [11, 10, 18, 17, 7, 12, 3, 4] to the dataset
+2025-03-25 16:09:42,461 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [13, 8, 11, 16, 5, 4, 18, 19]
+2025-03-25 16:10:30,208 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [13, 8, 11, 16, 5, 4, 18, 19] to the dataset
+2025-03-25 16:10:30,572 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [1, 0, 13, 14, 5, 10, 7, 2]
+2025-03-25 16:11:17,257 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [1, 0, 13, 14, 5, 10, 7, 2] to the dataset
+2025-03-25 16:11:17,626 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [15, 16, 5, 6, 9, 8]
+2025-03-25 16:11:46,424 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [15, 16, 5, 6, 9, 8] to the dataset
+2025-03-25 16:11:46,756 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [11, 6, 9, 14, 3, 0]
+2025-03-25 16:12:28,104 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [11, 6, 9, 14, 3, 0] to the dataset
+2025-03-25 16:12:28,439 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [15, 19, 13, 17, 9, 4]
+2025-03-25 16:13:00,852 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [15, 19, 13, 17, 9, 4] to the dataset
+2025-03-25 16:13:01,199 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [3, 2, 15, 14]
+2025-03-25 16:13:22,508 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [3, 2, 15, 14] to the dataset
+2025-03-25 16:13:22,798 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [9, 10, 13, 12]
+2025-03-25 16:13:45,350 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [9, 10, 13, 12] to the dataset
+2025-03-25 16:13:45,659 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [15, 10, 3, 8]
+2025-03-25 16:14:11,964 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [15, 10, 3, 8] to the dataset
+2025-03-25 16:14:12,300 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [7, 8, 1, 4, 18, 14]
+2025-03-25 16:14:49,412 - iqm.benchmarks.logging_config - INFO - Adding counts of qubit pairs [7, 8, 1, 4, 18, 14] to the dataset
+2025-03-25 16:14:49,823 - iqm.benchmarks.logging_config - INFO - Graph State benchmark experiment execution concluded !
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span> <span class="o">=</span> <span class="n">benchmark_graphstate</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-25 16:14:50,042 - iqm.benchmarks.logging_config - INFO - Fetching dataset
+2025-03-25 16:14:50,197 - iqm.benchmarks.logging_config - INFO - Dataset imported OK
+2025-03-25 16:14:50,197 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 1/10
+2025-03-25 16:14:50,473 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXGeneral&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,477 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXGeneral&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,482 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXGeneral&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,487 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXGeneral&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,492 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXNonUnicode&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,494 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXNonUnicode&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,496 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXNonUnicode&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,499 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXSizeOneSym&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,501 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXSizeTwoSym&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,505 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXSizeThreeSym&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,507 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXSizeFourSym&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,509 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;STIXSizeFiveSym&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,512 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmsy10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,514 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmr10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,516 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmtt10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,518 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmmi10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,521 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmb10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,524 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmss10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,527 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;cmex10&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:50,537 - matplotlib.font_manager - WARNING - findfont: Font family [&#39;DejaVu Sans Mono&#39;] not found. Falling back to DejaVu Sans.
+2025-03-25 16:14:51,525 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 2/10
+2025-03-25 16:14:52,721 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 3/10
+2025-03-25 16:14:53,930 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 4/10
+2025-03-25 16:14:54,845 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 5/10
+2025-03-25 16:14:55,798 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 6/10
+2025-03-25 16:14:56,719 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 7/10
+2025-03-25 16:14:57,351 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 8/10
+2025-03-25 16:14:57,987 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 9/10
+2025-03-25 16:14:58,683 - iqm.benchmarks.logging_config - INFO - Retrieving tomography-reconstructed states with 150 for qubit-pair group 10/10
+2025-03-25 16:14:59,625 - iqm.benchmarks.logging_config - INFO - Analysis of Graph State Benchmark experiment concluded!
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Displaying the maximum negativity for all qubit pairs</strong></p>
+<p>The negativity is shown as a percentage of the ideal maximum value of 0.5 (which would be achieved on a noiseless backend).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">observations</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observations: </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">****************************</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">qubit_indices</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="mf">100.0</span><span class="o">*</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">value</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="mf">100.0</span><span class="o">*</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> %&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Observations: max_negativity
+****************************
+
+(11, 10): 64.14 +/- 5.95 %
+(18, 17): 70.84 +/- 3.04 %
+(7, 12): 77.78 +/- 2.04 %
+(3, 4): 86.72 +/- 6.60 %
+(13, 8): 87.32 +/- 6.81 %
+(11, 16): 74.34 +/- 2.08 %
+(5, 4): 77.37 +/- 4.60 %
+(18, 19): 79.19 +/- 2.28 %
+(1, 0): 81.85 +/- 1.38 %
+(13, 14): 73.77 +/- 7.81 %
+(5, 10): 66.90 +/- 5.63 %
+(7, 2): 73.34 +/- 2.39 %
+(15, 16): 65.22 +/- 4.29 %
+(5, 6): 71.33 +/- 2.61 %
+(9, 8): 75.35 +/- 8.14 %
+(11, 6): 66.83 +/- 2.46 %
+(9, 14): 69.73 +/- 9.56 %
+(3, 0): 78.94 +/- 3.42 %
+(15, 19): 65.61 +/- 4.04 %
+(13, 17): 73.36 +/- 3.90 %
+(9, 4): 74.65 +/- 7.04 %
+(3, 2): 69.32 +/- 3.54 %
+(15, 14): 65.31 +/- 8.66 %
+(9, 10): 79.11 +/- 9.59 %
+(13, 12): 76.06 +/- 3.82 %
+(15, 10): 74.69 +/- 8.82 %
+(3, 8): 83.07 +/- 6.22 %
+(7, 8): 82.68 +/- 5.13 %
+(1, 4): 76.21 +/- 3.80 %
+(18, 14): 74.91 +/- 4.26 %
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Inspect the available plots</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;(11, 10)&#39;, &#39;(18, 17)&#39;, &#39;(7, 12)&#39;, &#39;(3, 4)&#39;, &#39;(13, 8)&#39;, &#39;(11, 16)&#39;, &#39;(5, 4)&#39;, &#39;(18, 19)&#39;, &#39;(1, 0)&#39;, &#39;(13, 14)&#39;, &#39;(5, 10)&#39;, &#39;(7, 2)&#39;, &#39;(15, 16)&#39;, &#39;(5, 6)&#39;, &#39;(9, 8)&#39;, &#39;(11, 6)&#39;, &#39;(9, 14)&#39;, &#39;(3, 0)&#39;, &#39;(15, 19)&#39;, &#39;(13, 17)&#39;, &#39;(9, 4)&#39;, &#39;(3, 2)&#39;, &#39;(15, 14)&#39;, &#39;(9, 10)&#39;, &#39;(13, 12)&#39;, &#39;(15, 10)&#39;, &#39;(3, 8)&#39;, &#39;(7, 8)&#39;, &#39;(1, 4)&#39;, &#39;(18, 14)&#39;, &#39;max_negativities_IQM_Backend_20250325-160833&#39;, &#39;max_negativities_graph_20250325-160833&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="s1">&#39;max_negativities_IQM_Backend_20250325-160833&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/95206db6798e35759b781bacae908e42bc181c7e136724c5fba9204d3814cbd8.png" src="../_images/95206db6798e35759b781bacae908e42bc181c7e136724c5fba9204d3814cbd8.png" />
+</div>
+</div>
+<p><strong>Plot the lowest and highest negativity resconstructed density matrices</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">observation_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">obs</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">qubit_indices</span><span class="p">:</span> <span class="n">obs</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">result_graphstate</span><span class="o">.</span><span class="n">observations</span><span class="p">}</span>
+<span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">observation_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">lowest_negativity_pair</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">observation_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">sorted_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+<span class="n">highest_negativity_pair</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">observation_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">sorted_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lowest_negativity_pair</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/d545bc15bea8d6ad873f7c7a19e9fe4b67e4fa580564c78710e3b676eb66414d.png" src="../_images/d545bc15bea8d6ad873f7c7a19e9fe4b67e4fa580564c78710e3b676eb66414d.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">highest_negativity_pair</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/741f627eafb0c736e5ebca10e83523870a5a026308568a570aadce0e280690dc.png" src="../_images/741f627eafb0c736e5ebca10e83523870a5a026308568a570aadce0e280690dc.png" />
+</div>
+</div>
+<p><strong>Display max negativities in the backend graph</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">plots</span><span class="p">[</span><span class="s1">&#39;max_negativities_graph_20250325-160833&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/6f374ddd56e3ea8b5f726a059cd4c7d6bd8d89898a573195ad2ce17b372836a3.png" src="../_images/6f374ddd56e3ea8b5f726a059cd4c7d6bd8d89898a573195ad2ce17b372836a3.png" />
+</div>
+</div>
+<p><strong>All available dataset attributes</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;session_timestamp&#39;, &#39;execution_timestamp&#39;, &#39;backend_configuration_name&#39;, &#39;backend_name&#39;, &#39;qubit_names&#39;, &#39;coupling_map&#39;, &#39;benchmark&#39;, &#39;shots&#39;, &#39;max_gates_per_batch&#39;, &#39;max_circuits_per_batch&#39;, &#39;calset_id&#39;, &#39;routing_method&#39;, &#39;physical_layout&#39;, &#39;use_dd&#39;, &#39;dd_strategy&#39;, &#39;qubits&#39;, &#39;tomography&#39;, &#39;num_bootstraps&#39;, &#39;n_random_unitaries&#39;, &#39;n_median_of_means&#39;, &#39;time_circuit_generation&#39;, &#39;all_unprojected_qubits&#39;, &#39;all_projected_qubits&#39;, &#39;all_pair_groups&#39;, &#39;all_neighbor_groups&#39;, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, &#39;all_tomography_states&#39;, &#39;all_negativities&#39;, &#39;max_negativities&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Inspect the bootstrap bias (difference between each bootstrap mean and the measured sample)</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">qubits</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_graphstate</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;max_negativities&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">qubits</span><span class="si">}</span><span class="s2"> bootstrap bias: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;bootstrapped_average&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> (sample) </span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> | (adjusted) </span><span class="si">{</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;bootstrapped_average&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(11, 10) bootstrap bias: 1.06e-02
+	 (sample) 0.3206842864916416 | (adjusted) 0.31010765308352356
+(18, 17) bootstrap bias: 2.93e-04
+	 (sample) 0.3542183495445777 | (adjusted) 0.3539253716950112
+(7, 12) bootstrap bias: 1.53e-03
+	 (sample) 0.3888948376922817 | (adjusted) 0.38736774049571426
+(3, 4) bootstrap bias: 1.40e-02
+	 (sample) 0.43361445043616353 | (adjusted) 0.4196633945881397
+(13, 8) bootstrap bias: 1.41e-02
+	 (sample) 0.43662497937638245 | (adjusted) 0.42249850678510703
+(11, 16) bootstrap bias: 1.90e-03
+	 (sample) 0.37169789059353975 | (adjusted) 0.36979367489991855
+(5, 4) bootstrap bias: 7.54e-03
+	 (sample) 0.38686144121566973 | (adjusted) 0.379324805728086
+(18, 19) bootstrap bias: 2.79e-03
+	 (sample) 0.39594160382229693 | (adjusted) 0.3931510385413373
+(1, 0) bootstrap bias: 5.97e-04
+	 (sample) 0.4092514317610637 | (adjusted) 0.4086540198375821
+(13, 14) bootstrap bias: 1.50e-02
+	 (sample) 0.36885658775672914 | (adjusted) 0.35382192582939426
+(5, 10) bootstrap bias: 9.08e-03
+	 (sample) 0.33451241682265326 | (adjusted) 0.32543228989306544
+(7, 2) bootstrap bias: 3.79e-04
+	 (sample) 0.36671508133810615 | (adjusted) 0.36709383454659233
+(15, 16) bootstrap bias: 4.77e-03
+	 (sample) 0.32608570801001885 | (adjusted) 0.3213134253456277
+(5, 6) bootstrap bias: 2.29e-03
+	 (sample) 0.3566393931240753 | (adjusted) 0.3543493221398908
+(9, 8) bootstrap bias: 1.81e-02
+	 (sample) 0.3767486702923495 | (adjusted) 0.35860149933340935
+(11, 6) bootstrap bias: 1.53e-03
+	 (sample) 0.3341624640356816 | (adjusted) 0.33262962066733953
+(9, 14) bootstrap bias: 3.00e-02
+	 (sample) 0.3486521211655147 | (adjusted) 0.3186675847362068
+(3, 0) bootstrap bias: 3.71e-03
+	 (sample) 0.39469814069723197 | (adjusted) 0.39099102345993036
+(15, 19) bootstrap bias: 6.13e-03
+	 (sample) 0.32804598413012276 | (adjusted) 0.3219124989220279
+(13, 17) bootstrap bias: 4.24e-03
+	 (sample) 0.3668085274286376 | (adjusted) 0.36257096650435117
+(9, 4) bootstrap bias: 1.62e-02
+	 (sample) 0.3732632016003694 | (adjusted) 0.35702785889177086
+(3, 2) bootstrap bias: 4.91e-03
+	 (sample) 0.3465755742920084 | (adjusted) 0.3416698385772142
+(15, 14) bootstrap bias: 2.17e-02
+	 (sample) 0.32654059296341725 | (adjusted) 0.30487999669484334
+(9, 10) bootstrap bias: 1.35e-02
+	 (sample) 0.39553971118808906 | (adjusted) 0.38203311102738585
+(13, 12) bootstrap bias: 3.17e-03
+	 (sample) 0.3803202427020316 | (adjusted) 0.37715389665511634
+(15, 10) bootstrap bias: 1.76e-02
+	 (sample) 0.37343498488547655 | (adjusted) 0.35586222167388737
+(3, 8) bootstrap bias: 1.60e-02
+	 (sample) 0.41534546787652044 | (adjusted) 0.3993565114966017
+(7, 8) bootstrap bias: 1.45e-02
+	 (sample) 0.4134082416427767 | (adjusted) 0.398899780892523
+(1, 4) bootstrap bias: 5.55e-03
+	 (sample) 0.3810499300589416 | (adjusted) 0.3755024431288029
+(18, 14) bootstrap bias: 7.34e-03
+	 (sample) 0.37452627891460544 | (adjusted) 0.3671820250131137
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>All the qubit pair groups generated during execution</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_graphstate</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;all_neighbor_groups&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [{5, 6, 9, 15, 16}, {13, 14, 19}, {2, 8, 13}, {0, 1, 2, 5, 8, 9}],
+ 1: [{3, 7, 9, 12, 14, 17}, {6, 10, 15}, {1, 3, 6, 9, 10}, {14, 15, 17}],
+ 2: [{3, 4}, {8, 9, 12, 15, 17, 18}, {4, 6, 9, 11, 15}, {3, 8, 12}],
+ 3: [{10, 11, 14, 19}, {4, 10, 11}, {3, 4, 7, 10, 13, 14}],
+ 4: [{5, 10, 16}, {4, 8, 10, 13, 15, 18}, {1, 2, 4, 8}],
+ 5: [{10, 14, 16, 18}, {8, 12, 14, 18}, {1, 3, 5, 8, 10, 14}],
+ 6: [{0, 4, 7, 8}, {9, 10, 13, 16, 18, 19}],
+ 7: [{4, 5, 8, 11, 14, 15}, {7, 8, 14, 17}],
+ 8: [{5, 9, 11, 14, 16, 19}, {0, 2, 4, 7, 9, 13}],
+ 9: [{2, 3, 9, 12, 13}, {0, 3, 5, 9}, {9, 13, 15, 17, 19}]}
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Inspect a graph state for some particular Pauli measurement</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_graphstate</span><span class="o">.</span><span class="n">circuits</span><span class="o">.</span><span class="n">benchmark_circuits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">circuit_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">circuits</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;iqp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="word-wrap: normal;white-space: pre;background: #fff0;line-height: 1.1;font-family: &quot;Courier New&quot;,Courier,monospace">               ┌────────────┐                                  ░               »
+      q_0 -> 0 ┤ R(π/2,π/2) ├─■──────────────■─────────────────░───────────────»
+               ├────────────┤ │              │                 ░               »
+      q_1 -> 1 ┤ R(π/2,π/2) ├─■──────────────┼────────■────────░───────────────»
+               ├────────────┤                │        │        ░               »
+      q_2 -> 2 ┤ R(π/2,π/2) ├────■───────────┼──■─────┼────────░───────────────»
+               ├────────────┤    │           │  │     │        ░               »
+      q_3 -> 3 ┤ R(π/2,π/2) ├─■──┼────────■──■──■─────┼────────░───────────────»
+               ├────────────┤ │  │        │           │        ░               »
+      q_4 -> 4 ┤ R(π/2,π/2) ├─■──┼────────┼──■─────■──■────────░───────────────»
+               ├────────────┤    │        │  │     │           ░               »
+      q_5 -> 5 ┤ R(π/2,π/2) ├────┼──■─────┼──┼──■──■───────────░───────────────»
+               ├────────────┤    │  │     │  │  │              ░               »
+      q_6 -> 6 ┤ R(π/2,π/2) ├────┼──┼──■──┼──┼──■──────────────░───────────────»
+               ├────────────┤    │  │  │  │  │                 ░               »
+      q_7 -> 7 ┤ R(π/2,π/2) ├────■──┼──┼──┼──┼──■──■───────────░───────────────»
+               ├────────────┤       │  │  │  │  │  │           ░               »
+      q_8 -> 8 ┤ R(π/2,π/2) ├─■─────┼──┼──■──┼──┼──■────────■──░───────────────»
+               ├────────────┤ │     │  │     │  │           │  ░               »
+      q_9 -> 9 ┤ R(π/2,π/2) ├─■─────┼──┼─────■──┼──■─────■──┼──░───────────────»
+               ├────────────┤       │  │        │  │     │  │  ░ ┌───────────┐ »
+    q_10 -> 10 ┤ R(π/2,π/2) ├───────■──┼──■─────┼──┼──■──■──┼──░─┤ R(-π/2,0) ├─»
+               ├────────────┤          │  │     │  │  │     │  ░ ├───────────┴┐»
+    q_11 -> 11 ┤ R(π/2,π/2) ├──────────■──┼──■──┼──┼──■─────┼──░─┤ R(π/2,π/2) ├»
+               ├────────────┤             │  │  │  │        │  ░ └────────────┘»
+    q_12 -> 12 ┤ R(π/2,π/2) ├─■───────────┼──┼──■──┼────────┼──░───────────────»
+               ├────────────┤ │           │  │     │        │  ░               »
+    q_13 -> 13 ┤ R(π/2,π/2) ├─■──■──■─────┼──┼─────┼────────■──░───────────────»
+               ├────────────┤    │  │     │  │     │           ░               »
+    q_14 -> 14 ┤ R(π/2,π/2) ├─■──■──┼─────┼──┼─────■──■────────░───────────────»
+               ├────────────┤ │     │     │  │        │        ░               »
+    q_15 -> 15 ┤ R(π/2,π/2) ├─■─────┼─────■──┼──■──■──┼────────░───────────────»
+               ├────────────┤       │        │  │  │  │        ░               »
+    q_16 -> 16 ┤ R(π/2,π/2) ├───────┼────────■──■──┼──┼────────░───────────────»
+               ├────────────┤       │              │  │        ░               »
+    q_17 -> 17 ┤ R(π/2,π/2) ├─■─────■──────────────┼──┼────────░───────────────»
+               ├────────────┤ │                    │  │        ░               »
+    q_18 -> 18 ┤ R(π/2,π/2) ├─■──■─────────────────┼──■────────░───────────────»
+               ├────────────┤    │                 │           ░               »
+    q_19 -> 19 ┤ R(π/2,π/2) ├────■─────────────────■───────────░───────────────»
+               └────────────┘                                  ░               »
+tomo_qubits: 2/════════════════════════════════════════════════════════════════»
+                                                                               »
+  neighbors: 5/════════════════════════════════════════════════════════════════»
+                                                                               »
+«                            ░                      
+«      q_0 -> 0 ─────────────░──────────────────────
+«                            ░                      
+«      q_1 -> 1 ─────────────░──────────────────────
+«                            ░                      
+«      q_2 -> 2 ─────────────░──────────────────────
+«                            ░                      
+«      q_3 -> 3 ─────────────░──────────────────────
+«                            ░                      
+«      q_4 -> 4 ─────────────░──────────────────────
+«                            ░       ┌─┐            
+«      q_5 -> 5 ─────────────░───────┤M├────────────
+«                            ░       └╥┘┌─┐         
+«      q_6 -> 6 ─────────────░────────╫─┤M├─────────
+«                            ░        ║ └╥┘         
+«      q_7 -> 7 ─────────────░────────╫──╫──────────
+«                            ░        ║  ║          
+«      q_8 -> 8 ─────────────░────────╫──╫──────────
+«                            ░        ║  ║ ┌─┐      
+«      q_9 -> 9 ─────────────░────────╫──╫─┤M├──────
+«               ┌──────────┐ ░    ┌─┐ ║  ║ └╥┘      
+«    q_10 -> 10 ┤ R(π,π/4) ├─░────┤M├─╫──╫──╫───────
+«               └┬────────┬┘ ░ ┌─┐└╥┘ ║  ║  ║       
+«    q_11 -> 11 ─┤ R(π,0) ├──░─┤M├─╫──╫──╫──╫───────
+«                └────────┘  ░ └╥┘ ║  ║  ║  ║       
+«    q_12 -> 12 ─────────────░──╫──╫──╫──╫──╫───────
+«                            ░  ║  ║  ║  ║  ║       
+«    q_13 -> 13 ─────────────░──╫──╫──╫──╫──╫───────
+«                            ░  ║  ║  ║  ║  ║       
+«    q_14 -> 14 ─────────────░──╫──╫──╫──╫──╫───────
+«                            ░  ║  ║  ║  ║  ║ ┌─┐   
+«    q_15 -> 15 ─────────────░──╫──╫──╫──╫──╫─┤M├───
+«                            ░  ║  ║  ║  ║  ║ └╥┘┌─┐
+«    q_16 -> 16 ─────────────░──╫──╫──╫──╫──╫──╫─┤M├
+«                            ░  ║  ║  ║  ║  ║  ║ └╥┘
+«    q_17 -> 17 ─────────────░──╫──╫──╫──╫──╫──╫──╫─
+«                            ░  ║  ║  ║  ║  ║  ║  ║ 
+«    q_18 -> 18 ─────────────░──╫──╫──╫──╫──╫──╫──╫─
+«                            ░  ║  ║  ║  ║  ║  ║  ║ 
+«    q_19 -> 19 ─────────────░──╫──╫──╫──╫──╫──╫──╫─
+«                            ░  ║  ║  ║  ║  ║  ║  ║ 
+«tomo_qubits: 2/════════════════╩══╩══╬══╬══╬══╬══╬═
+«                               0  1  ║  ║  ║  ║  ║ 
+«  neighbors: 5/══════════════════════╩══╩══╩══╩══╩═
+«                                     0  1  2  3  4 </pre></div></div>
+</div>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="example_mirror_rb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Mirror Randomized Benchmarking (MRB)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="example_gst.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Compressive Gate Set Tomography (GST)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Graph State Benchmark Example</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-state-configuration">Graph State Configuration</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By IQM Benchmarks developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, IQM.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2025-03-26.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

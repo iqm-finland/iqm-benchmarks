@@ -29,6 +29,7 @@ iqm.benchmarks.entanglement
    :recursive:
 
    ~iqm.benchmarks.entanglement.ghz
+   ~iqm.benchmarks.entanglement.graph_states
 
 
 

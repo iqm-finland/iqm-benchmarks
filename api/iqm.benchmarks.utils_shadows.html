@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.utils.GraphPositions &#8212; IQM Benchmarks 2.27 documentation</title>
+    <title>iqm.benchmarks.utils_shadows &#8212; IQM Benchmarks 2.28 documentation</title>
   
   
   
@@ -41,20 +41,20 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=58d1c09f"></script>
+    <script src="../_static/documentation_options.js?v=12774161"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.utils.GraphPositions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.utils_shadows';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License" href="../license.html" />
-    <link rel="prev" title="iqm.benchmarks.utils.xrvariable_to_counts" href="iqm.benchmarks.utils.xrvariable_to_counts.html" />
+    <link rel="next" title="iqm.benchmarks.utils_shadows.CUE" href="iqm.benchmarks.utils_shadows.CUE.html" />
+    <link rel="prev" title="iqm.benchmarks.utils_plots.GraphPositions" href="iqm.benchmarks.utils_plots.GraphPositions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.27" />
-    <meta name="docbuild:last-update" content="2025-03-25"/>
+  <meta name="docsearch:version" content="2.28" />
+    <meta name="docbuild:last-update" content="2025-03-26"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.27 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.27 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.28 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.28 documentation - Home"/>
   
   
 </a></div>
@@ -154,6 +154,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_graphstate.html">Graph State Benchmark Example</a></li>
+
+
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_quantum_volume.html">Quantum Volume (QV)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_quantum_volume_deneb.html">QV on Deneb</a></li>
@@ -205,6 +208,7 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.entanglement.graph_states.html">iqm.benchmarks.entanglement.graph_states</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
@@ -231,24 +235,44 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.generate_state_tomography_circuits.html">iqm.benchmarks.utils.generate_state_tomography_circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_Pauli_expectation.html">iqm.benchmarks.utils.get_Pauli_expectation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_active_qubits.html">iqm.benchmarks.utils.get_active_qubits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_measurement_mapping.html">iqm.benchmarks.utils.get_measurement_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_neighbors_of_edges.html">iqm.benchmarks.utils.get_neighbors_of_edges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_tomography_matrix.html">iqm.benchmarks.utils.get_tomography_matrix</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.median_with_uncertainty.html">iqm.benchmarks.utils.median_with_uncertainty</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.plot_layout_fidelity_graph.html">iqm.benchmarks.utils.plot_layout_fidelity_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.remove_directed_duplicates_to_list.html">iqm.benchmarks.utils.remove_directed_duplicates_to_list</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.split_sequence_in_chunks.html">iqm.benchmarks.utils.split_sequence_in_chunks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">iqm.benchmarks.utils.GraphPositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.rx_to_nx_graph.html">iqm.benchmarks.utils_plots.rx_to_nx_graph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.GraphPositions.html">iqm.benchmarks.utils_plots.GraphPositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">iqm.benchmarks.utils_shadows</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_shadows.CUE.html">iqm.benchmarks.utils_shadows.CUE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_shadows.get_local_shadow.html">iqm.benchmarks.utils_shadows.get_local_shadow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_shadows.get_negativity.html">iqm.benchmarks.utils_shadows.get_negativity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_shadows.local_shadow_tomography.html">iqm.benchmarks.utils_shadows.local_shadow_tomography</a></li>
 </ul>
 </details></li>
 </ul>
@@ -318,7 +342,7 @@
       
       
       
-      <li><a href="../_sources/api/iqm.benchmarks.utils.GraphPositions.rst" target="_blank"
+      <li><a href="../_sources/api/iqm.benchmarks.utils_shadows.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -381,9 +405,7 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</label>
+
 </div></div>
       
     </div>
@@ -394,25 +416,11 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>iqm.benchmarks.utils.GraphPositions</h1>
+    <h1>iqm.benchmarks.utils_shadows</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions"><code class="docutils literal notranslate"><span class="pre">GraphPositions</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.garnet_positions"><code class="docutils literal notranslate"><span class="pre">GraphPositions.garnet_positions</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.deneb_positions"><code class="docutils literal notranslate"><span class="pre">GraphPositions.deneb_positions</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.predefined_stations"><code class="docutils literal notranslate"><span class="pre">GraphPositions.predefined_stations</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.create_positions"><code class="docutils literal notranslate"><span class="pre">GraphPositions.create_positions()</span></code></a></li>
-</ul>
-</li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -422,102 +430,27 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="iqm-benchmarks-utils-graphpositions">
-<h1>iqm.benchmarks.utils.GraphPositions<a class="headerlink" href="#iqm-benchmarks-utils-graphpositions" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="iqm.benchmarks.utils.GraphPositions">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.utils.</span></span><span class="sig-name descname"><span class="pre">GraphPositions</span></span><a class="headerlink" href="#iqm.benchmarks.utils.GraphPositions" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A class to store and generate graph positions for different chip layouts.</p>
-<p>This class contains predefined node positions for various quantum chip topologies and
-provides methods to generate positions for different layout types.</p>
-<dl class="field-list simple">
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="iqm.benchmarks.utils.GraphPositions.garnet_positions">
-<span class="sig-name descname"><span class="pre">garnet_positions</span></span><a class="headerlink" href="#iqm.benchmarks.utils.GraphPositions.garnet_positions" title="Link to this definition">#</a></dt>
-<dd><p>Mapping of node indices to (x,y) positions for Garnet chip.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, Tuple[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="iqm.benchmarks.utils.GraphPositions.deneb_positions">
-<span class="sig-name descname"><span class="pre">deneb_positions</span></span><a class="headerlink" href="#iqm.benchmarks.utils.GraphPositions.deneb_positions" title="Link to this definition">#</a></dt>
-<dd><p>Mapping of node indices to (x,y) positions for Deneb chip.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, Tuple[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="iqm.benchmarks.utils.GraphPositions.predefined_stations">
-<span class="sig-name descname"><span class="pre">predefined_stations</span></span><a class="headerlink" href="#iqm.benchmarks.utils.GraphPositions.predefined_stations" title="Link to this definition">#</a></dt>
-<dd><p>Mapping of chip names to their position dictionaries.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Dict[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, Tuple[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>]]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Attributes</p>
+  <section id="module-iqm.benchmarks.utils_shadows">
+<span id="iqm-benchmarks-utils-shadows"></span><h1>iqm.benchmarks.utils_shadows<a class="headerlink" href="#module-iqm.benchmarks.utils_shadows" title="Link to this heading">#</a></h1>
+<p>Shadow Tomography utility functions</p>
+<p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.utils.GraphPositions.deneb_positions" title="iqm.benchmarks.utils.GraphPositions.deneb_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deneb_positions</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_shadows.CUE.html#iqm.benchmarks.utils_shadows.CUE" title="iqm.benchmarks.utils_shadows.CUE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CUE</span></code></a>(random_gen, n)</p></td>
+<td><p>Prepares single qubit Haar-random unitary (drawn from Circuilar Unitary Ensemble - CUE).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.utils.GraphPositions.garnet_positions" title="iqm.benchmarks.utils.GraphPositions.garnet_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">garnet_positions</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils_shadows.get_local_shadow.html#iqm.benchmarks.utils_shadows.get_local_shadow" title="iqm.benchmarks.utils_shadows.get_local_shadow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_local_shadow</span></code></a>(counts, unitary_arg, ...[, ...])</p></td>
+<td><p>Constructs shadows for each individual initialisation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.utils.GraphPositions.predefined_stations" title="iqm.benchmarks.utils.GraphPositions.predefined_stations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predefined_stations</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_shadows.get_negativity.html#iqm.benchmarks.utils_shadows.get_negativity" title="iqm.benchmarks.utils_shadows.get_negativity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_negativity</span></code></a>(rho, NA, NB)</p></td>
+<td><p>Computes the negativity of a given density matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils_shadows.local_shadow_tomography.html#iqm.benchmarks.utils_shadows.local_shadow_tomography" title="iqm.benchmarks.utils_shadows.local_shadow_tomography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">local_shadow_tomography</span></code></a>(qc, Nu, active_qubits)</p></td>
+<td><p>Prepares the circuits to perform local Haar or Clifford shadow tomography.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="rubric">Methods</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__eq__</span></code>(other)</p></td>
-<td><p>Return self==value.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__repr__</span></code>()</p></td>
-<td><p>Return repr(self).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.utils.GraphPositions.create_positions" title="iqm.benchmarks.utils.GraphPositions.create_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_positions</span></code></a>(graph[, topology])</p></td>
-<td><p>Generate node positions for a given graph and topology.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="iqm.benchmarks.utils.GraphPositions.create_positions">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyGraph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.utils.GraphPositions.create_positions" title="Link to this definition">#</a></dt>
-<dd><p>Generate node positions for a given graph and topology.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (<em>PyGraph</em>) – The graph to generate positions for.</p></li>
-<li><p><strong>topology</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – The type of layout to generate. Must be either “star” or “crystal”.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary mapping node indices to (x,y) coordinates.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><em>Tuple</em></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a>]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 
 
@@ -532,20 +465,20 @@ provides methods to generate positions for different layout types.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iqm.benchmarks.utils.xrvariable_to_counts.html"
+       href="iqm.benchmarks.utils_plots.GraphPositions.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">iqm.benchmarks.utils.xrvariable_to_counts</p>
+        <p class="prev-next-title">iqm.benchmarks.utils_plots.GraphPositions</p>
       </div>
     </a>
     <a class="right-next"
-       href="../license.html"
+       href="iqm.benchmarks.utils_shadows.CUE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">License</p>
+        <p class="prev-next-title">iqm.benchmarks.utils_shadows.CUE</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -555,28 +488,6 @@ provides methods to generate positions for different layout types.</p>
             </div>
             
             
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions"><code class="docutils literal notranslate"><span class="pre">GraphPositions</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.garnet_positions"><code class="docutils literal notranslate"><span class="pre">GraphPositions.garnet_positions</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.deneb_positions"><code class="docutils literal notranslate"><span class="pre">GraphPositions.deneb_positions</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.predefined_stations"><code class="docutils literal notranslate"><span class="pre">GraphPositions.predefined_stations</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.utils.GraphPositions.create_positions"><code class="docutils literal notranslate"><span class="pre">GraphPositions.create_positions()</span></code></a></li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>
@@ -606,7 +517,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-03-25.
+  Last updated on 2025-03-26.
   <br/>
 </p>
   </div>
