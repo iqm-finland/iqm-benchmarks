@@ -66,7 +66,7 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     """
     # Define the keys for different categories of times
     job_keys = ["submit_total", "compile_total", "execution_total"]
-    user_keys = ["user_submit_total", "user_retrieve_total", "assign_parameters_total"]
+    user_keys = ["user_submit_total", "user_retrieve_total", "assign_parameters_total", "time_transpile"]
     total_keys = ["job_total"]
 
     # Define variables for dataset values
@@ -141,7 +141,7 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     # Set axis labels and limits
     ax1.set_ylabel("Total CLOPS time (seconds)")
     ax2.set_ylabel("Total CLOPS time (%)")
-    ax1.set_ylim(-0.2, clops_time + 1)
+    ax1.set_ylim(-0.2, clops_time + all_data["assign_parameters_total"] + all_data["time_transpile"] + 1)
     ax2.set_ylim(-0.2, 100)
 
     # Set x-ticks and labels
@@ -671,7 +671,7 @@ class CLOPSBenchmark(Benchmark):
 
         dataset.attrs.update(
             {
-                "clops_time": end_clops_timer - start_clops_timer,
+                "clops_time": end_clops_timer - start_clops_timer - sum(all_times_parameter_assign.values()),
                 "all_times_parameter_assign": all_times_parameter_assign,
                 "all_times_submit": all_times_submit,
                 "all_times_retrieve": all_times_retrieve,
