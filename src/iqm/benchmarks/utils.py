@@ -830,7 +830,7 @@ def split_into_disjoint_pairs(pairs: Sequence[Tuple[int, int]]) -> List[List[Tup
     Example: input [(0,3), (2,3), (3,8), (8,13), (13,17), (17,18)] gives
     output [[(0, 3), (8, 13), (17, 18)], [(2, 3), (13, 17)], [(3, 8)]].
 
-    # TODO: enable specifying a given split size of Lists of disjoint pairs. # pylint: disable=fixme
+    # TODO: enable specifying a max split size of Lists of disjoint pairs. # pylint: disable=fixme
 
     Args:
         pairs (Sequence[Tuple[int, int]]): The input list of pairs of integers.
