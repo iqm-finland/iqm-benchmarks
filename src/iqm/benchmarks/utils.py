@@ -377,7 +377,9 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     #     backend_object = IQMFakeSirius()
 
     else:
-        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'sirius', 'fakeadonis' or 'fakeapollo'.")
+        raise ValueError(
+            f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'sirius', 'fakeadonis' or 'fakeapollo'."
+        )
 
     return backend_object
 
