@@ -211,11 +211,12 @@ class EPLGBenchmark(Benchmark):
         # Defined outside configuration - if any
 
     def validate_custom_qubits_array(self):
-        """Validates that the custom qubits array input forms a linear chain (Hamiltonian path)."""
+        """Validates the custom qubits array input ."""
         if self.custom_qubits_array is not None:
             # TODO: Validate that the qubits constitute a linear chain (Hamiltonian path)! # pylint: disable=fixme
             qcvv_logger.info(
-                "WARNING: custom_qubits_array validation not yet implemented! Make sure it forms a linear chain."
+                "WARNING: custom_qubits_array validation not yet implemented! Only linear chains are currently supported "
+                "- so make sure custom_qubits_array forms a linear chain!"
             )
 
         if self.num_disjoint_layers is None:
@@ -312,7 +313,7 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
         custom_qubits_array (Optional[Sequence[int]]): The custom qubits array to consider.
                 * If not specified, will proceed to generate linear chains at random, selecting the one with the highest total 2Q gate fidelity.
                 * Default is None.
-        chain_length (Optional[int]): The length of the linear chain of 2Q gates to consider, corresponding to the number of qubits, if custom_qubits_array not specified.
+        chain_length (Optional[int]): The length of a linear chain of 2Q gates to consider, corresponding to the number of qubits, if custom_qubits_array not specified.
                 * Default is None: assigns the number of qubits in the backend minus one.
         chain_path_samples (int): The number of chain path samples to consider, if custom_qubits_array not specified.
                 * Default is None: assigns 20 path samples (arbitrary).
