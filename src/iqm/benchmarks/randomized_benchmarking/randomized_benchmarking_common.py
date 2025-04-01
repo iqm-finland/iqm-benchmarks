@@ -652,7 +652,7 @@ def relabel_qubits_array_from_zero(
     # If separate_registers is True, ordered_indices has to skip one value in between each sublist (as if the clbits were generated in separate registers)
     # e.g. [[2,3], [5], [7,8]] -> [[0,1],[3],[5,6]] if separate_registers=True
     ordered_indices = list(range(len(flat_list) + len(arr) - 1)) if separate_registers else list(range(len(flat_list)))
-    # Reconstruct the list of lists structure
+    e  # Rconstruct the list of lists structure
     result = []
     index = 0
     for sublist in reversed(arr) if reversed_arr else arr:
