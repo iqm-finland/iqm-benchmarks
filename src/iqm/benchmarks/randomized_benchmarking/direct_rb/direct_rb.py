@@ -917,7 +917,7 @@ class DirectRandomizedBenchmarking(Benchmark):
 
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
-        qcvv_logger.info(f"DRB experiment execution concluded !")
+        qcvv_logger.info(f"DRB experiment execution concluded!")
 
         return dataset
 
