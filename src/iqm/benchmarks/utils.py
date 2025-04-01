@@ -170,7 +170,7 @@ def count_native_gates(
 
     native_operations = backend.operation_names
 
-    if "move" in backend.architecture.gates:
+    if backend.has_resonators():
         native_operations.append("move")
     # Some backends may not include "barrier" in the operation_names attribute
     if "barrier" not in native_operations:
@@ -575,12 +575,12 @@ def perform_backend_transpilation(
             initial_layout=qubits if aux_qc is None else None,
             routing_method=routing_method,
         )
-        if "move" in backend.architecture.gates:
+        if backend.has_resonators():
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
-            if "move" in backend.architecture.gates:
+            if backend.has_resonators():
                 if backend.num_qubits in qubits:
                     raise ValueError(
                         f"Label {backend.num_qubits} is reserved for Resonator - "
@@ -604,7 +604,7 @@ def perform_backend_transpilation(
     if coupling_map == backend.coupling_map:
         transpiled_qc_list = [transpile_and_optimize(qc) for qc in qc_list]
     else:  # The coupling map will be reduced if the physical layout is to be fixed
-        if "move" in backend.architecture.gates:
+        if backend.has_resonators():
             aux_qc_list = [QuantumCircuit(backend.num_qubits + 1, q.num_clbits) for q in qc_list]
         else:
             aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
