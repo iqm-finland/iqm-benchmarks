@@ -366,6 +366,16 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     elif backend_label.lower() in ("iqmfakedeneb", "fakedeneb"):
         backend_object = IQMFakeDeneb()
 
+    # ****** 16Q Resonator Star ******
+    # Sirius
+    elif backend_label.lower() == "sirius":
+        iqm_server_url = "https://cocos.resonance.meetiqm.com/sirius"
+        provider = IQMProvider(iqm_server_url)
+        backend_object = provider.get_backend()
+    # FakeSirius
+    # elif backend_label.lower() in ("iqmfakesirius", "fakesirius"):
+    #     backend_object = IQMFakeSirius()
+
     else:
         raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis' or 'fakeapollo'.")
 
