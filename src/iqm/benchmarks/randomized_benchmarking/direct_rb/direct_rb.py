@@ -985,3 +985,4 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
     densities_2q_gates: Optional[Sequence[float]] = None
     clifford_sqg_probabilities: Optional[Sequence[float]] = None
     sqg_gate_ensembles: Optional[Sequence[Dict[str, float]]] = None
+    routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "sabre"
