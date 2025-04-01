@@ -962,7 +962,7 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
             * Keys correspond to str names of qiskit circuit library gates, e.g., "CZGate" or "CXGate".
             * Values correspond to the probability for the respective gate to be sampled.
             * Each Dict[str,float] corresponds to each qubit layout in qubits_array.
-            * If len(two_qubit_gate_ensembles) != len(qubits_array), the first Dict is assinged by default.
+            * If len(two_qubit_gate_ensembles) != len(qubits_array), the first Dict is assigned by default.
             * Default is None, which assigns {str(q): {"CZGate": 1.0} for q in qubits_array}.
         densities_2q_gates (Optional[Sequence[float]]): The expected densities of 2-qubit gates in the final circuits per qubit layout.
             * If len(densities_2q_gates) != len(qubits_array), the first density value is assinged by default.
