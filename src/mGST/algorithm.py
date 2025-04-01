@@ -688,30 +688,30 @@ def run_mGST(
         K, E = (init[0], init[1])
         # offset small negative eigenvalues for stability
         rho = init[2] + 1e-14 * np.eye(pdim).reshape(-1)
-        max_inits = 0
+        A = np.array([la.cholesky(E[k].reshape(pdim, pdim) + 1e-14 * np.eye(pdim)).T.conj() for k in range(n_povm)])
+        B = la.cholesky(rho.reshape(pdim, pdim))
+        X = np.einsum("ijkl,ijnm -> iknlm", K, K.conj()).reshape((d, r, r))
+        res_list = [objf(X, E, rho, J, y)]
     else:
-        K, _, E, rho = random_gs(d, r, rK, n_povm)
-
-    A = np.array([la.cholesky(E[k].reshape(pdim, pdim) + 1e-14 * np.eye(pdim)).T.conj() for k in range(n_povm)])
-    B = la.cholesky(rho.reshape(pdim, pdim))
-    X = np.einsum("ijkl,ijnm -> iknlm", K, K.conj()).reshape((d, r, r))
-    res_list = [objf(X, E, rho, J, y)]
-
-    for i in range(max_inits):
-        with logging_redirect_tqdm(loggers=[qcvv_logger]):
-            for _ in trange(max_iter):
-                yb, Jb = batch(y, J, bsize)
-                K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
-                res_list.append(objf(X, E, rho, J, y))
-                if res_list[-1] < delta:
-                    qcvv_logger.info(f"Batch optimization successful, improving estimate over full data....")
-                    success = True
-                    break
-        if testing:
-            plot_objf(res_list, delta, f"Objective function for batch optimization")
-        if success:
-            break
-        qcvv_logger.info(f"Run {i} failed, trying new initialization...")
+        for i in range(max_inits):
+            K, X, E, rho = random_gs(d, r, rK, n_povm)
+            A = np.array([la.cholesky(E[k].reshape(pdim, pdim) + 1e-14 * np.eye(pdim)).T.conj() for k in range(n_povm)])
+            B = la.cholesky(rho.reshape(pdim, pdim))
+            res_list = [objf(X, E, rho, J, y)]
+            with logging_redirect_tqdm(loggers=[qcvv_logger]):
+                for _ in trange(max_iter):
+                    yb, Jb = batch(y, J, bsize)
+                    K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
+                    res_list.append(objf(X, E, rho, J, y))
+                    if res_list[-1] < delta:
+                        qcvv_logger.info(f"Batch optimization successful, improving estimate over full data....")
+                        success = True
+                        break
+            if testing:
+                plot_objf(res_list, delta, f"Objective function for batch optimization")
+            if success:
+                break
+            qcvv_logger.info(f"Run {i} failed, trying new initialization...")
 
     if not success and max_inits > 0:
         qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
