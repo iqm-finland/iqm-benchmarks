@@ -534,7 +534,7 @@ class DirectRandomizedBenchmarking(Benchmark):
 
         Args:
             backend_arg (IQMBackendBase | str): _description_
-            configuration (MirrorRBConfiguration): _description_
+            configuration (DirectRBConfiguration): _description_
         """
         super().__init__(backend_arg, configuration)
 
