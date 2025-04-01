@@ -60,7 +60,7 @@ def compute_inverse_clifford(qc_inv: QuantumCircuit, clifford_dictionary: Dict) 
 
 # pylint: disable=too-many-branches, too-many-statements
 def edge_grab(
-    qubit_set: List[int],
+    qubit_set: List[int] | Sequence[int],
     n_layers: int,
     backend_arg: IQMBackendBase | str,
     density_2q_gates: float = 0.25,
