@@ -47,6 +47,7 @@ from iqm.benchmarks.utils import (
     timeit,
     xrvariable_to_counts,
 )
+from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -95,7 +96,7 @@ def generate_drb_circuits(
         retrieved_backend = backend_arg
 
     # Check if backend includes MOVE gates and set coupling map
-    if "move" in retrieved_backend.operation_names:
+    if "move" in retrieved_backend.architecture.gates:
         # All-to-all coupling map on the active qubits
         effective_coupling_map = [[x, y] for x in qubits for y in qubits if x != y]
     else:
@@ -147,11 +148,10 @@ def generate_drb_circuits(
         # Would need to modify this for larger num qubits !
         # Here, for 2-qubit DRB subroutines, it *should* suffice (in principle) to compile the inverse.
 
-        circ_untransp = circ.copy()
         # Add measurements to untranspiled - after!
         # THIS LINE IS ONLY NEEDED IF STABILIZER MEASUREMENT IS NOT TAKEN TO IDENTITY
-        # circ_untranspiled = transpile(Clifford(circ_untransp).to_circuit(), simulator)
-        circ_untranspiled = circ_untransp
+        # circ_untranspiled = transpile(Clifford(circ.copy()).to_circuit(), simulator)
+        circ_untranspiled = circ.copy()
         circ_untranspiled.measure_all()
 
         # Add measurements to transpiled - before!
@@ -197,7 +197,7 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
     is_eplg: bool = False,
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates DRB circuits in parallel on multiple qubit layouts.
-        The circuits follow a layered pattern with barriers, taylored to measured EPLG (arXiv:2311.05933),
+        The circuits follow a layered pattern with barriers, taylored to measure EPLG (arXiv:2311.05933),
         with layers of random Cliffords interleaved among sampled layers of 2Q gates and sequence inversion.
 
     Args:
@@ -228,11 +228,13 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
 
     # Check if backend includes MOVE gates and set coupling map
     flat_qubits_array = [x for y in qubits_array for x in y]
-    if "move" in backend.operation_names:
+    if "move" in backend.architecture.gates:
         # All-to-all coupling map on the active qubits
         effective_coupling_map = [[x, y] for x in flat_qubits_array for y in flat_qubits_array if x != y]
+        is_circuit_native = False
     else:
         effective_coupling_map = backend.coupling_map
+        is_circuit_native = True
 
     # Identify total amount of qubits
     qubit_counts = [len(x) for x in qubits_array]
@@ -252,13 +254,10 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
     drb_circuits_untranspiled: List[QuantumCircuit] = []
     drb_circuits_transpiled: List[QuantumCircuit] = []
 
-    # simulator = AerSimulator(method=simulation_method)
 
     # Generate the layer if EPLG: this will be repeated in all samples and all depths!
     cycle_layers = {}
 
-    # Assume circuits will already be native - avoid transpiling if so!
-    is_circuit_native = True
     if is_eplg:
         for q_idx, q in enumerate(shuffled_qubits_array):
             original_qubits = str(qubits_array[q_idx])
@@ -341,14 +340,24 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
             circ_transpiled = QuantumCircuit(backend.num_qubits)
             circ_transpiled.compose(circ_untranspiled, qubits=flat_qubits_array, inplace=True)
         else:  # Do full qiskit transpile
-            circ_transpiled = transpile(
-                circ,
-                backend=backend,
-                coupling_map=effective_coupling_map,
-                optimization_level=qiskit_optim_level,
-                initial_layout=flat_qubits_array,
-                routing_method=routing_method,
-            )
+            if "move" in backend.architecture.gates:
+                circ_transpiled = transpile_to_IQM(
+                    circ,
+                    backend=backend,
+                    coupling_map=effective_coupling_map,
+                    optimization_level=qiskit_optim_level,
+                    initial_layout=flat_qubits_array,
+                    routing_method=routing_method,
+                )
+            else:
+                circ_transpiled = transpile(
+                    circ,
+                    backend=backend,
+                    coupling_map=effective_coupling_map,
+                    optimization_level=qiskit_optim_level,
+                    initial_layout=flat_qubits_array,
+                    routing_method=routing_method,
+                )
 
         drb_circuits_untranspiled.append(circ_untranspiled)
         drb_circuits_transpiled.append(circ_transpiled)

@@ -27,6 +27,7 @@ from iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb import (
     DirectRBConfiguration,
     direct_rb_analysis,
 )
+from iqm.benchmarks.utils import split_into_disjoint_pairs
 from iqm.benchmarks.utils_plots import GraphPositions, evaluate_hamiltonian_paths, rx_to_nx_graph
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -211,17 +212,14 @@ class EPLGBenchmark(Benchmark):
         # Defined outside configuration - if any
 
     def validate_custom_qubits_array(self):
-        """Validates that the custom qubits array input forms a linear chain (Hamiltonian path)."""
+        """Validates the custom qubits array input ."""
         if self.custom_qubits_array is not None:
-            # TODO: Validate that the qubits constitute a linear chain (Hamiltonian path)! # pylint: disable=fixme
-            qcvv_logger.info(
-                "WARNING: custom_qubits_array validation not yet implemented! Make sure it forms a linear chain."
-            )
-
-        if self.num_disjoint_layers is None:
-            self.num_disjoint_layers = 2
-        elif self.num_disjoint_layers < 1:
-            raise ValueError("The number of disjoint layers must be a positive integer.")
+            # Validate that the custom qubits array is a list of pairs
+            if not all(isinstance(pair, tuple) and len(pair) == 2 for pair in self.custom_qubits_array):
+                raise ValueError("The custom qubits array must be a Sequence of tuples.")
+            # Validate that the custom qubits array has no repeated qubits
+            if len(set([tuple(sorted(x)) for x in self.custom_qubits_array])) != len(self.custom_qubits_array):
+                raise ValueError("The custom qubits array must have unique qubit pairs.")
 
     def validate_random_chain_inputs(self):
         """Validates inputs for chain sampling.
@@ -262,10 +260,10 @@ class EPLGBenchmark(Benchmark):
 
         if self.custom_qubits_array is not None:
             self.validate_custom_qubits_array()
-            all_disjoint = [
-                self.custom_qubits_array[i :: self.num_disjoint_layers]
-                for i in range(cast(int, self.num_disjoint_layers))
-            ]
+            all_disjoint = split_into_disjoint_pairs(self.custom_qubits_array)
+            qcvv_logger.info(
+                f"Using specified custom_qubits_array: will split into {len(all_disjoint)} disjoint layers."
+            )
 
         else:
             self.validate_random_chain_inputs()
@@ -309,10 +307,10 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
     Attributes:
         drb_depths (Sequence[int]): The layer depths to consider for the parallel DRB.
         drb_circuit_samples (int): The number of circuit samples to consider for the parallel DRB.
-        custom_qubits_array (Optional[Sequence[int]]): The custom qubits array to consider.
+        custom_qubits_array (Optional[Sequence[Tuple[int, int]]]): The custom qubits array to consider; this corresponds to a Sequence of Tuple pairs of qubits.
                 * If not specified, will proceed to generate linear chains at random, selecting the one with the highest total 2Q gate fidelity.
                 * Default is None.
-        chain_length (Optional[int]): The length of the linear chain of 2Q gates to consider, corresponding to the number of qubits, if custom_qubits_array not specified.
+        chain_length (Optional[int]): The length of a linear chain of 2Q gates to consider, corresponding to the number of qubits, if custom_qubits_array not specified.
                 * Default is None: assigns the number of qubits in the backend minus one.
         chain_path_samples (int): The number of chain path samples to consider, if custom_qubits_array not specified.
                 * Default is None: assigns 20 path samples (arbitrary).
@@ -327,7 +325,7 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
     benchmark: Type[Benchmark] = EPLGBenchmark
     drb_depths: Sequence[int]
     drb_circuit_samples: int
-    custom_qubits_array: Optional[Sequence[Sequence[int]]] = None
+    custom_qubits_array: Optional[Sequence[Tuple[int, int]]] = None
     chain_length: Optional[int] = None
     chain_path_samples: Optional[int] = None
     num_disjoint_layers: Optional[int] = None

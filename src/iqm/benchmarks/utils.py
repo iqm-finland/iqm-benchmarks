@@ -366,8 +366,20 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     elif backend_label.lower() in ("iqmfakedeneb", "fakedeneb"):
         backend_object = IQMFakeDeneb()
 
+    # ****** 16Q Resonator Star ******
+    # Sirius
+    elif backend_label.lower() == "sirius":
+        iqm_server_url = "https://cocos.resonance.meetiqm.com/sirius"
+        provider = IQMProvider(iqm_server_url)
+        backend_object = provider.get_backend()
+    # FakeSirius
+    # elif backend_label.lower() in ("iqmfakesirius", "fakesirius"):
+    #     backend_object = IQMFakeSirius()
+
     else:
-        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis' or 'fakeapollo'.")
+        raise ValueError(
+            f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'sirius', 'fakeadonis' or 'fakeapollo'."
+        )
 
     return backend_object
 
@@ -810,6 +822,34 @@ def split_sequence_in_chunks(sequence_in: Sequence[Any], split_size: int) -> Lis
         )
 
     return [sequence_in[i : i + split_size] for i in range(0, len(sequence_in), split_size)]
+
+
+def split_into_disjoint_pairs(pairs: Sequence[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
+    """
+    Split a Sequence of pairs of integers into a List of a minimal number of Lists of disjoint pairs.
+    Example: input [(0,3), (2,3), (3,8), (8,13), (13,17), (17,18)] gives
+    output [[(0, 3), (8, 13), (17, 18)], [(2, 3), (13, 17)], [(3, 8)]].
+
+    # TODO: enable specifying a given split size of Lists of disjoint pairs. # pylint: disable=fixme
+
+    Args:
+        pairs (Sequence[Tuple[int, int]]): The input list of pairs of integers.
+    Returns:
+        List[List[Tuple[int, int]]]: A List of Lists of disjoint pairs.
+    """
+    result: List[List[Tuple[int, int]]] = []
+
+    for pair in pairs:
+        added = False
+        for group in result:
+            if not any(elem in pair for p in group for elem in p):
+                group.append(pair)
+                added = True
+                break
+        if not added:
+            result.append([pair])
+
+    return result
 
 
 @timeit
