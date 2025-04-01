@@ -147,11 +147,10 @@ def generate_drb_circuits(
         # Would need to modify this for larger num qubits !
         # Here, for 2-qubit DRB subroutines, it *should* suffice (in principle) to compile the inverse.
 
-        circ_untransp = circ.copy()
         # Add measurements to untranspiled - after!
         # THIS LINE IS ONLY NEEDED IF STABILIZER MEASUREMENT IS NOT TAKEN TO IDENTITY
-        # circ_untranspiled = transpile(Clifford(circ_untransp).to_circuit(), simulator)
-        circ_untranspiled = circ_untransp
+        # circ_untranspiled = transpile(Clifford(circ.copy()).to_circuit(), simulator)
+        circ_untranspiled = circ.copy()
         circ_untranspiled.measure_all()
 
         # Add measurements to transpiled - before!
