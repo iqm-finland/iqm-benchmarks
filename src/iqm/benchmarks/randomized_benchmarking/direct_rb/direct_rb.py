@@ -96,7 +96,7 @@ def generate_drb_circuits(
         retrieved_backend = backend_arg
 
     # Check if backend includes MOVE gates and set coupling map
-    if "move" in retrieved_backend.architecture.gates:
+    if retrieved_backend.has_resonators():
         # All-to-all coupling map on the active qubits
         effective_coupling_map = [[x, y] for x in qubits for y in qubits if x != y]
     else:
@@ -157,14 +157,24 @@ def generate_drb_circuits(
         # Add measurements to transpiled - before!
         circ.measure_all()
 
-        circ_transpiled = transpile(
-            circ,
-            backend=retrieved_backend,
-            coupling_map=effective_coupling_map,
-            optimization_level=qiskit_optim_level,
-            initial_layout=qubits,
-            routing_method=routing_method,
-        )
+        if retrieved_backend.has_resonators():
+            circ_transpiled = transpile_to_IQM(
+                circ,
+                backend=retrieved_backend,
+                coupling_map=effective_coupling_map,
+                optimization_level=qiskit_optim_level,
+                initial_layout=qubits,
+                routing_method=routing_method,
+            )
+        else:
+            circ_transpiled = transpile(
+                circ,
+                backend=retrieved_backend,
+                coupling_map=effective_coupling_map,
+                optimization_level=qiskit_optim_level,
+                initial_layout=qubits,
+                routing_method=routing_method,
+            )
 
         drb_circuits_untranspiled.append(circ_untranspiled)
         drb_circuits_transpiled.append(circ_transpiled)
@@ -228,7 +238,7 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
 
     # Check if backend includes MOVE gates and set coupling map
     flat_qubits_array = [x for y in qubits_array for x in y]
-    if "move" in backend.architecture.gates:
+    if backend.has_resonators():
         # All-to-all coupling map on the active qubits
         effective_coupling_map = [[x, y] for x in flat_qubits_array for y in flat_qubits_array if x != y]
         is_circuit_native = False
@@ -340,7 +350,7 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
             circ_transpiled = QuantumCircuit(backend.num_qubits)
             circ_transpiled.compose(circ_untranspiled, qubits=flat_qubits_array, inplace=True)
         else:  # Do full qiskit transpile
-            if "move" in backend.architecture.gates:
+            if backend.has_resonators():
                 circ_transpiled = transpile_to_IQM(
                     circ,
                     backend=backend,
