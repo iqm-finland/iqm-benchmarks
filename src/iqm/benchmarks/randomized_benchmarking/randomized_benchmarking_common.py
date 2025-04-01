@@ -891,7 +891,7 @@ def plot_rb_decay(
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
             stddevs_from_mean[identifier] = {
-                str(q): dataset_attrs[q_idx]["average_polatization_stderr"]
+                str(q): dataset_attrs[q_idx]["average_polarization_stderr"]
                 for q_idx, q in enumerate(qubits_array, qubits_index)
             }
         else:  # identifier == "clifford"
