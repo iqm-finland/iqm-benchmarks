@@ -964,7 +964,7 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
             * If len(two_qubit_gate_ensembles) != len(qubits_array), the first Dict is assigned by default.
             * Default is None, which assigns {str(q): {"CZGate": 1.0} for q in qubits_array}.
         densities_2q_gates (Optional[Sequence[float]]): The expected densities of 2-qubit gates in the final circuits per qubit layout.
-            * If len(densities_2q_gates) != len(qubits_array), the first density value is assinged by default.
+            * If len(densities_2q_gates) != len(qubits_array), the first density value is assigned by default.
             * Default is None, which assigns 0.25 to all qubit layouts.
         clifford_sqg_probabilities (Optional[Sequence[float]]): Probability with which to uniformly sample Clifford 1Q gates per qubit layout.
             * Default is None, which assigns 1.0 to all qubit layouts.
