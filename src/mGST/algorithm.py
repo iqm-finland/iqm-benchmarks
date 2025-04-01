@@ -719,7 +719,7 @@ def run_mGST(
         for _ in trange(final_iter):
             K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
             res_list.append(objf(X, E, rho, J, y))
-            if np.abs(res_list[-2] - res_list[-1]) < delta * target_rel_prec:
+            if len(res_list) >= 2 and np.abs(res_list[-2] - res_list[-1]) < delta * target_rel_prec:
                 break
     if testing:
         plot_objf(res_list, delta, f"Objective function over batches and full data")
