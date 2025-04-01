@@ -482,7 +482,7 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                         "fit_offset": {"value": popt["offset"].value, "uncertainty": popt["offset"].stderr},
                         "polarizations": polarizations[str(qubits)],
                         "average_polarization_nominal_values": average_polarizations,
-                        "average_polatization_stderr": stddevs_from_mean,
+                        "average_polarization_stderr": stddevs_from_mean,
                         "fitting_method": str(rb_fit_results.method),
                         "num_function_evals": int(rb_fit_results.nfev),
                         "data_points": int(rb_fit_results.ndata),
