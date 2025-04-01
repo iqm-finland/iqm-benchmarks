@@ -196,7 +196,7 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
     is_eplg: bool = False,
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates DRB circuits in parallel on multiple qubit layouts.
-        The circuits follow a layered pattern with barriers, taylored to measured EPLG (arXiv:2311.05933),
+        The circuits follow a layered pattern with barriers, taylored to measure EPLG (arXiv:2311.05933),
         with layers of random Cliffords interleaved among sampled layers of 2Q gates and sequence inversion.
 
     Args:
