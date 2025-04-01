@@ -825,7 +825,7 @@ def split_into_disjoint_pairs(pairs: Sequence[Tuple[int, int]]) -> List[List[Tup
     Returns:
         List[List[Tuple[int, int]]]: A List of Lists of disjoint pairs.
     """
-    result = []
+    result: List[List[Tuple[int, int]]] = []
 
     for pair in pairs:
         added = False
