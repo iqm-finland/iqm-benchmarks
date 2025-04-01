@@ -813,7 +813,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                             shots=self.shots,
                             calset_id=self.calset_id,
                             max_gates_per_batch=self.max_gates_per_batch,
-                            max_circuits_per_batch=self.configuration.max_gates_per_batch,
+                            max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                         )
                     )
                     qcvv_logger.info(f"Job for depth {depth} submitted successfully!")
