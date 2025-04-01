@@ -202,7 +202,7 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
     assigned_sqg_gate_ensembles: Dict[str, Dict[str, float]],
     cliffords_1q: Dict[str, QuantumCircuit],
     cliffords_2q: Dict[str, QuantumCircuit],
-    qiskit_optim_level: int = 3,
+    qiskit_optim_level: int = 1,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
     is_eplg: bool = False,
 ) -> Dict[str, List[QuantumCircuit]]:
