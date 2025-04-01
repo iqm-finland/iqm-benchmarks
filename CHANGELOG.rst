@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.30
+============
+* Updated CLOPS value and plot reporting, making explicit offline values, such as time spent in transpilation and in parameter assigning.
+
 Version 2.29
 ============
 * Fixed header levels in `example_graphstate` notebook for correct pages rendering.

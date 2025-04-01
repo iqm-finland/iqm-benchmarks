@@ -66,8 +66,8 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     """
     # Define the keys for different categories of times
     job_keys = ["submit_total", "compile_total", "execution_total"]
-    user_keys = ["user_submit_total", "user_retrieve_total", "assign_parameters_total"]
     total_keys = ["job_total"]
+    user_keys = ["user_retrieve_total", "user_submit_total", "assign_parameters_total", "time_transpile"]
 
     # Define variables for dataset values
     qubits = clops_data.attrs["qubits"]
@@ -95,14 +95,10 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
 
     fig_name = f"{num_qubits}_qubits_{tuple(qubits)}"
 
-    # Plot total CLOPS time
-    x_t = ax1.bar(4 * sep, clops_time, barsize, zorder=0, label="clops time", color=(colors[-1], alpha), edgecolor="k")
-    ax1.bar_label(x_t, fmt=f"clops time: {clops_time:.2f}", fontsize=fontsize)
-
     # Plot user keys
     for i, (key, cumulative_value) in enumerate(zip(user_keys, np.cumsum([all_data[k] for k in user_keys]))):
         x = ax1.bar(
-            3 * sep,
+            4 * sep,
             cumulative_value,
             barsize,
             zorder=1 - i / 10,
@@ -111,6 +107,10 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
             edgecolor="k",
         )
         ax1.bar_label(x, fmt=f"{key.replace('_total', ' ').replace('_', ' ')}: {all_data[key]:.2f}", fontsize=fontsize)
+
+    # Plot total CLOPS time
+    x_t = ax1.bar(3 * sep, clops_time, barsize, zorder=0, color=(colors[-1], alpha), edgecolor="k")
+    ax1.bar_label(x_t, fmt=f"CLOPS time: {clops_time:.2f}", fontsize=fontsize)
 
     # Plot total keys
     for i, (key, cumulative_value) in enumerate(zip(total_keys, np.cumsum([all_data[k] for k in total_keys]))):
@@ -139,13 +139,13 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     ax2.spines["bottom"].set_visible(False)
 
     # Set axis labels and limits
-    ax1.set_ylabel("Total CLOPS time (seconds)")
-    ax2.set_ylabel("Total CLOPS time (%)")
-    ax1.set_ylim(-0.2, clops_time + 1)
+    ax1.set_ylabel("Total CLOPS experiment time (seconds)")
+    ax2.set_ylabel("Total CLOPS experiment time (%)")
+    ax1.set_ylim(-0.2, clops_time + all_data["assign_parameters_total"] + all_data["time_transpile"] + 1)
     ax2.set_ylim(-0.2, 100)
 
     # Set x-ticks and labels
-    time_types = ["Remote (components)", "Remote (total)", "Wall-time (components)", "Wall-time (total)"]
+    time_types = ["Remote (components)", "Remote (total)", "Wall-time (CLOPS)", "Wall-time (all components)"]
     ax1.set_xticks([i * sep + 1 for i in range(4)], time_types, fontsize=fontsize)
 
     # Set plot title
@@ -671,7 +671,7 @@ class CLOPSBenchmark(Benchmark):
 
         dataset.attrs.update(
             {
-                "clops_time": end_clops_timer - start_clops_timer,
+                "clops_time": end_clops_timer - start_clops_timer - sum(all_times_parameter_assign.values()),
                 "all_times_parameter_assign": all_times_parameter_assign,
                 "all_times_submit": all_times_submit,
                 "all_times_retrieve": all_times_retrieve,

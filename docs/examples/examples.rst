@@ -12,8 +12,6 @@ This section contains a collection of examples that demonstrate how to use the I
    example_graphstate
    example_gst
    example_quantum_volume
-   example_quantum_volume_deneb
    example_clops
    example_ghz
-   example_ghz_deneb
    example_qscore
