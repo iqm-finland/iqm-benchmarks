@@ -730,7 +730,14 @@ class DirectRandomizedBenchmarking(Benchmark):
         return drb_submit_results
 
     def execute(self, backend: IQMBackendBase) -> xr.Dataset:  # pylint: disable=too-many-statements
-        """Executes the benchmark"""
+    """Executes the Direct Randomized Benchmarking benchmark.
+    
+    Args:
+        backend (IQMBackendBase): The IQM backend to execute the benchmark on
+        
+    Returns:
+        xr.Dataset: Dataset containing benchmark results and metadata
+    """
 
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
 
