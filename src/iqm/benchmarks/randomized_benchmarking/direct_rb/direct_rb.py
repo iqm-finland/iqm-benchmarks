@@ -254,7 +254,6 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
     drb_circuits_untranspiled: List[QuantumCircuit] = []
     drb_circuits_transpiled: List[QuantumCircuit] = []
 
-    # simulator = AerSimulator(method=simulation_method)
 
     # Generate the layer if EPLG: this will be repeated in all samples and all depths!
     cycle_layers = {}
