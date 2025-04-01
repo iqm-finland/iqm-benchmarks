@@ -969,7 +969,7 @@ class DirectRBConfiguration(BenchmarkConfigurationBase):
         clifford_sqg_probabilities (Optional[Sequence[float]]): Probability with which to uniformly sample Clifford 1Q gates per qubit layout.
             * Default is None, which assigns 1.0 to all qubit layouts.
         sqg_gate_ensembles (Optional[Sequence[Dict[str, float]]]): A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
-            * If len(sqg_gate_ensembles) != len(qubits_array), the first ensemble is assinged by default.
+            * If len(sqg_gate_ensembles) != len(qubits_array), the first ensemble is assigned by default.
             * Default is None, which leaves only uniform sampling of 1Q Clifford gates.
 
     """
