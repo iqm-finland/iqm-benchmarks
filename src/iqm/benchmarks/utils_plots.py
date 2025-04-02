@@ -17,8 +17,9 @@ Plotting and visualization utility functions
 """
 from dataclasses import dataclass
 import os
-from typing import Dict, List, Literal, Optional, Tuple
+from typing import Dict, List, Literal, Optional, Sequence, Tuple
 
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -76,7 +77,14 @@ class GraphPositions:
         6: (3.0, 3.0),
     }
 
-    predefined_stations = {"garnet": garnet_positions, "deneb": deneb_positions}
+    predefined_stations = {
+        "garnet": garnet_positions,
+        "fakeapollo": garnet_positions,
+        "iqmfakeapollo": garnet_positions,
+        "deneb": deneb_positions,
+        "fakedeneb": deneb_positions,
+        "iqmfakedeneb": deneb_positions,
+    }
 
     @staticmethod
     def create_positions(
@@ -118,6 +126,93 @@ class GraphPositions:
                 for k, v in spring_layout(graph, scale=2, pos=fixed_pos, num_iter=300, fixed={0}).items()
             }
         return pos
+
+
+def draw_graph_edges(
+    backend_coupling_map: CouplingMap,
+    backend_num_qubits: int,
+    edge_list: Sequence[Tuple[int, int]],
+    timestamp: str,
+    disjoint_layers: Optional[Sequence[Sequence[Tuple[int, int]]]] = None,
+    station: Optional[str] = None,
+) -> Tuple[str, Figure]:
+    """Draw given edges on a graph within the given backend.
+
+    Args:
+        backend_coupling_map (CouplingMap): The coupling map to draw the graph from.
+        backend_num_qubits (int): The number of qubits of the respectve backend.
+        edge_list (Sequence[Tuple[int, int]]): The edge list of the linear chain.
+        timestamp (str): The timestamp to include in the figure name.
+        disjoint_layers (Optional[Sequence[Sequence[Tuple[int, int]]]): Sequences of edges defining disjoint layers to draw.
+            * Default is None.
+        station (Optional[str]): The name of the station.
+            * Default is None.
+
+    Returns:
+         Tuple[str, Figure]: The figure name and the figure object.
+    """
+    disjoint = "_disjoint" if disjoint_layers is not None else ""
+    fig_name_station = f"_{station.lower()}" if station is not None else ""
+    fig_name = f"edges_graph{disjoint}{fig_name_station}_{timestamp}"
+
+    fig = plt.figure()
+    ax = plt.axes()
+
+    if station is not None:
+        if station.lower() in GraphPositions.predefined_stations:
+            qubit_positions = GraphPositions.predefined_stations[station.lower()]
+        else:
+            if backend_num_qubits in (6, 20):
+                station = "garnet" if backend_num_qubits == 20 else "deneb"
+                qubit_positions = GraphPositions.predefined_stations[station]
+            else:
+                graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
+                qubit_positions = GraphPositions.create_positions(graph_backend)
+    else:
+        graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
+        if backend_num_qubits in (6, 20):
+            station = "garnet" if backend_num_qubits == 20 else "deneb"
+            qubit_positions = GraphPositions.predefined_stations[station]
+        else:
+            qubit_positions = GraphPositions.create_positions(graph_backend)
+
+    label_station = station if station is not None else f"{backend_num_qubits}-qubit IQM Backend"
+    if disjoint_layers is None:
+        nx.draw_networkx(
+            rx_to_nx_graph(backend_coupling_map),
+            pos=qubit_positions,
+            edgelist=edge_list,
+            width=4.0,
+            edge_color="k",
+            node_color="k",
+            font_color="w",
+            ax=ax,
+        )
+
+        plt.title(f"Selected edges in {label_station}\n" f"\n{timestamp}")
+
+    else:
+        num_disjoint_layers = len(disjoint_layers)
+        colors = plt.colormaps["rainbow"](np.linspace(0, 1, num_disjoint_layers))
+        all_edge_colors = [[colors[i]] * len(l) for i, l in enumerate(disjoint_layers)]  # Flatten below
+        nx.draw_networkx(
+            rx_to_nx_graph(backend_coupling_map),
+            pos=qubit_positions,
+            edgelist=[x for y in disjoint_layers for x in y],
+            width=4.0,
+            edge_color=[x for y in all_edge_colors for x in y],
+            node_color="k",
+            font_color="w",
+            ax=ax,
+        )
+
+        plt.title(
+            f"Selected edges in {label_station}\n" f"{len(disjoint_layers)} groups of disjoint layers" f"\n{timestamp}"
+        )
+
+    plt.close()
+
+    return fig_name, fig
 
 
 def evaluate_hamiltonian_paths(
