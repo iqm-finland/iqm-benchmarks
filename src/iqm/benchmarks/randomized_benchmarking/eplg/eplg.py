@@ -125,7 +125,6 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_qubits = dataset.attrs["chain_length"]
 
     total_mean = []
-    # fid_product = [1, 0]
     fid_product = ufloat(1, 0)
     for obs in observations:
         fid_product *= ufloat(obs.value, obs.uncertainty)
