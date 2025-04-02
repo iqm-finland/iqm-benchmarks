@@ -61,7 +61,7 @@ def generate_drb_circuits(
     two_qubit_gate_ensemble: Optional[Dict[str, float]] = None,
     clifford_sqg_probability: float = 1.0,
     sqg_gate_ensemble: Optional[Dict[str, float]] = None,
-    qiskit_optim_level: int = 3,
+    qiskit_optim_level: int = 1,
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "basic",
 ) -> Dict[str, List[QuantumCircuit]]:
     """Generates lists of samples of Direct RB circuits, of structure:
