@@ -264,9 +264,10 @@ def generate_fixed_depth_parallel_drb_circuits(  # pylint: disable=too-many-bran
     drb_circuits_untranspiled: List[QuantumCircuit] = []
     drb_circuits_transpiled: List[QuantumCircuit] = []
 
-    # Generate the layer if EPLG: this will be repeated in all samples and all depths!
     cycle_layers = {}
 
+    # Generate the layer if EPLG:
+    # this will be repeated in all samples (and all depths)! So can be done outside the loop over circuit samples.
     if is_eplg:
         for q_idx, q in enumerate(shuffled_qubits_array):
             original_qubits = str(qubits_array[q_idx])
@@ -662,19 +663,23 @@ class DirectRandomizedBenchmarking(Benchmark):
                 if len(self.sqg_gate_ensembles) != 1:
                     qcvv_logger.warning(
                         f"The amount of 1Q gate ensembles ({len(self.sqg_gate_ensembles)}) is not the same "
-                        f"as the amount of all qubit layout configurations ({len(flat_all_qubits)}):\n\tWill assign to all the first "
-                        f"configuration: {self.sqg_gate_ensembles[0]} !"
+                        f"as the amount of all qubit layout configurations ({len(flat_all_qubits)}):\n"
+                        f"\tWill assign to all the first configuration: {self.sqg_gate_ensembles[0]} !"
                     )
                 assigned_sqg_gate_ensembles = {str(q): self.sqg_gate_ensembles[0] for q in flat_all_qubits}
             else:
                 assigned_sqg_gate_ensembles = {
                     str(q): self.sqg_gate_ensembles[q_idx] for q_idx, q in enumerate(flat_all_qubits)
                 }
-        elif self.sqg_gate_ensembles is None and self.is_eplg:  # No Cliffords and no 1Q gates in layers
+        elif self.sqg_gate_ensembles is None and self.is_eplg:  # No Cliffords and no 1Q gates in Cycle Layers
             assigned_sqg_gate_ensembles = {str(q): {"IGate": 1.0} for q in flat_all_qubits}
-        elif self.sqg_gate_ensembles is None:  # all are Clifford
-            assigned_sqg_gate_ensembles = {str(q): {"HGate": 0.0} for q in flat_all_qubits}
+        elif self.sqg_gate_ensembles is None and assigned_clifford_sqg_probabilities == {str(q): 1.0 for q in flat_all_qubits}:
+            assigned_sqg_gate_ensembles = {str(q): None for q in flat_all_qubits}
+            # None (together with condition of clifford sqg probabilities 1) implies that the edge grab algorithm
+            # will only sample 1Q Clifford gates as 1Q gates when forming Cycle Layers
         else:
+            # In this case, assign the rest to be either Cliffords or HGate with complementary probabilities
+            # Choice of HGate is arbitrary, could be any other (Clifford, unless looking for some danger) 1Q gate
             assigned_sqg_gate_ensembles = {
                 str(q): {"HGate": 1.0 - assigned_clifford_sqg_probabilities[str(q)]} for q in flat_all_qubits
             }
