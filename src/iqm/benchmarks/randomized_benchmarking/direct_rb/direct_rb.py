@@ -673,7 +673,9 @@ class DirectRandomizedBenchmarking(Benchmark):
                 }
         elif self.sqg_gate_ensembles is None and self.is_eplg:  # No Cliffords and no 1Q gates in Cycle Layers
             assigned_sqg_gate_ensembles = {str(q): {"IGate": 1.0} for q in flat_all_qubits}
-        elif self.sqg_gate_ensembles is None and assigned_clifford_sqg_probabilities == {str(q): 1.0 for q in flat_all_qubits}:
+        elif self.sqg_gate_ensembles is None and assigned_clifford_sqg_probabilities == {
+            str(q): 1.0 for q in flat_all_qubits
+        }:
             assigned_sqg_gate_ensembles = {str(q): None for q in flat_all_qubits}
             # None (together with condition of clifford sqg probabilities 1) implies that the edge grab algorithm
             # will only sample 1Q Clifford gates as 1Q gates when forming Cycle Layers

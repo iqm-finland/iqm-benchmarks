@@ -5,10 +5,7 @@ Error Per Layered Gate (EPLG).
 from time import strftime
 from typing import Dict, Optional, Sequence, Tuple, Type, cast
 
-from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
-import networkx as nx
-import numpy as np
 from uncertainties import ufloat
 import xarray as xr
 
@@ -28,82 +25,8 @@ from iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb import (
     direct_rb_analysis,
 )
 from iqm.benchmarks.utils import split_into_disjoint_pairs
-from iqm.benchmarks.utils_plots import GraphPositions, evaluate_hamiltonian_paths, rx_to_nx_graph
+from iqm.benchmarks.utils_plots import draw_graph_edges, evaluate_hamiltonian_paths
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
-
-
-# Move to plot utils file
-def draw_linear_chain_graph(
-    backend: IQMBackendBase,
-    edge_list: Sequence[Tuple[int, int]],
-    disjoint_layers: Optional[Sequence[Sequence[Tuple[int, int]]]] = None,
-    timestamp: Optional[str] = None,
-    station: Optional[str] = None,
-) -> Tuple[str, Figure]:
-    """Draw a linear chain graph on the given backend.
-
-    Args:
-        backend (IQMBackendBase): The backend to draw the graph on.
-        edge_list (Sequence[Tuple[int, int]]): The edge list of the linear chain.
-        disjoint_layers (Optional[Sequence[Sequence[Tuple[int, int]]]): The edges defining disjoint layers to draw.
-        timestamp (Optional[str]): The timestamp to include in the figure name.
-        station (Optional[str]): The name of the station.
-
-    Returns:
-         Tuple[str, Figure]: The figure name and the figure object.
-    """
-    disjoint = "_disjoint" if disjoint_layers is not None else ""
-    fig_name = (
-        f"linear_chain_graph{disjoint}_{backend.name}_{timestamp}"
-        if timestamp is not None
-        else f"linear_chain_graph{disjoint}_{backend.name}"
-    )
-
-    fig = plt.figure()
-    ax = plt.axes()
-
-    if station is not None:
-        if station.lower() in GraphPositions.predefined_stations:
-            qubit_positions = GraphPositions.predefined_stations[station.lower()]
-        else:
-            graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
-            qubit_positions = GraphPositions.create_positions(graph_backend)
-    else:
-        graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
-        if backend.num_qubits in (6, 20):
-            station = "garnet" if backend.num_qubits == 20 else "deneb"
-            qubit_positions = GraphPositions.predefined_stations[station]
-        else:
-            qubit_positions = GraphPositions.create_positions(graph_backend)
-
-    if disjoint_layers is None:
-        nx.draw_networkx(
-            rx_to_nx_graph(backend),
-            pos=qubit_positions,
-            edgelist=edge_list,
-            width=4.0,
-            edge_color="k",
-            node_color="k",
-            font_color="w",
-            ax=ax,
-        )
-
-    else:
-        num_disjoint_layers = len(disjoint_layers)
-        colors = plt.colormaps["rainbow"](np.linspace(0, 1, num_disjoint_layers))
-        all_edge_colors = [[colors[i]] * len(l) for i, l in enumerate(disjoint_layers)]  # Flatten below
-        nx.draw_networkx(
-            rx_to_nx_graph(backend),
-            pos=qubit_positions,
-            edgelist=[x for y in disjoint_layers for x in y],
-            width=4.0,
-            edge_color=[x for y in all_edge_colors for x in y],
-            node_color="k",
-            font_color="w",
-            ax=ax,
-        )
-
-    return fig_name, fig
 
 
 def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
@@ -122,8 +45,16 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     observations = result_direct_rb.observations
     plots: Dict[str, Figure] = {}
 
+    timestamp = dataset.attrs["execution_timestamp"]
+
+    backend_configuration_name = dataset.attrs["backend_configuration_name"]
+    backend_coupling_map = dataset.attrs["backend_coupling_map"]
+    backend_num_qubits = dataset.attrs["backend_num_qubits"]
+
     num_edges = len(observations)
     num_qubits = dataset.attrs["chain_length"]
+    edges = dataset.attrs["edges"]
+    disjoint_layers = dataset.attrs["disjoint_layers"]
 
     total_mean = []
     fid_product = ufloat(1, 0)
@@ -151,6 +82,17 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             uncertainty=EPLG.std_dev,
         )
     )
+
+    # Plot the edges graph
+    fig_name, fig = draw_graph_edges(
+        backend_coupling_map,
+        backend_num_qubits=backend_num_qubits,
+        edge_list=edges,
+        timestamp=timestamp,
+        disjoint_layers=disjoint_layers,
+        station=backend_configuration_name,
+    )
+    plots[fig_name] = fig
 
     return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
@@ -198,9 +140,10 @@ class EPLGBenchmark(Benchmark):
         """
         dataset.attrs["session_timestamp"] = self.session_timestamp
         dataset.attrs["execution_timestamp"] = self.execution_timestamp
-        dataset.attrs["backend"] = self.backend
         dataset.attrs["backend_configuration_name"] = self.backend_configuration_name
         dataset.attrs["backend_name"] = self.backend.name
+        dataset.attrs["backend_coupling_map"] = self.backend.coupling_map
+        dataset.attrs["backend_num_qubits"] = self.backend.num_qubits
 
         for key, value in self.configuration:
             if key == "benchmark":  # Avoid saving the class object
@@ -216,7 +159,7 @@ class EPLGBenchmark(Benchmark):
             if not all(isinstance(pair, tuple) and len(pair) == 2 for pair in self.custom_qubits_array):
                 raise ValueError("The custom qubits array must be a Sequence of tuples.")
             # Validate that the custom qubits array has no repeated qubits
-            if len(set([tuple(sorted(x)) for x in self.custom_qubits_array])) != len(self.custom_qubits_array):
+            if len(set(tuple(sorted(x)) for x in self.custom_qubits_array)) != len(self.custom_qubits_array):
                 raise ValueError("The custom qubits array must have unique qubit pairs.")
 
     def validate_random_chain_inputs(self):
@@ -254,18 +197,17 @@ class EPLGBenchmark(Benchmark):
 
         dataset_eplg = xr.Dataset()
 
-        self.add_all_meta_to_dataset(dataset_eplg)
-
         if self.custom_qubits_array is not None:
             self.validate_custom_qubits_array()
+            edges = self.custom_qubits_array
             all_disjoint = split_into_disjoint_pairs(self.custom_qubits_array)
+            self.num_disjoint_layers = len(all_disjoint)
             qcvv_logger.info(
-                f"Using specified custom_qubits_array: will split into {len(all_disjoint)} disjoint layers."
+                f"Using specified custom_qubits_array: will split into {self.num_disjoint_layers} disjoint layers."
             )
 
         else:
             self.validate_random_chain_inputs()
-
             qcvv_logger.info("Generating linear chain path")
             h_path_costs = evaluate_hamiltonian_paths(
                 self.chain_length, self.chain_path_samples, self.backend, self.calibration_url
@@ -276,6 +218,9 @@ class EPLGBenchmark(Benchmark):
             all_disjoint = [
                 max_cost_path[i :: self.num_disjoint_layers] for i in range(cast(int, self.num_disjoint_layers))
             ]
+            edges = max_cost_path
+
+        self.add_all_meta_to_dataset(dataset_eplg)
 
         # Execute parallel DRB in all disjoint layers
         drb_config = DirectRBConfiguration(
@@ -293,6 +238,8 @@ class EPLGBenchmark(Benchmark):
         run_direct_rb = benchmarks_direct_rb.run()
 
         dataset = run_direct_rb.dataset
+
+        dataset_eplg.attrs.update({"disjoint_layers": all_disjoint, "edges": edges})
 
         dataset.attrs.update(dataset_eplg.attrs)
 
