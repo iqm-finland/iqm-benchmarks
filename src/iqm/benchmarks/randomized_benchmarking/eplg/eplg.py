@@ -144,7 +144,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     observations.append(
         BenchmarkObservation(
-            name="EPLG",
+            name="eplg",
             identifier=BenchmarkObservationIdentifier(f"(n_qubits={num_qubits})"),
             value=EPLG.nominal_value,
             uncertainty=EPLG.std_dev,
