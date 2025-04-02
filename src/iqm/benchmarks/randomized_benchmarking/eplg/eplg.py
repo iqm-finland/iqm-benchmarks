@@ -54,9 +54,9 @@ def draw_linear_chain_graph(
     """
     disjoint = "_disjoint" if disjoint_layers is not None else ""
     fig_name = (
-        f"linear_chain_graph{disjoint}_{station}_{timestamp}"
+        f"linear_chain_graph{disjoint}_{backend.name}_{timestamp}"
         if timestamp is not None
-        else f"linear_chain_graph{disjoint}_{station}"
+        else f"linear_chain_graph{disjoint}_{backend.name}"
     )
 
     fig = plt.figure()
