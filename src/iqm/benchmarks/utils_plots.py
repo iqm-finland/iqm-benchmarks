@@ -27,6 +27,7 @@ from qiskit.transpiler import CouplingMap
 import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 
+from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import extract_fidelities, get_iqm_backend, random_hamiltonian_path
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -244,19 +245,20 @@ def evaluate_hamiltonian_paths(
     all_paths = []
     sample_counter = 0
     tries = 0
-    while sample_counter < path_samples and tries < max_tries:
+    while sample_counter < path_samples and tries <= max_tries:
         h_path = random_hamiltonian_path(backend_nx_graph, N)
         if not h_path:
+            qcvv_logger.debug(f"Failed to generate a Hamiltonian path with {N} vertices - retrying...")
             tries += 1
+            if tries == max_tries - 1:
+                raise RecursionError(
+                    f"Max tries to generate a Hamiltonian path with {N} vertices reached - Try with less vertices!\n"
+                    f"For EPLG, you may also manually specify qubit pairs."
+                )
             continue
-
         all_paths.append(h_path)
         tries = 0
         sample_counter += 1
-    if tries == max_tries - 1:
-        raise RecursionError(
-            f"Max tries to generate a Hamiltonian path with {N} vertices reached - try with less vertices!"
-        )
 
     # Get scores for all paths
     # Retrieve fidelity data
