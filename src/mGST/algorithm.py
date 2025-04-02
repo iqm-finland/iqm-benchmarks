@@ -711,7 +711,7 @@ def run_mGST(
                 plot_objf(res_list, delta, f"Objective function for batch optimization")
             if success:
                 break
-            qcvv_logger.info(f"Run {i} failed, trying new initialization...")
+            qcvv_logger.info(f"Run {i+1}/{max_inits} failed, trying new initialization...")
 
     if not success and max_inits > 0:
         qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
