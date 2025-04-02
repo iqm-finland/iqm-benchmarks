@@ -100,6 +100,7 @@ def draw_linear_chain_graph(
             edge_color=[x for y in all_edge_colors for x in y],
             node_color="k",
             font_color="w",
+            ax=ax,
         )
 
     return fig_name, fig
