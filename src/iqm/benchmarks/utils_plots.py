@@ -250,7 +250,7 @@ def evaluate_hamiltonian_paths(
         if not h_path:
             qcvv_logger.debug(f"Failed to generate a Hamiltonian path with {N} vertices - retrying...")
             tries += 1
-            if tries == max_tries - 1:
+            if tries == max_tries:
                 raise RecursionError(
                     f"Max tries to generate a Hamiltonian path with {N} vertices reached - Try with less vertices!\n"
                     f"For EPLG, you may also manually specify qubit pairs."
