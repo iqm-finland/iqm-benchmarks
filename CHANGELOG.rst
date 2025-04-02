@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.31
+============
+* Fixed a bug in the bootstrapping functionality of the GST benchmark and updated the respective Jupyter tutorial.
+
 Version 2.30
 ============
 * Updated CLOPS value and plot reporting, making explicit offline values, such as time spent in transpilation and in parameter assigning.
