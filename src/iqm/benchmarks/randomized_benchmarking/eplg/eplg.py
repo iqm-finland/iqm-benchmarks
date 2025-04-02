@@ -129,9 +129,6 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     for obs in observations:
         fid_product *= ufloat(obs.value, obs.uncertainty)
         total_mean.append(fid_product)
-        # fid_product[0] *= obs.value
-        # fid_product[1] += obs.uncertainty
-        # total_mean.append(ufloat(obs.value, obs.uncertainty))
 
     LF = fid_product
     EPLG = 1 - LF ** (1 / num_edges)
