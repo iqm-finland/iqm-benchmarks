@@ -74,7 +74,7 @@ def draw_linear_chain_graph(
             station = "garnet" if backend.num_qubits == 20 else "deneb"
             qubit_positions = GraphPositions.predefined_stations[station]
         else:
-            qubit_positions = GraphPositions.create_positions(graph_backend, station)
+            qubit_positions = GraphPositions.create_positions(graph_backend)
 
     if disjoint_layers is None:
         nx.draw_networkx(
