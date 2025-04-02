@@ -94,6 +94,8 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     )
     plots[fig_name] = fig
 
+    plots.update(result_direct_rb.plots)
+
     return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)
 
 
