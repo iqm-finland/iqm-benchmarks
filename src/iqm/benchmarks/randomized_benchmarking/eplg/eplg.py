@@ -133,6 +133,7 @@ class EPLGBenchmark(Benchmark):
         self.chain_path_samples = configuration.chain_path_samples
         self.num_disjoint_layers = configuration.num_disjoint_layers
         self.calibration_url = configuration.calibration_url
+        self.max_hamiltonian_path_tries = configuration.max_hamiltonian_path_tries
 
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
         """Adds all configuration metadata and circuits to the dataset variable
@@ -192,6 +193,11 @@ class EPLGBenchmark(Benchmark):
         elif self.num_disjoint_layers < 1:
             raise ValueError("The number of disjoint layers must be a positive integer.")
 
+        if self.max_hamiltonian_path_tries is None:
+            self.max_hamiltonian_path_tries = 10
+        elif self.max_hamiltonian_path_tries < 1:
+            raise ValueError("The maximum number of Hamiltonian path tries must be a positive integer.")
+
     def execute(self, backend: IQMBackendBase) -> xr.Dataset:
         """Execute the EPLG Benchmark"""
 
@@ -212,7 +218,7 @@ class EPLGBenchmark(Benchmark):
             self.validate_random_chain_inputs()
             qcvv_logger.info("Generating linear chain path")
             h_path_costs = evaluate_hamiltonian_paths(
-                self.chain_length, self.chain_path_samples, self.backend, self.calibration_url
+                self.chain_length, self.chain_path_samples, self.backend, self.calibration_url, self.max_hamiltonian_path_tries
             )
             qcvv_logger.info("Extracting the path that maximizes total 2Q calibration fidelity")
             max_cost_path = h_path_costs[max(h_path_costs.keys())]
@@ -266,6 +272,10 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
                 * Default is None - raises an error if custom_qubits_array is not specified.
         num_disjoint_layers (Optional[int]): The number of disjoint layers to consider.
                 * Default is None: assigns 2 disjoint layers (arbitrary).
+        max_hamiltonian_path_tries (Optional[int]): The maximum number of tries to find a Hamiltonian path.
+                * Default is None: assigns 10 tries (arbitrary).
+        calibration_url (Optional[str]): The URL of the IQM station to retrieve calibration data from.
+                * Default is None - raises an error if custom_qubits_array is not specified.
 
     """
 
@@ -276,4 +286,5 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
     chain_length: Optional[int] = None
     chain_path_samples: Optional[int] = None
     num_disjoint_layers: Optional[int] = None
+    max_hamiltonian_path_tries: Optional[int] = None
     calibration_url: Optional[str] = None
