@@ -218,7 +218,11 @@ class EPLGBenchmark(Benchmark):
             self.validate_random_chain_inputs()
             qcvv_logger.info("Generating linear chain path")
             h_path_costs = evaluate_hamiltonian_paths(
-                self.chain_length, self.chain_path_samples, self.backend, self.calibration_url, self.max_hamiltonian_path_tries
+                self.chain_length,
+                self.chain_path_samples,
+                self.backend,
+                self.calibration_url,
+                self.max_hamiltonian_path_tries,
             )
             qcvv_logger.info("Extracting the path that maximizes total 2Q calibration fidelity")
             max_cost_path = h_path_costs[max(h_path_costs.keys())]
