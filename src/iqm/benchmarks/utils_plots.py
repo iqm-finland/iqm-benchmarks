@@ -239,7 +239,7 @@ def evaluate_hamiltonian_paths(
     else:
         backend = backend_arg
 
-    backend_nx_graph = rx_to_nx_graph(backend_arg)
+    backend_nx_graph = rx_to_nx_graph(backend.coupling_map)
 
     all_paths = []
     sample_counter = 0
