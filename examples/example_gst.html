@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Compressive Gate Set Tomography (GST) &#8212; IQM Benchmarks 2.30 documentation</title>
+    <title>Compressive Gate Set Tomography (GST) &#8212; IQM Benchmarks 2.31 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=ae79d215"></script>
+    <script src="../_static/documentation_options.js?v=15855008"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Graph State Benchmark Example" href="example_graphstate.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.30" />
-    <meta name="docbuild:last-update" content="2025-04-01"/>
+  <meta name="docsearch:version" content="2.31" />
+    <meta name="docbuild:last-update" content="2025-04-02"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.30 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.30 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.31 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.31 documentation - Home"/>
   
   
 </a></div>
@@ -509,9 +509,9 @@ A low rank has the benefit of needing less circuits and less computing time, whi
 <span class="n">Minimal_2Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
     <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span>
     <span class="n">gate_set</span><span class="o">=</span><span class="s2">&quot;2QXYCZ&quot;</span><span class="p">,</span>
-    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">rank</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">rank</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -531,16 +531,36 @@ A low rank has the benefit of needing less circuits and less computing time, whi
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-01-08 12:51:09,571 - iqm.benchmarks.logging_config - INFO - Now generating 50 random GST circuits...
-2025-01-08 12:51:09,790 - iqm.benchmarks.logging_config - INFO - Will transpile all 50 circuits according to fixed physical layout
-2025-01-08 12:51:09,790 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
-2025-01-08 12:51:10,779 - iqm.benchmarks.logging_config - INFO - Submitting batch with 50 circuits corresponding to qubits [0]
-2025-01-08 12:51:10,790 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
-2025-01-08 12:51:10,871 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-01-08 12:51:12,191 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
- 39%|███████████████████████████████▌                                                 | 39/100 [00:32&lt;00:50,  1.20it/s]
-2025-01-08 12:51:44,621 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
-2025-01-08 12:51:44,623 - iqm.benchmarks.logging_config - INFO - Final objective 7.53e-5 in time 32.43s
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-01 16:06:42,999 - iqm.benchmarks.logging_config - INFO - Now generating 50 random GST circuits...
+2025-04-01 16:06:43,430 - iqm.benchmarks.logging_config - INFO - Will transpile all 50 circuits according to fixed physical layout
+2025-04-01 16:06:43,430 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
+2025-04-01 16:06:44,259 - iqm.benchmarks.logging_config - INFO - Submitting batch with 50 circuits corresponding to qubits [0]
+2025-04-01 16:06:44,338 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
+2025-04-01 16:06:44,434 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-04-01 16:06:46,644 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 26%|██▌       | 64/250 [00:01&lt;00:05, 36.20it/s]
+2025-04-01 16:06:48,462 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-04-01 16:06:48,462 - iqm.benchmarks.logging_config - INFO - Final objective 1.56e-4 in time 1.82s
+</pre></div>
+</div>
+</div>
+</div>
+<p>To get a unitary model of the gate set from the same data, the <code class="docutils literal notranslate"><span class="pre">rank</span></code> parameter of the benchmark object can be set to 1.
+The analysis will give a Hamiltonian parametrization of the gate set and produce different plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="n">benchmark_rK1</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span>
+<span class="n">benchmark_rK1</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;rank&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">result_rK1</span> <span class="o">=</span> <span class="n">benchmark_rK1</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-01 16:07:55,034 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 11%|█         | 27/250 [00:01&lt;00:08, 24.83it/s]
+2025-04-01 16:07:56,147 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-04-01 16:07:56,148 - iqm.benchmarks.logging_config - INFO - Final objective 1.99e-4 in time 1.11s
 </pre></div>
 </div>
 </div>
@@ -646,6 +666,21 @@ where \)</span>P_i, P_j$ are Pauli matrices.</p>
 </pre></div>
 </div>
 <img alt="../_images/85973b8a8da2e8539b4c570bd26a3cf94b41010b39267c1e8e3108bc9f05b932.png" src="../_images/85973b8a8da2e8539b4c570bd26a3cf94b41010b39267c1e8e3108bc9f05b932.png" />
+</div>
+</div>
+<p>Rank 1 results (for example the gate Hamiltonians in the Pauli basis)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result_rK1</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="n">result_rK1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0]_hamiltonian_parameters&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;layout_[0]_hamiltonian_parameters&#39;, &#39;layout_[0]_gate_metrics&#39;, &#39;layout_[0]_other_metrics&#39;, &#39;layout_[0]_process_matrix_0&#39;, &#39;layout_[0]_process_matrix_1&#39;, &#39;layout_[0]_process_matrix_2&#39;, &#39;layout_[0]_SPAM_matrices_real&#39;, &#39;layout_[0]_SPAM_matrices_imag&#39;]
+</pre></div>
+</div>
+<img alt="../_images/fb8fc196a1797b6e27812197746f860defc9cc60b0468dcac5a05751c2608120.png" src="../_images/fb8fc196a1797b6e27812197746f860defc9cc60b0468dcac5a05751c2608120.png" />
 </div>
 </div>
 <p>Alternatively, all plots (of all layouts) can be displayed via <code class="docutils literal notranslate"><span class="pre">result.plot_all()</span></code>.</p>
@@ -871,7 +906,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-04-01.
+  Last updated on 2025-04-02.
   <br/>
 </p>
   </div>
