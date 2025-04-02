@@ -169,8 +169,9 @@ class EPLGBenchmark(Benchmark):
         """Construct the EPLG class
 
         Args:
-            backend_arg (IQMBackendBase | str): _description_
-            configuration (MirrorRBConfiguration): _description_
+            backend_arg (IQMBackendBase | str): The backend to use for the benchmark,
+                either as a backend instance or a backend name string.
+            configuration (EPLGConfiguration): The configuration settings for the EPLG benchmark.
         """
         super().__init__(backend_arg, configuration)
         # EXPERIMENT
