@@ -268,15 +268,10 @@ def evaluate_hamiltonian_paths(
     r = requests.get(url, headers=headers, timeout=60)
     calibration = r.json()
 
-    edge_dictionary = {}
     for iq in calibration["calibrations"][0]["metrics"][0]["metrics"]:
         temp = list(iq.values())
         two_qubit_fidelity[str(temp[0])] = temp[1]
         two_qubit_fidelity[str([temp[0][1], temp[0][0]])] = temp[1]
-        edge_dictionary[str([temp[0][1], temp[0][0]])] = (
-            backend.qubit_name_to_index(temp[0][1]),
-            backend.qubit_name_to_index(temp[0][0]),
-        )
 
     # Rate all the paths
     path_costs = {}  # keys are costs, values are edge paths
