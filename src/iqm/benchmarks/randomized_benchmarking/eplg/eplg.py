@@ -70,8 +70,8 @@ def draw_linear_chain_graph(
             qubit_positions = GraphPositions.create_positions(graph_backend)
     else:
         graph_backend = backend.coupling_map.graph.to_undirected(multigraph=False)
-        if backend.num_qubits in (20, 49):
-            station = "garnet" if backend.num_qubits == 20 else "emerald"
+        if backend.num_qubits in (6, 20):
+            station = "garnet" if backend.num_qubits == 20 else "deneb"
             qubit_positions = GraphPositions.predefined_stations[station]
         else:
             qubit_positions = GraphPositions.create_positions(graph_backend, station)
