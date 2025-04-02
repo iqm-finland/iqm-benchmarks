@@ -135,7 +135,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     observations.append(
         BenchmarkObservation(
-            name="Layer Fidelity",
+            name="layer_fidelity",
             identifier=BenchmarkObservationIdentifier(f"(n_qubits={num_qubits})"),
             value=LF.nominal_value,
             uncertainty=LF.std_dev,
