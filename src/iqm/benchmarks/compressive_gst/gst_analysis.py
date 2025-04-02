@@ -316,9 +316,7 @@ def generate_unit_rank_gate_results(
         bootstrap_pauli_coeffs = np.zeros((len(X_array), dataset.attrs["num_gates"], dataset.attrs["pdim"] ** 2))
         for i, X_ in enumerate(X_array):
             X_std, _, _ = compatibility.pp2std(X_, E_array[i], rho_array[i])
-            U_opt_ = reporting.phase_opt(
-                np.array([change_basis(X_std[j], "pp", "std") for j in range(dataset.attrs["num_gates"])]), K_target
-            )
+            U_opt_ = reporting.phase_opt(X_std, K_target)
             pauli_coeffs_ = reporting.compute_sparsest_Pauli_Hamiltonian(U_opt_)
             bootstrap_pauli_coeffs[i, :, :] = pauli_coeffs_
         pauli_coeffs_low, pauli_coeffs_high = np.nanpercentile(bootstrap_pauli_coeffs, [2.5, 97.5], axis=0)
