@@ -271,14 +271,12 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
                 * Default is None: assigns the number of qubits in the backend minus one.
         chain_path_samples (int): The number of chain path samples to consider, if custom_qubits_array not specified.
                 * Default is None: assigns 20 path samples (arbitrary).
-        calibration_url (Optional[str]): The URL of the IQM station to retrieve calibration data from.
-                * It must be specified if custom_qubits_array is not specified.
-                * Default is None - raises an error if custom_qubits_array is not specified.
         num_disjoint_layers (Optional[int]): The number of disjoint layers to consider.
                 * Default is None: assigns 2 disjoint layers (arbitrary).
         max_hamiltonian_path_tries (Optional[int]): The maximum number of tries to find a Hamiltonian path.
                 * Default is None: assigns 10 tries (arbitrary).
         calibration_url (Optional[str]): The URL of the IQM station to retrieve calibration data from.
+                * It must be specified if custom_qubits_array is not specified.
                 * Default is None - raises an error if custom_qubits_array is not specified.
 
     """
