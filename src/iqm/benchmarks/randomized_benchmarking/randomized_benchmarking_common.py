@@ -815,6 +815,7 @@ def plot_rb_decay(
     interleaved_gate: Optional[str] = None,
     mrb_2q_density: Optional[float | Dict[str, float]] = None,
     mrb_2q_ensemble: Optional[Dict[str, Dict[str, float]]] = None,
+    is_eplg: bool = False,
 ) -> Tuple[str, Figure]:
     """Plot the fidelity decay and the fit to the model.
 
@@ -832,6 +833,7 @@ def plot_rb_decay(
         interleaved_gate (Optional[str]): The label or the interleaved gate. Defaults to None
         mrb_2q_density (Optional[float], optional): Density of MRB 2Q gates. Defaults to None.
         mrb_2q_ensemble (Optional[Dict[str, float]], optional): MRB ensemble of 2Q gates. Defaults to None.
+        is_eplg (bool, optional): Whether the experiment is EPLG or not. Defaults to False.
 
     Returns:
         Tuple[str, Figure]: the plot title and the figure
@@ -1120,17 +1122,24 @@ def plot_rb_decay(
     elif identifier == "clifford":
         ax.set_title(f"{identifier.capitalize()} experiment {on_qubits}\nbackend: {backend_name} --- {timestamp}")
     else:
-        if identifier == "drb" and len(qubits_array) == 1:
-            density = cast(dict, mrb_2q_density)[str(qubits_array[0])]
-            ensemble = cast(dict, mrb_2q_ensemble)[str(qubits_array[0])]
+        if not is_eplg:
+            if identifier == "drb" and len(qubits_array) == 1:
+                density = cast(dict, mrb_2q_density)[str(qubits_array[0])]
+                ensemble = cast(dict, mrb_2q_ensemble)[str(qubits_array[0])]
+            else:
+                density = mrb_2q_density
+                ensemble = mrb_2q_ensemble
+            ax.set_title(
+                f"{identifier.upper()} experiment {on_qubits}\n"
+                f"2Q gate density: {density}, ensemble {ensemble}\n"
+                f"backend: {backend_name} --- {timestamp}"
+            )
         else:
-            density = mrb_2q_density
-            ensemble = mrb_2q_ensemble
-        ax.set_title(
-            f"{identifier.upper()} experiment {on_qubits}\n"
-            f"2Q gate density: {density}, ensemble {ensemble}\n"
-            f"backend: {backend_name} --- {timestamp}"
-        )
+            ax.set_title(
+                f"EPLG parallel {identifier.upper()} experiment {on_qubits}\n"
+                f"backend: {backend_name} --- {timestamp}"
+            )
+
     if identifier in ("mrb", "drb"):
         ax.set_ylabel("Polarization")
         ax.set_xlabel("Layer Depth")

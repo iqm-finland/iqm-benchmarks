@@ -406,6 +406,8 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     density_2q_gates = dataset.attrs["densities_2q_gates"]
     two_qubit_gate_ensemble = dataset.attrs["two_qubit_gate_ensembles"]
 
+    is_eplg = dataset.attrs["is_eplg"]
+
     all_noisy_counts: Dict[str, Dict[int, List[Dict[str, int]]]] = {}
 
     if isinstance(all_qubits_array[0][0], int):
@@ -517,6 +519,7 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 observations=obs_dict,
                 mrb_2q_density=density_2q_gates,  # Misnomer coming from MRB - ignore
                 mrb_2q_ensemble=two_qubit_gate_ensemble,
+                is_eplg=is_eplg,
             )
             plots[fig_name] = fig
 
@@ -602,6 +605,7 @@ class DirectRandomizedBenchmarking(Benchmark):
 
         # 2Q gate ensemble
         if self.two_qubit_gate_ensembles is None:
+            # Assign native 2Qg with probability 1.0 - this is also default for EPLG
             assigned_two_qubit_gate_ensembles = {str(q): {"CZGate": 1.0} for q in flat_all_qubits}
         else:
             if len(self.two_qubit_gate_ensembles) != len(flat_all_qubits):
@@ -619,6 +623,7 @@ class DirectRandomizedBenchmarking(Benchmark):
 
         # Density 2Q gates
         if self.densities_2q_gates is None and self.is_eplg:
+            # For EPLG, with density 2Qg of 0.5, the edge_grab will sample 2Qg with probability 1.0
             assigned_density_2q_gates = {str(q): 0.5 for q in flat_all_qubits}
         elif self.densities_2q_gates is None:
             assigned_density_2q_gates = {str(q): 0.25 for q in flat_all_qubits}
