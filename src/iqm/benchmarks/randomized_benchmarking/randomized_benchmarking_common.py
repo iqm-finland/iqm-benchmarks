@@ -1176,8 +1176,9 @@ def validate_rb_qubits(qubits_array: List[List[int]], backend_arg: str | IQMBack
         raise ValueError("Please specify qubit layouts with only n=1 or n=2 qubits. Run MRB for n>2 instead.")
     pairs_qubits = [qubits_array[i] for i, n in enumerate(qubit_counts) if n == 2]
     # Qubits should be connected
-    if any(tuple(x) not in backend.coupling_map for x in pairs_qubits):
-        raise ValueError("Some specified pairs of qubits are not connected")
+    for x in pairs_qubits:
+        if tuple(x) not in list(backend.coupling_map) and tuple(reversed(x)) not in list(backend.coupling_map):
+            raise ValueError(f"Input qubits {tuple(x)} are not connected")
 
 
 def validate_irb_gate(
