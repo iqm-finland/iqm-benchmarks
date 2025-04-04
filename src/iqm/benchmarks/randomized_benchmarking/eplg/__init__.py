@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Mirror RB estimates the average layer fidelity of ensembles of gates
+Error Per Layered Gate (EPLG) estimates the layer fidelity of 2Q gate layers.
 """
 
-from . import mirror_rb
+from . import eplg

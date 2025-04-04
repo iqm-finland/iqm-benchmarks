@@ -20,12 +20,14 @@ from functools import wraps
 import itertools
 from math import floor
 import os
+import random
 from time import time
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple, Union, cast
 import warnings
 
 from more_itertools import chunked
 from mthree.utils import final_measurement_mapping
+import networkx as nx
 import numpy as np
 from numpy.random import Generator
 from qiskit import ClassicalRegister, transpile
@@ -47,12 +49,12 @@ from iqm.qiskit_iqm.iqm_provider import IQMProvider
 
 
 def timeit(f):
-    """Calculates the amount of time a function takes to execute
+    """Calculates the amount of time a function takes to execute.
 
     Args:
-        f: The function to add the timing attribute to
+        f: The function to add the timing attribute to.
     Returns:
-        The decorated function execution with logger statement of elapsed time in execution
+        The decorated function execution with logger statement of elapsed time in execution.
     """
 
     @wraps(f)
@@ -168,7 +170,7 @@ def count_native_gates(
 
     native_operations = backend.operation_names
 
-    if "move" in backend.architecture.gates:
+    if backend.has_resonators():
         native_operations.append("move")
     # Some backends may not include "barrier" in the operation_names attribute
     if "barrier" not in native_operations:
@@ -281,6 +283,50 @@ def get_active_qubits(qc: QuantumCircuit) -> List[int]:
     return list(active_qubits)
 
 
+def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]:
+    """Returns couplings and CZ-fidelities from calibration data URL
+
+    Args:
+        cal_url: str
+            The url under which the calibration data for the backend can be found
+    Returns:
+        list_couplings: List[List[int]]
+            A list of pairs, each of which is a qubit coupling for which the calibration
+            data contains a fidelity.
+        list_fids: List[float]
+            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
+        topology: str
+            Name of the chip topology layout, currently either "star" or "crystal"
+    """
+    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
+    r = requests.get(cal_url, headers=headers, timeout=60)
+    calibration = r.json()
+    cal_keys = {
+        el2["key"]: (i, j) for i, el1 in enumerate(calibration["calibrations"]) for j, el2 in enumerate(el1["metrics"])
+    }
+    list_couplings = []
+    list_fids = []
+    if "double_move_gate_fidelity" in cal_keys.keys():
+        i, j = cal_keys["double_move_gate_fidelity"]
+        topology = "star"
+    else:
+        i, j = cal_keys["cz_gate_fidelity"]
+        topology = "crystal"
+    for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
+        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
+        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
+        if topology == "star":
+            list_couplings.append([qb1, qb2])
+        else:
+            list_couplings.append([qb1 - 1, qb2 - 1])
+        list_fids.append(float(item["value"]))
+    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
+    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
+
+    return list_couplings, list_fids, topology
+
+
 # pylint: disable=too-many-branches
 def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     """Get the IQM backend object from a backend name (str).
@@ -320,8 +366,20 @@ def get_iqm_backend(backend_label: str) -> IQMBackendBase:
     elif backend_label.lower() in ("iqmfakedeneb", "fakedeneb"):
         backend_object = IQMFakeDeneb()
 
+    # ****** 16Q Resonator Star ******
+    # Sirius
+    elif backend_label.lower() == "sirius":
+        iqm_server_url = "https://cocos.resonance.meetiqm.com/sirius"
+        provider = IQMProvider(iqm_server_url)
+        backend_object = provider.get_backend()
+    # FakeSirius
+    # elif backend_label.lower() in ("iqmfakesirius", "fakesirius"):
+    #     backend_object = IQMFakeSirius()
+
     else:
-        raise ValueError(f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'fakeadonis' or 'fakeapollo'.")
+        raise ValueError(
+            f"Backend {backend_label} not supported. Try 'garnet', 'deneb', 'sirius', 'fakeadonis' or 'fakeapollo'."
+        )
 
     return backend_object
 
@@ -517,12 +575,12 @@ def perform_backend_transpilation(
             initial_layout=qubits if aux_qc is None else None,
             routing_method=routing_method,
         )
-        if "move" in backend.architecture.gates:
+        if backend.has_resonators():
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
         if aux_qc is not None:
-            if "move" in backend.architecture.gates:
+            if backend.has_resonators():
                 if backend.num_qubits in qubits:
                     raise ValueError(
                         f"Label {backend.num_qubits} is reserved for Resonator - "
@@ -546,13 +604,54 @@ def perform_backend_transpilation(
     if coupling_map == backend.coupling_map:
         transpiled_qc_list = [transpile_and_optimize(qc) for qc in qc_list]
     else:  # The coupling map will be reduced if the physical layout is to be fixed
-        if "move" in backend.architecture.gates:
+        if backend.has_resonators():
             aux_qc_list = [QuantumCircuit(backend.num_qubits + 1, q.num_clbits) for q in qc_list]
         else:
             aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]
 
     return transpiled_qc_list
+
+
+def random_hamiltonian_path(G: nx.Graph, N: int) -> List[Tuple[int, int]]:
+    """
+    Generates a random Hamiltonian path with N vertices from a given NetworkX graph.
+
+    Args:
+        G (networkx.Graph): The input graph.
+        N (int): The desired number of vertices in the Hamiltonian path.
+
+    Returns:
+        list: A list of edges (tuples of nodes) representing the Hamiltonian path, or an empty list if not possible.
+    """
+    if N > len(G):
+        raise ValueError(
+            f"The number of vertices in the Hamiltonian path ({N}) cannot be greater than the number of nodes in the graph ({len(G)})"
+        )
+
+    nodes = list(G.nodes)
+    random.shuffle(nodes)  # Shuffle nodes to introduce randomness
+
+    for start in nodes:
+        path = [start]
+        visited = set(path)
+        edges = []
+
+        while len(path) < N:
+            neighbors = [n for n in G.neighbors(path[-1]) if n not in visited]
+
+            if not neighbors:
+                break  # Dead end, stop trying this path
+
+            next_node = random.choice(neighbors)
+            edges.append((int(path[-1]), int(next_node)))
+            path.append(next_node)
+            visited.add(next_node)
+
+        if len(path) == N:
+            return edges  # Successfully found a Hamiltonian path of length N
+
+    return []  # No valid path found
 
 
 def reduce_to_active_qubits(
@@ -725,6 +824,34 @@ def split_sequence_in_chunks(sequence_in: Sequence[Any], split_size: int) -> Lis
     return [sequence_in[i : i + split_size] for i in range(0, len(sequence_in), split_size)]
 
 
+def split_into_disjoint_pairs(pairs: Sequence[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
+    """
+    Split a Sequence of pairs of integers into a List of a minimal number of Lists of disjoint pairs.
+    Example: input [(0,3), (2,3), (3,8), (8,13), (13,17), (17,18)] gives
+    output [[(0, 3), (8, 13), (17, 18)], [(2, 3), (13, 17)], [(3, 8)]].
+
+    # TODO: enable specifying a max split size of Lists of disjoint pairs. # pylint: disable=fixme
+
+    Args:
+        pairs (Sequence[Tuple[int, int]]): The input list of pairs of integers.
+    Returns:
+        List[List[Tuple[int, int]]]: A List of Lists of disjoint pairs.
+    """
+    result: List[List[Tuple[int, int]]] = []
+
+    for pair in pairs:
+        added = False
+        for group in result:
+            if not any(elem in pair for p in group for elem in p):
+                group.append(pair)
+                added = True
+                break
+        if not added:
+            result.append([pair])
+
+    return result
+
+
 @timeit
 def sort_batches_by_final_layout(
     transpiled_circuit_list: List[QuantumCircuit],
@@ -824,7 +951,9 @@ def submit_execute(
                 qcvv_logger.warning(
                     "Both max_gates_per_batch and max_circuits_per_batch are not None. Selecting the one giving the smallest batches."
                 )
-                batching_size = min(max_circuits_per_batch, max(1, floor(max_gates_per_batch / avg_gates_per_qc)))  # type: ignore
+                batching_size = min(
+                    cast(int, max_circuits_per_batch), max(1, floor(cast(int, max_gates_per_batch) / avg_gates_per_qc))
+                )
                 if batching_size == max_circuits_per_batch:
                     restriction = "max_circuits_per_batch"
                 else:
@@ -861,47 +990,3 @@ def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int
         dict(zip(list(dataset[f"{identifier}_state_{u}"].data), dataset[f"{identifier}_counts_{u}"].data))
         for u in range(counts_range)
     ]
-
-
-def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]:
-    """Returns couplings and CZ-fidelities from calibration data URL
-
-    Args:
-        cal_url: str
-            The url under which the calibration data for the backend can be found
-    Returns:
-        list_couplings: List[List[int]]
-            A list of pairs, each of which is a qubit coupling for which the calibration
-            data contains a fidelity.
-        list_fids: List[float]
-            A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
-        topology: str
-            Name of the chip topology layout, currently either "star" or "crystal"
-    """
-    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
-    r = requests.get(cal_url, headers=headers, timeout=60)
-    calibration = r.json()
-    cal_keys = {
-        el2["key"]: (i, j) for i, el1 in enumerate(calibration["calibrations"]) for j, el2 in enumerate(el1["metrics"])
-    }
-    list_couplings = []
-    list_fids = []
-    if "double_move_gate_fidelity" in cal_keys.keys():
-        i, j = cal_keys["double_move_gate_fidelity"]
-        topology = "star"
-    else:
-        i, j = cal_keys["cz_gate_fidelity"]
-        topology = "crystal"
-    for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if "COMP" not in item["locus"][0] else 0
-        qb2 = int(item["locus"][1][2:]) if "COMP" not in item["locus"][1] else 0
-        list_couplings.append([qb1 - 1, qb2 - 1])
-        list_fids.append(float(item["value"]))
-    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    qubit_mapping = {}
-    if topology == "star":
-        qubit_mapping.update({-1: len(calibrated_qubits)})  # Place resonator qubit as last qubit
-    qubit_mapping.update({qubit: idx for idx, qubit in enumerate(calibrated_qubits)})
-    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
-
-    return list_couplings, list_fids, topology

@@ -8,6 +8,7 @@ This section contains a collection of examples that demonstrate how to use the I
    example_experiment_all
    example_clifford_rb
    example_interleaved_rb
+   example_eplg
    example_mirror_rb
    example_graphstate
    example_gst

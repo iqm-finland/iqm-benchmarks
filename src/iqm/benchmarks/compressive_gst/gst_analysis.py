@@ -14,7 +14,6 @@ from numpy import ndarray
 import numpy as np
 from pandas import DataFrame
 from pygsti.models.model import Model
-from pygsti.tools import change_basis
 import xarray as xr
 
 from iqm.benchmarks.benchmark_definition import (

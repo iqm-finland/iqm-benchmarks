@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Mirror RB estimates the average layer fidelity of ensembles of gates
+Direct RB estimates the layer fidelity of canonical gates
 """
 
-from . import mirror_rb
+from . import direct_rb
