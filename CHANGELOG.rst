@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.32
+============
+* Added Error Per Layered Gate (EPLG) benchmark.
+
 Version 2.31
 ============
 * Fixed a bug in the bootstrapping functionality of the GST benchmark and updated the respective Jupyter tutorial.
