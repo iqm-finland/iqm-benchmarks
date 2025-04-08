@@ -54,6 +54,7 @@ from iqm.benchmarks.utils import (
     timeit,
     xrvariable_to_counts,
 )
+from iqm.benchmarks.utils_plots import rx_to_nx_graph
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
@@ -562,15 +563,23 @@ class GHZBenchmark(Benchmark):
         self.state_generation_routine = configuration.state_generation_routine
         if configuration.custom_qubits_array:
             self.custom_qubits_array = configuration.custom_qubits_array
-        else:
-            self.custom_qubits_array = [list(set(chain(*backend.coupling_map)))]
-        self.qubit_counts: Sequence[int] | List[int]
-        if not configuration.qubit_counts:
+            if configuration.qubit_counts:
+                qcvv_logger.warning(f"Specifying both custom_qubits_array and qubit_counts will prioritize "
+                                    f"custom_qubits_array and set qubit_counts to the lengths of the custom qubit "
+                                    f"layouts.")
             self.qubit_counts = [len(layout) for layout in self.custom_qubits_array]
         else:
-            if any(np.max(configuration.qubit_counts) > [len(layout) for layout in self.custom_qubits_array]):
-                raise ValueError("The maximum given qubit count is larger than the size of the smallest qubit layout.")
-            self.qubit_counts = configuration.qubit_counts
+            if configuration.qubit_counts: # Select qubits based on a spanning tree over the whole backend
+                qcvv_logger.warning(f"Since no custom qubit layouts were specified, the qubits will be automatically "
+                                    f"selected, likely leading to suboptimal fidelities.")
+                self.qubit_counts = configuration.qubit_counts
+                G = rx_to_nx_graph(backend.coupling_map)
+                cx_map = get_cx_map(list(set(chain(*backend.coupling_map))), G)
+                cx_map_qubits = list(dict.fromkeys([q for pair in cx_map for q in pair]))
+                self.custom_qubits_array = [cx_map_qubits[:i] for i in self.qubit_counts]
+            else: # run on all qubits of the backend if nothing is specified
+                self.custom_qubits_array = [list(set(chain(*backend.coupling_map)))]
+                self.qubit_counts = [len(layout) for layout in self.custom_qubits_array]
 
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.optimize_sqg = configuration.optimize_sqg
@@ -813,7 +822,7 @@ class GHZBenchmark(Benchmark):
             xr.Dataset: dataset to be used for further data storage
         """
 
-        for key, value in self.configuration:
+        for key, value in (self.configuration.__dict__ | self.__dict__).items():
             if key == "benchmark":  # Avoid saving the class object
                 dataset.attrs[key] = value.name
             else:
@@ -841,7 +850,6 @@ class GHZBenchmark(Benchmark):
         for qubit_layout in aux_custom_qubits_array:
             Id = BenchmarkObservationIdentifier(qubit_layout)
             idx = Id.string_identifier
-            # for qubit_count in self.qubit_counts[idx]:
             qubit_count = len(qubit_layout)
             circuit_group: CircuitGroup = self.generate_readout_circuit(qubit_layout, qubit_count)
             transpiled_circuit_dict = {tuple(qubit_layout): circuit_group.circuits}

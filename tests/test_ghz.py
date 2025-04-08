@@ -13,11 +13,7 @@ class TestGHZ:
     def test_layouts(self, mock_fig):
         MINIMAL_GHZ = GHZConfiguration(
             state_generation_routine=f"tree",
-            custom_qubits_array=[
-                [0, 1],
-                [1, 3, 4],
-                [1, 3, 4, 5],
-            ],
+            qubit_counts = [2,4,5],
             shots=3,
             qiskit_optim_level=3,
             optimize_sqg=True,
@@ -57,6 +53,7 @@ class TestGHZ:
             MINIMAL_GHZ = GHZConfiguration(
                 state_generation_routine=f"tree",
                 custom_qubits_array=[[2, 3, 4]],
+                qubit_counts=[3],
                 shots=3,
                 qiskit_optim_level=3,
                 optimize_sqg=True,
