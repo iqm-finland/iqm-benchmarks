@@ -332,21 +332,7 @@ def plot_layout_fidelity_graph(
         for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
 
-    # Ensuring weights are in correct order for the plot
-    edge_list = graph.edge_list()
-    weights_dict = {}
-    edge_pos = set()
-
-    # Create a mapping between edge positions as defined in rustworkx and their weights
-    for e, w in zip(edge_list, weights):
-        pos_tuple = (tuple(pos[e[0]]), tuple(pos[e[1]]))
-        weights_dict[pos_tuple] = w
-        edge_pos.add(pos_tuple)
-
-    # Get corresponding weights in the same order
-    weights_ordered = np.array([weights_dict[edge] for edge in list(edge_pos)])
-
-    plt.subplots(figsize=(6, 6))
+    plt.subplots(figsize=(1.5 * np.sqrt(len(nodes)), 1.5 * np.sqrt(len(nodes))))
 
     # Draw the graph
     visualization.mpl_draw(
@@ -355,7 +341,7 @@ def plot_layout_fidelity_graph(
         node_color=node_colors,
         pos=pos,
         labels=lambda node: node,
-        width=7 * weights_ordered / np.max(weights_ordered),
+        width=7 * weights / np.max(weights),
     )  # type: ignore[call-arg]
 
     # Add edge labels using matplotlib's annotate
