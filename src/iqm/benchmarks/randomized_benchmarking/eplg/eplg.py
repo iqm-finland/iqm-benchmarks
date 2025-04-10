@@ -119,9 +119,9 @@ def plot_layered_fidelities_graph(
     station_string = "IQM Backend" if station is None else station.capitalize()
 
     eplg_string = (
-        f"EPLG estimate: {eplg_estimate['value']:.2e} +/- {eplg_estimate['uncertainty']:.2e} --- "
+        f"EPLG estimate: {eplg_estimate['value']:.2e} +/- {eplg_estimate['uncertainty']:.2e}\n"
         if eplg_estimate
-        else " --- "
+        else ""
     )
     plt.title(f"Layered fidelities for qubit pairs in {station_string}\n" f"{eplg_string}{timestamp}")
     plt.close()
@@ -193,6 +193,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         disjoint_layers=disjoint_layers,
         station=backend_configuration_name,
         qubit_names=qubit_names,
+        is_eplg=True,
     )
     plots[fig_name] = fig
 

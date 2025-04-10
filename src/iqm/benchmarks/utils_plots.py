@@ -137,6 +137,7 @@ def draw_graph_edges(
     disjoint_layers: Optional[Sequence[Sequence[Tuple[int, int]]]] = None,
     station: Optional[str] = None,
     qubit_names: Optional[Dict[int, str]] = None,
+    is_eplg: Optional[bool] = False,
 ) -> Tuple[str, Figure]:
     """Draw given edges on a graph within the given backend.
 
@@ -151,6 +152,8 @@ def draw_graph_edges(
             * Default is None.
         qubit_names (Optional[Dict[int, str]]): A dictionary mapping qubit indices to their names.
             * Default is None.
+        is_eplg (Optional[bool]): A flag indicating if the graph refers to an EPLG experiment.
+            * Default is False.
 
     Returns:
          Tuple[str, Figure]: The figure name and the figure object.
@@ -216,8 +219,11 @@ def draw_graph_edges(
             ax=ax,
         )
 
+        is_eplg_string = " for EPLG experiment" if is_eplg else ""
         plt.title(
-            f"Selected edges in {label_station}\n" f"{len(disjoint_layers)} groups of disjoint layers" f"\n{timestamp}"
+            f"Selected edges in {label_station.capitalize()}{is_eplg_string}\n"
+            f"{len(disjoint_layers)} groups of disjoint layers"
+            f"\n{timestamp}"
         )
     ax.set_aspect(0.925)
     plt.close()
