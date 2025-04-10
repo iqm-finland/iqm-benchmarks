@@ -345,8 +345,8 @@ class EPLGBenchmark(Benchmark):
             ]
             edges = max_cost_path
 
-        qubits = list(set(x for y in edges for x in y))
-        dataset_eplg.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in qubits}
+        backend_qubits = list(range(backend.num_qubits))
+        dataset_eplg.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in backend_qubits}
 
         self.add_all_meta_to_dataset(dataset_eplg)
 
