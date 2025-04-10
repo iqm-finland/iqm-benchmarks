@@ -9,6 +9,7 @@ Below is a list of the benchmarks currently available in the suite:
   - Interleaved Randomized Benchmarking [[Phys. Rev. Lett. 109, 080505](https://doi.org/10.1103/PhysRevLett.109.080505) (2012)]
   - Compressive Gate Set Tomography [[PRX Quantum 4, 010325](https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.4.010325) (2023)]
   - Mirror Randomized Benchmarking [[Phys. Rev. Lett. 129, 150502](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.129.150502) (2022)]
+  - Error Per Layered Gate [[arXiv:2311.05933 [quant-ph]](https://arxiv.org/abs/2311.05933) (2023)]
 * Holistic:
   - Quantum Volume [[Phys. Rev. A 100, 032328](https://doi.org/10.1103/PhysRevA.100.032328) (2019)]
   - CLOPS [[arXiv:2110.14108 [quant-ph]](https://arxiv.org/abs/2110.14108) (2021)]
