@@ -219,7 +219,7 @@ def draw_graph_edges(
         plt.title(
             f"Selected edges in {label_station}\n" f"{len(disjoint_layers)} groups of disjoint layers" f"\n{timestamp}"
         )
-
+    ax.set_aspect(0.925)
     plt.close()
 
     return fig_name, fig
