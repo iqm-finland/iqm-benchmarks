@@ -136,6 +136,7 @@ def draw_graph_edges(
     timestamp: str,
     disjoint_layers: Optional[Sequence[Sequence[Tuple[int, int]]]] = None,
     station: Optional[str] = None,
+    qubit_names: Optional[Dict[int, str]] = None,
 ) -> Tuple[str, Figure]:
     """Draw given edges on a graph within the given backend.
 
@@ -147,6 +148,8 @@ def draw_graph_edges(
         disjoint_layers (Optional[Sequence[Sequence[Tuple[int, int]]]): Sequences of edges defining disjoint layers to draw.
             * Default is None.
         station (Optional[str]): The name of the station.
+            * Default is None.
+        qubit_names (Optional[Dict[int, str]]): A dictionary mapping qubit indices to their names.
             * Default is None.
 
     Returns:
@@ -199,6 +202,12 @@ def draw_graph_edges(
         nx.draw_networkx(
             rx_to_nx_graph(backend_coupling_map),
             pos=qubit_positions,
+            labels=(
+                {x: qubit_names[x] for x in range(backend_num_qubits)}
+                if qubit_names
+                else list(range(backend_num_qubits))
+            ),
+            font_size=6.5 if qubit_names else 10,
             edgelist=[x for y in disjoint_layers for x in y],
             width=4.0,
             edge_color=[x for y in all_edge_colors for x in y],

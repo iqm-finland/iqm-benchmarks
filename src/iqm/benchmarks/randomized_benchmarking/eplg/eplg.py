@@ -6,6 +6,9 @@ from time import strftime
 from typing import Dict, Optional, Sequence, Tuple, Type, cast
 
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import networkx as nx
+from qiskit.transpiler import CouplingMap
 from uncertainties import ufloat
 import xarray as xr
 
@@ -25,8 +28,105 @@ from iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb import (
     direct_rb_analysis,
 )
 from iqm.benchmarks.utils import split_into_disjoint_pairs
-from iqm.benchmarks.utils_plots import draw_graph_edges, evaluate_hamiltonian_paths
+from iqm.benchmarks.utils_plots import GraphPositions, draw_graph_edges, evaluate_hamiltonian_paths, rx_to_nx_graph
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
+
+
+def plot_layered_fidelities_graph(
+    fidelities: Dict[str, Dict[str, float]],
+    backend_coupling_map: CouplingMap,
+    qubit_names: Dict[int, str],
+    timestamp: str,
+    station: Optional[str] = None,
+    eplg_estimate: Optional[Dict[str, float]] = None,
+) -> Tuple[str, Figure]:
+    """Plots the layered fidelity for each corresponding pair of qubits in a graph layout of the given backend.
+
+    Args:
+        fidelities (Dict[str, Dict[str, float]]): A dictionary (str qubit keys) of dictionaries (keys "value"/"uncertainty") of fidelities (float) to plot.
+        backend_coupling_map (CouplingMap): The CouplingMap instance.
+        qubit_names (Dict[int, str]): A dictionary of qubit names corresponding to qubit indices.
+        timestamp (str): The timestamp of the corresponding experiment.
+        station (str): The name of the station to use for the graph layout.
+        eplg_estimate (Optional[Dict[str, float]]): A dictionary with the EPLG estimate value and its uncertainty.
+
+    Returns:
+        Tuple[str, Figure]: The figure label and the layered fidelities plot figure.
+    """
+    num_qubits = len(qubit_names.keys())
+    fig_name = (
+        f"layered_fidelities_graph_{station}_{timestamp}"
+        if station is not None
+        else f"layered_fidelities_graph_{timestamp}"
+    )
+    # Sort the fidelities by value
+    sorted_fidelities = dict(sorted(fidelities.items(), key=lambda item: item[1]["value"]))
+
+    qubit_pairs = [
+        tuple(int(num) for num in x.replace("(", "").replace(")", "").replace("...", "").split(", "))
+        for x in sorted_fidelities.keys()
+    ]
+    fidelity_values = [a["value"] for a in sorted_fidelities.values()]
+
+    fidelity_edges = dict(zip(qubit_pairs, fidelity_values))
+
+    cmap = plt.cm.get_cmap("winter")
+
+    fig = plt.figure()
+    ax = plt.axes()
+
+    if station is not None:
+        if station.lower() in GraphPositions.predefined_stations:
+            qubit_positions = GraphPositions.predefined_stations[station.lower()]
+        else:
+            if num_qubits in (20, 7):
+                station = "garnet" if num_qubits == 20 else "deneb"
+                qubit_positions = GraphPositions.predefined_stations[station]
+            else:
+                graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
+                qubit_positions = GraphPositions.create_positions(graph_backend)
+    else:
+        graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
+        if num_qubits in (20, 7):
+            station = "garnet" if num_qubits == 20 else "deneb"
+            qubit_positions = GraphPositions.predefined_stations[station]
+        else:
+            qubit_positions = GraphPositions.create_positions(graph_backend)
+
+    # Normalize fidelity values to the range [0, 1] for color mapping
+    norm = plt.Normalize(vmin=cast(float, min(fidelity_values)), vmax=cast(float, max(fidelity_values)))
+    edge_colors = [cmap(norm(fidelity_edges[edge])) for edge in qubit_pairs]
+
+    nx.draw_networkx(
+        rx_to_nx_graph(backend_coupling_map),
+        pos=qubit_positions,
+        nodelist=list(range(num_qubits)),
+        labels={x: qubit_names[x] for x in range(num_qubits)},
+        font_size=6.5,
+        edgelist=qubit_pairs,
+        width=4.0,
+        edge_color=edge_colors,
+        node_color="k",
+        font_color="w",
+        ax=ax,
+    )
+
+    # Add colorbar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    fig.colorbar(sm, ax=ax, shrink=0.5, label="Layered Fidelity")
+
+    station_string = "IQM Backend" if station is None else station.capitalize()
+
+    eplg_string = (
+        f"EPLG estimate: {eplg_estimate['value']:.2e} +/- {eplg_estimate['uncertainty']:.2e} --- "
+        if eplg_estimate
+        else " --- "
+    )
+    plt.title(f"Layered fidelities for qubit pairs in {station_string}\n" f"{eplg_string}{timestamp}")
+    plt.close()
+
+    return fig_name, fig
 
 
 def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
@@ -55,12 +155,13 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_qubits = dataset.attrs["chain_length"]
     edges = dataset.attrs["edges"]
     disjoint_layers = dataset.attrs["disjoint_layers"]
+    qubit_names = dataset.attrs["qubit_names"]
 
-    total_mean = []
+    fidelities = {}
     fid_product = ufloat(1, 0)
     for obs in observations:
         fid_product *= ufloat(obs.value, obs.uncertainty)
-        total_mean.append(fid_product)
+        fidelities[str(obs.identifier.qubit_indices)] = {"value": obs.value, "uncertainty": obs.uncertainty}
 
     LF = fid_product
     EPLG = 1 - LF ** (1 / num_edges)
@@ -91,6 +192,18 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         timestamp=timestamp,
         disjoint_layers=disjoint_layers,
         station=backend_configuration_name,
+        qubit_names=qubit_names,
+    )
+    plots[fig_name] = fig
+
+    # Plot the layered fidelities graph
+    fig_name, fig = plot_layered_fidelities_graph(
+        fidelities=fidelities,
+        backend_coupling_map=backend_coupling_map,
+        qubit_names=qubit_names,
+        timestamp=timestamp,
+        station=backend_configuration_name,
+        eplg_estimate={"value": EPLG.nominal_value, "uncertainty": EPLG.std_dev},
     )
     plots[fig_name] = fig
 
@@ -231,6 +344,9 @@ class EPLGBenchmark(Benchmark):
                 max_cost_path[i :: self.num_disjoint_layers] for i in range(cast(int, self.num_disjoint_layers))
             ]
             edges = max_cost_path
+
+        qubits = list(set(x for y in edges for x in y))
+        dataset_eplg.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in qubits}
 
         self.add_all_meta_to_dataset(dataset_eplg)
 
