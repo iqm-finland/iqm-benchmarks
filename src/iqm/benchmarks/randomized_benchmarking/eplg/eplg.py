@@ -119,9 +119,7 @@ def plot_layered_fidelities_graph(
     station_string = "IQM Backend" if station is None else station.capitalize()
 
     eplg_string = (
-        f"EPLG estimate: {eplg_estimate['value']:.2e} +/- {eplg_estimate['uncertainty']:.2e}\n"
-        if eplg_estimate
-        else ""
+        f"EPLG estimate: {eplg_estimate['value']:.2e} +/- {eplg_estimate['uncertainty']:.2e}\n" if eplg_estimate else ""
     )
     plt.title(f"Layered fidelities for qubit pairs in {station_string}\n" f"{eplg_string}{timestamp}")
     plt.close()
@@ -152,7 +150,7 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     backend_num_qubits = dataset.attrs["backend_num_qubits"]
 
     num_edges = len(observations)
-    num_qubits = dataset.attrs["chain_length"]
+    num_qubits = dataset.attrs["num_qubits"]
     edges = dataset.attrs["edges"]
     disjoint_layers = dataset.attrs["disjoint_layers"]
     qubit_names = dataset.attrs["qubit_names"]
@@ -322,6 +320,7 @@ class EPLGBenchmark(Benchmark):
         if self.custom_qubits_array is not None:
             self.validate_custom_qubits_array()
             edges = self.custom_qubits_array
+            num_qubits = len(list(set(x for y in edges for x in y)))
             all_disjoint = split_into_disjoint_pairs(self.custom_qubits_array)
             self.num_disjoint_layers = len(all_disjoint)
             qcvv_logger.info(
@@ -330,6 +329,7 @@ class EPLGBenchmark(Benchmark):
 
         else:
             self.validate_random_chain_inputs()
+            num_qubits = cast(int, self.chain_length)
             qcvv_logger.info("Generating linear chain path")
             h_path_costs = evaluate_hamiltonian_paths(
                 self.chain_length,
@@ -346,6 +346,7 @@ class EPLGBenchmark(Benchmark):
             ]
             edges = max_cost_path
 
+        dataset_eplg.attrs["num_qubits"] = num_qubits
         backend_qubits = list(range(backend.num_qubits))
         dataset_eplg.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in backend_qubits}
 
