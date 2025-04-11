@@ -598,7 +598,7 @@ def import_native_gate_cliffords(
         with open(os.path.join(os.path.dirname(__file__), "clifford_2q.pkl"), "rb") as f2q:
             clifford_2q_dict = pickle.load(f2q)
 
-    qcvv_logger.info(f"Clifford dictionaries for {system_size or 'both systems'} imported successfully!")
+    qcvv_logger.info(f"Clifford dictionaries for {system_size or 'both 1 & 2 qubits'} imported successfully!")
 
     if system_size == "1q":
         return clifford_1q_dict
