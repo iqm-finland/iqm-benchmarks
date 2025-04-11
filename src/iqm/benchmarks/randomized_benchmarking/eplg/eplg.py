@@ -364,13 +364,10 @@ class EPLGBenchmark(Benchmark):
         )
 
         benchmarks_direct_rb = DirectRandomizedBenchmarking(backend, drb_config)
-
         run_direct_rb = benchmarks_direct_rb.run()
-
         dataset = run_direct_rb.dataset
-
+        self.circuits = benchmarks_direct_rb.circuits
         dataset_eplg.attrs.update({"disjoint_layers": all_disjoint, "edges": edges})
-
         dataset.attrs.update(dataset_eplg.attrs)
 
         return dataset
