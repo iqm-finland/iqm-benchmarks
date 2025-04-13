@@ -8,6 +8,7 @@ from typing import Dict, Optional, Sequence, Tuple, Type, cast
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 from qiskit.transpiler import CouplingMap
 from uncertainties import ufloat
 import xarray as xr
@@ -66,7 +67,7 @@ def plot_layered_fidelities_graph(
         tuple(int(num) for num in x.replace("(", "").replace(")", "").replace("...", "").split(", "))
         for x in sorted_fidelities.keys()
     ]
-    fidelity_values = [a["value"] for a in sorted_fidelities.values()]
+    fidelity_values = [100 * a["value"] for a in sorted_fidelities.values()]
 
     fidelity_edges = dict(zip(qubit_pairs, fidelity_values))
 
@@ -114,7 +115,8 @@ def plot_layered_fidelities_graph(
     # Add colorbar
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    fig.colorbar(sm, ax=ax, shrink=0.5, label="Layered Fidelity")
+    cbar = fig.colorbar(sm, ax=ax, shrink=0.5, label="Layered Fidelity (%)", format="%.2f")
+    cbar.set_ticks(np.linspace(min(fidelity_values), max(fidelity_values), 5, endpoint=True))
 
     station_string = "IQM Backend" if station is None else station.capitalize()
 
