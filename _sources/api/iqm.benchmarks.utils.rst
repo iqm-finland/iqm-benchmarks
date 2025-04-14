@@ -28,12 +28,14 @@ iqm.benchmarks.utils
       marginal_distribution
       median_with_uncertainty
       perform_backend_transpilation
+      random_hamiltonian_path
       reduce_to_active_qubits
       remove_directed_duplicates_to_list
       retrieve_all_counts
       retrieve_all_job_metadata
       set_coupling_map
       sort_batches_by_final_layout
+      split_into_disjoint_pairs
       split_sequence_in_chunks
       submit_execute
       timeit

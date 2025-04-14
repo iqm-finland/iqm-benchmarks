@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; IQM Benchmarks 2.32 documentation</title>
+    <title>Index &#8212; IQM Benchmarks 2.33 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=02f1d06e"></script>
+    <script src="_static/documentation_options.js?v=b90d5273"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -50,8 +50,8 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.32" />
-    <meta name="docbuild:last-update" content="2025-04-09"/>
+  <meta name="docsearch:version" content="2.33" />
+    <meta name="docbuild:last-update" content="2025-04-14"/>
   </head>
   
   
@@ -132,8 +132,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.32 documentation - Home"/>
-    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.32 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.33 documentation - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.33 documentation - Home"/>
   
   
 </a></div>
@@ -150,10 +150,11 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">IQM Benchmarks</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="examples/examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_clifford_rb.html">Clifford Randomized Benchmarking (CRB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_eplg.html">Error Per Layered Gate (EPLG)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/example_graphstate.html">Graph State Benchmark Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_graphstate.html">Graph State Bipartite Entanglement</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/example_quantum_volume.html">Quantum Volume (QV)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
@@ -218,6 +219,8 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.html">iqm.benchmarks.randomized_benchmarking.direct_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.eplg.html">iqm.benchmarks.randomized_benchmarking.eplg</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
@@ -245,12 +248,14 @@
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.median_with_uncertainty.html">iqm.benchmarks.utils.median_with_uncertainty</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.random_hamiltonian_path.html">iqm.benchmarks.utils.random_hamiltonian_path</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.remove_directed_duplicates_to_list.html">iqm.benchmarks.utils.remove_directed_duplicates_to_list</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.split_into_disjoint_pairs.html">iqm.benchmarks.utils.split_into_disjoint_pairs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.split_sequence_in_chunks.html">iqm.benchmarks.utils.split_sequence_in_chunks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
@@ -258,6 +263,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils_plots.draw_graph_edges.html">iqm.benchmarks.utils_plots.draw_graph_edges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html">iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils_plots.rx_to_nx_graph.html">iqm.benchmarks.utils_plots.rx_to_nx_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/iqm.benchmarks.utils_plots.GraphPositions.html">iqm.benchmarks.utils_plots.GraphPositions</a></li>
@@ -426,6 +433,10 @@
 </li>
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeBenchmark.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeBenchmark.add_all_meta_to_dataset">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeBenchmark method)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.add_all_meta_to_dataset">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking method)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.add_all_meta_to_dataset">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark method)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking.add_all_meta_to_dataset">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking method)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking.add_all_meta_to_dataset">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking method)</a>
@@ -462,6 +473,10 @@
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking.analysis_function">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking static method)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.analysis_function">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking static method)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.analysis_function">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark static method)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking.analysis_function">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking static method)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking.analysis_function">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking static method)</a>
@@ -474,6 +489,8 @@
       <li><a href="api/iqm.benchmarks.entanglement.ghz.GHZBenchmark.html#iqm.benchmarks.entanglement.ghz.GHZBenchmark.append_rms">append_rms() (iqm.benchmarks.entanglement.ghz.GHZBenchmark method)</a>
 </li>
       <li><a href="api/iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation.html#iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation">apply_readout_error_mitigation() (in module iqm.benchmarks.readout_mitigation)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.assign_inputs_to_qubits">assign_inputs_to_qubits() (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking method)</a>
 </li>
       <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.html#iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.assign_random_parameters_to_all">assign_random_parameters_to_all() (iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark method)</a>
 </li>
@@ -503,6 +520,8 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.benchmark">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.benchmark">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.benchmark">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.benchmark">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
 </li>
@@ -541,9 +560,15 @@
 </li>
       <li><a href="api/iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1.html#iqm.benchmarks.optimization.qscore.calculate_optimal_angles_for_QAOA_p1">calculate_optimal_angles_for_QAOA_p1() (in module iqm.benchmarks.optimization.qscore)</a>
 </li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url">calibration_url (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
       <li><a href="api/iqm.benchmarks.readout_mitigation.M3IQM.html#iqm.benchmarks.readout_mitigation.M3IQM.cals_from_system">cals_from_system() (iqm.benchmarks.readout_mitigation.M3IQM method)</a>
 </li>
       <li><a href="api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase.calset_id">calset_id (iqm.benchmarks.benchmark.BenchmarkConfigurationBase attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.chain_length">chain_length (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.chain_path_samples">chain_path_samples (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.benchmark.BenchmarkBase.html#iqm.benchmarks.benchmark.BenchmarkBase.check_requirements">check_requirements() (iqm.benchmarks.benchmark.BenchmarkBase static method)</a>
 </li>
@@ -569,18 +594,22 @@
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.clifford_rb_analysis.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.clifford_rb_analysis">clifford_rb_analysis() (in module iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb)</a>
 </li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.clifford_sqg_probabilities">clifford_sqg_probabilities (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability">clifford_sqg_probability (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
+</li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking">CliffordRandomizedBenchmarking (class in iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration">CliffordRBConfiguration (class in iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb)</a>
 </li>
       <li><a href="api/iqm.benchmarks.quantum_volume.clops.clops_analysis.html#iqm.benchmarks.quantum_volume.clops.clops_analysis">clops_analysis() (in module iqm.benchmarks.quantum_volume.clops)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.html#iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.clops_cycle">clops_cycle() (iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark method)</a>
 </li>
       <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.html#iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.clops_h_bool">clops_h_bool (iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.html#iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark">CLOPSBenchmark (class in iqm.benchmarks.quantum_volume.clops)</a>
 </li>
       <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.html#iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration">CLOPSConfiguration (class in iqm.benchmarks.quantum_volume.clops)</a>
@@ -622,6 +651,8 @@
 </li>
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.custom_qubits_array">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration attribute)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.custom_qubits_array">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
       </ul></li>
       <li><a href="api/iqm.benchmarks.optimization.qscore.cut_cost_function.html#iqm.benchmarks.optimization.qscore.cut_cost_function">cut_cost_function() (in module iqm.benchmarks.optimization.qscore)</a>
 </li>
@@ -637,13 +668,29 @@
 </li>
       <li><a href="api/iqm.benchmarks.benchmark_definition.default_analysis_function.html#iqm.benchmarks.benchmark_definition.default_analysis_function">default_analysis_function() (in module iqm.benchmarks.benchmark_definition)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.utils_plots.GraphPositions.html#iqm.benchmarks.utils_plots.GraphPositions.deneb_positions">deneb_positions (iqm.benchmarks.utils_plots.GraphPositions attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.densities_2q_gates">densities_2q_gates (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.density_2q_gates">density_2q_gates (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
 </li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.depths">depths (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.depths_array">depths_array (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.direct_rb_analysis.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.direct_rb_analysis">direct_rb_analysis() (in module iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking">DirectRandomizedBenchmarking (class in iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration">DirectRBConfiguration (class in iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.utils_plots.draw_graph_edges.html#iqm.benchmarks.utils_plots.draw_graph_edges">draw_graph_edges() (in module iqm.benchmarks.utils_plots)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.drb_circuit_samples">drb_circuit_samples (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.drb_depths">drb_depths (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -651,11 +698,19 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.edge_grab.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.edge_grab">edge_grab() (in module iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb)</a>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.edge_grab.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.edge_grab">edge_grab() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.eplg_analysis.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.eplg_analysis">eplg_analysis() (in module iqm.benchmarks.randomized_benchmarking.eplg.eplg)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark">EPLGBenchmark (class in iqm.benchmarks.randomized_benchmarking.eplg.eplg)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration">EPLGConfiguration (class in iqm.benchmarks.randomized_benchmarking.eplg.eplg)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.estimate_survival_probabilities.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.estimate_survival_probabilities">estimate_survival_probabilities() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.multi_lmfit.eval_func_single_dataset.html#iqm.benchmarks.randomized_benchmarking.multi_lmfit.eval_func_single_dataset">eval_func_single_dataset() (in module iqm.benchmarks.randomized_benchmarking.multi_lmfit)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html#iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths">evaluate_hamiltonian_paths() (in module iqm.benchmarks.utils_plots)</a>
 </li>
       <li><a href="api/iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark.execute">execute() (iqm.benchmarks.benchmark_definition.Benchmark method)</a>
 
@@ -673,6 +728,10 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeBenchmark.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeBenchmark.execute">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeBenchmark method)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking.execute">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRandomizedBenchmarking method)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.execute">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking method)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.execute">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark method)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking.execute">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRandomizedBenchmarking method)</a>
 </li>
@@ -737,7 +796,11 @@
       </ul></li>
       <li><a href="api/iqm.benchmarks.entanglement.ghz.GHZBenchmark.html#iqm.benchmarks.entanglement.ghz.GHZBenchmark.generate_coherence_meas_circuits">generate_coherence_meas_circuits() (iqm.benchmarks.entanglement.ghz.GHZBenchmark method)</a>
 </li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.generate_drb_circuits.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.generate_drb_circuits">generate_drb_circuits() (in module iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb)</a>
+</li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.generate_fixed_depth_mrb_circuits">generate_fixed_depth_mrb_circuits() (in module iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.generate_fixed_depth_parallel_drb_circuits.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.generate_fixed_depth_parallel_drb_circuits">generate_fixed_depth_parallel_drb_circuits() (in module iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.generate_fixed_depth_parallel_rb_circuits.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.generate_fixed_depth_parallel_rb_circuits">generate_fixed_depth_parallel_rb_circuits() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
 </li>
@@ -962,8 +1025,6 @@
         <li><a href="api/iqm.benchmarks.optimization.qscore.html#module-iqm.benchmarks.optimization.qscore">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     iqm.benchmarks.quantum_volume
 
@@ -985,6 +1046,8 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.html#module-iqm.benchmarks.quantum_volume.quantum_volume">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     iqm.benchmarks.randomized_benchmarking
 
@@ -1004,6 +1067,34 @@
 
       <ul>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.html#module-iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb">module</a>
+</li>
+      </ul></li>
+      <li>
+    iqm.benchmarks.randomized_benchmarking.direct_rb
+
+      <ul>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.html#module-iqm.benchmarks.randomized_benchmarking.direct_rb">module</a>
+</li>
+      </ul></li>
+      <li>
+    iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb
+
+      <ul>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.html#module-iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb">module</a>
+</li>
+      </ul></li>
+      <li>
+    iqm.benchmarks.randomized_benchmarking.eplg
+
+      <ul>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.html#module-iqm.benchmarks.randomized_benchmarking.eplg">module</a>
+</li>
+      </ul></li>
+      <li>
+    iqm.benchmarks.randomized_benchmarking.eplg.eplg
+
+      <ul>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.html#module-iqm.benchmarks.randomized_benchmarking.eplg.eplg">module</a>
 </li>
       </ul></li>
       <li>
@@ -1076,6 +1167,8 @@
         <li><a href="api/iqm.benchmarks.utils_shadows.html#module-iqm.benchmarks.utils_shadows">module</a>
 </li>
       </ul></li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.is_eplg">is_eplg (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
       <li><a href="api/iqm.benchmarks.optimization.qscore.is_successful.html#iqm.benchmarks.optimization.qscore.is_successful">is_successful() (in module iqm.benchmarks.optimization.qscore)</a>
 
       <ul>
@@ -1109,6 +1202,8 @@
       <li><a href="api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase.max_circuits_per_batch">max_circuits_per_batch (iqm.benchmarks.benchmark.BenchmarkConfigurationBase attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase.max_gates_per_batch">max_gates_per_batch (iqm.benchmarks.benchmark.BenchmarkConfigurationBase attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.max_hamiltonian_path_tries">max_hamiltonian_path_tries (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.compressive_gst.compressive_gst.GSTConfiguration.html#iqm.benchmarks.compressive_gst.compressive_gst.GSTConfiguration.max_inits">max_inits (iqm.benchmarks.compressive_gst.compressive_gst.GSTConfiguration attribute)</a>
 </li>
@@ -1155,6 +1250,10 @@
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.model_computed_fields">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.model_computed_fields">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.model_computed_fields">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.model_computed_fields">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_computed_fields">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
@@ -1177,6 +1276,10 @@
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.model_config">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.model_config">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.model_config">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.model_config">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_config">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
@@ -1198,6 +1301,10 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.model_fields">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.model_fields">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.model_fields">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.model_fields">(iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.model_fields">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
@@ -1247,6 +1354,14 @@
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.html#module-iqm.benchmarks.randomized_benchmarking.clifford_rb">iqm.benchmarks.randomized_benchmarking.clifford_rb</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.html#module-iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb">iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.html#module-iqm.benchmarks.randomized_benchmarking.direct_rb">iqm.benchmarks.randomized_benchmarking.direct_rb</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.html#module-iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb">iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.html#module-iqm.benchmarks.randomized_benchmarking.eplg">iqm.benchmarks.randomized_benchmarking.eplg</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.html#module-iqm.benchmarks.randomized_benchmarking.eplg.eplg">iqm.benchmarks.randomized_benchmarking.eplg.eplg</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.html#module-iqm.benchmarks.randomized_benchmarking.interleaved_rb">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a>
 </li>
@@ -1304,6 +1419,8 @@
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.num_circuit_samples">num_circuit_samples (iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
 
       <ul>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.num_circuit_samples">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.num_circuit_samples">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.num_circuit_samples">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
@@ -1319,6 +1436,8 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.num_circuits">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.num_disjoint_layers">num_disjoint_layers (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration attribute)</a>
+</li>
       <li><a href="api/iqm.benchmarks.optimization.qscore.QScoreConfiguration.html#iqm.benchmarks.optimization.qscore.QScoreConfiguration.num_instances">num_instances (iqm.benchmarks.optimization.qscore.QScoreConfiguration attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.num_pauli_samples">num_pauli_samples (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
@@ -1366,6 +1485,8 @@
       <ul>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.parallel_execution">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.parallel_execution">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.parallel_execution">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
       </ul></li>
@@ -1397,6 +1518,8 @@
 </li>
       <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.plot_hop_threshold.html#iqm.benchmarks.quantum_volume.quantum_volume.plot_hop_threshold">plot_hop_threshold() (in module iqm.benchmarks.quantum_volume.quantum_volume)</a>
 </li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.plot_layered_fidelities_graph.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.plot_layered_fidelities_graph">plot_layered_fidelities_graph() (in module iqm.benchmarks.randomized_benchmarking.eplg.eplg)</a>
+</li>
       <li><a href="api/iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html#iqm.benchmarks.utils_plots.plot_layout_fidelity_graph">plot_layout_fidelity_graph() (in module iqm.benchmarks.utils_plots)</a>
 </li>
       <li><a href="api/iqm.benchmarks.entanglement.graph_states.plot_max_negativities.html#iqm.benchmarks.entanglement.graph_states.plot_max_negativities">plot_max_negativities() (in module iqm.benchmarks.entanglement.graph_states)</a>
@@ -1423,6 +1546,8 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.html#iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.qiskit_optim_level">(iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.qiskit_optim_level">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.qiskit_optim_level">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.qiskit_optim_level">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
 </li>
@@ -1476,6 +1601,8 @@
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.qubits_array">qubits_array (iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
 
       <ul>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.qubits_array">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.qubits_array">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.qubits_array">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
@@ -1489,6 +1616,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/iqm.benchmarks.utils.random_hamiltonian_path.html#iqm.benchmarks.utils.random_hamiltonian_path">random_hamiltonian_path() (in module iqm.benchmarks.utils)</a>
+</li>
       <li><a href="api/iqm.benchmarks.compressive_gst.compressive_gst.GSTConfiguration.html#iqm.benchmarks.compressive_gst.compressive_gst.GSTConfiguration.rank">rank (iqm.benchmarks.compressive_gst.compressive_gst.GSTConfiguration attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.readout_mitigation.readout_error_m3.html#iqm.benchmarks.readout_mitigation.readout_error_m3">readout_error_m3() (in module iqm.benchmarks.readout_mitigation)</a>
@@ -1521,6 +1650,8 @@
         <li><a href="api/iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.html#iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration.routing_method">(iqm.benchmarks.quantum_volume.clops.CLOPSConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.html#iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration.routing_method">(iqm.benchmarks.quantum_volume.quantum_volume.QuantumVolumeConfiguration attribute)</a>
+</li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.routing_method">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
 </li>
@@ -1560,6 +1691,8 @@
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration.shots">(iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb.CliffordRBConfiguration attribute)</a>
 </li>
+        <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.shots">(iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
+</li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.shots">(iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
         <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.shots">(iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
@@ -1567,13 +1700,21 @@
       </ul></li>
       <li><a href="api/iqm.benchmarks.benchmark_definition.show_figure.html#iqm.benchmarks.benchmark_definition.show_figure">show_figure() (in module iqm.benchmarks.benchmark_definition)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method">simulation_method (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
+</li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration.simultaneous_fit">simultaneous_fit (iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb.InterleavedRBConfiguration attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.utils.sort_batches_by_final_layout.html#iqm.benchmarks.utils.sort_batches_by_final_layout">sort_batches_by_final_layout() (in module iqm.benchmarks.utils)</a>
 </li>
+      <li><a href="api/iqm.benchmarks.utils.split_into_disjoint_pairs.html#iqm.benchmarks.utils.split_into_disjoint_pairs">split_into_disjoint_pairs() (in module iqm.benchmarks.utils)</a>
+</li>
       <li><a href="api/iqm.benchmarks.utils.split_sequence_in_chunks.html#iqm.benchmarks.utils.split_sequence_in_chunks">split_sequence_in_chunks() (in module iqm.benchmarks.utils)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble">sqg_gate_ensemble (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.sqg_gate_ensembles">sqg_gate_ensembles (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
 </li>
       <li><a href="api/iqm.benchmarks.entanglement.ghz.GHZConfiguration.html#iqm.benchmarks.entanglement.ghz.GHZConfiguration.state_generation_routine">state_generation_routine (iqm.benchmarks.entanglement.ghz.GHZConfiguration attribute)</a>
 </li>
@@ -1586,6 +1727,8 @@
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job">submit_parallel_rb_job() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_sequential_rb_jobs.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_sequential_rb_jobs">submit_sequential_rb_jobs() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking.submit_single_drb_job">submit_single_drb_job() (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRandomizedBenchmarking method)</a>
 </li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking.submit_single_mrb_job">submit_single_mrb_job() (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking method)</a>
 </li>
@@ -1601,11 +1744,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.utils.timeit.html#iqm.benchmarks.utils.timeit">timeit() (in module iqm.benchmarks.utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.entanglement.graph_states.GraphStateConfiguration.html#iqm.benchmarks.entanglement.graph_states.GraphStateConfiguration.tomography">tomography (iqm.benchmarks.entanglement.graph_states.GraphStateConfiguration attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.two_qubit_gate_ensemble">two_qubit_gate_ensemble (iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration attribute)</a>
+</li>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.html#iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration.two_qubit_gate_ensembles">two_qubit_gate_ensembles (iqm.benchmarks.randomized_benchmarking.direct_rb.direct_rb.DirectRBConfiguration attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1631,10 +1776,14 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.validate_custom_qubits_array">validate_custom_qubits_array() (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark method)</a>
+</li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.validate_irb_gate.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.validate_irb_gate">validate_irb_gate() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.validate_random_chain_inputs">validate_random_chain_inputs() (iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark method)</a>
+</li>
       <li><a href="api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.validate_rb_qubits.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.validate_rb_qubits">validate_rb_qubits() (in module iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common)</a>
 </li>
       <li><a href="api/iqm.benchmarks.benchmark_definition.BenchmarkObservation.html#iqm.benchmarks.benchmark_definition.BenchmarkObservation.value">value (iqm.benchmarks.benchmark_definition.BenchmarkObservation attribute)</a>
@@ -1697,7 +1846,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-04-09.
+  Last updated on 2025-04-14.
   <br/>
 </p>
   </div>

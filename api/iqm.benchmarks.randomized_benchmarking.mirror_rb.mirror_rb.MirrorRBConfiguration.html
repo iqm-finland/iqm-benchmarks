@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration &#8212; IQM Benchmarks 2.32 documentation</title>
+    <title>iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration &#8212; IQM Benchmarks 2.33 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=02f1d06e"></script>
+    <script src="../_static/documentation_options.js?v=b90d5273"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.mrb_analysis" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.mrb_analysis.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.32" />
-    <meta name="docbuild:last-update" content="2025-04-09"/>
+  <meta name="docsearch:version" content="2.33" />
+    <meta name="docbuild:last-update" content="2025-04-14"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.32 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.32 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.33 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.33 documentation - Home"/>
   
   
 </a></div>
@@ -151,10 +151,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">IQM Benchmarks</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../examples/examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/example_clifford_rb.html">Clifford Randomized Benchmarking (RB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_clifford_rb.html">Clifford Randomized Benchmarking (CRB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_eplg.html">Error Per Layered Gate (EPLG)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/example_graphstate.html">Graph State Benchmark Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_graphstate.html">Graph State Bipartite Entanglement</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_quantum_volume.html">Quantum Volume (QV)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
@@ -219,6 +220,8 @@
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.direct_rb.html">iqm.benchmarks.randomized_benchmarking.direct_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.eplg.html">iqm.benchmarks.randomized_benchmarking.eplg</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
 <li class="toctree-l4 current active"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
@@ -246,12 +249,14 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.median_with_uncertainty.html">iqm.benchmarks.utils.median_with_uncertainty</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.random_hamiltonian_path.html">iqm.benchmarks.utils.random_hamiltonian_path</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.remove_directed_duplicates_to_list.html">iqm.benchmarks.utils.remove_directed_duplicates_to_list</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.split_into_disjoint_pairs.html">iqm.benchmarks.utils.split_into_disjoint_pairs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.split_sequence_in_chunks.html">iqm.benchmarks.utils.split_sequence_in_chunks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
@@ -259,6 +264,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.draw_graph_edges.html">iqm.benchmarks.utils_plots.draw_graph_edges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html">iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.rx_to_nx_graph.html">iqm.benchmarks.utils_plots.rx_to_nx_graph</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.GraphPositions.html">iqm.benchmarks.utils_plots.GraphPositions</a></li>
@@ -435,6 +442,9 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.routing_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.two_qubit_gate_ensemble"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.two_qubit_gate_ensemble</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.density_2q_gates"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.density_2q_gates</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.clifford_sqg_probability</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.sqg_gate_ensemble</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.simulation_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.model_computed_fields</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_config"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.model_config</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_fields"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.model_fields</span></code></a></li>
@@ -455,7 +465,7 @@
 <h1>iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration<a class="headerlink" href="#iqm-benchmarks-randomized-benchmarking-mirror-rb-mirror-rb-mirrorrbconfiguration" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.</span></span><span class="sig-name descname"><span class="pre">MirrorRBConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking'&gt;,</span> <span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_circuits_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre',</span> <span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed',</span> <span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed',</span> <span class="pre">use_dd:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">dd_strategy:</span> <span class="pre">~iqm.iqm_client.models.DDStrategy</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]],</span> <span class="pre">depths_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]],</span> <span class="pre">num_circuit_samples:</span> <span class="pre">int,</span> <span class="pre">num_pauli_samples:</span> <span class="pre">int,</span> <span class="pre">qiskit_optim_level:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">two_qubit_gate_ensemble:</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">float]</span> <span class="pre">=</span> <span class="pre">{'CZGate':</span> <span class="pre">1.0},</span> <span class="pre">density_2q_gates:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.25</span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.</span></span><span class="sig-name descname"><span class="pre">MirrorRBConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking'&gt;,</span> <span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_circuits_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre',</span> <span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed',</span> <span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed',</span> <span class="pre">use_dd:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">dd_strategy:</span> <span class="pre">~iqm.iqm_client.models.DDStrategy</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]],</span> <span class="pre">depths_array:</span> <span class="pre">~typing.Sequence[~typing.Sequence[int]],</span> <span class="pre">num_circuit_samples:</span> <span class="pre">int,</span> <span class="pre">num_pauli_samples:</span> <span class="pre">int,</span> <span class="pre">qiskit_optim_level:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">two_qubit_gate_ensemble:</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">float]</span> <span class="pre">=</span> <span class="pre">{'CZGate':</span> <span class="pre">1.0},</span> <span class="pre">density_2q_gates:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.25,</span> <span class="pre">clifford_sqg_probability:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">sqg_gate_ensemble:</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">float]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">simulation_method:</span> <span class="pre">~typing.Literal['automatic',</span> <span class="pre">'statevector',</span> <span class="pre">'stabilizer',</span> <span class="pre">'extended_stabilizer',</span> <span class="pre">'matrix_product_state']</span> <span class="pre">=</span> <span class="pre">'automatic'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase" title="iqm.benchmarks.benchmark.BenchmarkConfigurationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfigurationBase</span></code></a></p>
 <p>Mirror RB configuration.</p>
 <dl class="field-list simple">
@@ -477,6 +487,9 @@
 <li><p><strong>qiskit_optim_level</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
 <li><p><strong>two_qubit_gate_ensemble</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>]</em>) – </p></li>
 <li><p><strong>density_2q_gates</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
+<li><p><strong>clifford_sqg_probability</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
+<li><p><strong>sqg_gate_ensemble</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>simulation_method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'automatic'</em><em>, </em><em>'statevector'</em><em>, </em><em>'stabilizer'</em><em>, </em><em>'extended_stabilizer'</em><em>, </em><em>'matrix_product_state'</em><em>]</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -598,6 +611,42 @@
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability">
+<span class="sig-name descname"><span class="pre">clifford_sqg_probability</span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability" title="Link to this definition">#</a></dt>
+<dd><p>Probability with which to uniformly sample Clifford 1Q gates.
+* Default is 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble">
+<span class="sig-name descname"><span class="pre">sqg_gate_ensemble</span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble" title="Link to this definition">#</a></dt>
+<dd><p>A dictionary with keys being str specifying 1Q gates, and values being corresponding probabilities.
+* Default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Dict[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)">float</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method">
+<span class="sig-name descname"><span class="pre">simulation_method</span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method" title="Link to this definition">#</a></dt>
+<dd><p>Qiskit’s Aer simulation method
+* Default is “automatic”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Literal[“automatic”, “statevector”, “stabilizer”, “extended_stabilizer”, “matrix_product_state”]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
@@ -634,28 +683,37 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.density_2q_gates" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.density_2q_gates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_2q_gates</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.shots" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.shots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shots</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clifford_sqg_probability</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_gates_per_batch</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqg_gate_ensemble</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_circuits_per_batch</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulation_method</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calset_id</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.shots" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.shots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shots</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">routing_method</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_gates_per_batch</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">physical_layout</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_circuits_per_batch</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_dd</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calset_id</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dd_strategy</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method" title="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">routing_method</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">physical_layout</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_dd</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dd_strategy</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -681,7 +739,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'benchmark':</span> <span class="pre">FieldInfo(annotation=Type[Benchmark],</span> <span class="pre">required=False,</span> <span class="pre">default=&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking'&gt;),</span> <span class="pre">'calset_id':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'dd_strategy':</span> <span class="pre">FieldInfo(annotation=Union[DDStrategy,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'density_2q_gates':</span> <span class="pre">FieldInfo(annotation=float,</span> <span class="pre">required=False,</span> <span class="pre">default=0.25),</span> <span class="pre">'depths_array':</span> <span class="pre">FieldInfo(annotation=Sequence[Sequence[int]],</span> <span class="pre">required=True),</span> <span class="pre">'max_circuits_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_gates_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'num_circuit_samples':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'num_pauli_samples':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'physical_layout':</span> <span class="pre">FieldInfo(annotation=Literal['fixed',</span> <span class="pre">'batching'],</span> <span class="pre">required=False,</span> <span class="pre">default='fixed'),</span> <span class="pre">'qiskit_optim_level':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=1),</span> <span class="pre">'qubits_array':</span> <span class="pre">FieldInfo(annotation=Sequence[Sequence[int]],</span> <span class="pre">required=True),</span> <span class="pre">'routing_method':</span> <span class="pre">FieldInfo(annotation=Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none'],</span> <span class="pre">required=False,</span> <span class="pre">default='sabre'),</span> <span class="pre">'shots':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=256),</span> <span class="pre">'two_qubit_gate_ensemble':</span> <span class="pre">FieldInfo(annotation=Dict[str,</span> <span class="pre">float],</span> <span class="pre">required=False,</span> <span class="pre">default={'CZGate':</span> <span class="pre">1.0}),</span> <span class="pre">'use_dd':</span> <span class="pre">FieldInfo(annotation=Union[bool,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=False)}</span></em><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_fields" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'benchmark':</span> <span class="pre">FieldInfo(annotation=Type[Benchmark],</span> <span class="pre">required=False,</span> <span class="pre">default=&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRandomizedBenchmarking'&gt;),</span> <span class="pre">'calset_id':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'clifford_sqg_probability':</span> <span class="pre">FieldInfo(annotation=float,</span> <span class="pre">required=False,</span> <span class="pre">default=1.0),</span> <span class="pre">'dd_strategy':</span> <span class="pre">FieldInfo(annotation=Union[DDStrategy,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'density_2q_gates':</span> <span class="pre">FieldInfo(annotation=float,</span> <span class="pre">required=False,</span> <span class="pre">default=0.25),</span> <span class="pre">'depths_array':</span> <span class="pre">FieldInfo(annotation=Sequence[Sequence[int]],</span> <span class="pre">required=True),</span> <span class="pre">'max_circuits_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'max_gates_per_batch':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'num_circuit_samples':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'num_pauli_samples':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'physical_layout':</span> <span class="pre">FieldInfo(annotation=Literal['fixed',</span> <span class="pre">'batching'],</span> <span class="pre">required=False,</span> <span class="pre">default='fixed'),</span> <span class="pre">'qiskit_optim_level':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=1),</span> <span class="pre">'qubits_array':</span> <span class="pre">FieldInfo(annotation=Sequence[Sequence[int]],</span> <span class="pre">required=True),</span> <span class="pre">'routing_method':</span> <span class="pre">FieldInfo(annotation=Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none'],</span> <span class="pre">required=False,</span> <span class="pre">default='sabre'),</span> <span class="pre">'shots':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=256),</span> <span class="pre">'simulation_method':</span> <span class="pre">FieldInfo(annotation=Literal['automatic',</span> <span class="pre">'statevector',</span> <span class="pre">'stabilizer',</span> <span class="pre">'extended_stabilizer',</span> <span class="pre">'matrix_product_state'],</span> <span class="pre">required=False,</span> <span class="pre">default='automatic'),</span> <span class="pre">'sqg_gate_ensemble':</span> <span class="pre">FieldInfo(annotation=Union[Dict[str,</span> <span class="pre">float],</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None),</span> <span class="pre">'two_qubit_gate_ensemble':</span> <span class="pre">FieldInfo(annotation=Dict[str,</span> <span class="pre">float],</span> <span class="pre">required=False,</span> <span class="pre">default={'CZGate':</span> <span class="pre">1.0}),</span> <span class="pre">'use_dd':</span> <span class="pre">FieldInfo(annotation=Union[bool,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=False)}</span></em><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_fields" title="Link to this definition">#</a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
@@ -748,6 +806,9 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] ob
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.routing_method"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.routing_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.two_qubit_gate_ensemble"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.two_qubit_gate_ensemble</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.density_2q_gates"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.density_2q_gates</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.clifford_sqg_probability"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.clifford_sqg_probability</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.sqg_gate_ensemble"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.sqg_gate_ensemble</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.simulation_method"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.simulation_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.model_computed_fields</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_config"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.model_config</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb.MirrorRBConfiguration.model_fields"><code class="docutils literal notranslate"><span class="pre">MirrorRBConfiguration.model_fields</span></code></a></li>
@@ -786,7 +847,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-04-09.
+  Last updated on 2025-04-14.
   <br/>
 </p>
   </div>

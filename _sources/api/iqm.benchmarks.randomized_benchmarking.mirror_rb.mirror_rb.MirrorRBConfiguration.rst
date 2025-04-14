@@ -24,6 +24,9 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb.MirrorRBConfigurat
       ~MirrorRBConfiguration.qiskit_optim_level
       ~MirrorRBConfiguration.two_qubit_gate_ensemble
       ~MirrorRBConfiguration.density_2q_gates
+      ~MirrorRBConfiguration.clifford_sqg_probability
+      ~MirrorRBConfiguration.sqg_gate_ensemble
+      ~MirrorRBConfiguration.simulation_method
       ~MirrorRBConfiguration.shots
       ~MirrorRBConfiguration.max_gates_per_batch
       ~MirrorRBConfiguration.max_circuits_per_batch

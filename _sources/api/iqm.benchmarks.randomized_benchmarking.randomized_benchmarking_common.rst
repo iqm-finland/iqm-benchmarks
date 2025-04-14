@@ -15,6 +15,7 @@ iqm.benchmarks.randomized\_benchmarking.randomized\_benchmarking\_common
       :toctree:
    
       compute_inverse_clifford
+      edge_grab
       estimate_survival_probabilities
       exponential_rb
       fit_decay_lmfit

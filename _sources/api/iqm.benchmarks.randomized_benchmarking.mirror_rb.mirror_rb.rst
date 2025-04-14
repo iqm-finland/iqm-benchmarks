@@ -15,7 +15,6 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb
       :toctree:
    
       compute_polarizations
-      edge_grab
       generate_fixed_depth_mrb_circuits
       generate_pauli_dressed_mrb_circuits
       list_to_numcircuit_times_numpauli_matrix

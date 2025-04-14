@@ -29,6 +29,8 @@ iqm.benchmarks.randomized\_benchmarking
    :recursive:
 
    ~iqm.benchmarks.randomized_benchmarking.clifford_rb
+   ~iqm.benchmarks.randomized_benchmarking.direct_rb
+   ~iqm.benchmarks.randomized_benchmarking.eplg
    ~iqm.benchmarks.randomized_benchmarking.interleaved_rb
    ~iqm.benchmarks.randomized_benchmarking.mirror_rb
    ~iqm.benchmarks.randomized_benchmarking.multi_lmfit

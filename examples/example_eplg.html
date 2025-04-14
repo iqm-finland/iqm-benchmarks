@@ -1,0 +1,1081 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Error Per Layered Gate (EPLG) &#8212; IQM Benchmarks 2.33 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=b90d5273"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/example_eplg';</script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mirror Randomized Benchmarking (MRB)" href="example_mirror_rb.html" />
+    <link rel="prev" title="Interleaved Randomized Benchmarking (IRB)" href="example_interleaved_rb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.33" />
+    <meta name="docbuild:last-update" content="2025-04-14"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.33 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.33 documentation - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">IQM Benchmarks</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_experiment_all.html">IQM Benchmarks: Summary Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clifford_rb.html">Clifford Randomized Benchmarking (CRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_interleaved_rb.html">Interleaved Randomized Benchmarking (IRB)</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Error Per Layered Gate (EPLG)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_mirror_rb.html">Mirror Randomized Benchmarking (MRB)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_graphstate.html">Graph State Bipartite Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_gst.html">Compressive Gate Set Tomography (GST)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_quantum_volume.html">Quantum Volume (QV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_clops.html">Circuit Layer Operations Per Second (CLOPS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_ghz.html">Greenberger–Horne–Zeilinger (GHZ) State Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_qscore.html">Q-Score</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../devices/devices.html">Devices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../devices/spark.html">Benchmarking IQM Spark</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../devices/star.html">Benchmarking IQM Star</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../development/development.html">Development</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/how_to_make_your_own_benchmark.html">How to make your own benchmark?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/generate_2qubit_cliffords.html">2-Qubit Clifford Group Decomposition</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../API.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/iqm.benchmarks.html">iqm.benchmarks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.html">iqm.benchmarks.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.BenchmarkBase.html">iqm.benchmarks.benchmark.BenchmarkBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html">iqm.benchmarks.benchmark.BenchmarkConfigurationBase</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.html">iqm.benchmarks.benchmark_definition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.add_counts_to_dataset.html">iqm.benchmarks.benchmark_definition.add_counts_to_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.default_analysis_function.html">iqm.benchmarks.benchmark_definition.default_analysis_function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.merge_datasets_dac.html">iqm.benchmarks.benchmark_definition.merge_datasets_dac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.show_figure.html">iqm.benchmarks.benchmark_definition.show_figure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.Benchmark.html">iqm.benchmarks.benchmark_definition.Benchmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult.html">iqm.benchmarks.benchmark_definition.BenchmarkAnalysisResult</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkObservation.html">iqm.benchmarks.benchmark_definition.BenchmarkObservation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier.html">iqm.benchmarks.benchmark_definition.BenchmarkObservationIdentifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.benchmark_definition.BenchmarkRunResult.html">iqm.benchmarks.benchmark_definition.BenchmarkRunResult</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.html">iqm.benchmarks.circuit_containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.BenchmarkCircuit.html">iqm.benchmarks.circuit_containers.BenchmarkCircuit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.CircuitGroup.html">iqm.benchmarks.circuit_containers.CircuitGroup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.circuit_containers.Circuits.html">iqm.benchmarks.circuit_containers.Circuits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.html">iqm.benchmarks.compressive_gst</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.compressive_gst.html">iqm.benchmarks.compressive_gst.compressive_gst</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.compressive_gst.gst_analysis.html">iqm.benchmarks.compressive_gst.gst_analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.html">iqm.benchmarks.entanglement</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.ghz.html">iqm.benchmarks.entanglement.ghz</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.entanglement.graph_states.html">iqm.benchmarks.entanglement.graph_states</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/iqm.benchmarks.logging_config.html">iqm.benchmarks.logging_config</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.optimization.html">iqm.benchmarks.optimization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.optimization.qscore.html">iqm.benchmarks.optimization.qscore</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.html">iqm.benchmarks.quantum_volume</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.clops.html">iqm.benchmarks.quantum_volume.clops</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.quantum_volume.quantum_volume.html">iqm.benchmarks.quantum_volume.quantum_volume</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.html">iqm.benchmarks.randomized_benchmarking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.clifford_rb.html">iqm.benchmarks.randomized_benchmarking.clifford_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.direct_rb.html">iqm.benchmarks.randomized_benchmarking.direct_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.eplg.html">iqm.benchmarks.randomized_benchmarking.eplg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.interleaved_rb.html">iqm.benchmarks.randomized_benchmarking.interleaved_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.mirror_rb.html">iqm.benchmarks.randomized_benchmarking.mirror_rb</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.multi_lmfit.html">iqm.benchmarks.randomized_benchmarking.multi_lmfit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.html">iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.html">iqm.benchmarks.readout_mitigation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation.html">iqm.benchmarks.readout_mitigation.apply_readout_error_mitigation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.readout_error_m3.html">iqm.benchmarks.readout_mitigation.readout_error_m3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.readout_mitigation.M3IQM.html">iqm.benchmarks.readout_mitigation.M3IQM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils.html">iqm.benchmarks.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.generate_state_tomography_circuits.html">iqm.benchmarks.utils.generate_state_tomography_circuits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_Pauli_expectation.html">iqm.benchmarks.utils.get_Pauli_expectation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_active_qubits.html">iqm.benchmarks.utils.get_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_iqm_backend.html">iqm.benchmarks.utils.get_iqm_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_measurement_mapping.html">iqm.benchmarks.utils.get_measurement_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_neighbors_of_edges.html">iqm.benchmarks.utils.get_neighbors_of_edges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_tomography_matrix.html">iqm.benchmarks.utils.get_tomography_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.marginal_distribution.html">iqm.benchmarks.utils.marginal_distribution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.median_with_uncertainty.html">iqm.benchmarks.utils.median_with_uncertainty</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.perform_backend_transpilation.html">iqm.benchmarks.utils.perform_backend_transpilation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.random_hamiltonian_path.html">iqm.benchmarks.utils.random_hamiltonian_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.reduce_to_active_qubits.html">iqm.benchmarks.utils.reduce_to_active_qubits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.remove_directed_duplicates_to_list.html">iqm.benchmarks.utils.remove_directed_duplicates_to_list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_counts.html">iqm.benchmarks.utils.retrieve_all_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.retrieve_all_job_metadata.html">iqm.benchmarks.utils.retrieve_all_job_metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.set_coupling_map.html">iqm.benchmarks.utils.set_coupling_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.sort_batches_by_final_layout.html">iqm.benchmarks.utils.sort_batches_by_final_layout</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.split_into_disjoint_pairs.html">iqm.benchmarks.utils.split_into_disjoint_pairs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.split_sequence_in_chunks.html">iqm.benchmarks.utils.split_sequence_in_chunks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.draw_graph_edges.html">iqm.benchmarks.utils_plots.draw_graph_edges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html">iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.rx_to_nx_graph.html">iqm.benchmarks.utils_plots.rx_to_nx_graph</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.GraphPositions.html">iqm.benchmarks.utils_plots.GraphPositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.html">iqm.benchmarks.utils_shadows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.CUE.html">iqm.benchmarks.utils_shadows.CUE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.get_local_shadow.html">iqm.benchmarks.utils_shadows.get_local_shadow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.get_negativity.html">iqm.benchmarks.utils_shadows.get_negativity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_shadows.local_shadow_tomography.html">iqm.benchmarks.utils_shadows.local_shadow_tomography</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/example_eplg.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Error Per Layered Gate (EPLG)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-iqm-token-if-using-resonance">Set IQM Token if using Resonance.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-benchmarking-configuration">Randomized Benchmarking Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-the-analysis">Perform the analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-all-the-fidelities-and-the-final-eplg">Inspect all the fidelities and the final EPLG</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-a-visualization-of-the-selected-layers-and-all-the-drb-decays">Plot a visualization of the selected layers and all the DRB decays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-a-sample-circuit-parallel-drb">Inspect a sample circuit (parallel DRB)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="error-per-layered-gate-eplg">
+<h1>Error Per Layered Gate (EPLG)<a class="headerlink" href="#error-per-layered-gate-eplg" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</div>
+<section id="set-iqm-token-if-using-resonance">
+<h2>Set IQM Token if using Resonance.<a class="headerlink" href="#set-iqm-token-if-using-resonance" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;xxxxxxxxxxxxxxxxxxxxxx&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="choose-or-define-a-backend">
+<h2>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h2>
+<p>In order to be able to use calibration fidelities as a proxy for selecting a linear chain, we need to specify the calibration URL of the station. If specifying qubit pairs manually (not necessarily forming a linear chain), this is not needed: you can simply pass the backend as a string name.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># To use calibration fidelities to (automatically) select a linear chain, use the following:</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm.iqm_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
+
+<span class="n">resonance_station</span><span class="o">=</span><span class="s2">&quot;garnet&quot;</span>
+<span class="n">iqm_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://cocos.resonance.meetiqm.com/</span><span class="si">{</span><span class="n">resonance_station</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">cal_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://api.resonance.meetiqm.com/quantum-computers/v1/</span><span class="si">{</span><span class="n">resonance_station</span><span class="si">}</span><span class="s2">/calibrations&quot;</span>
+<span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_url</span><span class="p">)</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
+
+<span class="c1"># If manually specifying qubit pairs, you can also simply use the following:</span>
+<span class="c1">#backend=&quot;fakeapollo&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="randomized-benchmarking-configuration">
+<h2>Randomized Benchmarking Configuration<a class="headerlink" href="#randomized-benchmarking-configuration" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.randomized_benchmarking.eplg.eplg</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EXAMPLE_EPLG</span> <span class="o">=</span> <span class="n">EPLGConfiguration</span><span class="p">(</span>
+    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">coupling_map</span><span class="p">),</span>
+    <span class="n">drb_depths</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">drb_circuit_samples</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+    <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
+    <span class="c1"># Parameters for a linear chain layer:</span>
+    <span class="c1"># chain_length=30,</span>
+    <span class="c1"># chain_path_samples=200,</span>
+    <span class="c1"># num_disjoint_layers=4,</span>
+    <span class="c1"># max_hamiltonian_path_tries=100,</span>
+    <span class="c1"># calibration_url=cal_url,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="run-the-experiment">
+<h2>Run the experiment<a class="headerlink" href="#run-the-experiment" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_eplg</span> <span class="o">=</span> <span class="n">EPLGBenchmark</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">EXAMPLE_EPLG</span><span class="p">)</span>
+<span class="n">run_eplg</span> <span class="o">=</span> <span class="n">benchmark_eplg</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-13 13:15:25,358 - iqm.benchmarks.logging_config - INFO - Using specified custom_qubits_array: will split into 4 disjoint layers.
+2025-04-13 13:15:28,742 - iqm.benchmarks.logging_config - INFO - Clifford dictionaries for both 1 &amp; 2 qubits imported successfully!
+2025-04-13 13:15:28,745 - iqm.benchmarks.logging_config - INFO - Executing parallel Direct RB on qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] (group 1/4). Will generate and submit all 25 DRB circuits for each depth [200, 111, 61, 34, 18, 10, 5, 3, 1]
+2025-04-13 13:15:28,748 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 13:17:14,267 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
+  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
+2025-04-13 13:17:56,569 - iqm.benchmarks.logging_config - INFO - Job for depth 200 submitted successfully!
+2025-04-13 13:17:56,571 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 13:18:18,227 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:18:28,523 - iqm.benchmarks.logging_config - INFO - Job for depth 111 submitted successfully!
+2025-04-13 13:18:28,539 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 13:18:40,580 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:18:46,333 - iqm.benchmarks.logging_config - INFO - Job for depth 61 submitted successfully!
+2025-04-13 13:18:46,333 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 13:18:52,692 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:18:57,059 - iqm.benchmarks.logging_config - INFO - Job for depth 34 submitted successfully!
+2025-04-13 13:18:57,059 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 13:19:00,816 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:19:03,812 - iqm.benchmarks.logging_config - INFO - Job for depth 18 submitted successfully!
+2025-04-13 13:19:03,812 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 13:19:06,057 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:19:07,672 - iqm.benchmarks.logging_config - INFO - Job for depth 10 submitted successfully!
+2025-04-13 13:19:07,672 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 13:19:08,826 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:19:10,097 - iqm.benchmarks.logging_config - INFO - Job for depth 5 submitted successfully!
+2025-04-13 13:19:10,112 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 13:19:11,454 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:19:12,888 - iqm.benchmarks.logging_config - INFO - Job for depth 3 submitted successfully!
+2025-04-13 13:19:12,888 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 13:19:13,556 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 0, 3, 2, 5, 4, 7, 8, 9, 10, 11, 6, 13, 12, 15, 14, 18, 17]
+2025-04-13 13:19:14,537 - iqm.benchmarks.logging_config - INFO - Job for depth 1 submitted successfully!
+2025-04-13 13:19:14,537 - iqm.benchmarks.logging_config - INFO - Executing parallel Direct RB on qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] (group 2/4). Will generate and submit all 25 DRB circuits for each depth [200, 111, 61, 34, 18, 10, 5, 3, 1]
+2025-04-13 13:19:14,547 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 13:20:05,054 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:20:26,805 - iqm.benchmarks.logging_config - INFO - Job for depth 200 submitted successfully!
+2025-04-13 13:20:26,805 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 13:20:51,921 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:04,066 - iqm.benchmarks.logging_config - INFO - Job for depth 111 submitted successfully!
+2025-04-13 13:21:04,066 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 13:21:18,899 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:25,649 - iqm.benchmarks.logging_config - INFO - Job for depth 61 submitted successfully!
+2025-04-13 13:21:25,649 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 13:21:33,101 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:37,712 - iqm.benchmarks.logging_config - INFO - Job for depth 34 submitted successfully!
+2025-04-13 13:21:37,712 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 13:21:41,280 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:44,252 - iqm.benchmarks.logging_config - INFO - Job for depth 18 submitted successfully!
+2025-04-13 13:21:44,252 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 13:21:46,704 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:48,536 - iqm.benchmarks.logging_config - INFO - Job for depth 10 submitted successfully!
+2025-04-13 13:21:48,536 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 13:21:49,689 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:51,204 - iqm.benchmarks.logging_config - INFO - Job for depth 5 submitted successfully!
+2025-04-13 13:21:51,204 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 13:21:52,112 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:53,802 - iqm.benchmarks.logging_config - INFO - Job for depth 3 submitted successfully!
+2025-04-13 13:21:53,802 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 13:21:54,303 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [1, 4, 3, 0, 5, 6, 7, 2, 9, 8, 11, 10, 13, 14, 15, 16, 18, 19]
+2025-04-13 13:21:55,205 - iqm.benchmarks.logging_config - INFO - Job for depth 1 submitted successfully!
+2025-04-13 13:21:55,205 - iqm.benchmarks.logging_config - INFO - Executing parallel Direct RB on qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] (group 3/4). Will generate and submit all 25 DRB circuits for each depth [200, 111, 61, 34, 18, 10, 5, 3, 1]
+2025-04-13 13:21:55,205 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 13:22:32,813 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:22:51,511 - iqm.benchmarks.logging_config - INFO - Job for depth 200 submitted successfully!
+2025-04-13 13:22:51,511 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 13:23:21,224 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:23:33,136 - iqm.benchmarks.logging_config - INFO - Job for depth 111 submitted successfully!
+2025-04-13 13:23:33,136 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 13:23:44,164 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:23:50,236 - iqm.benchmarks.logging_config - INFO - Job for depth 61 submitted successfully!
+2025-04-13 13:23:50,236 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 13:23:55,920 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:23:59,124 - iqm.benchmarks.logging_config - INFO - Job for depth 34 submitted successfully!
+2025-04-13 13:23:59,126 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 13:24:02,019 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:24:04,833 - iqm.benchmarks.logging_config - INFO - Job for depth 18 submitted successfully!
+2025-04-13 13:24:04,833 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 13:24:06,724 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:24:08,631 - iqm.benchmarks.logging_config - INFO - Job for depth 10 submitted successfully!
+2025-04-13 13:24:08,631 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 13:24:09,861 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:24:10,955 - iqm.benchmarks.logging_config - INFO - Job for depth 5 submitted successfully!
+2025-04-13 13:24:10,955 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 13:24:11,658 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:24:12,819 - iqm.benchmarks.logging_config - INFO - Job for depth 3 submitted successfully!
+2025-04-13 13:24:12,819 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 13:24:13,161 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 4, 5, 10, 7, 12, 9, 14, 11, 16, 13, 8, 15, 19]
+2025-04-13 13:24:14,033 - iqm.benchmarks.logging_config - INFO - Job for depth 1 submitted successfully!
+2025-04-13 13:24:14,048 - iqm.benchmarks.logging_config - INFO - Executing parallel Direct RB on qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] (group 4/4). Will generate and submit all 25 DRB circuits for each depth [200, 111, 61, 34, 18, 10, 5, 3, 1]
+2025-04-13 13:24:14,050 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 13:24:42,357 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:24:55,785 - iqm.benchmarks.logging_config - INFO - Job for depth 200 submitted successfully!
+2025-04-13 13:24:55,785 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 13:25:08,236 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:15,147 - iqm.benchmarks.logging_config - INFO - Job for depth 111 submitted successfully!
+2025-04-13 13:25:15,147 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 13:25:21,289 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:25,253 - iqm.benchmarks.logging_config - INFO - Job for depth 61 submitted successfully!
+2025-04-13 13:25:25,253 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 13:25:30,567 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:32,914 - iqm.benchmarks.logging_config - INFO - Job for depth 34 submitted successfully!
+2025-04-13 13:25:32,914 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 13:25:34,694 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:36,282 - iqm.benchmarks.logging_config - INFO - Job for depth 18 submitted successfully!
+2025-04-13 13:25:36,282 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 13:25:37,408 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:38,721 - iqm.benchmarks.logging_config - INFO - Job for depth 10 submitted successfully!
+2025-04-13 13:25:38,738 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 13:25:40,298 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:41,395 - iqm.benchmarks.logging_config - INFO - Job for depth 5 submitted successfully!
+2025-04-13 13:25:41,395 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 13:25:41,913 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:42,828 - iqm.benchmarks.logging_config - INFO - Job for depth 3 submitted successfully!
+2025-04-13 13:25:42,830 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 13:25:43,129 - iqm.benchmarks.logging_config - INFO - Submitting batch with 25 circuits corresponding to qubits [3, 8, 9, 4, 13, 17, 15, 10, 18, 14]
+2025-04-13 13:25:43,852 - iqm.benchmarks.logging_config - INFO - Job for depth 1 submitted successfully!
+2025-04-13 13:25:43,852 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_200
+2025-04-13 13:25:51,914 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 200 run to the dataset
+2025-04-13 13:25:52,307 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_111
+2025-04-13 13:25:58,471 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 111 run to the dataset
+2025-04-13 13:25:58,900 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_61
+2025-04-13 13:26:02,525 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 61 run to the dataset
+2025-04-13 13:26:03,067 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_34
+2025-04-13 13:26:04,832 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 34 run to the dataset
+2025-04-13 13:26:05,255 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_18
+2025-04-13 13:26:07,851 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 18 run to the dataset
+2025-04-13 13:26:08,246 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_10
+2025-04-13 13:26:09,460 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 10 run to the dataset
+2025-04-13 13:26:09,843 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_5
+2025-04-13 13:26:10,750 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 5 run to the dataset
+2025-04-13 13:26:11,279 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_3
+2025-04-13 13:26:13,154 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 3 run to the dataset
+2025-04-13 13:26:13,641 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_1
+2025-04-13 13:26:14,455 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)] and depth 1 run to the dataset
+2025-04-13 13:26:14,950 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_200
+2025-04-13 13:26:21,568 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 200 run to the dataset
+2025-04-13 13:26:22,163 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_111
+2025-04-13 13:26:26,798 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 111 run to the dataset
+2025-04-13 13:26:27,382 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_61
+2025-04-13 13:26:30,979 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 61 run to the dataset
+2025-04-13 13:26:31,636 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_34
+2025-04-13 13:26:33,322 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 34 run to the dataset
+2025-04-13 13:26:34,048 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_18
+2025-04-13 13:26:35,273 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 18 run to the dataset
+2025-04-13 13:26:36,036 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_10
+2025-04-13 13:26:38,769 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 10 run to the dataset
+2025-04-13 13:26:39,681 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_5
+2025-04-13 13:26:40,751 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 5 run to the dataset
+2025-04-13 13:26:41,774 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_3
+2025-04-13 13:26:42,788 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 3 run to the dataset
+2025-04-13 13:26:43,632 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_1
+2025-04-13 13:26:44,546 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)] and depth 1 run to the dataset
+2025-04-13 13:26:45,487 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_200
+2025-04-13 13:26:51,094 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 200 run to the dataset
+2025-04-13 13:26:52,059 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_111
+2025-04-13 13:26:56,528 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 111 run to the dataset
+2025-04-13 13:26:57,594 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_61
+2025-04-13 13:26:59,437 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 61 run to the dataset
+2025-04-13 13:27:00,511 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_34
+2025-04-13 13:27:01,817 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 34 run to the dataset
+2025-04-13 13:27:02,873 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_18
+2025-04-13 13:27:05,598 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 18 run to the dataset
+2025-04-13 13:27:06,769 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_10
+2025-04-13 13:27:07,917 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 10 run to the dataset
+2025-04-13 13:27:09,124 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_5
+2025-04-13 13:27:09,901 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 5 run to the dataset
+2025-04-13 13:27:11,363 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_3
+2025-04-13 13:27:12,126 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 3 run to the dataset
+2025-04-13 13:27:13,895 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_1
+2025-04-13 13:27:14,806 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)] and depth 1 run to the dataset
+2025-04-13 13:27:16,329 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_200
+2025-04-13 13:27:21,585 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 200 run to the dataset
+2025-04-13 13:27:23,412 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_111
+2025-04-13 13:27:25,593 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 111 run to the dataset
+2025-04-13 13:27:27,499 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_61
+2025-04-13 13:27:29,048 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 61 run to the dataset
+2025-04-13 13:27:30,904 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_34
+2025-04-13 13:27:31,986 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 34 run to the dataset
+2025-04-13 13:27:33,814 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_18
+2025-04-13 13:27:36,401 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 18 run to the dataset
+2025-04-13 13:27:38,178 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_10
+2025-04-13 13:27:38,945 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 10 run to the dataset
+2025-04-13 13:27:40,863 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_5
+2025-04-13 13:27:41,516 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 5 run to the dataset
+2025-04-13 13:27:43,708 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_3
+2025-04-13 13:27:44,321 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 3 run to the dataset
+2025-04-13 13:27:46,656 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for qubits_[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_1
+2025-04-13 13:27:47,279 - iqm.benchmarks.logging_config - INFO - Adding counts of qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)] and depth 1 run to the dataset
+2025-04-13 13:27:49,576 - iqm.benchmarks.logging_config - INFO - DRB experiment execution concluded!
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="perform-the-analysis">
+<h2>Perform the analysis<a class="headerlink" href="#perform-the-analysis" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">175</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_eplg</span> <span class="o">=</span> <span class="n">benchmark_eplg</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-13 14:00:50,030 - iqm.benchmarks.logging_config - INFO - Post-processing parallel Direct RB on qubits [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)].
+2025-04-13 14:00:50,082 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 14:00:50,302 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 14:00:50,476 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 14:00:50,615 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 14:00:50,774 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 14:00:50,893 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 14:00:51,014 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 14:00:51,108 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 14:00:51,176 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 14:00:51,497 - iqm.benchmarks.logging_config - INFO - Post-processing parallel Direct RB on qubits [(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)].
+2025-04-13 14:00:51,542 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 14:00:51,683 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 14:00:51,819 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 14:00:51,935 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 14:00:52,059 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 14:00:52,173 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 14:00:52,290 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 14:00:52,367 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 14:00:52,442 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 14:00:52,774 - iqm.benchmarks.logging_config - INFO - Post-processing parallel Direct RB on qubits [(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)].
+2025-04-13 14:00:52,827 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 14:00:52,935 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 14:00:53,069 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 14:00:53,194 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 14:00:53,308 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 14:00:53,405 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 14:00:53,471 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 14:00:53,526 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 14:00:53,575 - iqm.benchmarks.logging_config - INFO - Depth 1
+2025-04-13 14:00:53,820 - iqm.benchmarks.logging_config - INFO - Post-processing parallel Direct RB on qubits [(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)].
+2025-04-13 14:00:53,857 - iqm.benchmarks.logging_config - INFO - Depth 200
+2025-04-13 14:00:53,946 - iqm.benchmarks.logging_config - INFO - Depth 111
+2025-04-13 14:00:54,031 - iqm.benchmarks.logging_config - INFO - Depth 61
+2025-04-13 14:00:54,116 - iqm.benchmarks.logging_config - INFO - Depth 34
+2025-04-13 14:00:54,185 - iqm.benchmarks.logging_config - INFO - Depth 18
+2025-04-13 14:00:54,241 - iqm.benchmarks.logging_config - INFO - Depth 10
+2025-04-13 14:00:54,289 - iqm.benchmarks.logging_config - INFO - Depth 5
+2025-04-13 14:00:54,334 - iqm.benchmarks.logging_config - INFO - Depth 3
+2025-04-13 14:00:54,375 - iqm.benchmarks.logging_config - INFO - Depth 1
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Display all the attributes in the dataset</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_eplg</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;session_timestamp&#39;, &#39;execution_timestamp&#39;, &#39;backend_configuration_name&#39;, &#39;backend_name&#39;, &#39;benchmark&#39;, &#39;shots&#39;, &#39;max_gates_per_batch&#39;, &#39;max_circuits_per_batch&#39;, &#39;calset_id&#39;, &#39;routing_method&#39;, &#39;physical_layout&#39;, &#39;use_dd&#39;, &#39;dd_strategy&#39;, &#39;qubits_array&#39;, &#39;is_eplg&#39;, &#39;parallel_execution&#39;, &#39;depths&#39;, &#39;num_circuit_samples&#39;, &#39;qiskit_optim_level&#39;, &#39;two_qubit_gate_ensembles&#39;, &#39;densities_2q_gates&#39;, &#39;clifford_sqg_probabilities&#39;, &#39;sqg_gate_ensembles&#39;, &#39;parallel_all_0&#39;, 0, &#39;parallel_all_1&#39;, 1, &#39;parallel_all_2&#39;, 2, &#39;parallel_all_3&#39;, 3, &#39;num_qubits&#39;, &#39;qubit_names&#39;, &#39;backend_coupling_map&#39;, &#39;backend_num_qubits&#39;, &#39;drb_depths&#39;, &#39;drb_circuit_samples&#39;, &#39;custom_qubits_array&#39;, &#39;chain_length&#39;, &#39;chain_path_samples&#39;, &#39;num_disjoint_layers&#39;, &#39;max_hamiltonian_path_tries&#39;, &#39;calibration_url&#39;, &#39;disjoint_layers&#39;, &#39;edges&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="inspect-all-the-fidelities-and-the-final-eplg">
+<h2>Inspect all the fidelities and the final EPLG<a class="headerlink" href="#inspect-all-the-fidelities-and-the-final-eplg" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">result_eplg</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;EPLG&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">qubit_indices</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">o</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">o</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> %&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">qubit_indices</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>average_gate_fidelity (1, 0): 97.97 +/- 0.04 %
+average_gate_fidelity (3, 2): 97.77 +/- 0.07 %
+average_gate_fidelity (5, 4): 96.95 +/- 0.30 %
+average_gate_fidelity (7, 8): 97.06 +/- 0.07 %
+average_gate_fidelity (9, 10): 96.44 +/- 0.12 %
+average_gate_fidelity (11, 6): 97.56 +/- 0.07 %
+average_gate_fidelity (13, 12): 97.33 +/- 0.09 %
+average_gate_fidelity (15, 14): 96.90 +/- 0.04 %
+average_gate_fidelity (18, 17): 98.11 +/- 0.06 %
+average_gate_fidelity (1, 4): 97.39 +/- 0.09 %
+average_gate_fidelity (3, 0): 97.71 +/- 0.03 %
+average_gate_fidelity (5, 6): 96.81 +/- 0.24 %
+average_gate_fidelity (7, 2): 97.87 +/- 0.10 %
+average_gate_fidelity (9, 8): 96.98 +/- 0.12 %
+average_gate_fidelity (11, 10): 97.63 +/- 0.09 %
+average_gate_fidelity (13, 14): 97.06 +/- 0.19 %
+average_gate_fidelity (15, 16): 97.75 +/- 0.07 %
+average_gate_fidelity (18, 19): 98.70 +/- 0.07 %
+average_gate_fidelity (3, 4): 97.62 +/- 0.06 %
+average_gate_fidelity (5, 10): 96.68 +/- 0.26 %
+average_gate_fidelity (7, 12): 97.80 +/- 0.10 %
+average_gate_fidelity (9, 14): 97.58 +/- 0.04 %
+average_gate_fidelity (11, 16): 98.49 +/- 0.08 %
+average_gate_fidelity (13, 8): 96.50 +/- 0.14 %
+average_gate_fidelity (15, 19): 97.63 +/- 0.10 %
+average_gate_fidelity (3, 8): 97.78 +/- 0.08 %
+average_gate_fidelity (9, 4): 97.77 +/- 0.06 %
+average_gate_fidelity (13, 17): 97.32 +/- 0.12 %
+average_gate_fidelity (15, 10): 97.95 +/- 0.07 %
+average_gate_fidelity (18, 14): 98.13 +/- 0.06 %
+layer_fidelity (n_qubits=20): 46.88 +/- 0.32 %
+eplg (n_qubits=20): 2.49 +/- 0.02 %
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plot-a-visualization-of-the-selected-layers-and-all-the-drb-decays">
+<h2>Plot a visualization of the selected layers and all the DRB decays<a class="headerlink" href="#plot-a-visualization-of-the-selected-layers-and-all-the-drb-decays" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_eplg</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c043f7525c2cdd0dc558e376af5e1880f5ec6b33fb37197b0d0894aa75b7bbed.png" src="../_images/c043f7525c2cdd0dc558e376af5e1880f5ec6b33fb37197b0d0894aa75b7bbed.png" />
+<img alt="../_images/03c02817bc50908f4b5436337e8970c0bdcbf6eaf9ee86148bda08c89f115149.png" src="../_images/03c02817bc50908f4b5436337e8970c0bdcbf6eaf9ee86148bda08c89f115149.png" />
+<img alt="../_images/273d6152062dab6c4722189cb1cb278ce82a25a782b7030fc9e0094a1ae11d41.png" src="../_images/273d6152062dab6c4722189cb1cb278ce82a25a782b7030fc9e0094a1ae11d41.png" />
+<img alt="../_images/c443fb669b18f58864ebb678b30bb942c8668c859f27810a70debf570d467be0.png" src="../_images/c443fb669b18f58864ebb678b30bb942c8668c859f27810a70debf570d467be0.png" />
+<img alt="../_images/5c4e6d2aa26f9bfa24fb03588c1b01b57bbd7a0eb3626d78b5daeb3ac598492e.png" src="../_images/5c4e6d2aa26f9bfa24fb03588c1b01b57bbd7a0eb3626d78b5daeb3ac598492e.png" />
+<img alt="../_images/bd8991186d20fcee4e42658e0b8a21b442c46ca780d793e116a74d3630760ca9.png" src="../_images/bd8991186d20fcee4e42658e0b8a21b442c46ca780d793e116a74d3630760ca9.png" />
+<img alt="../_images/96cb4da49a6bd382f5971dd6a382e3173e4e3de7eb0c45f96e18d369959f10d1.png" src="../_images/96cb4da49a6bd382f5971dd6a382e3173e4e3de7eb0c45f96e18d369959f10d1.png" />
+<img alt="../_images/5e49176dbb65ef8ebf781b642a0dd833da2c56882194cd8a72ecaa126a754120.png" src="../_images/5e49176dbb65ef8ebf781b642a0dd833da2c56882194cd8a72ecaa126a754120.png" />
+<img alt="../_images/cf9c3ce51a05c3c2d0fb24a517aeca5d8458ab77337346656df53336ba164e4f.png" src="../_images/cf9c3ce51a05c3c2d0fb24a517aeca5d8458ab77337346656df53336ba164e4f.png" />
+<img alt="../_images/1f1a361faf7977fe388e88ff31c3cb0bd8a9ae279ce97c20fcdfe513a383c67d.png" src="../_images/1f1a361faf7977fe388e88ff31c3cb0bd8a9ae279ce97c20fcdfe513a383c67d.png" />
+<img alt="../_images/abdb73c287f961123f7838977675ce2d37b2ebb2fe7b44641782f0f8dd17075a.png" src="../_images/abdb73c287f961123f7838977675ce2d37b2ebb2fe7b44641782f0f8dd17075a.png" />
+<img alt="../_images/b0797b02b85c661d17844acfd30535826af2001bf8c133dcd3eddd33087e851d.png" src="../_images/b0797b02b85c661d17844acfd30535826af2001bf8c133dcd3eddd33087e851d.png" />
+<img alt="../_images/aa51a74d096249097ecefb666d4c7d84fea4bf356fff93c964c513a0cdf29998.png" src="../_images/aa51a74d096249097ecefb666d4c7d84fea4bf356fff93c964c513a0cdf29998.png" />
+<img alt="../_images/dc8da4eadf36517d64abf843757b9dc4483d044c4cd9840ae3407759fb5efc5c.png" src="../_images/dc8da4eadf36517d64abf843757b9dc4483d044c4cd9840ae3407759fb5efc5c.png" />
+<img alt="../_images/94ef8108a039021c5cf5a31236c8933971a0fd07d6a17b9eed92550ff7fb828a.png" src="../_images/94ef8108a039021c5cf5a31236c8933971a0fd07d6a17b9eed92550ff7fb828a.png" />
+<img alt="../_images/d571d021e3a6bb8979f65aa10b9b37b4b8c048c5f20b10b2288026254538e44f.png" src="../_images/d571d021e3a6bb8979f65aa10b9b37b4b8c048c5f20b10b2288026254538e44f.png" />
+<img alt="../_images/87566375b172068c9a38bbc466e4711d4b42eb08665312c92b3c0d28893d486a.png" src="../_images/87566375b172068c9a38bbc466e4711d4b42eb08665312c92b3c0d28893d486a.png" />
+<img alt="../_images/a20ff653dbee3d22b1ee865bbe97f01b5351cddc0d4ede7ca45fd0fda094b349.png" src="../_images/a20ff653dbee3d22b1ee865bbe97f01b5351cddc0d4ede7ca45fd0fda094b349.png" />
+<img alt="../_images/7c75f89deb139d419ca0256de5cbe074e20851a92e80daa9778e87c91d93ed94.png" src="../_images/7c75f89deb139d419ca0256de5cbe074e20851a92e80daa9778e87c91d93ed94.png" />
+<img alt="../_images/43cacea55895c6d406cd5ca6dfd6a12ff2243affd43c14afe8ee5539c61c6fa7.png" src="../_images/43cacea55895c6d406cd5ca6dfd6a12ff2243affd43c14afe8ee5539c61c6fa7.png" />
+<img alt="../_images/ce7d3d7923e0bfc1b14d2d89bd6ccbe6ce56834d2e88a19bc008f3f4f6c77c6c.png" src="../_images/ce7d3d7923e0bfc1b14d2d89bd6ccbe6ce56834d2e88a19bc008f3f4f6c77c6c.png" />
+<img alt="../_images/59e13356ddb3e0c8a78ca308bd6f71bc8a5c36fa398674e6d0b6567a5a7ce870.png" src="../_images/59e13356ddb3e0c8a78ca308bd6f71bc8a5c36fa398674e6d0b6567a5a7ce870.png" />
+<img alt="../_images/8492db634569a2f4b46a1fa643135010010e32d823813068fbbaaf3f69141f34.png" src="../_images/8492db634569a2f4b46a1fa643135010010e32d823813068fbbaaf3f69141f34.png" />
+<img alt="../_images/f4066c84d37cf6bba49e8e3417005adb8ead9fcc9cdeef327d6402230f919c3c.png" src="../_images/f4066c84d37cf6bba49e8e3417005adb8ead9fcc9cdeef327d6402230f919c3c.png" />
+<img alt="../_images/648692779c82a790021da430c31127d689edf32e7fb7f99fafdef0e80fa48e8a.png" src="../_images/648692779c82a790021da430c31127d689edf32e7fb7f99fafdef0e80fa48e8a.png" />
+<img alt="../_images/a37e5e41d75245454975819533f06bd3b4469e121e71227ed07eef7e51c9d9c1.png" src="../_images/a37e5e41d75245454975819533f06bd3b4469e121e71227ed07eef7e51c9d9c1.png" />
+<img alt="../_images/9d0d1691f1281c990aaac9a32981815e8362b9387a02ab2604bcc23d39c8a35c.png" src="../_images/9d0d1691f1281c990aaac9a32981815e8362b9387a02ab2604bcc23d39c8a35c.png" />
+<img alt="../_images/85f63176bc278753d646706a022ccd9a5bcce5c73ea5c23d27db6aaa7ab65f44.png" src="../_images/85f63176bc278753d646706a022ccd9a5bcce5c73ea5c23d27db6aaa7ab65f44.png" />
+<img alt="../_images/dcd0fffa7030b962df2dd46babd82048fb6edf3916a9aae5ce42c5365329aa5e.png" src="../_images/dcd0fffa7030b962df2dd46babd82048fb6edf3916a9aae5ce42c5365329aa5e.png" />
+<img alt="../_images/f179b92b0460755cca80f4d1386a8ddc730b8c635da661c378aa3b008f40fe4b.png" src="../_images/f179b92b0460755cca80f4d1386a8ddc730b8c635da661c378aa3b008f40fe4b.png" />
+<img alt="../_images/df425e003b195b8e6ab227e952d955732d7c662e36c80858ad941fb39bd01acc.png" src="../_images/df425e003b195b8e6ab227e952d955732d7c662e36c80858ad941fb39bd01acc.png" />
+<img alt="../_images/ab52fdc51b612e1297f2b959565a098004dca07e854d8650249aaf76176aac88.png" src="../_images/ab52fdc51b612e1297f2b959565a098004dca07e854d8650249aaf76176aac88.png" />
+</div>
+</div>
+</section>
+<section id="inspect-a-sample-circuit-parallel-drb">
+<h2>Inspect a sample circuit (parallel DRB)<a class="headerlink" href="#inspect-a-sample-circuit-parallel-drb" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eplg_circ_names</span> <span class="o">=</span> <span class="n">benchmark_eplg</span><span class="o">.</span><span class="n">circuits</span><span class="o">.</span><span class="n">benchmark_circuits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">group_names</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">eplg_circ_names</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_200
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_111
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_61
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_34
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_18
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_10
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_5
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_3
+[(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_1
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_200
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_111
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_61
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_34
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_18
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_10
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_5
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_3
+[(1, 4), (3, 0), (5, 6), (7, 2), (9, 8), (11, 10), (13, 14), (15, 16), (18, 19)]_depth_1
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_200
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_111
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_61
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_34
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_18
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_10
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_5
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_3
+[(3, 4), (5, 10), (7, 12), (9, 14), (11, 16), (13, 8), (15, 19)]_depth_1
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_200
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_111
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_61
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_34
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_18
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_10
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_5
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_3
+[(3, 8), (9, 4), (13, 17), (15, 10), (18, 14)]_depth_1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">circ_group_idx</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">circ_sample</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Circuit group name: </span><span class="si">{</span><span class="n">eplg_circ_names</span><span class="p">[</span><span class="n">circ_group_idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">circuit_to_draw</span> <span class="o">=</span> <span class="n">benchmark_eplg</span><span class="o">.</span><span class="n">circuits</span><span class="o">.</span><span class="n">get_benchmark_circuits_by_name</span><span class="p">(</span><span class="s1">&#39;transpiled_circuits&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">circuit_groups</span><span class="p">[</span><span class="n">circ_group_idx</span><span class="p">]</span><span class="o">.</span><span class="n">circuits</span><span class="p">[</span><span class="n">circ_sample</span><span class="p">]</span>
+
+<span class="n">circuit_to_draw</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;mpl&#39;</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">idle_wires</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Circuit group name: [(1, 0), (3, 2), (5, 4), (7, 8), (9, 10), (11, 6), (13, 12), (15, 14), (18, 17)]_depth_5
+</pre></div>
+</div>
+<img alt="../_images/4ba21fe571390aeab8b99bc02b86498a3411c9b195d8570e99589cc5456dee2f.png" src="../_images/4ba21fe571390aeab8b99bc02b86498a3411c9b195d8570e99589cc5456dee2f.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="example_interleaved_rb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Interleaved Randomized Benchmarking (IRB)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="example_mirror_rb.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Mirror Randomized Benchmarking (MRB)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-iqm-token-if-using-resonance">Set IQM Token if using Resonance.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-benchmarking-configuration">Randomized Benchmarking Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-the-analysis">Perform the analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-all-the-fidelities-and-the-final-eplg">Inspect all the fidelities and the final EPLG</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-a-visualization-of-the-selected-layers-and-all-the-drb-decays">Plot a visualization of the selected layers and all the DRB decays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-a-sample-circuit-parallel-drb">Inspect a sample circuit (parallel DRB)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By IQM Benchmarks developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, IQM.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2025-04-14.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

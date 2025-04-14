@@ -14,6 +14,8 @@ iqm.benchmarks.utils\_plots
    .. autosummary::
       :toctree:
    
+      draw_graph_edges
+      evaluate_hamiltonian_paths
       plot_layout_fidelity_graph
       rx_to_nx_graph
    
