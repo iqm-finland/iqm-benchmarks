@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.33
+============
+* Added Error Per Layered Gate (EPLG) benchmark.
+
 Version 2.32
 ============
 * Fixed incorrect edge width assignment in qubit selection plot.

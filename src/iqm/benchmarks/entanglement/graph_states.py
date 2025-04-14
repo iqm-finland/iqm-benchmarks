@@ -474,7 +474,7 @@ def plot_max_negativities_graph(
     # Add colorbar
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    fig.colorbar(sm, ax=ax, shrink=0.5)
+    fig.colorbar(sm, ax=ax, shrink=0.5, label="Entanglement negativity")
 
     shots_string = "" if num_shots is None else f"Shots per tomography sample: {num_shots}"
     station_string = "IQM Backend" if station is None else station.capitalize()

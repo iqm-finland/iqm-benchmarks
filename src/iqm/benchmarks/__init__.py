@@ -32,6 +32,8 @@ from .optimization.qscore import QScoreBenchmark, QScoreConfiguration
 from .quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from .quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
 from .randomized_benchmarking.clifford_rb.clifford_rb import CliffordRandomizedBenchmarking, CliffordRBConfiguration
+from .randomized_benchmarking.direct_rb.direct_rb import DirectRandomizedBenchmarking, DirectRBConfiguration
+from .randomized_benchmarking.eplg.eplg import EPLGBenchmark, EPLGConfiguration
 from .randomized_benchmarking.interleaved_rb.interleaved_rb import (
     InterleavedRandomizedBenchmarking,
     InterleavedRBConfiguration,
@@ -46,6 +48,8 @@ AVAILABLE_BENCHMARKS = {
     CliffordRandomizedBenchmarking.name: CliffordRandomizedBenchmarking,
     InterleavedRandomizedBenchmarking.name: InterleavedRandomizedBenchmarking,
     MirrorRandomizedBenchmarking.name: MirrorRandomizedBenchmarking,
+    DirectRandomizedBenchmarking.name: DirectRandomizedBenchmarking,
+    EPLGBenchmark.name: EPLGBenchmark,
     QScoreBenchmark.name: QScoreBenchmark,
     GraphStateBenchmark.name: GraphStateBenchmark,
 }
