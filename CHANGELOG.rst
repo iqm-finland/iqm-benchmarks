@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.34
+============
+* Update `iqm-client` dependency to `23.8+`.
+
 Version 2.33
 ============
 * Added Error Per Layered Gate (EPLG) benchmark.
