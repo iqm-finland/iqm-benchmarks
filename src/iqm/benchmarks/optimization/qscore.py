@@ -862,17 +862,28 @@ class QScoreBenchmark(Benchmark):
                         # All-to-all coupling map on the active qubits
                         effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
                     else:
-                        active_qubit_set = qubit_set
-                        effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
-                    transpiled_qc, _ = perform_backend_transpilation(
-                        [qc],
-                        backend=self.backend,
-                        qubits=active_qubit_set,
-                        coupling_map=effective_coupling_map,
-                        qiskit_optim_level=self.qiskit_optim_level,
-                        optimize_sqg=self.optimize_sqg,
-                        routing_method=self.routing_method,
-                    )
+                        if self.choose_qubits_routine == "naive":
+                            transpiled_qc, _ = perform_backend_transpilation(
+                                [qc],
+                                backend=self.backend,
+                                qubits=None,
+                                coupling_map=self.backend.coupling_map(),
+                                qiskit_optim_level=self.qiskit_optim_level,
+                                optimize_sqg=self.optimize_sqg,
+                                routing_method=self.routing_method,
+                            )
+                        else:
+                            active_qubit_set = qubit_set
+                            effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
+                        transpiled_qc, _ = perform_backend_transpilation(
+                            [qc],
+                            backend=self.backend,
+                            qubits=active_qubit_set,
+                            coupling_map=effective_coupling_map,
+                            qiskit_optim_level=self.qiskit_optim_level,
+                            optimize_sqg=self.optimize_sqg,
+                            routing_method=self.routing_method,
+                        )
 
                     sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
                     # Execute on the backend
