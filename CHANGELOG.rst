@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.35
+============
+* Improved qiskit transpilation for Qscore benchmark.
+
 Version 2.34
 ============
 * Update `iqm-client` dependency to `23.8+`.

@@ -855,24 +855,30 @@ class QScoreBenchmark(Benchmark):
                     qcvv_logger.debug(f"This graph instance has no edges.")
                 else:
                     qcvv_logger.setLevel(logging.WARNING)
-                    # Account for all-to-all connected backends like Deneb
+                    # Account for all-to-all connected backends like Sirius
                     if "move" in backend.architecture.gates:
                         # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
                         active_qubit_set = qubit_set[: len(qc.qubits)]
                         # All-to-all coupling map on the active qubits
                         effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
                     else:
-                        active_qubit_set = qubit_set
-                        effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
-                    transpiled_qc, _ = perform_backend_transpilation(
-                        [qc],
-                        backend=self.backend,
-                        qubits=active_qubit_set,
-                        coupling_map=effective_coupling_map,
-                        qiskit_optim_level=self.qiskit_optim_level,
-                        optimize_sqg=self.optimize_sqg,
-                        routing_method=self.routing_method,
-                    )
+                        if self.choose_qubits_routine == "naive":
+                            active_qubit_set = None
+                            effective_coupling_map = self.backend.coupling_map
+                        else:
+                            active_qubit_set = qubit_set
+                            effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
+
+                    transpilation_params = {
+                        "backend": self.backend,
+                        "qubits": active_qubit_set,
+                        "coupling_map": effective_coupling_map,
+                        "qiskit_optim_level": self.qiskit_optim_level,
+                        "optimize_sqg": self.optimize_sqg,
+                        "routing_method": self.routing_method,
+                    }
+
+                    transpiled_qc, _ = perform_backend_transpilation([qc], **transpilation_params)
 
                     sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
                     # Execute on the backend
