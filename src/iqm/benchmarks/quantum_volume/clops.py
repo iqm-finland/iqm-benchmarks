@@ -65,7 +65,7 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
         Figure: the figure.
     """
     # Define the keys for different categories of times
-    job_keys = ["submit_total", "compile_total", "execution_total"]
+    job_keys = ["compile_total", "execution_total"]
     total_keys = ["job_total"]
     user_keys = ["user_retrieve_total", "user_submit_total", "assign_parameters_total", "time_transpile"]
 
@@ -98,7 +98,7 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     # Plot user keys
     for i, (key, cumulative_value) in enumerate(zip(user_keys, np.cumsum([all_data[k] for k in user_keys]))):
         x = ax1.bar(
-            4 * sep,
+            3 * sep,
             cumulative_value,
             barsize,
             zorder=1 - i / 10,
@@ -109,21 +109,21 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
         ax1.bar_label(x, fmt=f"{key.replace('_total', ' ').replace('_', ' ')}: {all_data[key]:.2f}", fontsize=fontsize)
 
     # Plot total CLOPS time
-    x_t = ax1.bar(3 * sep, clops_time, barsize, zorder=0, color=(colors[-1], alpha), edgecolor="k")
+    x_t = ax1.bar(2 * sep, clops_time, barsize, zorder=0, color=(colors[-1], alpha), edgecolor="k")
     ax1.bar_label(x_t, fmt=f"CLOPS time: {clops_time:.2f}", fontsize=fontsize)
 
-    # Plot total keys
-    for i, (key, cumulative_value) in enumerate(zip(total_keys, np.cumsum([all_data[k] for k in total_keys]))):
-        x = ax1.bar(
-            2 * sep,
-            cumulative_value,
-            barsize,
-            zorder=1 - i / 10,
-            label=key,
-            color=(colors[len(job_keys) + i], alpha),
-            edgecolor="k",
-        )
-        ax1.bar_label(x, fmt=f"{key.replace('_total', ' ')}: {all_data[key]:.2f}", fontsize=fontsize)
+    # # Plot total keys
+    # for i, (key, cumulative_value) in enumerate(zip(total_keys, np.cumsum([all_data[k] for k in total_keys]))):
+    #     x = ax1.bar(
+    #         2 * sep,
+    #         cumulative_value,
+    #         barsize,
+    #         zorder=1 - i / 10,
+    #         label=key,
+    #         color=(colors[len(job_keys) + i], alpha),
+    #         edgecolor="k",
+    #     )
+    #     ax1.bar_label(x, fmt=f"{key.replace('_total', ' ')}: {all_data[key]:.2f}", fontsize=fontsize)
 
     # Plot job keys
     for i, (key, cumulative_value) in enumerate(zip(job_keys, np.cumsum([all_data[k] for k in job_keys]))):
@@ -145,8 +145,8 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     ax2.set_ylim(-0.2, 100)
 
     # Set x-ticks and labels
-    time_types = ["Remote (components)", "Remote (total)", "Wall-time (CLOPS)", "Wall-time (all components)"]
-    ax1.set_xticks([i * sep + 1 for i in range(4)], time_types, fontsize=fontsize)
+    time_types = ["Remote (components)", "Wall-time (CLOPS)", "Wall-time (all components)"]
+    ax1.set_xticks([i * sep + 1 for i in range(3)], time_types, fontsize=fontsize)
 
     # Set plot title
     if all_data["clops_h"]["value"] == 0:
@@ -187,8 +187,8 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
                 job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"  # Is it possible to extract this automatically?
                 compile_f = datetime.strptime(x["compile_end"], job_time_format)
                 compile_i = datetime.strptime(x["compile_start"], job_time_format)
-                submit_f = datetime.strptime(x["submit_end"], job_time_format)
-                submit_i = datetime.strptime(x["submit_start"], job_time_format)
+                # submit_f = datetime.strptime(x["submit_end"], job_time_format)
+                # submit_i = datetime.strptime(x["submit_start"], job_time_format)
                 execution_f = datetime.strptime(x["execution_end"], job_time_format)
                 execution_i = datetime.strptime(x["execution_start"], job_time_format)
                 job_f = datetime.strptime(x["job_end"], job_time_format)
@@ -197,7 +197,7 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
                 all_job_elapsed[update][batch] = {
                     "job_total": job_f - job_i,
                     "compile_total": compile_f - compile_i,
-                    "submit_total": submit_f - submit_i,
+                    # "submit_total": submit_f - submit_i,
                     "execution_total": execution_f - execution_i,
                 }
 
