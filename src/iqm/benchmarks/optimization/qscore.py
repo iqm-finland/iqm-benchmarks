@@ -601,7 +601,6 @@ class QScoreBenchmark(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
         self.seed = configuration.seed
-        self.qpu_topology = configuration.qpu_topology
 
         self.graph_physical: Graph
         self.virtual_nodes: List[Tuple[int, int]]
@@ -747,10 +746,7 @@ class QScoreBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
-        if self.qpu_topology == "star":
-            nqubits = self.backend.num_qubits - 1  # need to leave out the resonator
-        else:
-            nqubits = self.backend.num_qubits
+        nqubits = self.backend.num_qubits
 
         if self.choose_qubits_routine == "custom":
             if self.use_virtual_node:
@@ -778,7 +774,7 @@ class QScoreBenchmark(Benchmark):
             graph_list = []
             qubit_set_list = []
             theta_list = []
-            ## updates the number of qubits to choose for the grpah problem.
+            ## updates the number of qubits to choose for the graph problem.
             if self.use_virtual_node:
                 updated_num_nodes = num_nodes - 1
             else:
@@ -969,8 +965,6 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is False.
         mit_shots: (int): Number of shots used in readout error mitigation.
                             * Default is 1000.
-        qpu_topology: (str): Topology of the QPU, either "crystal" or "star".
-                            * Default is "crystal".
     """
 
     benchmark: Type[Benchmark] = QScoreBenchmark
@@ -988,4 +982,3 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     seed: int = 1
     REM: bool = False
     mit_shots: int = 1000
-    qpu_topology: str = "crystal"
