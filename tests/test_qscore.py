@@ -7,7 +7,6 @@ from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 class TestQScore:
     backend = IQMFakeApollo()
-    qpu_topology = "crystal"
     custom_qubits_array = [[0, 1, 3], [0, 1, 2, 3] , [0, 1, 2, 3, 4]]
 
     def test_qscore(self):
@@ -25,7 +24,6 @@ class TestQScore:
             seed=1,
             REM=True,
             mit_shots=10,
-            qpu_topology=self.qpu_topology
         )
         benchmark = QScoreBenchmark(self.backend, EXAMPLE_QSCORE)
         benchmark.run()
@@ -33,5 +31,4 @@ class TestQScore:
 
 class TestQScoreDeneb(TestQScore):
     backend = IQMFakeDeneb()
-    qpu_topology = "star"
     custom_qubits_array = [[1], [1, 2], [1, 2, 3, 4], [1, 2, 3, 4, 5]]
