@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Benchmarking IQM Star &#8212; IQM Benchmarks 2.35 documentation</title>
+    <title>Benchmarking IQM Star &#8212; IQM Benchmarks 2.36 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=97e452bf"></script>
+    <script src="../_static/documentation_options.js?v=8090d2d9"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Benchmarking IQM Spark" href="spark.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.35" />
-    <meta name="docbuild:last-update" content="2025-04-22"/>
+  <meta name="docsearch:version" content="2.36" />
+    <meta name="docbuild:last-update" content="2025-04-28"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.35 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.35 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.36 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.36 documentation - Home"/>
   
   
 </a></div>
@@ -461,19 +461,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-<span class="n">QPU</span> <span class="o">=</span> <span class="s2">&quot;deneb&quot;</span> <span class="c1"># or any other star QPU</span>
-<span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
-
-<span class="n">iqm_url</span> <span class="o">=</span> <span class="s2">&quot;https://cocos.resonance.meetiqm.com/&quot;</span> <span class="o">+</span> <span class="n">QPU</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKENS_FILE&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;YOUR TOKEN HERE&quot;</span>
+<span class="n">iqm_url</span> <span class="o">=</span>  <span class="s1">&#39;YOUR URL HERE&#39;</span>
 <span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_url</span><span class="p">)</span>
 <span class="n">backend</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\RaphaelBrieger\miniconda3\envs\iqm-benchmarks\Lib\site-packages\iqm\iqm_client\iqm_client.py:140: UserWarning: Your IQM Client version 22.8 was built for a different version of IQM Server. You might encounter issues. For the best experience, consider using a version of IQM Client that satisfies 20.8 &lt;= iqm-client &lt; 22.0.
-  warnings.warn(version_incompatibility_msg)
 </pre></div>
 </div>
 </div>
@@ -494,9 +485,6 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/c7b641bc50387919b49c8965cfea220abf4d8e7459ff5cc76ff4f5f367a46cb1.png" src="../_images/c7b641bc50387919b49c8965cfea220abf4d8e7459ff5cc76ff4f5f367a46cb1.png" />
 </div>
 </div>
 <p>We run the cell below to ignore those warnings that are not critical for the correct run of the benchmarks.</p>
@@ -548,34 +536,6 @@ F(\text{ideal}, \text{measured})= \langle GHZ | \rho_{\text{measured}} | GHZ \ra
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-14 16:42:11,866 - iqm.benchmarks.logging_config - INFO - Now generating a 2-qubit GHZ state on qubits [0, 1]
-2025-03-14 16:42:11,868 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:12,665 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:12,936 - iqm.benchmarks.logging_config - INFO - Submitting batch with 7 circuits corresponding to qubits [0, 1]
-2025-03-14 16:42:13,384 - iqm.benchmarks.logging_config - INFO - Now generating a 3-qubit GHZ state on qubits [0, 1, 2]
-2025-03-14 16:42:13,384 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:13,429 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:13,762 - iqm.benchmarks.logging_config - INFO - Submitting batch with 9 circuits corresponding to qubits [0, 1, 2]
-2025-03-14 16:42:14,307 - iqm.benchmarks.logging_config - INFO - Now generating a 4-qubit GHZ state on qubits [0, 1, 2, 3]
-2025-03-14 16:42:14,310 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:14,413 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:15,066 - iqm.benchmarks.logging_config - INFO - Submitting batch with 11 circuits corresponding to qubits [0, 1, 2, 3]
-2025-03-14 16:42:15,497 - iqm.benchmarks.logging_config - INFO - Now generating a 5-qubit GHZ state on qubits [0, 1, 2, 3, 4]
-2025-03-14 16:42:15,501 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:15,565 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:42:16,297 - iqm.benchmarks.logging_config - INFO - Submitting batch with 13 circuits corresponding to qubits [0, 1, 2, 3, 4]
-2025-03-14 16:42:16,758 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-14 16:42:25,323 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-03-14 16:43:06,137 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-14 16:43:07,265 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-03-14 16:43:12,988 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-14 16:43:14,028 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-03-14 16:43:20,028 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-14 16:43:21,991 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -583,9 +543,6 @@ F(\text{ideal}, \text{measured})= \langle GHZ | \rho_{\text{measured}} | GHZ \ra
 <span class="n">result_ghz</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/15f675a5b927adf43799313f61df916b21121dc36abfaf0ada5e14caa596dcc6.png" src="../_images/15f675a5b927adf43799313f61df916b21121dc36abfaf0ada5e14caa596dcc6.png" />
 </div>
 </div>
 </section>
@@ -607,7 +564,7 @@ The quantum volume is then defined as</p>
 <p>We define a combination of qubits to test quantum volume on.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_layouts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span> <span class="c1">## choose the optimal layouts to run</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_layouts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span> <span class="c1">## choose the optimal layouts to run</span>
 <span class="n">QV</span> <span class="o">=</span> <span class="n">QuantumVolumeConfiguration</span><span class="p">(</span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> 
     <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
@@ -617,7 +574,7 @@ The quantum volume is then defined as</p>
     <span class="n">custom_qubits_array</span><span class="o">=</span><span class="n">chosen_layouts</span><span class="p">,</span> 
     <span class="n">qiskit_optim_level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">optimize_sqg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span>
+    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">60_000</span><span class="p">,</span>
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
 <span class="p">)</span>
@@ -636,22 +593,6 @@ The quantum volume is then defined as</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-14 16:45:14,314 - iqm.benchmarks.logging_config - INFO - Executing QV on qubits [0, 2, 3]
-2025-03-14 16:45:15,655 - iqm.benchmarks.logging_config - INFO - Successfully generated all 500 circuits to be executed
-2025-03-14 16:45:15,657 - iqm.benchmarks.logging_config - INFO - Will transpile according to &quot;fixed&quot; physical layout
-2025-03-14 16:45:15,658 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-14 16:46:04,018 - iqm.benchmarks.logging_config - INFO - Submitting batch with 500 circuits corresponding to qubits [0, 2, 3]
-2025-03-14 16:46:04,033 - iqm.benchmarks.logging_config - INFO - max_gates_per_batch restriction: submitting subbatch #1 with 192 circuits corresponding to qubits [0, 2, 3]
-2025-03-14 16:46:05,443 - iqm.benchmarks.logging_config - INFO - max_gates_per_batch restriction: submitting subbatch #2 with 192 circuits corresponding to qubits [0, 2, 3]
-2025-03-14 16:46:06,786 - iqm.benchmarks.logging_config - INFO - max_gates_per_batch restriction: submitting subbatch #3 with 116 circuits corresponding to qubits [0, 2, 3]
-2025-03-14 16:46:07,863 - iqm.benchmarks.logging_config - INFO - Job for layout [0, 2, 3] submitted successfully!
-2025-03-14 16:46:07,863 - iqm.benchmarks.logging_config - INFO - Retrieving all counts for [0, 2, 3]
-2025-03-14 16:47:24,654 - iqm.benchmarks.logging_config - INFO - Adding counts of [0, 2, 3] run to the dataset
-2025-03-14 16:47:40,986 - iqm.benchmarks.logging_config - INFO - QV experiment execution concluded !
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -660,14 +601,6 @@ The quantum volume is then defined as</p>
     <span class="n">display</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-14 16:47:41,326 - iqm.benchmarks.logging_config - INFO - Noiseless simulation and post-processing for layout [0, 2, 3]
-2025-03-14 16:47:42,554 - iqm.benchmarks.logging_config - INFO - REM post-processing for layout [0, 2, 3] with 1000 shots
-</pre></div>
-</div>
-<img alt="../_images/41368adba2ee8942ea3e347fb711d64d5b2eff5c4f4bc08824173f04da9c60ee.png" src="../_images/41368adba2ee8942ea3e347fb711d64d5b2eff5c4f4bc08824173f04da9c60ee.png" />
-<img alt="../_images/e3065da959fee9e72f80c885b1fe8dae2a9c3b706bd8e51d901a99e779a5bc99.png" src="../_images/e3065da959fee9e72f80c885b1fe8dae2a9c3b706bd8e51d901a99e779a5bc99.png" />
 </div>
 </div>
 </section>
@@ -690,7 +623,7 @@ The quantum volume is then defined as</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CLOPS</span> <span class="o">=</span> <span class="n">CLOPSConfiguration</span><span class="p">(</span>
-    <span class="n">qubits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="c1"># run with the same layout as </span>
+    <span class="n">qubits</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="c1"># run with the same layout as </span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">num_updates</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
     <span class="n">num_shots</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
@@ -718,8 +651,14 @@ The quantum volume is then defined as</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clops</span> <span class="o">=</span> <span class="n">benchmark_clops</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
-<span class="n">fig_clops</span> <span class="o">=</span> <span class="n">plot_times</span><span class="p">(</span><span class="n">result_clops</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">result_clops</span><span class="o">.</span><span class="n">observations</span><span class="p">)</span>
-<span class="n">display</span><span class="p">(</span><span class="n">fig_clops</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">result_clops</span><span class="o">.</span><span class="n">observations</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clops</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -735,6 +674,7 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.optimization.qscore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QScoreConfiguration</span><span class="p">,</span> <span class="n">QScoreBenchmark</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 </pre></div>
 </div>
 </div>
@@ -744,20 +684,19 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_qubits</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">num_qubits</span>
 <span class="n">chosen_layout</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">qubits</span><span class="p">))</span> <span class="k">for</span> <span class="n">qubits</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">num_qubits</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
 <span class="n">QSCORE</span> <span class="o">=</span> <span class="n">QScoreConfiguration</span><span class="p">(</span>
-    <span class="n">num_instances</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">num_instances</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
     <span class="n">num_qaoa_layers</span><span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">shots</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
+    <span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
     <span class="n">min_num_nodes</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">max_num_nodes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">use_virtual_node</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_classically_optimized_angles</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">choose_qubits_routine</span> <span class="o">=</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span>
-    <span class="n">custom_qubits_array</span><span class="o">=</span><span class="n">chosen_layout</span><span class="p">,</span>
+    <span class="n">custom_qubits_array</span><span class="o">=</span> <span class="n">chosen_layout</span><span class="p">,</span>
     <span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">999999</span><span class="p">),</span>
     <span class="n">REM</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-    <span class="n">qpu_topology</span> <span class="o">=</span> <span class="s2">&quot;star&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -806,7 +745,7 @@ The obtained cost of the solution, i.e. the average number of cut edges, must be
 
 <span class="c1">### CLOPS</span>
 <span class="n">obs_clops</span> <span class="o">=</span> <span class="n">result_clops</span><span class="o">.</span><span class="n">observations</span>
-<span class="n">clops</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">obs_clops</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;clops_v&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obs_clops</span><span class="p">])</span>
+<span class="n">clops</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">obs_clops</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">])</span>
 
 <span class="c1">### QS </span>
 <span class="n">obs_qs</span> <span class="o">=</span> <span class="n">result_qscore</span><span class="o">.</span><span class="n">observations</span>
@@ -917,7 +856,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-04-22.
+  Last updated on 2025-04-28.
   <br/>
 </p>
   </div>

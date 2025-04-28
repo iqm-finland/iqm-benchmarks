@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Circuit Layer Operations Per Second (CLOPS) &#8212; IQM Benchmarks 2.35 documentation</title>
+    <title>Circuit Layer Operations Per Second (CLOPS) &#8212; IQM Benchmarks 2.36 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=97e452bf"></script>
+    <script src="../_static/documentation_options.js?v=8090d2d9"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="Quantum Volume (QV)" href="example_quantum_volume.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.35" />
-    <meta name="docbuild:last-update" content="2025-04-22"/>
+  <meta name="docsearch:version" content="2.36" />
+    <meta name="docbuild:last-update" content="2025-04-28"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.35 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.35 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.36 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.36 documentation - Home"/>
   
   
 </a></div>
@@ -461,12 +461,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre></div>
-</div>
-</div>
 </div>
 <section id="set-iqm-token-if-using-resonance">
 <h2>Set IQM Token if using Resonance<a class="headerlink" href="#set-iqm-token-if-using-resonance" title="Link to this heading">#</a></h2>
@@ -504,7 +498,7 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EXAMPLE_CLOPS</span> <span class="o">=</span> <span class="n">CLOPSConfiguration</span><span class="p">(</span>
-    <span class="n">qubits</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+    <span class="n">qubits</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">],</span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># By definition set to 100</span>
     <span class="n">num_updates</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># By definition set to 10</span>
     <span class="n">num_shots</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># By definition set to 100</span>
@@ -524,95 +518,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-31 15:33:57,096 - iqm.benchmarks.logging_config - INFO - NB: CLOPS should be estimated with same qubit layout and optional inputs used to establish QV!
-2025-03-31 15:33:57,097 - iqm.benchmarks.logging_config - INFO - Now generating 100 parametrized circuit templates on qubits [2, 3, 7, 8, 12]
-2025-03-31 15:33:57,305 - iqm.benchmarks.logging_config - INFO - Will transpile all 100 circuits according to &quot;fixed&quot; physical layout
-2025-03-31 15:33:57,306 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQM Backend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-03-31 15:34:04,479 - iqm.benchmarks.logging_config - INFO - CLOPS time started
-2025-03-31 15:34:04,480 - iqm.benchmarks.logging_config - INFO - Update 1/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:34:07,564 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:34:07,565 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:34:09,253 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:34:09,254 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:34:22,941 - iqm.benchmarks.logging_config - INFO - Update 2/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:34:25,830 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:34:25,831 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:34:27,704 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:34:27,704 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:34:40,276 - iqm.benchmarks.logging_config - INFO - Update 3/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:34:43,052 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:34:43,053 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:34:44,793 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:34:44,794 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:34:57,249 - iqm.benchmarks.logging_config - INFO - Update 4/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:35:00,170 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:35:00,170 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:35:01,790 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:35:01,791 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:35:16,669 - iqm.benchmarks.logging_config - INFO - Update 5/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:35:20,287 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:35:20,288 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:35:21,973 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:35:21,974 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:35:34,363 - iqm.benchmarks.logging_config - INFO - Update 6/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:35:37,232 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:35:37,233 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:35:38,853 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:35:38,853 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:35:51,480 - iqm.benchmarks.logging_config - INFO - Update 7/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:35:54,200 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:35:54,200 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:35:55,923 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:35:55,924 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:36:08,405 - iqm.benchmarks.logging_config - INFO - Update 8/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:36:11,032 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:36:11,033 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:36:12,630 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:36:12,631 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:36:25,126 - iqm.benchmarks.logging_config - INFO - Update 9/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:36:27,926 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:36:27,927 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:36:29,607 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:36:29,608 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-03-31 15:36:42,052 - iqm.benchmarks.logging_config - INFO - Update 10/10
-Assigning random parameters to all 100 circuits
-2025-03-31 15:36:44,708 - iqm.benchmarks.logging_config - INFO - Executing the corresponding circuit batch
-2025-03-31 15:36:44,709 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [2, 3, 7, 8, 12]
-C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:177: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&#39;Unknown backend option(s): {unknown_options}&#39;)
-2025-03-31 15:36:46,235 - iqm.benchmarks.logging_config - INFO - Retrieving counts
-2025-03-31 15:36:46,236 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="perform-analysis">
@@ -620,15 +525,6 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clops</span> <span class="o">=</span> <span class="n">benchmark_clops</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-31 16:19:37,247 - iqm.benchmarks.logging_config - INFO - Total elapsed times from job execution metadata:
-2025-03-31 16:19:37,248 - iqm.benchmarks.logging_config - INFO - 	&quot;job_total&quot;: 1.29 min
-2025-03-31 16:19:37,249 - iqm.benchmarks.logging_config - INFO - 	&quot;compile_total&quot;: 15.86 sec
-2025-03-31 16:19:37,249 - iqm.benchmarks.logging_config - INFO - 	&quot;submit_total&quot;: 5.31 sec
-2025-03-31 16:19:37,250 - iqm.benchmarks.logging_config - INFO - 	&quot;execution_total&quot;: 48.82 sec
 </pre></div>
 </div>
 </div>
@@ -642,69 +538,10 @@ C:\Users\PedroFigueroaRomero\anaconda3\envs\iqm-bench\Lib\site-packages\iqm\qisk
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>all_times_parameter_assign
-all_times_retrieve
-all_times_submit
-assign_parameters_total
-backend_configuration_name
-backend_name
-benchmark
-calset_id
-clops_h_bool
-clops_time
-compile_total
-counts_per_update
-dd_strategy
-depth
-execution_timestamp
-execution_total
-job_meta_per_update
-job_total
-max_circuits_per_batch
-max_gates_per_batch
-num_circuits
-num_parameters
-num_qubits
-num_shots
-num_updates
-operation_counts
-optimize_sqg
-parallel_2q_layers
-parameters_per_update
-physical_layout
-qiskit_optim_level
-qubits
-routing_method
-session_timestamp
-shots
-submit_total
-time_circuit_generate
-time_count_layers
-time_sort_batches
-time_transpile
-u_per_layer
-use_dd
-user_retrieve_total
-user_submit_total
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_clops</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;operation_counts&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;delay&#39;: {&#39;Mean&#39;: 0.0, &#39;Std&#39;: 0.0},
- &#39;measure&#39;: {&#39;Mean&#39;: 4.9504950495049505, &#39;Std&#39;: 0.4950495049504951},
- &#39;id&#39;: {&#39;Mean&#39;: 0.0, &#39;Std&#39;: 0.0},
- &#39;r&#39;: {&#39;Mean&#39;: 409.56435643564356, &#39;Std&#39;: 40.9997381883899},
- &#39;reset&#39;: {&#39;Mean&#39;: 0.0, &#39;Std&#39;: 0.0},
- &#39;cz&#39;: {&#39;Mean&#39;: 33.53465346534654, &#39;Std&#39;: 3.7852354032651045},
- &#39;barrier&#39;: {&#39;Mean&#39;: 0.9900990099009901, &#39;Std&#39;: 0.09900990099009897}}
 </pre></div>
 </div>
 </div>
@@ -715,12 +552,6 @@ user_submit_total
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clops</span><span class="o">.</span><span class="n">observations</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[BenchmarkObservation(name=&#39;clops_v&#39;, value=3410, identifier=BenchmarkObservationIdentifier(qubit_indices=[2, 3, 7, 8, 12]), uncertainty=None),
- BenchmarkObservation(name=&#39;clops_h&#39;, value=0, identifier=BenchmarkObservationIdentifier(qubit_indices=[2, 3, 7, 8, 12]), uncertainty=None)]
 </pre></div>
 </div>
 </div>
@@ -746,9 +577,6 @@ user_submit_total
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_clops</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/4fa35f1c9c2094ad34f9800c3520b255610f17b97c6f67b4dbe3d63fb1c09540.png" src="../_images/4fa35f1c9c2094ad34f9800c3520b255610f17b97c6f67b4dbe3d63fb1c09540.png" />
 </div>
 </div>
 </section>
@@ -844,7 +672,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-04-22.
+  Last updated on 2025-04-28.
   <br/>
 </p>
   </div>
