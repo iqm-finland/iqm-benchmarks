@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.36
+============
+* Fixed bugs for qscore and CLOPS.
+
 Version 2.35
 ============
 * Improved qiskit transpilation for Qscore benchmark.
