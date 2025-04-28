@@ -112,19 +112,6 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     x_t = ax1.bar(2 * sep, clops_time, barsize, zorder=0, color=(colors[-1], alpha), edgecolor="k")
     ax1.bar_label(x_t, fmt=f"CLOPS time: {clops_time:.2f}", fontsize=fontsize)
 
-    # # Plot total keys
-    # for i, (key, cumulative_value) in enumerate(zip(total_keys, np.cumsum([all_data[k] for k in total_keys]))):
-    #     x = ax1.bar(
-    #         2 * sep,
-    #         cumulative_value,
-    #         barsize,
-    #         zorder=1 - i / 10,
-    #         label=key,
-    #         color=(colors[len(job_keys) + i], alpha),
-    #         edgecolor="k",
-    #     )
-    #     ax1.bar_label(x, fmt=f"{key.replace('_total', ' ')}: {all_data[key]:.2f}", fontsize=fontsize)
-
     # Plot job keys
     for i, (key, cumulative_value) in enumerate(zip(job_keys, np.cumsum([all_data[k] for k in job_keys]))):
         x = ax1.bar(
