@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version 2.34
+Version 2.37
 ============
 * Update `iqm-client` dependency to `25.0+`.
 
