@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.34
+============
+* Update `iqm-client` dependency to `25.0+`.
+
 Version 2.36
 ============
 * Fixed bugs for qscore and CLOPS.
