@@ -76,38 +76,43 @@ def plot_layered_fidelities_graph(
     fig = plt.figure()
     ax = plt.axes()
 
-    if station is not None:
-        if station.lower() in GraphPositions.predefined_stations:
-            qubit_positions = GraphPositions.predefined_stations[station.lower()]
-        else:
-            if num_qubits in (20, 7):
-                station = "garnet" if num_qubits == 20 else "deneb"
-                qubit_positions = GraphPositions.predefined_stations[station]
-            else:
-                graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-                qubit_positions = GraphPositions.create_positions(graph_backend)
+    if station is not None and station.lower() in GraphPositions.predefined_stations:
+        qubit_positions = GraphPositions.predefined_stations[station.lower()]
     else:
         graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        if num_qubits in (20, 7):
-            station = "garnet" if num_qubits == 20 else "deneb"
+        qubit_station_dict ={6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
+        num_qubits_backend = len(set((v for edge in backend_coupling_map for v in edge)))
+        if num_qubits_backend in qubit_station_dict:
+            station = qubit_station_dict[num_qubits]
             qubit_positions = GraphPositions.predefined_stations[station]
         else:
             qubit_positions = GraphPositions.create_positions(graph_backend)
 
     # Normalize fidelity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(fidelity_values)), vmax=cast(float, max(fidelity_values)))
-    edge_colors = [cmap(norm(fidelity_edges[edge])) for edge in qubit_pairs]
+    edge_colors = []
+    for edge in backend_coupling_map:
+        if edge in fidelity_edges:
+            edge_colors.append(cmap(norm(fidelity_edges[edge])))
+        elif (edge[1], edge[0]) in fidelity_edges:
+            edge_colors.append(cmap(norm(fidelity_edges[(edge[1], edge[0])])))
+        else:
+            edge_colors.append("lightgray")
+
+    nodes = list(set(v for edge in backend_coupling_map for v in edge))
+    active_nodes = list(set(v for edge in qubit_pairs for v in edge))
+    node_colors = ["lightgray" if v not in active_nodes else "k" for v in nodes]
 
     nx.draw_networkx(
         rx_to_nx_graph(backend_coupling_map),
         pos=qubit_positions,
-        nodelist=list(range(num_qubits)),
-        labels={x: qubit_names[x] for x in range(num_qubits)},
+        nodelist=nodes,
+        edgelist=list(backend_coupling_map),
+        labels={x: qubit_names[x] for x in nodes},
         font_size=6.5,
-        edgelist=qubit_pairs,
         width=4.0,
         edge_color=edge_colors,
-        node_color="k",
+        node_color=node_colors,
         font_color="w",
         ax=ax,
     )
@@ -124,6 +129,7 @@ def plot_layered_fidelities_graph(
         f"EPLG estimate: {eplg_estimate['value']:.2e} +/- {eplg_estimate['uncertainty']:.2e}\n" if eplg_estimate else ""
     )
     plt.title(f"Layered fidelities for qubit pairs in {station_string}\n" f"{eplg_string}{timestamp}")
+    plt.gca().invert_yaxis()
     plt.close()
 
     return fig_name, fig
@@ -190,8 +196,8 @@ def eplg_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         backend_num_qubits=backend_num_qubits,
         edge_list=edges,
         timestamp=timestamp,
-        disjoint_layers=disjoint_layers,
         station=backend_configuration_name,
+        disjoint_layers=disjoint_layers,
         qubit_names=qubit_names,
         is_eplg=True,
     )

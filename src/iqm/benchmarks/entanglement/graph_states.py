@@ -447,26 +447,30 @@ def plot_max_negativities_graph(
             qubit_positions = GraphPositions.create_positions(graph_backend)
     else:
         graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        if num_qubits in (20, 7):
-            station = "garnet" if num_qubits == 20 else "deneb"
+        qubit_station_dict ={6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
+        if num_qubits in qubit_station_dict:
+            station = qubit_station_dict[num_qubits]
             qubit_positions = GraphPositions.predefined_stations[station]
         else:
             qubit_positions = GraphPositions.create_positions(graph_backend)
 
     # Normalize negativity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(negativity_values)), vmax=cast(float, max(negativity_values)))
-    edge_colors = [cmap(norm(negativity_edges[edge])) for edge in qubit_pairs]
+    edge_colors = [cmap(norm(negativity_edges[edge])) if edge in qubit_pairs else "lightgray" for edge in backend_coupling_map ]#
+    nodes = list(set(v for edge in backend_coupling_map for v in edge))
+    active_nodes = list(set(v for edge in qubit_pairs for v in edge))
+    node_colors = ["lightgray" if v not in active_nodes else "k" for v in nodes]
 
     nx.draw_networkx(
         rx_to_nx_graph(backend_coupling_map),
         pos=qubit_positions,
-        nodelist=list(range(num_qubits)),
-        labels={x: qubit_names[x] for x in range(num_qubits)},
+        nodelist=nodes,
+        edgelist=list(backend_coupling_map),
+        labels={x: qubit_names[x] for x in nodes},
         font_size=6.5,
-        edgelist=qubit_pairs,
         width=4.0,
         edge_color=edge_colors,
-        node_color="k",
+        node_color=node_colors,
         font_color="w",
         ax=ax,
     )
@@ -490,6 +494,8 @@ def plot_max_negativities_graph(
             f"{shots_string}; Bootstraps: {num_bootstraps}"
             f"\n{timestamp}"
         )
+    # Invert y-axis to match the intended qubit positions
+    plt.gca().invert_yaxis()
     plt.close()
 
     return fig_name, fig
@@ -955,7 +961,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     dataset = run.dataset.copy(deep=True)
     qcvv_logger.info("Dataset imported OK")
     backend_name = dataset.attrs["backend_name"]
-    coupling_map = dataset.attrs["coupling_map"]
+    coupling_map_full = dataset.attrs["coupling_map_full"]
     qubit_names = dataset.attrs["qubit_names"]
     execution_timestamp = dataset.attrs["execution_timestamp"]
     tomography = dataset.attrs["tomography"]
@@ -1004,7 +1010,7 @@ def negativity_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     fig_name, fig = plot_max_negativities_graph(
         negativities=max_negativities,
-        backend_coupling_map=coupling_map,
+        backend_coupling_map=coupling_map_full,
         qubit_names=qubit_names,
         timestamp=execution_timestamp,
         tomography=tomography,
@@ -1066,8 +1072,9 @@ class GraphStateBenchmark(Benchmark):
         dataset.attrs["execution_timestamp"] = self.execution_timestamp
         dataset.attrs["backend_configuration_name"] = self.backend_configuration_name
         dataset.attrs["backend_name"] = self.backend.name
-        dataset.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in self.qubits}
+        dataset.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in np.arange(self.backend.num_qubits)}
         dataset.attrs["coupling_map"] = self.coupling_map
+        dataset.attrs["coupling_map_full"] = self.backend.coupling_map
 
         for key, value in self.configuration:
             if key == "benchmark":  # Avoid saving the class object

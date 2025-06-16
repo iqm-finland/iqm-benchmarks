@@ -313,8 +313,8 @@ def extract_fidelities(cal_url: str) -> tuple[list[list[int]], list[float], str]
         i, j = cal_keys["cz_gate_fidelity"]
         topology = "crystal"
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if item["locus"][0] != "COMP_R" else 0
-        qb2 = int(item["locus"][1][2:]) if item["locus"][1] != "COMP_R" else 0
+        qb1 = int(item["locus"][0][2:]) if "COMPR" not in item["locus"][0] else 0
+        qb2 = int(item["locus"][1][2:]) if "COMPR" not in item["locus"][1] else 0
         if topology == "star":
             list_couplings.append([qb1, qb2])
         else:

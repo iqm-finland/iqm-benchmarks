@@ -68,6 +68,29 @@ class GraphPositions:
         19: (3.0, 1.0),
     }
 
+    emerald_positions = {
+        0: (10, 10), 1: (11, 9),
+        2: (7, 11), 3: (8, 10), 4: (9, 9), 5: (10, 8), 6: (11, 7),
+        7: (5, 11), 8: (6, 10), 9: (7, 9), 10: (8, 8), 11: (9, 7), 12: (10, 6), 13: (11, 5),
+        14: (3, 11), 15: (4, 10), 16: (5, 9), 17: (6, 8), 18: (7, 7), 19: (8, 6), 20: (9, 5), 21: (10, 4),
+        22: (2, 10), 23: (3, 9), 24: (4, 8), 25: (5, 7), 26: (6, 6), 27: (7, 5), 28: (8, 4), 29: (9, 3), 30: (10, 2),
+        31: (2, 8), 32: (3, 7), 33: (4, 6), 34: (5, 5), 35: (6, 4), 36: (7, 3), 37: (8, 2), 38: (9, 1),
+        39: (1, 7), 40: (2, 6), 41: (3, 5), 42: (4, 4), 43: (5, 3), 44: (6, 2), 45: (7, 1),
+        46: (1, 5), 47: (2, 4), 48: (3, 3), 49: (4, 2), 50: (5, 1),
+        51: (1, 3), 52: (2, 2), 53: (3, 1),
+    }
+
+    sirius_positions = {
+        # Node 0 in the middle
+        0: (11.0, 3.0),
+        # Even nodes on top (single row)
+        2: (2.0, 3.5), 4: (4.0, 3.5), 6: (6.0, 3.5), 8: (8.0, 3.5), 10: (10.0, 3.5), 12: (12.0, 3.5), 14: (14.0, 3.5),
+        16: (16.0, 3.5), 18: (18.0, 3.5), 20: (20.0, 3.5), 22: (22.0, 3.5),
+        # Odd nodes on bottom (single row)
+        1: (2.0, 2.5), 3: (4.0, 2.5), 5: (6.0, 2.5), 7: (8.0, 2.5), 9: (10.0, 2.5), 11: (12.0, 2.5), 13: (14.0, 2.5),
+        15: (16.0, 2.5), 17: (18.0, 2.5), 19: (20.0, 2.5), 21: (22.0, 2.5), 23: (24.0, 2.5),
+    }
+
     deneb_positions = {
         0: (2.0, 2.0),
         1: (1.0, 1.0),
@@ -85,6 +108,8 @@ class GraphPositions:
         "deneb": deneb_positions,
         "fakedeneb": deneb_positions,
         "iqmfakedeneb": deneb_positions,
+        "emerald": emerald_positions,
+        "sirius": sirius_positions,
     }
 
     @staticmethod
@@ -165,20 +190,13 @@ def draw_graph_edges(
     fig = plt.figure()
     ax = plt.axes()
 
-    if station is not None:
-        if station.lower() in GraphPositions.predefined_stations:
-            qubit_positions = GraphPositions.predefined_stations[station.lower()]
-        else:
-            if backend_num_qubits in (6, 20):
-                station = "garnet" if backend_num_qubits == 20 else "deneb"
-                qubit_positions = GraphPositions.predefined_stations[station]
-            else:
-                graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-                qubit_positions = GraphPositions.create_positions(graph_backend)
+    if station is not None and station.lower() in GraphPositions.predefined_stations:
+        qubit_positions = GraphPositions.predefined_stations[station.lower()]
     else:
         graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        if backend_num_qubits in (6, 20):
-            station = "garnet" if backend_num_qubits == 20 else "deneb"
+        qubit_station_dict ={6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
+        if backend_num_qubits in qubit_station_dict:
+            station = qubit_station_dict[backend_num_qubits]
             qubit_positions = GraphPositions.predefined_stations[station]
         else:
             qubit_positions = GraphPositions.create_positions(graph_backend)
@@ -337,9 +355,14 @@ def plot_layout_fidelity_graph(
 
     # Define qubit positions in plot
     if station is not None and station.lower() in GraphPositions.predefined_stations:
-        pos = GraphPositions.predefined_stations[station.lower()]
+        qubit_positions = GraphPositions.predefined_stations[station.lower()]
     else:
-        pos = GraphPositions.create_positions(graph, topology)
+        qubit_station_dict ={6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
+        if len(nodes) in qubit_station_dict:
+            station = qubit_station_dict[len(nodes)]
+            qubit_positions = GraphPositions.predefined_stations[station]
+        else:
+            qubit_positions = GraphPositions.create_positions(graph)
 
     # Define node colors
     node_colors = ["lightgrey" for _ in range(len(nodes))]
@@ -347,22 +370,30 @@ def plot_layout_fidelity_graph(
         for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
 
-    plt.subplots(figsize=(1.5 * np.sqrt(len(nodes)), 1.5 * np.sqrt(len(nodes))))
+    if topology == "star":
+        plt.subplots(figsize=(len(nodes), 3))
+    else:
+        plt.subplots(figsize=(1.5 * np.sqrt(len(nodes)), 1.5 * np.sqrt(len(nodes))))
 
     # Draw the graph
     visualization.mpl_draw(
         graph,
         with_labels=True,
-        node_color=node_colors,
-        pos=pos,
+        node_color='none',# node_colors,
+        pos=qubit_positions,
         labels=lambda node: node,
         width=7 * weights / np.max(weights),
     )  # type: ignore[call-arg]
+    from matplotlib.patches import Circle
+
+    for node, (x, y) in qubit_positions.items():
+        outer = Circle((x, y), radius=0.15, color=node_colors[node], fill=True, alpha=1)
+        plt.gca().add_patch(outer)
 
     # Add edge labels using matplotlib's annotate
     for edge in edges_graph:
-        x1, y1 = pos[edge[0]]
-        x2, y2 = pos[edge[1]]
+        x1, y1 = qubit_positions[edge[0]]
+        x2, y2 = qubit_positions[edge[1]]
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         plt.annotate(
