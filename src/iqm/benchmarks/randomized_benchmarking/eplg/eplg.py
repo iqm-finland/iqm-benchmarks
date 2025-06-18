@@ -76,17 +76,9 @@ def plot_layered_fidelities_graph(
     fig = plt.figure()
     ax = plt.axes()
 
-    if station is not None and station.lower() in GraphPositions.predefined_stations:
-        qubit_positions = GraphPositions.predefined_stations[station.lower()]
-    else:
-        graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        qubit_station_dict ={6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
-        num_qubits_backend = len(set((v for edge in backend_coupling_map for v in edge)))
-        if num_qubits_backend in qubit_station_dict:
-            station = qubit_station_dict[num_qubits]
-            qubit_positions = GraphPositions.predefined_stations[station]
-        else:
-            qubit_positions = GraphPositions.create_positions(graph_backend)
+    qubit_positions = GraphPositions.get_positions(
+        station=station, graph=backend_coupling_map.graph.to_undirected(multigraph=False), num_qubits=num_qubits
+    )
 
     # Normalize fidelity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(fidelity_values)), vmax=cast(float, max(fidelity_values)))

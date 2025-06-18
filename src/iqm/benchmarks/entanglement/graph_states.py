@@ -439,24 +439,15 @@ def plot_max_negativities_graph(
     fig = plt.figure()
     ax = plt.axes()
 
-    if station is not None:
-        if station.lower() in GraphPositions.predefined_stations:
-            qubit_positions = GraphPositions.predefined_stations[station.lower()]
-        else:
-            graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-            qubit_positions = GraphPositions.create_positions(graph_backend)
-    else:
-        graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        qubit_station_dict ={6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
-        if num_qubits in qubit_station_dict:
-            station = qubit_station_dict[num_qubits]
-            qubit_positions = GraphPositions.predefined_stations[station]
-        else:
-            qubit_positions = GraphPositions.create_positions(graph_backend)
+    qubit_positions = GraphPositions.get_positions(
+        station=station, graph=backend_coupling_map.graph.to_undirected(multigraph=False), num_qubits=num_qubits
+    )
 
     # Normalize negativity values to the range [0, 1] for color mapping
     norm = plt.Normalize(vmin=cast(float, min(negativity_values)), vmax=cast(float, max(negativity_values)))
-    edge_colors = [cmap(norm(negativity_edges[edge])) if edge in qubit_pairs else "lightgray" for edge in backend_coupling_map ]#
+    edge_colors = [
+        cmap(norm(negativity_edges[edge])) if edge in qubit_pairs else "lightgray" for edge in backend_coupling_map
+    ]  #
     nodes = list(set(v for edge in backend_coupling_map for v in edge))
     active_nodes = list(set(v for edge in qubit_pairs for v in edge))
     node_colors = ["lightgray" if v not in active_nodes else "k" for v in nodes]
@@ -1072,7 +1063,9 @@ class GraphStateBenchmark(Benchmark):
         dataset.attrs["execution_timestamp"] = self.execution_timestamp
         dataset.attrs["backend_configuration_name"] = self.backend_configuration_name
         dataset.attrs["backend_name"] = self.backend.name
-        dataset.attrs["qubit_names"] = {qubit: self.backend.index_to_qubit_name(qubit) for qubit in np.arange(self.backend.num_qubits)}
+        dataset.attrs["qubit_names"] = {
+            qubit: self.backend.index_to_qubit_name(qubit) for qubit in np.arange(self.backend.num_qubits)
+        }
         dataset.attrs["coupling_map"] = self.coupling_map
         dataset.attrs["coupling_map_full"] = self.backend.coupling_map
 

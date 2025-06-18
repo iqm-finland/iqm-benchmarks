@@ -48,6 +48,8 @@ from iqm.qiskit_iqm.iqm_job import IQMJob
 from iqm.qiskit_iqm.iqm_provider import IQMProvider
 
 
+# pylint: disable=too-many-lines
+
 def timeit(f):
     """Calculates the amount of time a function takes to execute.
 
