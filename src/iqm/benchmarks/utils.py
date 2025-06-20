@@ -575,6 +575,8 @@ def perform_backend_transpilation(
             initial_layout=qubits if aux_qc is None else None,
             routing_method=routing_method,
         )
+        if optimize_sqg:
+            transpiled = optimize_single_qubit_gates(transpiled)
         if backend.has_resonators():
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
