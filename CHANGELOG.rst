@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.38
+============
+* Added optimise_single_qubit_gates option for crystal processors.
+
 Version 2.37
 ============
 * Update `iqm-client` dependency to `27.0+`.
