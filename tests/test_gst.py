@@ -5,6 +5,7 @@ from unittest.mock import patch
 from iqm.benchmarks.compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
+from qiskit.circuit import QuantumCircuit
 
 
 class TestGST:
@@ -12,9 +13,15 @@ class TestGST:
 
     @patch('matplotlib.pyplot.figure')
     def test_1q(self, mock_fig):
+        # Testing minimal gate context
+        gate_context = [QuantumCircuit(self.backend.num_qubits) for _ in range(3)]
+        gate_context[0].h(0)
+        gate_context[1].s(0)
+        # config
         minimal_1Q_config = GSTConfiguration(
             qubit_layouts=[[4], [1]],
             gate_set="1QXYI",
+            gate_context=gate_context,
             num_circuits=10,
             shots=10,
             rank=4,
