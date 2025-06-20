@@ -40,7 +40,7 @@ import xarray as xr
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
-from iqm.qiskit_iqm import IQMFakeDeneb, transpile_to_IQM
+from iqm.qiskit_iqm import IQMFakeDeneb, optimize_single_qubit_gates, transpile_to_IQM
 from iqm.qiskit_iqm.fake_backends.fake_adonis import IQMFakeAdonis
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
