@@ -50,6 +50,7 @@ from iqm.qiskit_iqm.iqm_provider import IQMProvider
 
 # pylint: disable=too-many-lines
 
+
 def timeit(f):
     """Calculates the amount of time a function takes to execute.
 
@@ -285,7 +286,10 @@ def get_active_qubits(qc: QuantumCircuit) -> List[int]:
     return list(active_qubits)
 
 
-def extract_fidelities(cal_url: str, all_metrics: bool = False) -> tuple[list[list[int]], list[float], str, dict]:
+def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
+    Tuple[List[List[int]], List[float], str, Dict[int, int]],
+    Tuple[List[List[int]], List[float], str, Dict[int, int], Dict[str, Dict[Union[int, Tuple[int, int]], float]]],
+]:
     """Returns couplings and CZ-fidelities from calibration data URL
 
     Args:
@@ -339,7 +343,7 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> tuple[list[li
         return list_couplings, list_fids, topology, qubit_mapping
 
     # Process all metrics if all_metrics is True
-    metrics_dict = {}
+    metrics_dict: Dict[str, Dict[Union[int, Tuple[int, int]], float]] = {}
     for metric_key, (i, j) in cal_keys.items():
         metric_data = calibration["calibrations"][i]["metrics"][j]["metrics"]
         metrics_dict[metric_key] = {}
@@ -613,6 +617,7 @@ def perform_backend_transpilation(
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
             )
+
         if aux_qc is not None:
             if backend.has_resonators():
                 if backend.num_qubits in qubits:

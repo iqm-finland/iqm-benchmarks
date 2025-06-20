@@ -5,6 +5,7 @@ Error Per Layered Gate (EPLG).
 from time import strftime
 from typing import Dict, Optional, Sequence, Tuple, Type, cast
 
+from matplotlib.colors import to_rgba
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -89,7 +90,7 @@ def plot_layered_fidelities_graph(
         elif (edge[1], edge[0]) in fidelity_edges:
             edge_colors.append(cmap(norm(fidelity_edges[(edge[1], edge[0])])))
         else:
-            edge_colors.append("lightgray")
+            edge_colors.append(to_rgba("lightgray"))
 
     nodes = list(set(v for edge in backend_coupling_map for v in edge))
     active_nodes = list(set(v for edge in qubit_pairs for v in edge))
@@ -113,7 +114,7 @@ def plot_layered_fidelities_graph(
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, ax=ax, shrink=0.5, label="Layered Fidelity (%)", format="%.2f")
-    cbar.set_ticks(np.linspace(min(fidelity_values), max(fidelity_values), 5, endpoint=True))
+    cbar.set_ticks(tuple(np.linspace(min(fidelity_values), max(fidelity_values), 5, endpoint=True)))
 
     station_string = "IQM Backend" if station is None else station.capitalize()
 

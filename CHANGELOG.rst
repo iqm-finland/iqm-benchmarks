@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 2.38
+============
+* Added qubit positions for Emerald
+* Visibility improvements for Graph state and EPLG plots
+* Add visualization of single qubit errors (Fidelity, readout, T1, T2) to the layout fidelity graph plot
+
 Version 2.37
 ============
 * Update `iqm-client` dependency to `27.0+`.

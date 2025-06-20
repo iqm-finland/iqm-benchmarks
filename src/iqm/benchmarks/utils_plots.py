@@ -17,7 +17,7 @@ Plotting and visualization utility functions
 """
 from dataclasses import dataclass
 import os
-from typing import Dict, List, Literal, Optional, Sequence, Tuple
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
 
 from matplotlib.figure import Figure
 from matplotlib.patches import Circle
@@ -241,12 +241,12 @@ class GraphPositions:
                 match any predefined layout and graph is None.
         """
         if station is not None and station.lower() in GraphPositions.predefined_stations:
-            qubit_positions = GraphPositions.predefined_stations[station.lower()]
+            qubit_positions = cast(Dict[int, Tuple[float, float]], GraphPositions.predefined_stations[station.lower()])
         else:
             qubit_station_dict = {6: "deneb", 20: "garnet", 24: "sirius", 17: "sirius", 54: "emerald"}
             if num_qubits is not None and num_qubits in qubit_station_dict:
                 station = qubit_station_dict[num_qubits]
-                qubit_positions = GraphPositions.predefined_stations[station]
+                qubit_positions = cast(Dict[int, Tuple[float, float]], GraphPositions.predefined_stations[station])
             elif graph is not None:
                 qubit_positions = GraphPositions.create_positions(graph)
             else:
@@ -290,16 +290,7 @@ def draw_graph_edges(
     fig = plt.figure()
     ax = plt.axes()
 
-    if station is not None and station.lower() in GraphPositions.predefined_stations:
-        qubit_positions = GraphPositions.predefined_stations[station.lower()]
-    else:
-        graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        qubit_station_dict = {6: "deneb", 20: "garnet", 24: "sirius", 54: "emerald"}
-        if backend_num_qubits in qubit_station_dict:
-            station = qubit_station_dict[backend_num_qubits]
-            qubit_positions = GraphPositions.predefined_stations[station]
-        else:
-            qubit_positions = GraphPositions.create_positions(graph_backend)
+    qubit_positions = GraphPositions.get_positions(station=station, graph=None, num_qubits=backend_num_qubits)
 
     label_station = station if station is not None else f"{backend_num_qubits}-qubit IQM Backend"
     if disjoint_layers is None:
@@ -476,10 +467,8 @@ def plot_layout_fidelity_graph(
     Returns:
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
     """
-    # pylint: disable=unbalanced-tuple-unpackingmypy
-    edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(
-        cal_url, all_metrics=True
-    )
+    # pylint: disable=unbalanced-tuple-unpacking
+    edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url, all_metrics=True)
     if topology == "star":
         # Translate calibrated qubits starting from 0 to qubit indices as defined by the backend
         # For the star topology, the central resonator is qubit 0, and the addressable qubits are indexed starting from 1
