@@ -91,7 +91,6 @@ def remove_idle_wires(qc):
             qc_out.qubits.remove(qubit)
     return qc_out
 
-
 def get_qiskit_circuits(gate_sequences, gate_set, n_qubits, active_qubits):
     """
     Generate a set of Qiskit quantum circuits from specified gate sequences.
@@ -128,6 +127,72 @@ def get_qiskit_circuits(gate_sequences, gate_set, n_qubits, active_qubits):
             qc.barrier(active_qubits)
         qc.measure(active_qubits, active_qubits)
         qiskit_circuits.append(qc)
+    return qiskit_circuits
+
+def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layouts, gate_context=None, parallel = False):
+    """Turn GST sequences into Qiskit circuits, adding context gates if provided.
+
+    For each GST sequence, either a single circuit is created for all qubit layouts if `parallel=True`, or a separate circuit if
+    `parallel=False`.
+
+    Parameters
+    ----------
+    gate_sequences : list of list of int
+        Sequences of gate indices to apply. Each integer corresponds to a gate in the gate_set.
+    gate_set : list
+        The gate set defined as a list of Qiskit quantum circuits.
+    n_qubits : int
+        Total number of qubits in the system.
+    qubit_layouts : list of list of int
+        Lists of qubits on which the GST experiment is run.
+    gate_context : QuantumCircuit or list of QuantumCircuit, optional
+        Optional context circuit(s) to apply during each gate on qubits that are not measured for GST.
+    parallel : bool, optional
+        Whether GST for all qubits layouts is done in parallel on the backend.
+        If True, applies gates to all qubit layouts in a single circuit.
+        If False, creates separate circuits for each layout. Default is False.
+
+    Returns
+    -------
+    list or list of list of QuantumCircuit
+        If parallel=True: A list of QuantumCircuits, one for each gate sequence.
+        If parallel=False: A list of lists of QuantumCircuits, where the outer list corresponds
+        to qubit layouts and the inner list corresponds to gate sequences.
+    """
+    qiskit_circuits = []
+    if parallel:
+        all_qubits = [q for qubits in qubit_layouts for q in qubits]
+        all_clbits = [i for i, _ in enumerate(all_qubits)]
+        for gate_sequence in gate_sequences:
+            qc = QuantumCircuit(n_qubits, len(all_clbits))
+            for gate_num in gate_sequence:
+                if gate_context is not None:
+                    if isinstance(gate_context, list):
+                        qc.compose(gate_context[gate_num], inplace=True)
+                    else:
+                        qc.compose(gate_context, inplace=True)
+                for qubits in qubit_layouts:
+                    qc.compose(gate_set[gate_num], qubits, inplace=True)
+                qc.barrier()
+            qc.measure(all_qubits, all_clbits)
+            qiskit_circuits.append(qc)
+    else:
+        for qubits in qubit_layouts:
+            clbits = [i for i, _ in enumerate(qubits)]
+            layout_circuits = []
+            for gate_sequence in gate_sequences:
+                qc = QuantumCircuit(n_qubits, len(clbits))
+                for gate_num in gate_sequence:
+                    if gate_context is not None:
+                        if isinstance(gate_context, list):
+                            qc.compose(gate_context[gate_num], inplace=True)
+                        else:
+                            qc.compose(gate_context, inplace=True)
+                    qc.compose(gate_set[gate_num], qubits, inplace=True)
+                    qc.barrier()
+                qc.measure(qubits, clbits)
+                layout_circuits.append(qc)
+            qiskit_circuits.append(layout_circuits)
     return qiskit_circuits
 
 
