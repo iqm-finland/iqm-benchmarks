@@ -17,7 +17,7 @@ from pygsti.tools import change_basis
 from pygsti.tools.optools import compute_povm_map
 from qiskit.quantum_info import SuperOp
 from qiskit.quantum_info.operators.measures import diamond_norm
-from scipy.linalg import logm, schur
+from scipy.linalg import logm, schur, expm
 from scipy.optimize import linear_sum_assignment, minimize
 
 from mGST import additional_fns, algorithm, compatibility, low_level_jit
@@ -358,6 +358,30 @@ def compute_sparsest_Pauli_Hamiltonian(U_set):
     pauli_coeffs = np.array(pp_vecs) / np.sqrt(pdim) / np.pi * 2
     return pauli_coeffs
 
+def match_hamiltonian_phase(pauli_coeffs, pauli_coeffs_target):
+    """
+    Matches the sign of the phase of a target gate Hamiltonian represented by Pauli coefficients to a measured Hamiltonian.
+
+    Parameters:
+    pauli_coeffs (numpy array): Pauli coefficients of the measured Hamiltonian.
+    pauli_coeffs_target (numpy array): Pauli coefficients of the target Hamiltonian.
+
+    Returns:
+    numpy array: Pauli coefficients of the target Hamiltonian with matched phase.
+    """
+    dim = int(np.sqrt(len(pauli_coeffs)))
+    H_opt = change_basis(pauli_coeffs, "pp", "std").reshape((dim, dim))
+    H_target = change_basis(pauli_coeffs_target, "pp", "std").reshape((dim, dim))
+    U_target = expm(-1j * H_target * np.pi * np.sqrt(dim) / 2)
+    U_target_alt = expm(1j * H_target * np.pi * np.sqrt(dim) / 2)
+
+    # Check if sign flip leads to same unitary
+    if np.linalg.norm(U_target - U_target_alt) < 1e-6:
+        # Check if sign flip leads to better match to target Hamiltonian in Pauli basis
+        if np.linalg.norm(pauli_coeffs_target - pauli_coeffs) > np.linalg.norm(pauli_coeffs_target + pauli_coeffs):
+            return -pauli_coeffs_target
+
+    return pauli_coeffs_target
 
 def phase_err(angle, U, U_t):
     """Computes norm between two input unitaries after a global phase is added to one of them

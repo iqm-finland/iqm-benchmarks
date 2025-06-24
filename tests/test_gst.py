@@ -36,9 +36,12 @@ class TestGST:
 
     @patch('matplotlib.pyplot.figure')
     def test_2q(self, mock_fig):
+        gate_context = QuantumCircuit(self.backend.num_qubits)
+        gate_context.cz(4,5)
         minimal_2Q_GST = GSTConfiguration(
             qubit_layouts=[[2, 3]],
             gate_set="2QXYCZ_extended",
+            gate_context=gate_context,
             num_circuits=4,
             shots=10,
             rank=1,
