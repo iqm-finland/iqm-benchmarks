@@ -335,6 +335,7 @@ def draw_graph_edges(
             f"\n{timestamp}"
         )
     ax.set_aspect(0.925)
+    plt.gca().invert_yaxis()
     plt.close()
 
     return fig_name, fig
