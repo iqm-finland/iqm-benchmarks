@@ -833,9 +833,9 @@ iqm-data-definitions==2.13 \
 iqm-exa-common==26.24.0 \
     --hash=sha256:92e880913589015b78baf8e0267f82cadc8a52cb090c8e7b5226d1d9a8ddbd26 \
     --hash=sha256:fc3edd89b501961b3ad034f4c37983bb879735626df4f342ea0edcab3bce8182
-iqm-station-control-client==9.0.0 \
-    --hash=sha256:ef8f35b79fb72a1a1e600262e93a157b1fc8bfc3cae8946111b2d6d78f1a32d6 \
-    --hash=sha256:ff9851fb7fa71d49b10f7f72614d891981e1de0639568424c8e292a36c63e39c
+iqm-station-control-client==9.3.0 \
+    --hash=sha256:1f21e12d3160100f5ba82bb737ed08f7faa41625f87c99db6c940f7069420598 \
+    --hash=sha256:557889329d25cf2953cdbdaf24b6079f542e014d2ae5e9aa2ceb877edd097c76
 isoduration==20.11.0 \
     --hash=sha256:ac2f9015137935279eac671f94f89eb00584f940f5dc49462a0c4ee692ba1bd9 \
     --hash=sha256:b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042
