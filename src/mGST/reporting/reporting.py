@@ -358,6 +358,7 @@ def compute_sparsest_Pauli_Hamiltonian(U_set):
     pauli_coeffs = np.array(pp_vecs) / np.sqrt(pdim) / np.pi * 2
     return pauli_coeffs
 
+
 def match_hamiltonian_phase(pauli_coeffs, pauli_coeffs_target):
     """
     Matches the sign of the phase of a target gate Hamiltonian represented by Pauli coefficients to a measured Hamiltonian.
@@ -382,6 +383,7 @@ def match_hamiltonian_phase(pauli_coeffs, pauli_coeffs_target):
             return -pauli_coeffs_target
 
     return pauli_coeffs_target
+
 
 def phase_err(angle, U, U_t):
     """Computes norm between two input unitaries after a global phase is added to one of them

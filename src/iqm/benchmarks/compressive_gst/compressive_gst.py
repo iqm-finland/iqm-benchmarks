@@ -43,7 +43,8 @@ from iqm.benchmarks.utils import (
     retrieve_all_counts,
     set_coupling_map,
     submit_execute,
-    timeit, get_active_qubits,
+    timeit,
+    get_active_qubits,
 )
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
@@ -88,7 +89,9 @@ class CompressiveGST(Benchmark):
                 context_qubits = get_active_qubits(self.gate_context)
             layout_qubits = [q for layout in self.qubit_layouts for q in layout]
             if any(q in layout_qubits for q in context_qubits):
-                raise ValueError(f"Gate context qubits {set(context_qubits)} must not overlap with qubits in layouts {set(layout_qubits)}.")
+                raise ValueError(
+                    f"Gate context qubits {set(context_qubits)} must not overlap with qubits in layouts {set(layout_qubits)}."
+                )
 
         if configuration.opt_method not in ["GD", "SFN", "auto"]:
             raise ValueError("Invalid optimization method, valid options are: GD, SFN, auto")
@@ -179,8 +182,13 @@ class CompressiveGST(Benchmark):
                 )
             # For each gate sequence, create a circuit with gate context and GST sequence on all qubits in the layout
             composed_qc_list = qiskit_interface.get_composed_qiskit_circuits(
-                gate_circuits, self.gate_set, self.backend.num_qubits, qubit_layouts, gate_context=self.gate_context,
-                parallel = True)
+                gate_circuits,
+                self.gate_set,
+                self.backend.num_qubits,
+                qubit_layouts,
+                gate_context=self.gate_context,
+                parallel=True,
+            )
             transpiled_qc_list, _ = perform_backend_transpilation(
                 composed_qc_list,
                 self.backend,
@@ -197,8 +205,13 @@ class CompressiveGST(Benchmark):
         else:
             # for parralel = False, a unique list of circuits is generated for each qubit layout
             composed_qc_list = qiskit_interface.get_composed_qiskit_circuits(
-                gate_circuits, self.gate_set, self.backend.num_qubits, qubit_layouts, gate_context=self.gate_context,
-                parallel = False)
+                gate_circuits,
+                self.gate_set,
+                self.backend.num_qubits,
+                qubit_layouts,
+                gate_context=self.gate_context,
+                parallel=False,
+            )
             for idx, qubits in enumerate(self.qubit_layouts):
                 transpiled_qc_list, _ = perform_backend_transpilation(
                     composed_qc_list[idx],

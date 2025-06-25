@@ -250,6 +250,7 @@ def generate_non_gate_results(
     fig = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
     return df_o_final, fig
 
+
 def generate_unit_rank_gate_results(
     dataset: xr.Dataset, qubit_layout: List[int], df_g: DataFrame, X_opt: ndarray, K_target: ndarray
 ) -> Tuple[DataFrame, DataFrame, Figure, Figure]:
@@ -290,45 +291,55 @@ def generate_unit_rank_gate_results(
         X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + identifier]["bootstrap_data"]
         df_g_array[df_g_array == -1] = np.nan
         percentiles_g_low, percentiles_g_high = np.nanpercentile(df_g_array, [2.5, 97.5], axis=0)
-
-        df_g_final = DataFrame(
-            {
-                r"average_gate_fidelity": [
-                    reporting.number_to_str(
-                        df_g.values[i, 0], [percentiles_g_high[i, 0], percentiles_g_low[i, 0]], precision=5
-                    )
-                    for i in range(len(dataset.attrs["gate_labels"][identifier]))
-                ],
-                r"diamond_distance": [
-                    reporting.number_to_str(
-                        df_g.values[i, 1], [percentiles_g_high[i, 1], percentiles_g_low[i, 1]], precision=5
-                    )
-                    for i in range(dataset.attrs["num_gates"])
-                ],
-            }
+        df_g_rotation = generate_rotation_param_results(
+            dataset, qubit_layout, X_opt, K_target, X_array, E_array, rho_array
         )
-        df_g_rotation = generate_rotation_param_results(dataset, qubit_layout, X_opt, K_target, X_array, E_array, rho_array)
 
     else:
-        df_g_final = DataFrame(
-            {
-                "average_gate_fidelity": [
-                    reporting.number_to_str(df_g.values[i, 0], precision=5) for i in range(dataset.attrs["num_gates"])
-                ],
-                "diamond_distance": [
-                    reporting.number_to_str(df_g.values[i, 1], precision=5) for i in range(dataset.attrs["num_gates"])
-                ],
-            }
-        )
         df_g_rotation = generate_rotation_param_results(dataset, qubit_layout, X_opt, K_target)
 
+    df_g_final = DataFrame(
+        {
+            r"average_gate_fidelity": [
+                reporting.number_to_str(
+                    df_g.values[i, 0],
+                    (
+                        [percentiles_g_high[i, 0], percentiles_g_low[i, 0]]
+                        if dataset.attrs["bootstrap_samples"] > 0
+                        else None
+                    ),
+                    precision=5,
+                )
+                for i in range(len(dataset.attrs["gate_labels"][identifier]))
+            ],
+            r"diamond_distance": [
+                reporting.number_to_str(
+                    df_g.values[i, 1],
+                    (
+                        [percentiles_g_high[i, 1], percentiles_g_low[i, 1]]
+                        if dataset.attrs["bootstrap_samples"] > 0
+                        else None
+                    ),
+                    precision=5,
+                )
+                for i in range(dataset.attrs["num_gates"])
+            ],
+        }
+    )
+
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
-    fig_rotation = dataframe_to_figure(df_g_rotation, dataset.attrs["gate_labels"][identifier])
-    return df_g_final, df_g_rotation, fig_g, fig_rotation
+    return df_g_final, df_g_rotation, fig_g
+
 
 def generate_rotation_param_results(
-    dataset: xr.Dataset, qubit_layout: List[int], X_opt: ndarray, K_target: ndarray,
-        X_array: ndarray = None, E_array: ndarray = None, rho_array: ndarray = None) -> DataFrame:
+    dataset: xr.Dataset,
+    qubit_layout: List[int],
+    X_opt: ndarray,
+    K_target: ndarray,
+    X_array: ndarray = None,
+    E_array: ndarray = None,
+    rho_array: ndarray = None,
+) -> DataFrame:
     """
     Produces all result tables for Kraus rank 1 estimates.
 
@@ -369,6 +380,7 @@ def generate_rotation_param_results(
             bootstrap_pauli_coeffs[i, :, :] = pauli_coeffs_
         pauli_coeffs_low, pauli_coeffs_high = np.nanpercentile(bootstrap_pauli_coeffs, [2.5, 97.5], axis=0)
 
+    # Pandas dataframe with formated confidence intervals
     df_g_rotation = DataFrame(
         np.array(
             [
@@ -376,7 +388,7 @@ def generate_rotation_param_results(
                     reporting.number_to_str(
                         pauli_coeffs[i, j],
                         [pauli_coeffs_high[i, j], pauli_coeffs_low[i, j]] if bootstrap else None,
-                        precision=5
+                        precision=5,
                     )
                     for i in range(dataset.attrs["num_gates"])
                 ]
@@ -387,7 +399,14 @@ def generate_rotation_param_results(
     df_g_rotation.columns = [f"h_%s" % label for label in pauli_labels]
     df_g_rotation.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
 
-    return df_g_rotation
+    # Store non-formated results in dictionary
+    identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+    Hamiltonian_params = {
+        "values": pauli_coeffs,
+        "uncertainties": (pauli_coeffs_low, pauli_coeffs_high) if bootstrap else None,
+    }
+    return df_g_rotation, Hamiltonian_params
+
 
 def compute_matched_ideal_hamiltonian_params(dataset):
     """
@@ -404,11 +423,12 @@ def compute_matched_ideal_hamiltonian_params(dataset):
 
     qubit_layouts = dataset.attrs["qubit_layouts"]
     param_list_layouts = [
-        [list(dataset.attrs[f'results_layout_{layout}']['hamiltonian_parameters'][label].values())
-         for label in dataset.attrs[f'results_layout_{layout}']['hamiltonian_parameters'].keys()]
+        dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}']["Hamiltonians"][
+            "values"
+        ]
         for layout in qubit_layouts
     ]
-    hamiltonian_params = np.array(param_list_layouts, dtype=float)
+    hamiltonian_params = np.array(param_list_layouts)
 
     K_target = qiskit_gate_to_operator(dataset.attrs["gate_set"])
     X_target = np.einsum("ijkl,ijnm -> iknlm", K_target, K_target.conj()).reshape(
@@ -417,23 +437,17 @@ def compute_matched_ideal_hamiltonian_params(dataset):
 
     param_list_layouts = []
     for qubit_layout in qubit_layouts:
-        df_g_rotation = generate_rotation_param_results(
-            dataset, qubit_layout, X_target, K_target
-        )
-        ideal_params = df_g_rotation.to_dict()
-
-        param_labels = ideal_params.keys()
-        param_list = []
-        for label in param_labels:
-            param_list.append(list(ideal_params[label].values()))
-        param_list_layouts.append(param_list)
-    hamiltonian_params_ideal = np.array(param_list_layouts, dtype=float)
+        _, ideal_params = generate_rotation_param_results(dataset, qubit_layout, X_target, K_target)
+        ideal_params = ideal_params["values"]
+        param_list_layouts.append(ideal_params)
+    hamiltonian_params_ideal = np.array(param_list_layouts)
 
     hamiltonian_params_ideal_matched = np.empty(hamiltonian_params_ideal.shape)
     for i, _ in enumerate(qubit_layouts):
         for j in range(hamiltonian_params_ideal.shape[-1]):
-            hamiltonian_params_ideal_matched[i, :, j] = reporting.match_hamiltonian_phase(hamiltonian_params[i, :, j],
-                                                                                hamiltonian_params_ideal[i, :, j])
+            hamiltonian_params_ideal_matched[i, :, j] = reporting.match_hamiltonian_phase(
+                hamiltonian_params[i, :, j], hamiltonian_params_ideal[i, :, j]
+            )
 
     return hamiltonian_params, hamiltonian_params_ideal_matched
 
@@ -453,33 +467,60 @@ def generate_hamiltonian_figures(dataset):
     param_labels = generate_basis_labels(dataset.attrs["pdim"], basis="Pauli")
     gate_labels = list(dataset.attrs["gate_labels"].values())
 
+    # Collect upper and lower end of the confidence intervals
+    qubit_layouts = dataset.attrs["qubit_layouts"]
+    hamiltonian_params_low = np.array(
+        [
+            dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}']["Hamiltonians"][
+                "uncertainties"
+            ][0]
+            for layout in qubit_layouts
+        ]
+    )
+    hamiltonian_params_high = np.array(
+        [
+            dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}']["Hamiltonians"][
+                "uncertainties"
+            ][1]
+            for layout in qubit_layouts
+        ]
+    )
+
     figures = []
 
-    for params, params_ideal, gate_label_dict in zip(hamiltonian_params, hamiltonian_params_ideal, gate_labels):
+    for params, params_ideal, params_low, params_high, gate_label_dict in zip(
+        hamiltonian_params, hamiltonian_params_ideal, hamiltonian_params_low, hamiltonian_params_high, gate_labels
+    ):
         layout_figures = []
         for l, gate_label in gate_label_dict.items():
             param_vec = (params - params_ideal)[:, [l]]
+            param_vec_low = (params_low - params_ideal)[:, [l]]
+            param_vec_high = (params_high - params_ideal)[:, [l]]
             shape = param_vec.shape
             max_size = 16
             num_splits = np.ceil(shape[0] / max_size)
 
             # Split param_vector into sub-arrays
             param_splits = np.array_split(param_vec, num_splits, axis=0)
+            param_splits_low = np.array_split(param_vec_low, num_splits, axis=0)
+            param_splits_high = np.array_split(param_vec_high, num_splits, axis=0)
 
             fig, axes = plt.subplots(len(param_splits), 1, figsize=(10, len(param_splits)))
 
             if len(param_splits) == 1:
                 axes = [axes]
 
-            for idx, (param_split, ax) in enumerate(zip(param_splits, axes)):
+            for idx, (param_split, param_split_low, param_split_high, ax) in enumerate(zip(param_splits, param_splits_low, param_splits_high, axes)):
                 split_size = param_split.shape[0]
-                im = ax.matshow(param_split.T, cmap="coolwarm", vmin=-.05, vmax=.05)
+                im = ax.matshow(param_split.T, cmap="coolwarm", vmin=-0.05, vmax=0.05)
                 ax.set_yticks(np.arange(shape[1]), labels=[gate_label], rotation=0)
-                ax.set_xticks(np.arange(split_size), labels=list(param_labels)[idx * split_size:(idx + 1) * split_size])
+                ax.set_xticks(
+                    np.arange(split_size), labels=list(param_labels)[idx * split_size : (idx + 1) * split_size]
+                )
 
                 for i in range(param_split.shape[0]):
                     for j in range(param_split.shape[1]):
-                        ax.text(i, j, f"{param_split[i, j]:.3f}", va='center', ha='center', color="black")
+                        ax.text(i, j, f"{param_split[i, j]:.3f}[{param_split_low[i, j]:.3f},{param_split_high[i, j]:.3f}]", va='center', ha='center', color="black")
 
             fig.colorbar(im, ax=axes, fraction=0.005, pad=0.04)
             layout_figures.append(fig)
@@ -489,7 +530,7 @@ def generate_hamiltonian_figures(dataset):
     return figures
 
 
-def generate_hamiltonian_bar_figures(dataset: xr.Dataset, n_errs: int =8) -> List[List[Figure]]:
+def generate_hamiltonian_bar_figures(dataset: xr.Dataset, n_errs: int = 8) -> List[List[Figure]]:
     """
     Plots the largest coherent error bars for the given Hamiltonian parameters.
 
@@ -537,7 +578,7 @@ def generate_hamiltonian_bar_figures(dataset: xr.Dataset, n_errs: int =8) -> Lis
             legend_labels = ['Positive', 'Negative']
             handles = [
                 plt.Rectangle((0, 0), 1, 1, color='#1f77b4', alpha=0.7),
-                plt.Rectangle((0, 0), 1, 1, color='#d62728', alpha=0.7)
+                plt.Rectangle((0, 0), 1, 1, color='#d62728', alpha=0.7),
             ]
             ax.legend(handles, legend_labels, title='Parameter Sign')
 
@@ -546,9 +587,13 @@ def generate_hamiltonian_bar_figures(dataset: xr.Dataset, n_errs: int =8) -> Lis
                 value = param_vec[sorting_indices][i]
                 height = bar.get_height()
                 ax.annotate(
-                    f'{value:.3f}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                    f'{value:.3f}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
                     xytext=(0, 3),  # 3 points vertical offset
-                    textcoords="offset points", ha='center', va='bottom', fontsize=10
+                    textcoords="offset points",
+                    ha='center',
+                    va='bottom',
+                    fontsize=10,
                 )
             layout_figures.append(fig)
             plt.close()
@@ -996,7 +1041,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         ### Result table generation and full report
         if dataset.attrs["rank"] == 1:
-            df_g_final, df_g_rotation, fig_g, _ = generate_unit_rank_gate_results(
+            df_g_final, df_g_rotation, fig_g = generate_unit_rank_gate_results(
                 dataset, qubit_layout, df_g, X_opt, K_target
             )
             dataset.attrs["results_layout_" + identifier].update({"hamiltonian_parameters": df_g_rotation.to_dict()})
@@ -1058,7 +1103,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     # Generate additional figures for Hamiltonian parameters if rank is 1
     if dataset.attrs["rank"] == 1:
         figures_rotation = generate_hamiltonian_figures(dataset)
-        figures_bar = generate_hamiltonian_bar_figures(dataset, n_errs = 4)
+        figures_bar = generate_hamiltonian_bar_figures(dataset, n_errs=4)
         for layout_idx, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
             identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
             gate_labels = dataset.attrs["gate_labels"][identifier]

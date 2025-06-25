@@ -91,6 +91,7 @@ def remove_idle_wires(qc):
             qc_out.qubits.remove(qubit)
     return qc_out
 
+
 def get_qiskit_circuits(gate_sequences, gate_set, n_qubits, active_qubits):
     """
     Generate a set of Qiskit quantum circuits from specified gate sequences.
@@ -129,7 +130,8 @@ def get_qiskit_circuits(gate_sequences, gate_set, n_qubits, active_qubits):
         qiskit_circuits.append(qc)
     return qiskit_circuits
 
-def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layouts, gate_context=None, parallel = False):
+
+def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layouts, gate_context=None, parallel=False):
     """Turn GST sequences into Qiskit circuits, adding context gates if provided.
 
     For each GST sequence, either a single circuit is created for all qubit layouts if `parallel=True`, or a separate circuit if
