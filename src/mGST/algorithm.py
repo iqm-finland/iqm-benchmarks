@@ -27,7 +27,6 @@ from mGST.optimization import (
 )
 from mGST.reporting.figure_gen import plot_objf
 
-
 def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     """Riemannian saddle free Newton step on the POVM parametrization
 
@@ -713,7 +712,7 @@ def run_mGST(
                 break
             qcvv_logger.info(f"Run {i+1}/{max_inits} failed, trying new initialization...")
 
-    if not success and max_inits > 0:
+    if not success and init is None:
         qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
     with logging_redirect_tqdm(loggers=[qcvv_logger]):
         for _ in trange(final_iter):

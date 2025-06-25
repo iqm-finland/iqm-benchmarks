@@ -39,12 +39,12 @@ from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Ci
 from iqm.benchmarks.compressive_gst.gst_analysis import mgst_analysis
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import (
+    get_active_qubits,
     perform_backend_transpilation,
     retrieve_all_counts,
     set_coupling_map,
     submit_execute,
     timeit,
-    get_active_qubits,
 )
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
@@ -253,7 +253,7 @@ class CompressiveGST(Benchmark):
         """
 
         dataset = xr.Dataset()
-        qcvv_logger.info(f"Now generating {self.configuration.num_circuits} random GST circuits...")
+        qcvv_logger.info(f"Generating {self.configuration.num_circuits} random GST circuits")
 
         self.circuits = Circuits()
         # Generate circuits
@@ -427,15 +427,15 @@ def parse_gate_set(
     """
     if isinstance(configuration.gate_set, str) and configuration.gate_set not in [
         "1QXYI",
-        "2QXYCZ",
+        "2QXYICZ",
         "2QXYCZ_extended",
         "3QXYCZ",
     ]:
         raise ValueError(
             "No gate set of the specified name is implemented, please choose among "
-            "1QXYI, 2QXYCZ, 2QXYCZ_extended, 3QXYCZ."
+            "1QXYI, 2QXYICZ, 2QXYCZ_extended, 3QXYCZ."
         )
-    if configuration.gate_set in ["1QXYI", "2QXYCZ", "2QXYCZ_extended", "3QXYCZ"]:
+    if configuration.gate_set in ["1QXYI", "2QXYICZ", "2QXYCZ_extended", "3QXYCZ"]:
         gate_set, gate_label_dict, num_gates = create_predefined_gate_set(
             configuration.gate_set, num_qubits, qubit_layouts
         )
@@ -459,7 +459,7 @@ def parse_gate_set(
         return gate_set, gate_label_dict, num_gates
 
     raise ValueError(
-        f"Invalid gate set, choose among 1QXYI, 2QXYCZ, 2QXYCZ_extended,"
+        f"Invalid gate set, choose among 1QXYI, 2QXYICZ, 2QXYCZ_extended,"
         f" 3QXYCZ or provide a list of Qiskti circuits to define the gates."
     )
 
@@ -485,23 +485,28 @@ def create_predefined_gate_set(
 
     """
     unmapped_qubits = list(np.arange(num_qubits))
+    # Define an idle gate using a time delay comparable to single qubit gate duration
+    Idle = QuantumCircuit(num_qubits, 0)
+    Idle.delay(32e-9, unit="s")
 
+    # Define the gate set
     if gate_set == "1QXYI":
-        gate_list = [RGate(1e-10, 0), RGate(0.5 * np.pi, 0), RGate(0.5 * np.pi, np.pi / 2)]
+        gate_list = [Idle, RGate(0.5 * np.pi, 0), RGate(0.5 * np.pi, np.pi / 2)]
         gates = [QuantumCircuit(num_qubits, 0) for _ in range(len(gate_list))]
         gate_qubits = [[0], [0], [0]]
         for i, gate in enumerate(gate_list):
             gates[i].append(gate, gate_qubits[i])
         gate_labels = ["Idle", "Rx_pi_2", "Ry_pi_2"]
-    elif gate_set == "2QXYCZ":
-        gate_qubits = [[0], [1], [0], [1], [0, 1]]
-        gates = [QuantumCircuit(num_qubits, 0) for _ in range(5)]
-        gates[0].append(RGate(0.5 * np.pi, 0), [0])
-        gates[1].append(RGate(0.5 * np.pi, 0), [1])
-        gates[2].append(RGate(0.5 * np.pi, np.pi / 2), [0])
-        gates[3].append(RGate(0.5 * np.pi, np.pi / 2), [1])
-        gates[4].append(CZGate(), [0, 1])
-        gate_labels = ["Rx_pi_2", "Rx_pi_2", "Ry_pi_2", "Ry_pi_2", "cz"]
+    elif gate_set == "2QXYICZ":
+        gate_qubits = [[0], [0], [1], [0], [1], [0, 1]]
+        gates = [QuantumCircuit(num_qubits, 0) for _ in range(6)]
+        gates[0].append(Idle, [0, 1])
+        gates[1].append(RGate(0.5 * np.pi, 0), [0])
+        gates[2].append(RGate(0.5 * np.pi, 0), [1])
+        gates[3].append(RGate(0.5 * np.pi, np.pi / 2), [0])
+        gates[4].append(RGate(0.5 * np.pi, np.pi / 2), [1])
+        gates[5].append(CZGate(), [0, 1])
+        gate_labels = ["Idle", "Rx_pi_2", "Rx_pi_2", "Ry_pi_2", "Ry_pi_2", "cz"]
     elif gate_set == "2QXYCZ_extended":
         gate_qubits = [[0], [1], [0], [1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
         gates = [QuantumCircuit(num_qubits, 0) for _ in range(9)]

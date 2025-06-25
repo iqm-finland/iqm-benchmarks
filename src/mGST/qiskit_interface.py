@@ -9,9 +9,7 @@ from qiskit.circuit.library import IGate
 from qiskit.quantum_info import Operator
 
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
-from mGST import additional_fns, algorithm, low_level_jit
-from mGST.compatibility import arrays_to_pygsti_model
-from mGST.reporting.reporting import gauge_opt, quick_report
+from mGST import low_level_jit
 
 
 def qiskit_gate_to_operator(gate_set):
@@ -263,87 +261,3 @@ def job_counts_to_mgst_format(active_qubits, n_povm, result_dict):
         y.append(row / np.sum(row))
     y = np.array(y).T
     return y
-
-
-def get_gate_estimation(gate_set, gate_sequences, sequence_results, shots, rK=4):
-    """Estimate quantum gates using a modified Gate Set Tomography (mGST) algorithm.
-
-    This function simulates quantum gates, applies noise, and then uses the mGST algorithm
-    to estimate the gates. It calculates and prints the Mean Variation Error (MVE) of the
-    estimation.
-
-    Parameters
-    ----------
-    gate_set : array_like
-        The set of quantum gates to be estimated.
-    gate_sequences : array_like
-        The sequences of gates applied in the quantum circuit.
-    sequence_results : array_like
-        The results of executing the gate sequences.
-    shots : int
-        The number of shots (repetitions) for each measurement.
-    """
-
-    K_target = qiskit_gate_to_operator(gate_set)
-    gate_set_length = len(gate_set)
-    pdim = K_target.shape[-1]  # Physical dimension
-    r = pdim**2  # Matrix dimension of gate superoperators
-    n_povm = pdim  # Number of POVM elements
-    sequence_length = gate_sequences.shape[0]
-
-    X_target = np.einsum("ijkl,ijnm -> iknlm", K_target, K_target.conj()).reshape(
-        (gate_set_length, pdim**2, pdim**2)
-    )  # tensor of superoperators
-
-    # Initial state |0>
-    rho_target = (
-        np.kron(additional_fns.basis(pdim, 0).T.conj(), additional_fns.basis(pdim, 0)).reshape(-1).astype(np.complex128)
-    )
-
-    # Computational basis measurement:
-    E_target = np.array(
-        [
-            np.kron(additional_fns.basis(pdim, i).T.conj(), additional_fns.basis(pdim, i)).reshape(-1)
-            for i in range(pdim)
-        ]
-    ).astype(np.complex128)
-    target_mdl = arrays_to_pygsti_model(X_target, E_target, rho_target, basis="std")
-
-    K_init = additional_fns.perturbed_target_init(X_target, rK)
-
-    bsize = 30 * pdim  # Batch size for optimization
-    _, X, E, rho, _ = algorithm.run_mGST(
-        sequence_results,
-        gate_sequences,
-        sequence_length,
-        gate_set_length,
-        r,
-        rK,
-        n_povm,
-        bsize,
-        shots,
-        method="SFN",
-        max_inits=10,
-        max_iter=100,
-        final_iter=50,
-        target_rel_prec=1e-4,
-        init=[K_init, E_target, rho_target],
-    )
-
-    # Output the final mean variation error
-    mean_var_error = additional_fns.MVE(
-        X_target, E_target, rho_target, X, E, rho, gate_set_length, sequence_length, n_povm
-    )[0]
-    print(f"Mean variation error:", mean_var_error)
-    print(f"Optimizing gauge...")
-    weights = dict({f"G%i" % i: 1 for i in range(gate_set_length)}, **{"spam": 1})
-    X_opt, E_opt, rho_opt = gauge_opt(X, E, rho, target_mdl, weights)
-    print("Compressive GST routine complete")
-
-    # Making sense of the outcomes
-    df_g, df_o = quick_report(X_opt, E_opt, rho_opt, gate_sequences, sequence_results, target_mdl)
-    print("First results:")
-    print(df_g.to_string())
-    print(df_o.T.to_string())
-
-    return X_opt, E_opt, rho_opt
