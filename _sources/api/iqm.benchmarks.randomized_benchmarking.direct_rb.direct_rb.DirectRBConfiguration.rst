@@ -13,9 +13,7 @@ iqm.benchmarks.randomized\_benchmarking.direct\_rb.direct\_rb.DirectRBConfigurat
 
    .. autosummary::
    
-      ~DirectRBConfiguration.model_computed_fields
       ~DirectRBConfiguration.model_config
-      ~DirectRBConfiguration.model_fields
       ~DirectRBConfiguration.benchmark
       ~DirectRBConfiguration.qubits_array
       ~DirectRBConfiguration.is_eplg

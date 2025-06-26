@@ -13,9 +13,7 @@ iqm.benchmarks.optimization.qscore.QScoreConfiguration
 
    .. autosummary::
    
-      ~QScoreConfiguration.model_computed_fields
       ~QScoreConfiguration.model_config
-      ~QScoreConfiguration.model_fields
       ~QScoreConfiguration.benchmark
       ~QScoreConfiguration.num_instances
       ~QScoreConfiguration.num_qaoa_layers

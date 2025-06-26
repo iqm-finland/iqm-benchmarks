@@ -13,9 +13,7 @@ iqm.benchmarks.entanglement.ghz.GHZConfiguration
 
    .. autosummary::
    
-      ~GHZConfiguration.model_computed_fields
       ~GHZConfiguration.model_config
-      ~GHZConfiguration.model_fields
       ~GHZConfiguration.benchmark
       ~GHZConfiguration.state_generation_routine
       ~GHZConfiguration.custom_qubits_array

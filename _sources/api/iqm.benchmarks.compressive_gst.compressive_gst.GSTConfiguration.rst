@@ -13,9 +13,7 @@ iqm.benchmarks.compressive\_gst.compressive\_gst.GSTConfiguration
 
    .. autosummary::
    
-      ~GSTConfiguration.model_computed_fields
       ~GSTConfiguration.model_config
-      ~GSTConfiguration.model_fields
       ~GSTConfiguration.benchmark
       ~GSTConfiguration.qubit_layouts
       ~GSTConfiguration.gate_set

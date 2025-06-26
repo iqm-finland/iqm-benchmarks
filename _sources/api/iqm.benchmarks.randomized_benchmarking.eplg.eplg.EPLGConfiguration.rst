@@ -13,9 +13,7 @@ iqm.benchmarks.randomized\_benchmarking.eplg.eplg.EPLGConfiguration
 
    .. autosummary::
    
-      ~EPLGConfiguration.model_computed_fields
       ~EPLGConfiguration.model_config
-      ~EPLGConfiguration.model_fields
       ~EPLGConfiguration.benchmark
       ~EPLGConfiguration.drb_depths
       ~EPLGConfiguration.drb_circuit_samples

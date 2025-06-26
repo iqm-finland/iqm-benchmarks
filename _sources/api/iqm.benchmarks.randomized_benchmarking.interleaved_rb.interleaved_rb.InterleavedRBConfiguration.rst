@@ -13,9 +13,7 @@ iqm.benchmarks.randomized\_benchmarking.interleaved\_rb.interleaved\_rb.Interlea
 
    .. autosummary::
    
-      ~InterleavedRBConfiguration.model_computed_fields
       ~InterleavedRBConfiguration.model_config
-      ~InterleavedRBConfiguration.model_fields
       ~InterleavedRBConfiguration.benchmark
       ~InterleavedRBConfiguration.qubits_array
       ~InterleavedRBConfiguration.sequence_lengths

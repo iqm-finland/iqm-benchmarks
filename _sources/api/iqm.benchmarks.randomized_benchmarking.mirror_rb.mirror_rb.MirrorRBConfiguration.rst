@@ -13,9 +13,7 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb.MirrorRBConfigurat
 
    .. autosummary::
    
-      ~MirrorRBConfiguration.model_computed_fields
       ~MirrorRBConfiguration.model_config
-      ~MirrorRBConfiguration.model_fields
       ~MirrorRBConfiguration.benchmark
       ~MirrorRBConfiguration.qubits_array
       ~MirrorRBConfiguration.depths_array

@@ -13,9 +13,7 @@ iqm.benchmarks.randomized\_benchmarking.clifford\_rb.clifford\_rb.CliffordRBConf
 
    .. autosummary::
    
-      ~CliffordRBConfiguration.model_computed_fields
       ~CliffordRBConfiguration.model_config
-      ~CliffordRBConfiguration.model_fields
       ~CliffordRBConfiguration.benchmark
       ~CliffordRBConfiguration.qubits_array
       ~CliffordRBConfiguration.sequence_lengths

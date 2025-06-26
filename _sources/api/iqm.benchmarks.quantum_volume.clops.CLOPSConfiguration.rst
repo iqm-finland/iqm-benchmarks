@@ -13,9 +13,7 @@ iqm.benchmarks.quantum\_volume.clops.CLOPSConfiguration
 
    .. autosummary::
    
-      ~CLOPSConfiguration.model_computed_fields
       ~CLOPSConfiguration.model_config
-      ~CLOPSConfiguration.model_fields
       ~CLOPSConfiguration.benchmark
       ~CLOPSConfiguration.qubits
       ~CLOPSConfiguration.num_circuits
