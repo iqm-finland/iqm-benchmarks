@@ -3,7 +3,6 @@ Data analysis code for compressive gate set tomography
 """
 
 import ast
-from itertools import product
 from time import perf_counter
 from typing import Any, List, Tuple, Union
 
@@ -26,7 +25,6 @@ from mGST import additional_fns, algorithm, compatibility
 from mGST.low_level_jit import contract
 from mGST.qiskit_interface import qiskit_gate_to_operator
 from mGST.reporting import figure_gen, reporting
-
 
 def dataframe_to_figure(
     df: DataFrame, row_labels: Union[List[str], None] = None, col_width: float = 2, fontsize: int = 12
@@ -210,6 +208,8 @@ def generate_non_gate_results(
     Returns:
         df_o_final: Pandas DataFrame
             The final formated results
+        fig: Figure
+            The figure containing the results in table format
     """
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     if dataset.attrs["bootstrap_samples"] > 0:
@@ -218,10 +218,10 @@ def generate_non_gate_results(
         percentiles_o_low, percentiles_o_high = np.nanpercentile(df_o_array, [2.5, 97.5], axis=0)
         df_o_final = DataFrame(
             {
-                f"mean_total_variation_distance_estimate_data": reporting.number_to_str(
+                f"mean_tvd_estimate_data": reporting.number_to_str(
                     df_o.values[0, 1].copy(), [percentiles_o_high[0, 1], percentiles_o_low[0, 1]], precision=5
                 ),
-                f"mean_total_variation_distance_target_data": reporting.number_to_str(
+                f"mean_tvd_target_data": reporting.number_to_str(
                     df_o.values[0, 2].copy(), [percentiles_o_high[0, 2], percentiles_o_low[0, 2]], precision=5
                 ),
                 f"povm_diamond_distance": reporting.number_to_str(
@@ -236,10 +236,10 @@ def generate_non_gate_results(
     else:
         df_o_final = DataFrame(
             {
-                f"mean_total_variation_distance_estimate_data": reporting.number_to_str(
+                f"mean_tvd_estimate_data": reporting.number_to_str(
                     df_o.values[0, 1].copy(), precision=5
                 ),
-                f"mean_total_variation_distance_target_data": reporting.number_to_str(
+                f"mean_tvd_target_data": reporting.number_to_str(
                     df_o.values[0, 2].copy(), precision=5
                 ),
                 f"povm_diamond_distance": reporting.number_to_str(df_o.values[0, 3].copy(), precision=5),
@@ -253,7 +253,7 @@ def generate_non_gate_results(
 
 def generate_unit_rank_gate_results(
     dataset: xr.Dataset, qubit_layout: List[int], df_g: DataFrame, X_opt: ndarray, K_target: ndarray
-) -> Tuple[DataFrame, DataFrame, Figure, Figure]:
+) -> Tuple[DataFrame, DataFrame, Figure]:
     """
     Produces all result tables for Kraus rank 1 estimates and turns them into figures.
 
@@ -280,96 +280,54 @@ def generate_unit_rank_gate_results(
             A dataframe containing Hamiltonian (rotation) parameters
         fig_g: Figure
             A table in Figure format of gate results (fidelities etc.)
-        fig_rotation: Figure
-            A table in Figure format of gate Hamiltonian parameters
 
 
     """
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-    pauli_labels = generate_basis_labels(dataset.attrs["pdim"], basis="Pauli")
     if dataset.attrs["bootstrap_samples"] > 0:
         X_array, E_array, rho_array, df_g_array, _ = dataset.attrs["results_layout_" + identifier]["bootstrap_data"]
         df_g_array[df_g_array == -1] = np.nan
         percentiles_g_low, percentiles_g_high = np.nanpercentile(df_g_array, [2.5, 97.5], axis=0)
-
-        df_g_final = DataFrame(
-            {
-                r"average_gate_fidelity": [
-                    reporting.number_to_str(
-                        df_g.values[i, 0], [percentiles_g_high[i, 0], percentiles_g_low[i, 0]], precision=5
-                    )
-                    for i in range(len(dataset.attrs["gate_labels"][identifier]))
-                ],
-                r"diamond_distance": [
-                    reporting.number_to_str(
-                        df_g.values[i, 1], [percentiles_g_high[i, 1], percentiles_g_low[i, 1]], precision=5
-                    )
-                    for i in range(dataset.attrs["num_gates"])
-                ],
-            }
+        df_g_rotation, hamiltonian_params = reporting.generate_rotation_param_results(
+            dataset, qubit_layout, X_opt, K_target, X_array, E_array, rho_array
         )
-
-        U_opt = reporting.phase_opt(X_opt, K_target)
-        pauli_coeffs = reporting.compute_sparsest_Pauli_Hamiltonian(U_opt)
-
-        bootstrap_pauli_coeffs = np.zeros((len(X_array), dataset.attrs["num_gates"], dataset.attrs["pdim"] ** 2))
-        for i, X_ in enumerate(X_array):
-            X_std, _, _ = compatibility.pp2std(X_, E_array[i], rho_array[i])
-            U_opt_ = reporting.phase_opt(X_std, K_target)
-            pauli_coeffs_ = reporting.compute_sparsest_Pauli_Hamiltonian(U_opt_)
-            bootstrap_pauli_coeffs[i, :, :] = pauli_coeffs_
-        pauli_coeffs_low, pauli_coeffs_high = np.nanpercentile(bootstrap_pauli_coeffs, [2.5, 97.5], axis=0)
-
-        df_g_rotation = DataFrame(
-            np.array(
-                [
-                    [
-                        reporting.number_to_str(
-                            pauli_coeffs[i, j], [pauli_coeffs_high[i, j], pauli_coeffs_low[i, j]], precision=5
-                        )
-                        for i in range(dataset.attrs["num_gates"])
-                    ]
-                    for j in range(dataset.attrs["pdim"] ** 2)
-                ]
-            ).T
-        )
-
-        df_g_rotation.columns = [f"h_%s" % label for label in pauli_labels]
-        df_g_rotation.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
 
     else:
-        df_g_final = DataFrame(
-            {
-                "average_gate_fidelity": [
-                    reporting.number_to_str(df_g.values[i, 0], precision=5) for i in range(dataset.attrs["num_gates"])
-                ],
-                "diamond_distance": [
-                    reporting.number_to_str(df_g.values[i, 1], precision=5) for i in range(dataset.attrs["num_gates"])
-                ],
-            }
-        )
-        U_opt = reporting.phase_opt(X_opt, K_target)
-        pauli_coeffs = reporting.compute_sparsest_Pauli_Hamiltonian(U_opt)
+        df_g_rotation, hamiltonian_params = reporting.generate_rotation_param_results(dataset, qubit_layout, X_opt, K_target)
 
-        df_g_rotation = DataFrame(
-            np.array(
-                [
-                    [
-                        reporting.number_to_str(pauli_coeffs[i, j], precision=5)
-                        for i in range(dataset.attrs["num_gates"])
-                    ]
-                    for j in range(dataset.attrs["pdim"] ** 2)
-                ]
-            ).T
-        )
-        df_g_rotation.columns = [f"h_%s" % label for label in pauli_labels]
-        df_g_rotation.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
-        df_g_final.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
+    # Store non-formated results in dictionary
+    dataset.attrs[f'results_layout_{identifier}']["hamiltonian_params"] = hamiltonian_params
+    df_g_final = DataFrame(
+        {
+            r"average_gate_fidelity": [
+                reporting.number_to_str(
+                    df_g.values[i, 0],
+                    (
+                        [percentiles_g_high[i, 0], percentiles_g_low[i, 0]]
+                        if dataset.attrs["bootstrap_samples"] > 0
+                        else None
+                    ),
+                    precision=5,
+                )
+                for i in range(len(dataset.attrs["gate_labels"][identifier]))
+            ],
+            r"diamond_distance": [
+                reporting.number_to_str(
+                    df_g.values[i, 1],
+                    (
+                        [percentiles_g_high[i, 1], percentiles_g_low[i, 1]]
+                        if dataset.attrs["bootstrap_samples"] > 0
+                        else None
+                    ),
+                    precision=5,
+                )
+                for i in range(dataset.attrs["num_gates"])
+            ],
+        }
+    )
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
-    fig_rotation = dataframe_to_figure(df_g_rotation, dataset.attrs["gate_labels"][identifier])
-    return df_g_final, df_g_rotation, fig_g, fig_rotation
-
+    return df_g_final, df_g_rotation, fig_g
 
 def generate_gate_results(
     dataset: xr.Dataset,
@@ -499,35 +457,8 @@ def generate_gate_results(
     df_g_evals_final.rename(index=dataset.attrs["gate_labels"][identifier], inplace=True)
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
-    fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
-    return df_g_final, df_g_evals_final, fig_g, fig_choi
-
-
-def generate_basis_labels(pdim: int, basis: Union[str, None] = None) -> List[str]:
-    """Generate a list of labels for the Pauli basis or the standard basis
-
-    Args:
-        pdim: int
-            Physical dimension
-        basis: str
-            Which basis the labels correspond to, currently default is standard basis and "Pauli" can be choose
-            for Pauli basis labels like "II", "IX", "XX", ...
-
-    Returns:
-        labels: List[str]
-            A list of all string combinations for the given dimension and basis
-    """
-    separator = ""
-    if basis == "Pauli":
-        pauli_labels_loc = ["I", "X", "Y", "Z"]
-        pauli_labels_rep = [pauli_labels_loc for _ in range(int(np.log2(pdim)))]
-        labels = [separator.join(map(str, x)) for x in product(*pauli_labels_rep)]
-    else:
-        std_labels_loc = ["0", "1"]
-        std_labels_rep = [std_labels_loc for _ in range(int(np.log2(pdim)))]
-        labels = [separator.join(map(str, x)) for x in product(*std_labels_rep)]
-
-    return labels
+    # fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
+    return df_g_final, df_g_evals_final, fig_g#, fig_choi
 
 
 def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
@@ -810,17 +741,16 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         ### Result table generation and full report
         if dataset.attrs["rank"] == 1:
-            df_g_final, df_g_rotation, fig_g, fig_rotation = generate_unit_rank_gate_results(
+            df_g_final, df_g_rotation, fig_g = generate_unit_rank_gate_results(
                 dataset, qubit_layout, df_g, X_opt, K_target
             )
-            dataset.attrs["results_layout_" + identifier].update({"hamiltonian_parameters": df_g_rotation.to_dict()})
-            plots[f"layout_{qubit_layout}_hamiltonian_parameters"] = fig_rotation
+            # dataset.attrs["results_layout_" + identifier].update({"hamiltonian_parameters": df_g_rotation.to_dict()})
         else:
-            df_g_final, df_g_evals, fig_g, fig_choi = generate_gate_results(
+            df_g_final, df_g_evals, fig_g = generate_gate_results(
                 dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt
             )
             dataset.attrs["results_layout_" + identifier].update({"choi_evals": df_g_evals.to_dict()})
-            plots[f"layout_{qubit_layout}_choi_eigenvalues"] = fig_choi
+            # plots[f"layout_{qubit_layout}_choi_eigenvalues"] = fig_choi
         plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
         plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
 
@@ -835,8 +765,8 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         )
 
         ### Process matrix plots
-        pauli_labels = generate_basis_labels(pdim, basis="Pauli")
-        std_labels = generate_basis_labels(pdim)
+        pauli_labels = figure_gen.generate_basis_labels(pdim, basis="Pauli")
+        std_labels = figure_gen.generate_basis_labels(pdim)
 
         figures = figure_gen.generate_gate_err_pdf(
             "",
@@ -869,6 +799,17 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             title=f"Imaginary part of state and measurement effects in the standard basis",
             return_fig=True,
         )
-        plt.close("all")
+
+    # Generate additional figures for Hamiltonian parameters if rank is 1
+    if dataset.attrs["rank"] == 1:
+        matrix_figures, bar_figures = figure_gen.generate_hamiltonian_visualizations(dataset)
+        for layout_idx, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
+            identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+            gate_labels = dataset.attrs["gate_labels"][identifier]
+            for i, fig in enumerate(matrix_figures[layout_idx]):
+                plots[f"layout_{qubit_layout}_hamiltonian_params_{gate_labels[i]}"] = fig
+            for i, fig in enumerate(bar_figures[layout_idx]):
+                plots[f"layout_{qubit_layout}_hamiltonian_params_bar_{gate_labels[i]}"] = fig
+    plt.close("all")
 
     return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)

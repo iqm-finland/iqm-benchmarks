@@ -171,6 +171,7 @@ def add_counts_to_dataset(counts: List[Dict[str, int]], identifier: str, dataset
         dataset_merged: xarray.Dataset
             A merged dataset where the new counts are added the input dataset
     """
+    qcvv_logger.info(f"Adding counts to dataset.")
     if not isinstance(counts, list):
         counts = [counts]
     datasets = []

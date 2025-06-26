@@ -5,8 +5,13 @@ Generation of figures
 from matplotlib import ticker
 from matplotlib.colors import Normalize
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import numpy as np
 import numpy.linalg as la
+import xarray as xr
+from iqm.benchmarks.benchmark_definition import BenchmarkObservationIdentifier
+from typing import List, Tuple
+from mGST.reporting.reporting import generate_basis_labels, compute_matched_ideal_hamiltonian_params
 
 
 SMALL_SIZE = 8
@@ -21,7 +26,7 @@ plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
 plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-cmap = plt.colormaps.get_cmap("RdBu")
+cmap = plt.colormaps.get_cmap("coolwarm")
 norm = Normalize(vmin=-1, vmax=1)
 
 
@@ -196,16 +201,19 @@ def generate_spam_err_std_pdf(
             ax = axes[i, j]
             ax.patch.set_facecolor("whitesmoke")
             ax.set_aspect("equal")
+            max_weight = 2**np.ceil(np.log2(np.abs(plot_matrices[j]).max()))
             for (x, y), w in np.ndenumerate(plot_matrices[j].reshape(pdim, pdim)):
-                size = np.sqrt(np.abs(w))
+                if j == 2:
+                    size = np.sqrt(np.abs(w)/max_weight)
+                else:
+                    size = np.sqrt(np.abs(w))
                 rect = plt.Rectangle(
                     [x + (1 - size) / 2, y + (1 - size) / 2],
                     size,
                     size,
-                    facecolor=cmap((w + 1) / 2),
-                    edgecolor=cmap((w + 1) / 2),
+                    facecolor='#d62728' if w < 0 else '#1f77b4',
+                    edgecolor='#d62728' if w < 0 else '#1f77b4',
                 )
-                # print(cmap(size))
                 ax.add_patch(rect)
             ax.invert_yaxis()
             ax.set_xticks(np.arange(pdim + 1), labels=[])
@@ -226,11 +234,11 @@ def generate_spam_err_std_pdf(
         fig.suptitle(title)
 
     if dim > 16:
-        fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=axes, pad=0, shrink=0.6)
-        fig.subplots_adjust(left=0, right=0.7, top=0.90, bottom=0.05, wspace=-0.6, hspace=0.4)
+        fig.subplots_adjust(left=0, right=1, top=0.80, bottom=0.05, wspace=-0.6, hspace=0.4)
+        set_size(np.sqrt(dim), 2 * np.sqrt(dim))
     else:
-        fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=axes, pad=0)
-        fig.subplots_adjust(left=0, right=0.7, top=0.90, bottom=0.05, wspace=-0.6, hspace=0.8)
+        fig.subplots_adjust(left=0, right=1, top=0.80, bottom=0.05, wspace=-0.8, hspace=0.4)
+        set_size(3 * np.sqrt(dim), 1.2 * np.sqrt(dim))
 
     if return_fig:
         return fig
@@ -244,7 +252,8 @@ def generate_gate_err_pdf(
     filename, gates1, gates2, basis_labels=False, gate_labels=False, magnification=5, return_fig=False
 ):
     """Main routine to generate plots of reconstructed gates, ideal gates and the noise channels
-    of the reconstructed gates.
+    of the reconstructed gates. The matrices are shown as Hinton diagrams, where the size of each square represents
+    the magnitude of the matrix element and the color represents its sign as well as the magnitude.
     The basis is arbitrary but using gates in the Pauli basis is recommended.
 
     Parameters
@@ -283,21 +292,25 @@ def generate_gate_err_pdf(
         plot_matrices = [
             np.real(gates1[i]),
             np.real(gates2[i]),
-            magnification * (np.eye(dim) - np.real(gates1[i] @ la.inv(gates2[i]))),
+            np.eye(dim) - np.real(gates1[i] @ la.inv(gates2[i])),
         ]
 
         for j in range(3):
             ax = axes[j]
             ax.patch.set_facecolor("whitesmoke")
             ax.set_aspect("equal")
+            max_weight = 2**np.ceil(np.log2(np.abs(plot_matrices[j]).max()))
             for (x, y), w in np.ndenumerate(plot_matrices[j].T):
-                size = np.sqrt(np.abs(w))
+                if j == 2:
+                    size = np.sqrt(np.abs(w)/max_weight)
+                else:
+                    size = np.sqrt(np.abs(w))
                 rect = plt.Rectangle(
                     [x + (1 - size) / 2, y + (1 - size) / 2],
                     size,
                     size,
-                    facecolor=cmap((w + 1) / 2),
-                    edgecolor=cmap((w + 1) / 2),
+                    facecolor='#d62728' if w < 0 else '#1f77b4',
+                    edgecolor='#d62728' if w < 0 else '#1f77b4',
                 )
                 ax.add_patch(rect)
             ax.invert_yaxis()
@@ -317,18 +330,224 @@ def generate_gate_err_pdf(
         axes[0].set_title(r"G (estimate)", fontsize="large")
         axes[0].set_ylabel(gate_labels[i], rotation=90, fontsize="large")
         axes[1].set_title(r"U (ideal gate)", fontsize="large")
-        axes[2].set_title(plot3_title, fontsize="large")
-        fig.suptitle(f"Process matrices in the Pauli basis", va="bottom")
+        axes[2].set_title(plot3_title+"\n(renormalized)", fontsize="large")
+        fig.suptitle(f"Process matrices in the Pauli basis\n(red:<0; blue:>0)", va="bottom")
 
         if dim > 16:
-            fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=axes.tolist(), pad=0, shrink=0.6)
-            fig.subplots_adjust(left=0.1, right=0.76, top=0.85, bottom=0.03)
             set_size(0.5 * np.sqrt(dim), 1.3 * np.sqrt(dim))
         else:
-            fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=axes.tolist(), pad=0)
-            fig.subplots_adjust(left=0.1, right=0.76, top=0.85, bottom=0.03, hspace=0.2)
             set_size(2 * np.sqrt(dim), 0.8 * np.sqrt(dim))
         figures.append(fig)
         if not return_fig:
             plt.savefig(filename + f"G%i.pdf" % i, dpi=150, transparent=True, bbox_inches="tight")
     return figures
+
+def generate_hamiltonian_visualizations(
+    dataset: xr.Dataset, n_errs: int = 4, threshold: float = 0.01
+) -> Tuple[List[List[Figure]], List[List[Figure]]]:
+    """
+    Plots the coherent errors as the difference of the entries of the Hamiltonian in the Pauli basis to its ideal values.
+    1. Matrix plots showing all parameters with color coding
+    2. Bar plots showing the largest coherent errors
+
+    Args:
+        dataset (xarray.Dataset): A dataset containing counts from the experiment, results, and configurations.
+        n_errs (int): Number of largest errors to plot in bar charts. Default is 4.
+        threshold (float, optional): Minimum threshold for errors to display in bar charts. The threshold can lead to
+            more than n_errs errors being displayed.
+
+    Returns:
+        Tuple[List[List[matplotlib.figure.Figure]], List[List[matplotlib.figure.Figure]]]:
+            A tuple containing two nested lists of figures for each qubit layout and gate:
+            - Matrix plots
+            - Bar plots
+    """
+    # Get the Hamiltonian parameters and their ideal values
+    hamiltonian_params, hamiltonian_params_ideal = compute_matched_ideal_hamiltonian_params(dataset)
+    param_labels = generate_basis_labels(dataset.attrs["pdim"], basis="Pauli")
+    gate_labels = list(dataset.attrs["gate_labels"].values())
+
+    # Collect upper and lower end of the confidence intervals
+    qubit_layouts = dataset.attrs["qubit_layouts"]
+    has_uncertainties = all(
+        dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
+            'hamiltonian_params'
+        ].get("uncertainties")
+        is not None
+        for layout in qubit_layouts
+    )
+
+    if has_uncertainties:
+        hamiltonian_params_low = np.array(
+            [
+                dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
+                    "hamiltonian_params"
+                ]["uncertainties"][0]
+                for layout in qubit_layouts
+            ]
+        )
+        hamiltonian_params_high = np.array(
+            [
+                dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
+                    "hamiltonian_params"
+                ]["uncertainties"][1]
+                for layout in qubit_layouts
+            ]
+        )
+    else:
+        # Create dummy arrays if no uncertainties are available
+        hamiltonian_params_low = hamiltonian_params.copy()
+        hamiltonian_params_high = hamiltonian_params.copy()
+
+    matrix_figures = []
+    bar_figures = []
+
+    # Iterate through each layout's parameters
+    for params, params_ideal, params_low, params_high, gate_label_dict in zip(
+        hamiltonian_params, hamiltonian_params_ideal, hamiltonian_params_low, hamiltonian_params_high, gate_labels
+    ):
+        layout_matrix_figures = []
+        layout_bar_figures = []
+
+        # Generate figures for each gate in the layout
+        for l, gate_label in gate_label_dict.items():
+            # Calculate error vectors (difference between measured and ideal)
+            param_vec = ((params - params_ideal)[:, l]).reshape(-1)
+            param_vec_low = ((params_low - params_ideal)[:, l]).reshape(-1) if has_uncertainties else param_vec
+            param_vec_high = ((params_high - params_ideal)[:, l]).reshape(-1) if has_uncertainties else param_vec
+
+            # Get uncertainties as difference vectors for error bars
+            yerr_low = np.abs(param_vec - param_vec_low) if has_uncertainties else None
+            yerr_high = np.abs(param_vec_high - param_vec) if has_uncertainties else None
+
+            # 1. Generate matrix plot
+            param_vec_reshaped = param_vec.reshape(-1, 1)
+            param_vec_low_reshaped = param_vec_low.reshape(-1, 1)
+            param_vec_high_reshaped = param_vec_high.reshape(-1, 1)
+            shape = param_vec_reshaped.shape
+            max_size = 16
+            num_splits = int(np.ceil(shape[0] / max_size))
+
+            # Split param_vector into a smaller array to plot
+            param_splits = np.array_split(param_vec_reshaped, num_splits, axis=0)
+            param_splits_low = np.array_split(param_vec_low_reshaped, num_splits, axis=0)
+            param_splits_high = np.array_split(param_vec_high_reshaped, num_splits, axis=0)
+
+            fig_matrix, axes = plt.subplots(len(param_splits), 1, figsize=(10, len(param_splits)))
+            if len(param_splits) == 1:
+                axes = [axes]
+
+            for idx, (param_split, param_split_low, param_split_high, ax) in enumerate(
+                zip(param_splits, param_splits_low, param_splits_high, axes)
+            ):
+                split_size = param_split.shape[0]
+                im = ax.matshow(param_split.T, cmap="coolwarm", vmin=-0.05, vmax=0.05)
+                ax.set_yticks(np.arange(1), labels=[gate_label], rotation=0)
+                ax.set_xticks(
+                    np.arange(split_size), labels=list(param_labels)[idx * split_size : (idx + 1) * split_size]
+                )
+
+                for i in range(param_split.shape[0]):
+                    for j in range(param_split.shape[1]):
+                        param_value = f"{param_split[i, j]:.3f}"
+
+                        if has_uncertainties:
+                            upper_bound = f"{param_split_high[i, j]:.3f}"
+                            lower_bound = f"{param_split_low[i, j]:.3f}"
+
+                            # Display upper bound above the parameter value
+                            ax.text(i, j-0.2, upper_bound, va='center', ha='center', color="black", fontsize=6)
+                            # Display parameter value in the middle
+                            ax.text(i, j, param_value, va='center', ha='center', color="black", fontweight='bold')
+                            # Display lower bound below the parameter value
+                            ax.text(i, j+0.2, lower_bound, va='center', ha='center', color="black", fontsize=6)
+                        else:
+                            # Just display the parameter value if no uncertainties
+                            ax.text(i, j, param_value, va='center', ha='center', color="black")
+
+            fig_matrix.colorbar(im, ax=axes, fraction=0.005, pad=0.04)
+            layout_matrix_figures.append(fig_matrix)
+            plt.close(fig_matrix)
+
+            # 2. Generate bar plot for largest errors
+            fig_bar, ax = plt.subplots(figsize=(6, 4))
+
+            # Sort indices by absolute magnitude
+            sorting_indices = np.argsort(np.abs(param_vec))[::-1]
+            param_vec_sorted = np.abs(param_vec)[sorting_indices]
+
+            # Apply a threshold if provided to show more than n_errs errors
+            if threshold is not None:
+                mask = param_vec_sorted >= threshold
+                if np.any(mask):
+                    param_vec_sorted = param_vec_sorted[mask]
+                    sorting_indices = sorting_indices[mask]
+                    n_errs = max(n_errs, len(param_vec_sorted))
+
+            # Truncate to determined number of errors
+            param_vec_sorted = param_vec_sorted[:n_errs]
+            sorting_indices = sorting_indices[:n_errs]
+
+            # Color bars based on parameter sign
+            colors = ['#1f77b4' if param_vec[i] >= 0 else '#d62728' for i in sorting_indices]
+
+            # Create bars
+            bars = ax.bar(
+                range(n_errs),
+                param_vec_sorted,
+                color=colors,
+                alpha=0.7,
+            )
+
+            # Add error bars if available
+            if has_uncertainties:
+                error_low = yerr_low[sorting_indices]
+                error_high = yerr_high[sorting_indices]
+                error_positions = np.arange(n_errs)
+
+                ax.errorbar(
+                    error_positions,
+                    param_vec_sorted,
+                    yerr=[error_low, error_high],
+                    fmt='none',
+                    ecolor=[0.2,0.2,0.2, 0.5],
+                    capsize=3,
+                )
+
+            # Configure axis labels and title
+            ax.set_xticks(range(n_errs))
+            ax.set_xticklabels(np.array(list(param_labels))[sorting_indices])
+            ax.set_ylim(0, 0.05)
+            ax.set_xlabel('Pauli labels')
+            ax.set_ylabel('Absolute deviation from target')
+            ax.set_title(f'Largest coherent errors for {gate_label}', fontsize=10)
+
+            # Add legend
+            legend_labels = ['Positive', 'Negative']
+            handles = [
+                plt.Rectangle((0, 0), 1, 1, color='#1f77b4', alpha=0.7),
+                plt.Rectangle((0, 0), 1, 1, color='#d62728', alpha=0.7),
+            ]
+            ax.legend(handles, legend_labels, title='Parameter Sign')
+
+            # Add values on top of each bar
+            for i, bar in enumerate(bars):
+                value = param_vec[sorting_indices[i]]
+                height = bar.get_height()
+                ax.annotate(
+                    f'{value:.3f}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center',
+                    va='bottom',
+                    fontsize=9,
+                )
+
+            layout_bar_figures.append(fig_bar)
+            plt.close(fig_bar)
+
+        matrix_figures.append(layout_matrix_figures)
+        bar_figures.append(layout_bar_figures)
+
+    return matrix_figures, bar_figures
