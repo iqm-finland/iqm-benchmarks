@@ -15,7 +15,7 @@
 import logging
 from math import ceil
 import threading
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Tuple
 import warnings
 
 import mthree
@@ -273,3 +273,74 @@ def apply_readout_error_mitigation(
     logging.getLogger().setLevel(logging.INFO)
 
     return rem_quasidistro
+
+def remove_spaces_from_keys(results: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, List[int]]]]:
+    """Remove spaces from keys in counts dictionaries. This is necessary for compatibility with M3, since
+    counts from two classical registers with a space in the middle are registered by M3 as having an extra qubit where
+    the space is.
+
+    Args:
+        results (List[Dict[str, Any]]): List of dictionaries with keys that may contain spaces.
+
+    Returns:
+        Tuple[List[Dict[str, Any]], List[Dict[str, List[int]]]]:
+            - List of dictionaries with spaces removed from keys
+            - List of dictionaries mapping cleaned keys to their original space positions
+    """
+    if not results:
+        return results, []
+
+    cleaned_results = []
+    all_space_positions = []
+
+    for result_dict in results:
+        cleaned_result = {}
+        space_positions = {}
+
+        for key, value in result_dict.items():
+            # Store positions of spaces in the key
+            positions = [i for i, char in enumerate(key) if char == ' ']
+            if positions:
+                cleaned_key = key.replace(" ", "")
+                cleaned_result[cleaned_key] = value
+                space_positions[cleaned_key] = positions
+            else:
+                cleaned_result[key] = value
+
+        cleaned_results.append(cleaned_result)
+        all_space_positions.append(space_positions)
+
+    return cleaned_results, all_space_positions
+
+def restore_spaces_in_keys(results: List[Dict[str, Any]], space_positions: List[Dict[str, List[int]]]) -> List[Dict[str, Any]]:
+    """Restore spaces in keys of counts dictionaries.
+
+    Args:
+        results (List[Dict[str, Any]]): List of dictionaries with spaces removed from keys.
+        space_positions (List[Dict[str, List[int]]]): List of dictionaries mapping cleaned keys to their original space positions.
+
+    Returns:
+        List[Dict[str, Any]]: List of dictionaries with spaces restored in keys.
+    """
+    if not results:
+        return results
+
+    restored_results = []
+
+    for result_dict, positions_dict in zip(results, space_positions):
+        restored_result = {}
+
+        for key, value in result_dict.items():
+            if key in positions_dict:
+                # Insert spaces at the recorded positions
+                chars = list(key)
+                for pos in sorted(positions_dict[key], reverse=True):
+                    chars.insert(pos, ' ')
+                restored_key = ''.join(chars)
+                restored_result[restored_key] = value
+            else:
+                restored_result[key] = value
+
+        restored_results.append(restored_result)
+
+    return restored_results

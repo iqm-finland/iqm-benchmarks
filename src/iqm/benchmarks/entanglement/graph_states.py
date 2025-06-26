@@ -38,6 +38,7 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkObservationIdentifier,
     add_counts_to_dataset,
 )
+from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation, remove_spaces_from_keys, restore_spaces_in_keys
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
 from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_transpilation,
@@ -292,18 +293,26 @@ def plot_max_negativities(
         Tuple[str, Figure]: The figure label and the max negativities plot figure.
     """
     fig_name = f"max_negativities_{backend_name}_{timestamp}".replace(" ", "_")
-    # Sort the negativities by value
-    sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
 
-    x = [x.replace("(", "").replace(")", "").replace(", ", "-") for x in list(sorted_negativities.keys())]
+    # Split negativities in raw and readout error mitigated negativities
+    negativities_raw = {k: v for k, v in negativities.items() if "rem" not in k}
+    negativities_rem = {k: v for k, v in negativities.items() if "rem" in k}
+    # Sort by raw negatibity values
+    sorted_negativities_raw = dict(sorted(negativities_raw.items(), key=lambda item: item[1]["value"]))
+    sorted_negativities_rem = {k: negativities_rem[k+"_rem"] for k in sorted_negativities_raw.keys()}
+
+    x = [x.replace("(", "").replace(")", "").replace(", ", "-") for x in list(sorted_negativities_raw.keys())]
     x_updated = [
         f"{cast(str, qubit_names[int(a)])[2:]}-{cast(str, qubit_names[int(b)])[2:]}"
         for edge in x
         for a, b in [edge.split("-")]
     ]  ## reindexes the edges label as in the QPU graph.
 
-    y = [a["value"] for a in sorted_negativities.values()]
-    yerr = [a["uncertainty"] for a in sorted_negativities.values()]
+    y = [a["value"] for a in sorted_negativities_raw.values()]
+    yerr = [a["uncertainty"] for a in sorted_negativities_raw.values()]
+
+    y_rem = [a["value"] for a in sorted_negativities_rem.values()]
+    yerr_rem = [a["uncertainty"] for a in sorted_negativities_rem.values()]
 
     cmap = plt.get_cmap("winter")
 
@@ -324,6 +333,18 @@ def plot_max_negativities(
         fmt="o",
         alpha=1,
         mec="black",
+        markersize=3,
+        label=errorbar_labels,
+    )
+    plt.errorbar(
+        x_updated,
+        y_rem,
+        yerr=yerr_rem,
+        capsize=2,
+        color=cmap(0.15),
+        fmt="o",
+        alpha=1,
+        mec="red",
         markersize=3,
         label=errorbar_labels,
     )
@@ -423,6 +444,9 @@ def plot_max_negativities_graph(
         if station is not None
         else f"max_negativities_graph_{timestamp}"
     )
+
+    # Remove rem results
+    negativities = {k: v for k, v in negativities.items() if "rem" not in k}
     # Sort the negativities by value
     sorted_negativities = dict(sorted(negativities.items(), key=lambda item: item[1]["value"]))
 
@@ -777,6 +801,7 @@ def state_tomography_analysis(
     max_negativities: Dict[str, Dict[str, str | float]] = {}
 
     execution_results = {}
+    raw_execution_results = {}
 
     num_bootstraps = dataset.attrs["num_bootstraps"]
 
@@ -790,159 +815,185 @@ def state_tomography_analysis(
     num_tomo_samples = (
         3**2
     )  # In general 3**n samples suffice (assuming trace-preservation and unitality for the Pauli measurements)
-    for group_idx, group in all_qubit_pairs_per_group.items():
-        qcvv_logger.info(
-            f"Retrieving tomography-reconstructed states with {num_bootstraps} for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
-        )
 
-        # Assume only pairs and nearest-neighbors were measured, and each pair in the group used num_RMs randomized measurements:
-        execution_results[group_idx] = xrvariable_to_counts(
-            dataset, str(all_unprojected_qubits[group_idx]), num_tomo_samples * len(group)
-        )
+    # Additionally retrieve and analyze readout error mitigated counts if available:
+    cases_to_analyze = ["", "_rem"] if dataset.attrs["rem"] == True else [""]
+    for identifier_suffix in cases_to_analyze:
+        if identifier_suffix == "_rem":
+            qcvv_logger.info(f"Analyzing readout error mitigated tomography data.")
+        for group_idx, group in all_qubit_pairs_per_group.items():
+            qcvv_logger.info(
+                f"Retrieving tomography-reconstructed states with {num_bootstraps} for qubit-pair group {group_idx+1}/{len(all_qubit_pairs_per_group)}"
+            )
 
-        tomography_state[group_idx] = {}
-        bootstrapped_states[group_idx] = {}
-        tomography_negativities[group_idx] = {}
-        bootstrapped_negativities[group_idx] = {}
-        bootstrapped_avg_negativities[group_idx] = {}
+            # Assume only pairs and nearest-neighbors were measured, and each pair in the group used num_RMs randomized measurements:
+            execution_results[group_idx] = xrvariable_to_counts(
+                dataset, str(all_unprojected_qubits[group_idx])+identifier_suffix, num_tomo_samples * len(group)
+            )
+            raw_execution_results[group_idx] = xrvariable_to_counts(
+                dataset, str(all_unprojected_qubits[group_idx]), num_tomo_samples * len(group)
+            )
 
-        partitioned_counts = split_sequence_in_chunks(execution_results[group_idx], num_tomo_samples)
+            tomography_state[group_idx] = {}
+            bootstrapped_states[group_idx] = {}
+            tomography_negativities[group_idx] = {}
+            bootstrapped_negativities[group_idx] = {}
+            bootstrapped_avg_negativities[group_idx] = {}
 
-        for pair_idx, qubit_pair in enumerate(group):
-            # Get the neighbor qubits of qubit_pair
-            neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
-            neighbor_bit_strings_length = len(neighbor_qubits)
-            # Generate all possible projection bitstrings for the neighbors, {'0','1'}^{\otimes{N}}
-            all_projection_bit_strings = [
-                "".join(x) for x in itertools.product(("0", "1"), repeat=neighbor_bit_strings_length)
-            ]
+            partitioned_counts = split_sequence_in_chunks(execution_results[group_idx], num_tomo_samples)
+            raw_partitioned_counts = split_sequence_in_chunks(raw_execution_results[group_idx], num_tomo_samples)
 
-            sqg_pauli_strings = ("Z", "X", "Y")
-            all_nonId_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=2)]
+            for pair_idx, qubit_pair in enumerate(group):
+                # Get the neighbor qubits of qubit_pair
+                neighbor_qubits = all_qubit_neighbors_per_group[group_idx][pair_idx]
+                neighbor_bit_strings_length = len(neighbor_qubits)
+                # Generate all possible projection bitstrings for the neighbors, {'0','1'}^{\otimes{N}}
+                all_projection_bit_strings = [
+                    "".join(x) for x in itertools.product(("0", "1"), repeat=neighbor_bit_strings_length)
+                ]
 
-            pauli_expectations: Dict[str, Dict[str, float]] = {
-                projection: {} for projection in all_projection_bit_strings
-            }
-            # pauli_expectations: projected_bit_string -> pauli string -> float expectation
-            for pauli_idx, counts in enumerate(partitioned_counts[pair_idx]):
-                projected_counts = {
-                    projection: {
-                        b_s[-2:]: b_c for b_s, b_c in counts.items() if b_s[:neighbor_bit_strings_length] == projection
+                sqg_pauli_strings = ("Z", "X", "Y")
+                all_nonId_pauli_labels = ["".join(x) for x in itertools.product(sqg_pauli_strings, repeat=2)]
+
+                pauli_expectations: Dict[str, Dict[str, float]] = {
+                    projection: {} for projection in all_projection_bit_strings
+                }
+                # pauli_expectations: projected_bit_string -> pauli string -> float expectation
+                for pauli_idx, counts in enumerate(partitioned_counts[pair_idx]):
+                    projected_counts = {
+                        projection: {
+                            b_s[-2:]: b_c for b_s, b_c in counts.items() if b_s[:neighbor_bit_strings_length] == projection
+                        }
+                        for projection in all_projection_bit_strings
+                        if projection in [c[:neighbor_bit_strings_length] for c in counts.keys()]
                     }
-                    for projection in all_projection_bit_strings
-                    if projection in [c[:neighbor_bit_strings_length] for c in counts.keys()]
-                }
 
-                pauli_expectations = update_pauli_expectations(
-                    pauli_expectations,
-                    projected_counts,
-                    nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
-                )
-
-            # Remove projections with empty values for pauli_expectations
-            # This will happen if certain projection bitstrings were just not measured
-            pauli_expectations = {
-                projection: expectations for projection, expectations in pauli_expectations.items() if expectations
-            }
-
-            tomography_state[group_idx][str(qubit_pair)] = {
-                projection: get_tomography_matrix(pauli_expectations=pauli_expectations[projection])
-                for projection in pauli_expectations.keys()
-            }
-
-            tomography_negativities[group_idx][str(qubit_pair)] = {
-                projected_bit_string: get_negativity(
-                    tomography_state[group_idx][str(qubit_pair)][projected_bit_string], 1, 1
-                )
-                for projected_bit_string in pauli_expectations.keys()
-            }
-
-            # Extract the max negativity and the corresponding projection - save in dictionary
-            all_negativities_list = [
-                tomography_negativities[group_idx][str(qubit_pair)][projected_bit_string]
-                for projected_bit_string in pauli_expectations.keys()
-            ]
-
-            max_negativity_projection_idx = np.argmax(all_negativities_list)
-            max_negativity_bitstring = list(pauli_expectations.keys())[max_negativity_projection_idx]
-
-            # Bootstrapping - do only for max projection bitstring
-            bootstrapped_pauli_expectations: List[Dict[str, Dict[str, float]]] = [
-                {max_negativity_bitstring: {}} for _ in range(num_bootstraps)
-            ]
-            for pauli_idx, counts in enumerate(partitioned_counts[pair_idx]):
-                projected_counts = {
-                    b_s[-2:]: b_c
-                    for b_s, b_c in counts.items()
-                    if b_s[:neighbor_bit_strings_length] == max_negativity_bitstring
-                }
-                all_bootstrapped_counts = bootstrap_counts(
-                    projected_counts, num_bootstraps, include_original_counts=True
-                )
-                for bootstrap in range(num_bootstraps):
-                    bootstrapped_pauli_expectations[bootstrap] = update_pauli_expectations(
-                        bootstrapped_pauli_expectations[bootstrap],
-                        projected_counts={max_negativity_bitstring: all_bootstrapped_counts[bootstrap]},
+                    pauli_expectations = update_pauli_expectations(
+                        pauli_expectations,
+                        projected_counts,
                         nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
                     )
 
-            bootstrapped_states[group_idx][str(qubit_pair)] = [
-                get_tomography_matrix(
-                    pauli_expectations=bootstrapped_pauli_expectations[bootstrap][max_negativity_bitstring]
-                )
-                for bootstrap in range(num_bootstraps)
-            ]
-
-            bootstrapped_negativities[group_idx][str(qubit_pair)] = [
-                get_negativity(bootstrapped_states[group_idx][str(qubit_pair)][bootstrap], 1, 1)
-                for bootstrap in range(num_bootstraps)
-            ]
-
-            bootstrapped_avg_negativities[group_idx][str(qubit_pair)] = {
-                "value": float(np.mean(bootstrapped_negativities[group_idx][str(qubit_pair)])),
-                "uncertainty": float(np.std(bootstrapped_negativities[group_idx][str(qubit_pair)])),
-            }
-
-            max_negativity = {
-                "value": all_negativities_list[max_negativity_projection_idx],
-                "bootstrapped_average": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["value"],
-                "uncertainty": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["uncertainty"],
-            }
-
-            max_negativities[str(qubit_pair)] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
-            max_negativities[str(qubit_pair)].update(
-                {
-                    "projection": max_negativity_bitstring,
+                # Remove projections with empty values for pauli_expectations
+                # This will happen if certain projection bitstrings were just not measured
+                pauli_expectations = {
+                    projection: expectations for projection, expectations in pauli_expectations.items() if expectations
                 }
-            )
-            max_negativities[str(qubit_pair)].update(max_negativity)
 
-            fig_name, fig = plot_density_matrix(
-                matrix=tomography_state[group_idx][str(qubit_pair)][max_negativity_bitstring],
-                qubit_pair=qubit_pair,
-                projection=max_negativity_bitstring,
-                negativity=max_negativity,
-                backend_name=backend_name,
-                timestamp=execution_timestamp,
-                tomography="state_tomography",
-            )
-            plots[fig_name] = fig
+                tomography_state[group_idx][str(qubit_pair)] = {
+                    projection: get_tomography_matrix(pauli_expectations=pauli_expectations[projection])
+                    for projection in pauli_expectations.keys()
+                }
 
-            observations.extend(
-                [
-                    BenchmarkObservation(
-                        name="max_negativity",
-                        value=max_negativity["value"],
-                        uncertainty=max_negativity["uncertainty"],
-                        identifier=BenchmarkObservationIdentifier(qubit_pair),
+                tomography_negativities[group_idx][str(qubit_pair)] = {
+                    projected_bit_string: get_negativity(
+                        tomography_state[group_idx][str(qubit_pair)][projected_bit_string], 1, 1
                     )
+                    for projected_bit_string in pauli_expectations.keys()
+                }
+
+                # Extract the max negativity and the corresponding projection - save in dictionary
+                all_negativities_list = [
+                    tomography_negativities[group_idx][str(qubit_pair)][projected_bit_string]
+                    for projected_bit_string in pauli_expectations.keys()
                 ]
-            )
+
+                max_negativity_projection_idx = np.argmax(all_negativities_list)
+                max_negativity_bitstring = list(pauli_expectations.keys())[max_negativity_projection_idx]
+
+                # Bootstrapping - do only for max projection bitstring
+                bootstrapped_pauli_expectations: List[Dict[str, Dict[str, float]]] = [
+                    {max_negativity_bitstring: {}} for _ in range(num_bootstraps)
+                ]
+                for pauli_idx, (counts, raw_counts) in enumerate(zip(partitioned_counts[pair_idx], raw_partitioned_counts[pair_idx])):
+                    projected_counts = {
+                        b_s[-2:]: b_c
+                        for b_s, b_c in counts.items()
+                        if b_s[:neighbor_bit_strings_length] == max_negativity_bitstring
+                    }
+                    raw_projected_counts = {
+                        b_s[-2:]: b_c
+                        for b_s, b_c in raw_counts.items()
+                        if b_s[:neighbor_bit_strings_length] == max_negativity_bitstring
+                    }
+                    if identifier_suffix == "_rem":
+                        rng = np.random.default_rng()
+                        all_bootstrapped_counts = []
+                        num_shots = np.sum(np.array(list(raw_projected_counts.values())))
+                        for i in range(num_bootstraps+1): # + 1 since we include the original counts for the non-rem version
+                            renormalized_probabilities = np.array(list(projected_counts.values()))/np.sum(np.array(list(projected_counts.values())))
+                            sampled_counts = rng.multinomial(num_shots, renormalized_probabilities)
+                            sample_dict = {key: sampled_counts[i] for i,key in enumerate(projected_counts.keys())}
+                            all_bootstrapped_counts.append(sample_dict)
+                    else:
+                        all_bootstrapped_counts = bootstrap_counts(
+                            projected_counts, num_bootstraps, include_original_counts=True
+                        )
+                    for bootstrap in range(num_bootstraps):
+                        bootstrapped_pauli_expectations[bootstrap] = update_pauli_expectations(
+                            bootstrapped_pauli_expectations[bootstrap],
+                            projected_counts={max_negativity_bitstring: all_bootstrapped_counts[bootstrap]},
+                            nonId_pauli_label=all_nonId_pauli_labels[pauli_idx],
+                        )
+
+                bootstrapped_states[group_idx][str(qubit_pair)] = [
+                    get_tomography_matrix(
+                        pauli_expectations=bootstrapped_pauli_expectations[bootstrap][max_negativity_bitstring]
+                    )
+                    for bootstrap in range(num_bootstraps)
+                ]
+
+                bootstrapped_negativities[group_idx][str(qubit_pair)] = [
+                    get_negativity(bootstrapped_states[group_idx][str(qubit_pair)][bootstrap], 1, 1)
+                    for bootstrap in range(num_bootstraps)
+                ]
+
+                bootstrapped_avg_negativities[group_idx][str(qubit_pair)] = {
+                    "value": float(np.mean(bootstrapped_negativities[group_idx][str(qubit_pair)])),
+                    "uncertainty": float(np.std(bootstrapped_negativities[group_idx][str(qubit_pair)])),
+                }
+
+                max_negativity = {
+                    "value": all_negativities_list[max_negativity_projection_idx],
+                    "bootstrapped_average": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["value"],
+                    "uncertainty": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["uncertainty"],
+                }
+
+                max_negativities[str(qubit_pair)+identifier_suffix] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
+                max_negativities[str(qubit_pair)+identifier_suffix].update(
+                    {
+                        "projection": max_negativity_bitstring,
+                    }
+                )
+                max_negativities[str(qubit_pair)+identifier_suffix].update(max_negativity)
+
+                if identifier_suffix == "":
+                    fig_name, fig = plot_density_matrix(
+                        matrix=tomography_state[group_idx][str(qubit_pair)][max_negativity_bitstring],
+                        qubit_pair=qubit_pair,
+                        projection=max_negativity_bitstring,
+                        negativity=max_negativity,
+                        backend_name=backend_name,
+                        timestamp=execution_timestamp,
+                        tomography="state_tomography",
+                    )
+                    plots[fig_name] = fig
+
+                observations.extend(
+                    [
+                        BenchmarkObservation(
+                            name="max_negativity"+identifier_suffix,
+                            value=max_negativity["value"],
+                            uncertainty=max_negativity["uncertainty"],
+                            identifier=BenchmarkObservationIdentifier(qubit_pair),
+                        )
+                    ]
+                )
 
         dataset.attrs.update(
             {
                 "all_tomography_states": tomography_state,
-                "all_negativities": tomography_negativities,
+                "all_negativities"+identifier_suffix: tomography_negativities,
             }
         )
 
@@ -1043,6 +1094,8 @@ class GraphStateBenchmark(Benchmark):
         self.num_bootstraps = configuration.num_bootstraps
         self.n_random_unitaries = configuration.n_random_unitaries
         self.n_median_of_means = configuration.n_median_of_means
+        self.rem = configuration.rem
+        self.mit_shots = configuration.mit_shots
 
         # Initialize relevant variables for the benchmark
         self.graph_state_circuit = generate_graph_state(self.qubits, self.backend)
@@ -1285,6 +1338,7 @@ class GraphStateBenchmark(Benchmark):
                 {
                     "unprojected_qubits": unprojected_qubits[idx],
                     "neighbor_qubits": neighbor_qubits[idx],
+                    "job_circuits": sorted_transpiled_qc_list,
                     "jobs": graph_jobs,
                     "time_submit": time_submit,
                 }
@@ -1314,6 +1368,14 @@ class GraphStateBenchmark(Benchmark):
 
             qcvv_logger.info(f"Adding counts of qubit pairs {unprojected_qubits} to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(unprojected_qubits), dataset)
+            if self.rem:
+                qcvv_logger.info(f"Applying readout error mitigation for qubits {unprojected_qubits}")
+                job_circuits = all_graph_submit_results[job_idx]["job_circuits"][tuple(unprojected_qubits)]
+                cleared_execution_results, space_positions = remove_spaces_from_keys(execution_results)
+                rem_results, _ = apply_readout_error_mitigation(backend, job_circuits, cleared_execution_results, self.mit_shots)
+                rem_results_dist_cleared = [counts_mit.nearest_probability_distribution() for counts_mit in rem_results]
+                rem_results_dist = restore_spaces_in_keys(rem_results_dist_cleared, space_positions)
+                dataset, _ = add_counts_to_dataset(rem_results_dist, str(unprojected_qubits) + "_rem", dataset)
 
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
@@ -1339,6 +1401,8 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
         n_median_of_means(int): The number of mean samples over n_random_unitaries to generate a median of means estimator for shadow tomography.
             * NB: The total amount of execution calls will be a multiplicative factor of n_random_unitaries x n_median_of_means.
             * Default is 1 (no median of means).
+        rem (bool): Whether to apply readout error mitigation (REM) to the results.
+        mit_shots (int): The number of shots to use for REM.
 
     """
 
@@ -1348,3 +1412,6 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
     num_bootstraps: int = 50
     n_random_unitaries: int = 100
     n_median_of_means: int = 1
+    rem: bool = True
+    mit_shots: int = 2000
+
