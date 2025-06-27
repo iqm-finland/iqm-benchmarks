@@ -38,9 +38,13 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkObservationIdentifier,
     add_counts_to_dataset,
 )
-from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation, remove_spaces_from_keys, restore_spaces_in_keys
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common import import_native_gate_cliffords
+from iqm.benchmarks.readout_mitigation import (
+    apply_readout_error_mitigation,
+    remove_spaces_from_keys,
+    restore_spaces_in_keys,
+)
 from iqm.benchmarks.utils import (  # marginal_distribution, perform_backend_transpilation,
     bootstrap_counts,
     generate_state_tomography_circuits,
@@ -299,7 +303,7 @@ def plot_max_negativities(
     negativities_rem = {k: v for k, v in negativities.items() if "rem" in k}
     # Sort by raw negatibity values
     sorted_negativities_raw = dict(sorted(negativities_raw.items(), key=lambda item: item[1]["value"]))
-    sorted_negativities_rem = {k: negativities_rem[k+"_rem"] for k in sorted_negativities_raw.keys()}
+    sorted_negativities_rem = {k: negativities_rem[k + "_rem"] for k in sorted_negativities_raw.keys()}
 
     x = [x.replace("(", "").replace(")", "").replace(", ", "-") for x in list(sorted_negativities_raw.keys())]
     x_updated = [
@@ -319,10 +323,16 @@ def plot_max_negativities(
     fig = plt.figure()
     ax = plt.axes()
 
+    plt.set_loglevel('WARNING') # To avoid matplotlib info messages about tick labels
+
     if tomography == "shadow_tomography":
-        errorbar_labels = rf"$1 \mathrm{{SEM}}$ (N={cast(int, num_RM_samples)*cast(int,num_MoMs_samples)} RMs)"
+        errorbar_labels = rf"Negativities (mean {np.mean(y):.2f}), $1 \mathrm{{SEM}}$ (N={cast(int, num_RM_samples)*cast(int,num_MoMs_samples)} RMs)"
+        errorbar_labels_rem = rf"REM negativities (mean {np.mean(y_rem):.2f}), $1 \mathrm{{SEM}}$ (N={cast(int, num_RM_samples)*cast(int,num_MoMs_samples)} RMs)"
     else:
-        errorbar_labels = rf"$1 \sigma$ ({cast(int, num_bootstraps)} bootstraps)"
+        errorbar_labels = rf"Negativities (mean {np.mean(y):.2f}), $1 \sigma$ ({cast(int, num_bootstraps)} bootstraps)"
+        errorbar_labels_rem = (
+            rf"REM negativities (mean {np.mean(y_rem):.2f}), $1 \sigma$ ({cast(int, num_bootstraps)} bootstraps)"
+        )
 
     plt.errorbar(
         x_updated,
@@ -341,12 +351,12 @@ def plot_max_negativities(
         y_rem,
         yerr=yerr_rem,
         capsize=2,
-        color=cmap(0.15),
+        color="red",
         fmt="o",
         alpha=1,
         mec="red",
         markersize=3,
-        label=errorbar_labels,
+        label=errorbar_labels_rem,
     )
     plt.axhline(0.5, color=cmap(1.0), linestyle="dashed")
 
@@ -360,7 +370,7 @@ def plot_max_negativities(
     ax.set_yticks(minor_ticks, minor=True)
     ax.grid(which="both")
 
-    lower_y = np.min(y) - 1.75 * float(yerr[0]) - 0.02 if np.min(y) - float(yerr[0]) < 0 else -0.01
+    lower_y = np.min(y) - 1.75 * float(yerr_rem[0]) - 0.02 if np.min(y_rem) - float(yerr_rem[0]) < 0 else -0.01
     upper_y = np.max(y) + 1.75 * float(yerr[-1]) + 0.02 if np.max(y) + float(yerr[-1]) > 0.5 else 0.51
     ax.set_ylim(
         (
@@ -828,7 +838,7 @@ def state_tomography_analysis(
 
             # Assume only pairs and nearest-neighbors were measured, and each pair in the group used num_RMs randomized measurements:
             execution_results[group_idx] = xrvariable_to_counts(
-                dataset, str(all_unprojected_qubits[group_idx])+identifier_suffix, num_tomo_samples * len(group)
+                dataset, str(all_unprojected_qubits[group_idx]) + identifier_suffix, num_tomo_samples * len(group)
             )
             raw_execution_results[group_idx] = xrvariable_to_counts(
                 dataset, str(all_unprojected_qubits[group_idx]), num_tomo_samples * len(group)
@@ -862,7 +872,9 @@ def state_tomography_analysis(
                 for pauli_idx, counts in enumerate(partitioned_counts[pair_idx]):
                     projected_counts = {
                         projection: {
-                            b_s[-2:]: b_c for b_s, b_c in counts.items() if b_s[:neighbor_bit_strings_length] == projection
+                            b_s[-2:]: b_c
+                            for b_s, b_c in counts.items()
+                            if b_s[:neighbor_bit_strings_length] == projection
                         }
                         for projection in all_projection_bit_strings
                         if projection in [c[:neighbor_bit_strings_length] for c in counts.keys()]
@@ -905,7 +917,9 @@ def state_tomography_analysis(
                 bootstrapped_pauli_expectations: List[Dict[str, Dict[str, float]]] = [
                     {max_negativity_bitstring: {}} for _ in range(num_bootstraps)
                 ]
-                for pauli_idx, (counts, raw_counts) in enumerate(zip(partitioned_counts[pair_idx], raw_partitioned_counts[pair_idx])):
+                for pauli_idx, (counts, raw_counts) in enumerate(
+                    zip(partitioned_counts[pair_idx], raw_partitioned_counts[pair_idx])
+                ):
                     projected_counts = {
                         b_s[-2:]: b_c
                         for b_s, b_c in counts.items()
@@ -920,10 +934,14 @@ def state_tomography_analysis(
                         rng = np.random.default_rng()
                         all_bootstrapped_counts = []
                         num_shots = np.sum(np.array(list(raw_projected_counts.values())))
-                        for i in range(num_bootstraps+1): # + 1 since we include the original counts for the non-rem version
-                            renormalized_probabilities = np.array(list(projected_counts.values()))/np.sum(np.array(list(projected_counts.values())))
+                        for i in range(
+                            num_bootstraps + 1
+                        ):  # + 1 since we include the original counts for the non-rem version
+                            renormalized_probabilities = np.array(list(projected_counts.values())) / np.sum(
+                                np.array(list(projected_counts.values()))
+                            )
                             sampled_counts = rng.multinomial(num_shots, renormalized_probabilities)
-                            sample_dict = {key: sampled_counts[i] for i,key in enumerate(projected_counts.keys())}
+                            sample_dict = {key: sampled_counts[i] for i, key in enumerate(projected_counts.keys())}
                             all_bootstrapped_counts.append(sample_dict)
                     else:
                         all_bootstrapped_counts = bootstrap_counts(
@@ -959,13 +977,15 @@ def state_tomography_analysis(
                     "uncertainty": bootstrapped_avg_negativities[group_idx][str(qubit_pair)]["uncertainty"],
                 }
 
-                max_negativities[str(qubit_pair)+identifier_suffix] = {}  # {str(qubit_pair): {"negativity": float, "projection": str}}
-                max_negativities[str(qubit_pair)+identifier_suffix].update(
+                max_negativities[str(qubit_pair) + identifier_suffix] = (
+                    {}
+                )  # {str(qubit_pair): {"negativity": float, "projection": str}}
+                max_negativities[str(qubit_pair) + identifier_suffix].update(
                     {
                         "projection": max_negativity_bitstring,
                     }
                 )
-                max_negativities[str(qubit_pair)+identifier_suffix].update(max_negativity)
+                max_negativities[str(qubit_pair) + identifier_suffix].update(max_negativity)
 
                 if identifier_suffix == "":
                     fig_name, fig = plot_density_matrix(
@@ -982,7 +1002,7 @@ def state_tomography_analysis(
                 observations.extend(
                     [
                         BenchmarkObservation(
-                            name="max_negativity"+identifier_suffix,
+                            name="max_negativity" + identifier_suffix,
                             value=max_negativity["value"],
                             uncertainty=max_negativity["uncertainty"],
                             identifier=BenchmarkObservationIdentifier(qubit_pair),
@@ -993,7 +1013,7 @@ def state_tomography_analysis(
         dataset.attrs.update(
             {
                 "all_tomography_states": tomography_state,
-                "all_negativities"+identifier_suffix: tomography_negativities,
+                "all_negativities" + identifier_suffix: tomography_negativities,
             }
         )
 
@@ -1372,7 +1392,9 @@ class GraphStateBenchmark(Benchmark):
                 qcvv_logger.info(f"Applying readout error mitigation for qubits {unprojected_qubits}")
                 job_circuits = all_graph_submit_results[job_idx]["job_circuits"][tuple(unprojected_qubits)]
                 cleared_execution_results, space_positions = remove_spaces_from_keys(execution_results)
-                rem_results, _ = apply_readout_error_mitigation(backend, job_circuits, cleared_execution_results, self.mit_shots)
+                rem_results, _ = apply_readout_error_mitigation(
+                    backend, job_circuits, cleared_execution_results, self.mit_shots
+                )
                 rem_results_dist_cleared = [counts_mit.nearest_probability_distribution() for counts_mit in rem_results]
                 rem_results_dist = restore_spaces_in_keys(rem_results_dist_cleared, space_positions)
                 dataset, _ = add_counts_to_dataset(rem_results_dist, str(unprojected_qubits) + "_rem", dataset)
@@ -1414,4 +1436,3 @@ class GraphStateConfiguration(BenchmarkConfigurationBase):
     n_median_of_means: int = 1
     rem: bool = True
     mit_shots: int = 2000
-

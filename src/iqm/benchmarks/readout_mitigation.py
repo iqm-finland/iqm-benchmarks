@@ -274,6 +274,7 @@ def apply_readout_error_mitigation(
 
     return rem_quasidistro
 
+
 def remove_spaces_from_keys(results: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, List[int]]]]:
     """Remove spaces from keys in counts dictionaries. This is necessary for compatibility with M3, since
     counts from two classical registers with a space in the middle are registered by M3 as having an extra qubit where
@@ -312,7 +313,10 @@ def remove_spaces_from_keys(results: List[Dict[str, Any]]) -> Tuple[List[Dict[st
 
     return cleaned_results, all_space_positions
 
-def restore_spaces_in_keys(results: List[Dict[str, Any]], space_positions: List[Dict[str, List[int]]]) -> List[Dict[str, Any]]:
+
+def restore_spaces_in_keys(
+    results: List[Dict[str, Any]], space_positions: List[Dict[str, List[int]]]
+) -> List[Dict[str, Any]]:
     """Restore spaces in keys of counts dictionaries.
 
     Args:
