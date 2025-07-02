@@ -13,6 +13,21 @@ from scipy.linalg import expm, qr
 from mGST.low_level_jit import Mp_norm_lower, MVE_lower, contract, local_basis
 
 
+import contextlib
+import os
+import sys
+
+@contextlib.contextmanager
+def suppress_stdout():
+    """Context manager to temporarily suppress stdout output."""
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
 def transp(dim1, dim2):
     """Superoperator of a map that performs the transpose operation
 

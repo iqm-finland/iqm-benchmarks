@@ -26,6 +26,11 @@ from mGST.low_level_jit import contract
 from mGST.qiskit_interface import qiskit_gate_to_operator
 from mGST.reporting import figure_gen, reporting
 
+from tqdm.contrib.logging import logging_redirect_tqdm
+from tqdm import trange
+from iqm.benchmarks.logging_config import qcvv_logger
+
+
 def dataframe_to_figure(
     df: DataFrame, row_labels: Union[List[str], None] = None, col_width: float = 2, fontsize: int = 12
 ) -> Figure:
@@ -146,46 +151,48 @@ def bootstrap_errors(
     df_g_list = []
     df_o_list = []
 
-    for i in range(dataset.attrs["bootstrap_samples"]):
-        y_sampled = additional_fns.sampled_measurements(y, dataset.attrs["shots"]).copy()
-        _, X_, E_, rho_, _ = algorithm.run_mGST(
-            y_sampled,
-            dataset.attrs["J"],
-            dataset.attrs["seq_len_list"][-1],
-            dataset.attrs["num_gates"],
-            dataset.attrs["pdim"] ** 2,
-            dataset.attrs["rank"],
-            dataset.attrs["num_povm"],
-            dataset.attrs["batch_size"],
-            dataset.attrs["shots"],
-            method=dataset.attrs["opt_method"],
-            max_inits=dataset.attrs["max_inits"],
-            max_iter=0,
-            final_iter=dataset.attrs["max_iterations"][1],
-            threshold_multiplier=dataset.attrs["convergence_criteria"][0],
-            target_rel_prec=dataset.attrs["convergence_criteria"][1],
-            init=[K, E, rho],
-            testing=False,
-        )
+    qcvv_logger.info(f"Analyzing bootstrap samples...")
+    with logging_redirect_tqdm(loggers=[qcvv_logger]):
+        for i in trange(dataset.attrs["bootstrap_samples"]):
+            y_sampled = additional_fns.sampled_measurements(y, dataset.attrs["shots"]).copy()
+            _, X_, E_, rho_, _ = algorithm.run_mGST(
+                y_sampled,
+                dataset.attrs["J"],
+                dataset.attrs["seq_len_list"][-1],
+                dataset.attrs["num_gates"],
+                dataset.attrs["pdim"] ** 2,
+                dataset.attrs["rank"],
+                dataset.attrs["num_povm"],
+                dataset.attrs["batch_size"],
+                dataset.attrs["shots"],
+                method=dataset.attrs["opt_method"],
+                max_inits=dataset.attrs["max_inits"],
+                max_iter=0,
+                final_iter=dataset.attrs["max_iterations"][1],
+                threshold_multiplier=dataset.attrs["convergence_criteria"][0],
+                target_rel_prec=dataset.attrs["convergence_criteria"][1],
+                init=[K, E, rho],
+                verbose_level=0,
+            )
 
-        X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, dataset.attrs[f"gauge_weights"])
-        df_g, df_o = reporting.report(
-            X_opt,
-            E_opt,
-            rho_opt,
-            dataset.attrs["J"],
-            y_sampled,
-            target_mdl,
-            dataset.attrs["gate_labels"][identifier],
-        )
-        df_g_list.append(df_g.values)
-        df_o_list.append(df_o.values)
+            X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, dataset.attrs[f"gauge_weights"])
+            df_g, df_o = reporting.report(
+                X_opt,
+                E_opt,
+                rho_opt,
+                dataset.attrs["J"],
+                y_sampled,
+                target_mdl,
+                dataset.attrs["gate_labels"][identifier],
+            )
+            df_g_list.append(df_g.values)
+            df_o_list.append(df_o.values)
 
-        X_opt_pp, E_opt_pp, rho_opt_pp = compatibility.std2pp(X_opt, E_opt, rho_opt)
+            X_opt_pp, E_opt_pp, rho_opt_pp = compatibility.std2pp(X_opt, E_opt, rho_opt)
 
-        X_array[i] = X_opt_pp
-        E_array[i] = E_opt_pp
-        rho_array[i] = rho_opt_pp
+            X_array[i] = X_opt_pp
+            E_array[i] = E_opt_pp
+            rho_array[i] = rho_opt_pp
 
     return X_array, E_array, rho_array, np.array(df_g_list), np.array(df_o_list)
 
@@ -236,12 +243,8 @@ def generate_non_gate_results(
     else:
         df_o_final = DataFrame(
             {
-                f"mean_tvd_estimate_data": reporting.number_to_str(
-                    df_o.values[0, 1].copy(), precision=5
-                ),
-                f"mean_tvd_target_data": reporting.number_to_str(
-                    df_o.values[0, 2].copy(), precision=5
-                ),
+                f"mean_tvd_estimate_data": reporting.number_to_str(df_o.values[0, 1].copy(), precision=5),
+                f"mean_tvd_target_data": reporting.number_to_str(df_o.values[0, 2].copy(), precision=5),
                 f"povm_diamond_distance": reporting.number_to_str(df_o.values[0, 3].copy(), precision=5),
                 f"state_trace_distance": reporting.number_to_str(df_o.values[0, 4].copy(), precision=5),
             },
@@ -293,7 +296,9 @@ def generate_unit_rank_gate_results(
         )
 
     else:
-        df_g_rotation, hamiltonian_params = reporting.generate_rotation_param_results(dataset, qubit_layout, X_opt, K_target)
+        df_g_rotation, hamiltonian_params = reporting.generate_rotation_param_results(
+            dataset, qubit_layout, X_opt, K_target
+        )
 
     # Store non-formated results in dictionary
     dataset.attrs[f'results_layout_{identifier}']["hamiltonian_params"] = hamiltonian_params
@@ -328,6 +333,7 @@ def generate_unit_rank_gate_results(
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
     return df_g_final, df_g_rotation, fig_g
+
 
 def generate_gate_results(
     dataset: xr.Dataset,
@@ -458,7 +464,7 @@ def generate_gate_results(
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
     # fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
-    return df_g_final, df_g_evals_final, fig_g#, fig_choi
+    return df_g_final, df_g_evals_final, fig_g  # , fig_choi
 
 
 def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
@@ -472,7 +478,7 @@ def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
 
     Returns:
         value: float
-            The parameter value as floar
+            The parameter value as float
         uncertainty: float
             A single uncertainty value
     """
@@ -669,7 +675,7 @@ def run_mGST_wrapper(
         threshold_multiplier=dataset.attrs["convergence_criteria"][0],
         target_rel_prec=dataset.attrs["convergence_criteria"][1],
         init=init_params,
-        testing=dataset.attrs["testing"],
+        verbose_level=dataset.attrs["verbose_level"],
     )
 
     return K, X, E, rho, K_target, X_target, E_target, rho_target
@@ -691,6 +697,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     observations = []
     for i, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
         identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+        qcvv_logger.info(f"Running mGST analysis for layout {qubit_layout} ({i + 1}/{len(dataset.attrs['qubit_layouts'])})")
 
         # Computing circuit outcome probabilities from counts
         y = dataset_counts_to_mgst_format(dataset, qubit_layout)
@@ -734,6 +741,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl, identifier)
             dataset.attrs["results_layout_" + identifier].update({"bootstrap_data": bootstrap_results})
 
+        qcvv_logger.info("Generating error measures and figures")
         _, df_o_full = reporting.report(
             X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"][identifier]
         )
@@ -746,9 +754,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             )
             # dataset.attrs["results_layout_" + identifier].update({"hamiltonian_parameters": df_g_rotation.to_dict()})
         else:
-            df_g_final, df_g_evals, fig_g = generate_gate_results(
-                dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt
-            )
+            df_g_final, df_g_evals, fig_g = generate_gate_results(dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt)
             dataset.attrs["results_layout_" + identifier].update({"choi_evals": df_g_evals.to_dict()})
             # plots[f"layout_{qubit_layout}_choi_eigenvalues"] = fig_choi
         plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
@@ -786,7 +792,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             E_target.real,
             rho_target.real,
             basis_labels=std_labels,
-            title=f"Real part of state and measurement effects in the standard basis",
+            title=f"Real part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
             return_fig=True,
         )
         plots[f"layout_{qubit_layout}_SPAM_matrices_imag"] = figure_gen.generate_spam_err_std_pdf(
@@ -796,20 +802,22 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             E_target.imag,
             rho_target.imag,
             basis_labels=std_labels,
-            title=f"Imaginary part of state and measurement effects in the standard basis",
+            title=f"Imaginary part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
             return_fig=True,
         )
 
     # Generate additional figures for Hamiltonian parameters if rank is 1
     if dataset.attrs["rank"] == 1:
-        matrix_figures, bar_figures = figure_gen.generate_hamiltonian_visualizations(dataset)
-        for layout_idx, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
-            identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-            gate_labels = dataset.attrs["gate_labels"][identifier]
-            for i, fig in enumerate(matrix_figures[layout_idx]):
-                plots[f"layout_{qubit_layout}_hamiltonian_params_{gate_labels[i]}"] = fig
-            for i, fig in enumerate(bar_figures[layout_idx]):
-                plots[f"layout_{qubit_layout}_hamiltonian_params_bar_{gate_labels[i]}"] = fig
+        hamiltonian_plots = figure_gen.generate_hamiltonian_visualizations(dataset)
+        plots.update(hamiltonian_plots)
+        # for layout_idx, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
+        #     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+        #     gate_labels = dataset.attrs["gate_labels"][identifier]
+        #     for i, fig in enumerate(matrix_figures[layout_idx]):
+        #         plots[f"layout_{qubit_layout}_hamiltonian_params_{gate_labels[i]}"] = fig
+        #     for i, fig in enumerate(bar_figures[layout_idx]):
+        #         plots[f"layout_{qubit_layout}_hamiltonian_params_bar_{gate_labels[i]}"] = fig
     plt.close("all")
+    qcvv_logger.info("Analysis completed")
 
     return BenchmarkAnalysisResult(dataset=dataset, observations=observations, plots=plots)

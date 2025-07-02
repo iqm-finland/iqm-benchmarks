@@ -353,6 +353,8 @@ class GSTConfiguration(BenchmarkConfigurationBase):
             * Default: "auto"
         bootstrap_samples (int): The number of times the optimization algorithm is repeated on fake data to estimate
             the uncertainty via bootstrapping.
+        verbose_level (int): The level of verbosity of the output. 0 is minimal, 1 gives optimization updates, 2 outputs optimization plots
+            * Default: 1
         parallel_execution (bool): Whether to run the circuits for all layouts in parallel on the backend.
     """
 
@@ -372,7 +374,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     convergence_criteria: Union[str, List[float]] = [4, 1e-4]
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
-    testing: bool = False
+    verbose_level: int = 1
     parallel_execution: bool = False
 
 

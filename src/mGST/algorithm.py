@@ -27,6 +27,7 @@ from mGST.optimization import (
 )
 from mGST.reporting.figure_gen import plot_objf
 
+
 def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     """Riemannian saddle free Newton step on the POVM parametrization
 
@@ -613,7 +614,7 @@ def run_mGST(
     threshold_multiplier=3,
     fixed_elements=None,
     init=None,
-    testing=False,
+    verbose_level=0,
 ):  # pylint: disable=too-many-branches
     """Main mGST routine
 
@@ -681,7 +682,8 @@ def run_mGST(
         )
 
     success = False
-    qcvv_logger.info(f"Starting mGST optimization...")
+    if verbose_level > 0:
+        qcvv_logger.info(f"Starting mGST optimization...")
 
     if init:
         K, E = (init[0], init[1])
@@ -697,8 +699,8 @@ def run_mGST(
             A = np.array([la.cholesky(E[k].reshape(pdim, pdim) + 1e-14 * np.eye(pdim)).T.conj() for k in range(n_povm)])
             B = la.cholesky(rho.reshape(pdim, pdim))
             res_list = [objf(X, E, rho, J, y)]
-            with logging_redirect_tqdm(loggers=[qcvv_logger]):
-                for _ in trange(max_iter):
+            with logging_redirect_tqdm(loggers=[qcvv_logger] if verbose_level > 0 else None):
+                for _ in trange(max_iter, disable=(verbose_level == 0)):
                     yb, Jb = batch(y, J, bsize)
                     K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
                     res_list.append(objf(X, E, rho, J, y))
@@ -706,29 +708,31 @@ def run_mGST(
                         qcvv_logger.info(f"Batch optimization successful, improving estimate over full data....")
                         success = True
                         break
-            if testing:
+            if verbose_level == 2:
                 plot_objf(res_list, delta, f"Objective function for batch optimization")
             if success:
                 break
-            qcvv_logger.info(f"Run {i+1}/{max_inits} failed, trying new initialization...")
+            if verbose_level > 0:
+                qcvv_logger.info(f"Run {i+1}/{max_inits} failed, trying new initialization...")
 
-    if not success and init is None:
+    if not success and init is None and verbose_level > 0:
         qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
-    with logging_redirect_tqdm(loggers=[qcvv_logger]):
-        for _ in trange(final_iter):
+    with logging_redirect_tqdm(loggers=[qcvv_logger] if verbose_level > 0 else None):
+        for _ in trange(final_iter, disable=(verbose_level == 0)):
             K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
             res_list.append(objf(X, E, rho, J, y))
             if len(res_list) >= 2 and np.abs(res_list[-2] - res_list[-1]) < delta * target_rel_prec:
                 break
-    if testing:
+    if verbose_level == 2:
         plot_objf(res_list, delta, f"Objective function over batches and full data")
-    if success or (res_list[-1] < delta):
-        qcvv_logger.info(f"Convergence criterion satisfied")
-    else:
+    if verbose_level > 0:
+        if success or (res_list[-1] < delta):
+            qcvv_logger.info(f"Convergence criterion satisfied")
+        else:
+            qcvv_logger.warn(
+                f"Convergence criterion not satisfied. Potential causes include too low max_iterations, bad initialization or model mismatch."
+            )
         qcvv_logger.info(
-            f"Convergence criterion not satisfied, inspect results and consider increasing max_iter or using new initializations.",
+            f"Final objective {Decimal(res_list[-1]):.2e} in time {(time.time() - t0):.2f}s",
         )
-    qcvv_logger.info(
-        f"Final objective {Decimal(res_list[-1]):.2e} in time {(time.time() - t0):.2f}s",
-    )
     return K, X, E, rho, res_list

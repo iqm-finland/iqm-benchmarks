@@ -4,7 +4,9 @@ Generation of error measures and result tables
 
 from argparse import Namespace
 import csv
+from itertools import product
 import os
+from typing import List, Tuple, Union
 
 import numpy as np
 import numpy.linalg as la
@@ -20,10 +22,8 @@ from qiskit.quantum_info.operators.measures import diamond_norm
 from scipy.linalg import expm, logm, schur
 from scipy.optimize import linear_sum_assignment, minimize
 import xarray as xr
-from itertools import product
-from iqm.benchmarks.benchmark_definition import BenchmarkObservationIdentifier
-from typing import List, Tuple, Union
 
+from iqm.benchmarks.benchmark_definition import BenchmarkObservationIdentifier
 from mGST import additional_fns, algorithm, compatibility, low_level_jit, qiskit_interface
 
 
@@ -138,6 +138,7 @@ def gauge_opt(X, E, rho, target_mdl, weights):
     )
     return compatibility.pygsti_model_to_arrays(gauge_optimized_mdl, basis="std")
 
+
 def generate_basis_labels(pdim: int, basis: Union[str, None] = None) -> List[str]:
     """Generate a list of labels for the Pauli basis or the standard basis
 
@@ -163,6 +164,7 @@ def generate_basis_labels(pdim: int, basis: Union[str, None] = None) -> List[str
         labels = [separator.join(map(str, x)) for x in product(*std_labels_rep)]
 
     return labels
+
 
 def report(X, E, rho, J, y, target_mdl, gate_labels):
     """Generation of pandas dataframes with gate and SPAM quality measures
@@ -410,6 +412,7 @@ def match_hamiltonian_phase(pauli_coeffs, pauli_coeffs_target):
 
     return pauli_coeffs_target
 
+
 def generate_rotation_param_results(
     dataset: xr.Dataset,
     qubit_layout: List[int],
@@ -488,6 +491,7 @@ def generate_rotation_param_results(
     }
 
     return df_g_rotation, hamiltonian_params
+
 
 def compute_matched_ideal_hamiltonian_params(dataset: xr.Dataset) -> Tuple[np.ndarray, np.ndarray]:
     """
