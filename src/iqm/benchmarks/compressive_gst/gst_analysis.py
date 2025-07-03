@@ -13,6 +13,8 @@ from numpy import ndarray
 import numpy as np
 from pandas import DataFrame
 from pygsti.models.model import Model
+from tqdm import trange
+from tqdm.contrib.logging import logging_redirect_tqdm
 import xarray as xr
 
 from iqm.benchmarks.benchmark_definition import (
@@ -21,14 +23,11 @@ from iqm.benchmarks.benchmark_definition import (
     BenchmarkObservationIdentifier,
     BenchmarkRunResult,
 )
+from iqm.benchmarks.logging_config import qcvv_logger
 from mGST import additional_fns, algorithm, compatibility
 from mGST.low_level_jit import contract
 from mGST.qiskit_interface import qiskit_gate_to_operator
 from mGST.reporting import figure_gen, reporting
-
-from tqdm.contrib.logging import logging_redirect_tqdm
-from tqdm import trange
-from iqm.benchmarks.logging_config import qcvv_logger
 
 
 def dataframe_to_figure(
@@ -301,7 +300,7 @@ def generate_unit_rank_gate_results(
         )
 
     # Store non-formated results in dictionary
-    dataset.attrs[f'results_layout_{identifier}']["hamiltonian_params"] = hamiltonian_params
+    dataset.attrs[f"results_layout_{identifier}"]["hamiltonian_params"] = hamiltonian_params
     df_g_final = DataFrame(
         {
             r"average_gate_fidelity": [
@@ -697,7 +696,10 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     observations = []
     for i, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
         identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        qcvv_logger.info(f"Running mGST analysis for layout {qubit_layout} ({i + 1}/{len(dataset.attrs['qubit_layouts'])})")
+        num_layouts = len(dataset.attrs["qubit_layouts"])
+        qcvv_logger.info(
+            f"Running mGST analysis for layout {qubit_layout} ({i + 1}/{num_layouts})"
+        )
 
         # Computing circuit outcome probabilities from counts
         y = dataset_counts_to_mgst_format(dataset, qubit_layout)
@@ -749,10 +751,9 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         ### Result table generation and full report
         if dataset.attrs["rank"] == 1:
-            df_g_final, df_g_rotation, fig_g = generate_unit_rank_gate_results(
+            df_g_final, _, fig_g = generate_unit_rank_gate_results(
                 dataset, qubit_layout, df_g, X_opt, K_target
             )
-            # dataset.attrs["results_layout_" + identifier].update({"hamiltonian_parameters": df_g_rotation.to_dict()})
         else:
             df_g_final, df_g_evals, fig_g = generate_gate_results(dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt)
             dataset.attrs["results_layout_" + identifier].update({"choi_evals": df_g_evals.to_dict()})
@@ -810,13 +811,6 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     if dataset.attrs["rank"] == 1:
         hamiltonian_plots = figure_gen.generate_hamiltonian_visualizations(dataset)
         plots.update(hamiltonian_plots)
-        # for layout_idx, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
-        #     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        #     gate_labels = dataset.attrs["gate_labels"][identifier]
-        #     for i, fig in enumerate(matrix_figures[layout_idx]):
-        #         plots[f"layout_{qubit_layout}_hamiltonian_params_{gate_labels[i]}"] = fig
-        #     for i, fig in enumerate(bar_figures[layout_idx]):
-        #         plots[f"layout_{qubit_layout}_hamiltonian_params_bar_{gate_labels[i]}"] = fig
     plt.close("all")
     qcvv_logger.info("Analysis completed")
 

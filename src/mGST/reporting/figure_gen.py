@@ -154,9 +154,7 @@ def generate_spam_err_pdf(filename, E, rho, E2, rho2, title=None, spam2_content=
     plt.close()
 
 
-def generate_spam_err_std_pdf(
-    filename, E, rho, E2, rho2, basis_labels=False, title=None, return_fig=False
-):
+def generate_spam_err_std_pdf(filename, E, rho, E2, rho2, basis_labels=False, title=None, return_fig=False):
     """Generate pdf plots of two sets of POVM + state side by side in matrix shape - standard basis
     The input sets can be either POVM/state directly or a difference different SPAM parametrizations to
     visualize errors.
@@ -215,8 +213,8 @@ def generate_spam_err_std_pdf(
                     [x + (1 - size) / 2, y + (1 - size) / 2],
                     size,
                     size,
-                    facecolor='#d62728' if w < 0 else '#1f77b4',
-                    edgecolor='#d62728' if w < 0 else '#1f77b4',
+                    facecolor="#d62728" if w < 0 else "#1f77b4",
+                    edgecolor="#d62728" if w < 0 else "#1f77b4",
                 )
                 ax.add_patch(rect)
             ax.invert_yaxis()
@@ -313,8 +311,8 @@ def generate_gate_err_pdf(
                     [x + (1 - size) / 2, y + (1 - size) / 2],
                     size,
                     size,
-                    facecolor='#d62728' if w < 0 else '#1f77b4',
-                    edgecolor='#d62728' if w < 0 else '#1f77b4',
+                    facecolor="#d62728" if w < 0 else "#1f77b4",
+                    edgecolor="#d62728" if w < 0 else "#1f77b4",
                 )
                 ax.add_patch(rect)
             ax.invert_yaxis()
@@ -375,8 +373,8 @@ def generate_hamiltonian_visualizations(
     # Collect upper and lower end of the confidence intervals
     qubit_layouts = dataset.attrs["qubit_layouts"]
     has_uncertainties = all(
-        dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
-            'hamiltonian_params'
+        dataset.attrs[f"results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}"][
+            "hamiltonian_params"
         ].get("uncertainties")
         is not None
         for layout in qubit_layouts
@@ -385,7 +383,7 @@ def generate_hamiltonian_visualizations(
     if has_uncertainties:
         hamiltonian_params_low = np.array(
             [
-                dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
+                dataset.attrs[f"results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}"][
                     "hamiltonian_params"
                 ]["uncertainties"][0]
                 for layout in qubit_layouts
@@ -393,7 +391,7 @@ def generate_hamiltonian_visualizations(
         )
         hamiltonian_params_high = np.array(
             [
-                dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
+                dataset.attrs[f"results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}"][
                     "hamiltonian_params"
                 ]["uncertainties"][1]
                 for layout in qubit_layouts
@@ -462,14 +460,14 @@ def generate_hamiltonian_visualizations(
                             lower_bound = f"{param_split_low[i, j]:.3e}"
 
                             # Display upper bound above the parameter value
-                            ax.text(i, j - 0.2, upper_bound, va='center', ha='center', color="black", fontsize=6)
+                            ax.text(i, j - 0.2, upper_bound, va="center", ha="center", color="black", fontsize=6)
                             # Display parameter value in the middle
-                            ax.text(i, j, param_value, va='center', ha='center', color="black", fontweight='bold')
+                            ax.text(i, j, param_value, va="center", ha="center", color="black", fontweight="bold")
                             # Display lower bound below the parameter value
-                            ax.text(i, j + 0.2, lower_bound, va='center', ha='center', color="black", fontsize=6)
+                            ax.text(i, j + 0.2, lower_bound, va="center", ha="center", color="black", fontsize=6)
                         else:
                             # Just display the parameter value if no uncertainties
-                            ax.text(i, j, param_value, va='center', ha='center', color="black")
+                            ax.text(i, j, param_value, va="center", ha="center", color="black")
 
             plt.title(f"Hamiltonian parameters for {gate_label}", fontsize=10)
 
@@ -511,43 +509,37 @@ def generate_hamiltonian_visualizations(
                     error_positions,
                     param_delta_sorted,
                     yerr=[error_low, error_high],
-                    fmt='none',
+                    fmt="none",
                     ecolor=[0.2, 0.2, 0.2, 0.5],
                     capsize=3,
                 )
                 error_extend = np.max([np.max(np.abs(param_delta_high)), np.max(np.abs(param_delta_low))])
-                ax.set_ylim(-error_extend*1.1, error_extend*1.1)
+                ax.set_ylim(-error_extend * 1.1, error_extend * 1.1)
             else:
                 param_range = np.max(param_delta_sorted) - np.min(param_delta_sorted)
-                ax.set_ylim(np.min(param_delta_sorted)-param_range/10, np.max(param_delta_sorted) + param_range/10)
+                ax.set_ylim(
+                    np.min(param_delta_sorted) - param_range / 10, np.max(param_delta_sorted) + param_range / 10
+                )
 
             # Configure axis labels and title
-            ax.axhline(0, color='black', linewidth=0.8)
+            ax.axhline(0, color="black", linewidth=0.8)
             ax.set_xticks(range(n_errs))
             ax.set_xticklabels(np.array(list(param_labels))[sorting_indices])
-            ax.set_xlabel('Pauli labels')
-            ax.set_ylabel('Deviation from target')
-            ax.set_title(f'Largest coherent errors for {gate_label}', fontsize=10)
-
-            # Add legend
-            # legend_labels = ['Positive', 'Negative']
-            # handles = [
-            #     plt.Rectangle((0, 0), 1, 1, color='#1f77b4', alpha=0.7),
-            #     plt.Rectangle((0, 0), 1, 1, color='#d62728', alpha=0.7),
-            # ]
-            # ax.legend(handles, legend_labels, title='Parameter Sign')
+            ax.set_xlabel("Pauli labels")
+            ax.set_ylabel("Deviation from target")
+            ax.set_title(f"Largest coherent errors for {gate_label}", fontsize=10)
 
             # Add values on top of each bar
             for i, bar in enumerate(bars):
                 value = param_delta[sorting_indices[i]]
                 height = bar.get_height()
                 ax.annotate(
-                    f'{value:.2e}',
+                    f"{value:.2e}",
                     xy=(bar.get_x() + bar.get_width() / 2, height),
-                    xytext=(0, 2) if height>0 else (0, -11),  # vertical offset above or below the bar
+                    xytext=(0, 2) if height > 0 else (0, -11),  # vertical offset above or below the bar
                     textcoords="offset points",
-                    ha='center',
-                    va='bottom',
+                    ha="center",
+                    va="bottom",
                     fontsize=9,
                 )
 

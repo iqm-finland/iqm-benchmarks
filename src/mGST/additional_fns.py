@@ -2,8 +2,10 @@
 Utility functions used by mGST modules
 """
 
+import contextlib
 import os
 import random
+import sys
 import warnings
 
 import numpy as np
@@ -12,10 +14,6 @@ from scipy.linalg import expm, qr
 
 from mGST.low_level_jit import Mp_norm_lower, MVE_lower, contract, local_basis
 
-
-import contextlib
-import os
-import sys
 
 @contextlib.contextmanager
 def suppress_stdout():
@@ -27,6 +25,7 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
 
 def transp(dim1, dim2):
     """Superoperator of a map that performs the transpose operation
