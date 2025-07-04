@@ -43,5 +43,6 @@ class TestGST:
         benchmark.analyze()
         mock_fig.assert_called()
 
+
 class TestGSTDeneb(TestGST):
     backend = IQMFakeDeneb()
