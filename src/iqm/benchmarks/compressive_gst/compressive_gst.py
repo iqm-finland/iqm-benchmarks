@@ -107,6 +107,8 @@ class CompressiveGST(Benchmark):
                 self.max_iterations = [250, 250]
         elif isinstance(configuration.max_iterations, list):
             self.max_iterations = configuration.max_iterations
+        elif isinstance(configuration.max_iterations, int):
+            self.max_iterations = [configuration.max_iterations, configuration.max_iterations]
         if configuration.batch_size == "auto":
             self.batch_size = 30 * self.pdim
         else:
@@ -370,7 +372,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     from_init: bool = True
     max_inits: int = 20
     opt_method: str = "auto"
-    max_iterations: Union[str, List[int]] = "auto"
+    max_iterations: Union[str, List[int], int] = "auto"
     convergence_criteria: Union[str, List[float]] = [4, 1e-4]
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
