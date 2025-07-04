@@ -260,8 +260,6 @@ def quick_report(X, E, rho, J, y, target_mdl, gate_labels=None):
             DataFrame of gate quality measures
         df_o : Pandas DataFrame
             DataFrame of all other quality/error measures
-        s_g : Pandas DataFrame.style object
-        s_o : Pandas DataFrame.style object
     """
     pdim = int(np.sqrt(rho.shape[0]))
     d = X.shape[0]

@@ -336,8 +336,10 @@ def generate_gate_err_pdf(
         fig.suptitle(f"Process matrices in the Pauli basis\n(red:<0; blue:>0)")
 
         if dim > 16:
+            fig.tight_layout(rect=[0, 0, 1, 0.90])  # Leave space for suptitle
             set_size(0.5 * np.sqrt(dim), 1.3 * np.sqrt(dim))
         else:
+            fig.tight_layout(rect=[0, 0, 1, 0.85])  # Leave space for suptitle
             set_size(2 * np.sqrt(dim), 0.8 * np.sqrt(dim))
         figures.append(fig)
         if not return_fig:

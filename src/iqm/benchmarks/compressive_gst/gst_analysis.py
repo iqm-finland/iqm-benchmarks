@@ -200,7 +200,7 @@ def bootstrap_errors(
 
 def generate_non_gate_results(
     qubit_layout: List[int], df_o: DataFrame, bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None
-) -> tuple[DataFrame]:
+) -> DataFrame:
     """
     Creates error bars (if bootstrapping was used) and formats results for non-gate errors.
     The resulting tables are also turned into figures, so that they can be saved automatically.
@@ -672,7 +672,7 @@ def run_mGST_wrapper(
 
 def process_layout(args):
     """Process a single qubit layout in parallel"""
-    dataset, qubit_layout, pdim, plots_dict, observations_list = args
+    dataset, qubit_layout, pdim = args
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
     qcvv_logger.info(f"Running mGST analysis for layout {qubit_layout}")
@@ -721,17 +721,15 @@ def process_layout(args):
     # Bootstrap
     bootstrap_results = None
     if dataset.attrs["bootstrap_samples"] > 0:
-        bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl, identifier)
+        bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl, identifier, parametric=True)
         results_dict.update({"bootstrap_data": bootstrap_results})
 
-    qcvv_logger.info(f"Generating error measures and figures for layout {qubit_layout}")
     _, df_o_full = reporting.report(
         X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"][identifier]
     )
     df_o_final = generate_non_gate_results(qubit_layout, df_o_full, bootstrap_results)
 
     # Result table generation and full report
-    layout_plots = {}
     if dataset.attrs["rank"] == 1:
         df_g_final, _ = generate_unit_rank_gate_results(
             dataset, qubit_layout, df_g, X_opt, K_target, bootstrap_results
@@ -750,54 +748,54 @@ def process_layout(args):
     return qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals
 
 
-def process_plots(dataset, results_dict, df_g_final, df_o_final, df_g_evals_final):
+def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, df_g_evals_final):
     layout_plots = {}
     # Process matrix plots
     pdim = dataset.attrs["pdim"]
     pauli_labels = figure_gen.generate_basis_labels(pdim, basis="Pauli")
     std_labels = figure_gen.generate_basis_labels(pdim)
 
-    for qubit_layout in dataset.attrs["qubit_layouts"]:
-        identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+    identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
-        fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
-        fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
-        fig_o = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
+    fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
+    fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
+    fig_o = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
 
 
-        layout_plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
-        layout_plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
-        figures = figure_gen.generate_gate_err_pdf(
-            "",
-            results_dict["gauge_opt_gates_Pauli_basis"],
-            results_dict["target_gates_Pauli_basis"],
-            basis_labels=pauli_labels,
-            gate_labels=dataset.attrs["gate_labels"][identifier],
-            return_fig=True,
-        )
-        for i, figure in enumerate(figures):
-            layout_plots[f"layout_{qubit_layout}_process_matrix_{i}"] = figure
+    layout_plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
+    layout_plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
+    figures = figure_gen.generate_gate_err_pdf(
+        "",
+        results_dict["gauge_opt_gates_Pauli_basis"],
+        results_dict["target_gates_Pauli_basis"],
+        basis_labels=pauli_labels,
+        gate_labels=dataset.attrs["gate_labels"][identifier],
+        return_fig=True,
+    )
+    for i, figure in enumerate(figures):
+        layout_plots[f"layout_{qubit_layout}_process_matrix_{i}"] = figure
 
-        layout_plots[f"layout_{qubit_layout}_SPAM_matrices_real"] = figure_gen.generate_spam_err_std_pdf(
-            "",
-            results_dict["gauge_opt_POVM"].reshape((-1,pdim**2)).real,
-            results_dict["gauge_opt_state"].reshape(-1).real,
-            results_dict["target_POVM"].reshape((-1,pdim**2)).real,
-            results_dict["target_state"].reshape(-1).real,
-            basis_labels=std_labels,
-            title=f"Real part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
-            return_fig=True,
-        )
-        layout_plots[f"layout_{qubit_layout}_SPAM_matrices_imag"] = figure_gen.generate_spam_err_std_pdf(
-            "",
-            results_dict["gauge_opt_POVM"].reshape((-1,pdim**2)).imag,
-            results_dict["gauge_opt_state"].reshape(-1).imag,
-            results_dict["target_POVM"].reshape((-1,pdim**2)).imag,
-            results_dict["target_state"].reshape(-1).imag,
-            basis_labels=std_labels,
-            title=f"Imaginary part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
-            return_fig=True,
-        )
+    layout_plots[f"layout_{qubit_layout}_SPAM_matrices_real"] = figure_gen.generate_spam_err_std_pdf(
+        "",
+        results_dict["gauge_opt_POVM"].reshape((-1,pdim**2)).real,
+        results_dict["gauge_opt_state"].reshape(-1).real,
+        results_dict["target_POVM"].reshape((-1,pdim**2)).real,
+        results_dict["target_state"].reshape(-1).real,
+        basis_labels=std_labels,
+        title=f"Real part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
+        return_fig=True,
+    )
+    layout_plots[f"layout_{qubit_layout}_SPAM_matrices_imag"] = figure_gen.generate_spam_err_std_pdf(
+        "",
+        results_dict["gauge_opt_POVM"].reshape((-1,pdim**2)).imag,
+        results_dict["gauge_opt_state"].reshape(-1).imag,
+        results_dict["target_POVM"].reshape((-1,pdim**2)).imag,
+        results_dict["target_state"].reshape(-1).imag,
+        basis_labels=std_labels,
+        title=f"Imaginary part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
+        return_fig=True,
+    )
+    plt.close("all")
     return layout_plots
 
 
@@ -813,51 +811,75 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """
     dataset = run.dataset
     pdim = dataset.attrs["pdim"]
-    # plots = {}
+    plots = {}
     # observations = []
 
     # Use all but one physical core
     num_physical_cores = psutil.cpu_count(logical=False)
     num_workers = max(1, num_physical_cores - 1)
+
+    args_list = [(dataset, qubit_layout, pdim)
+                 for qubit_layout in dataset.attrs["qubit_layouts"]]
+
+    # Execute in parallel
+    # all_results = []
+    # for args in args_list:
+    #     all_results.append(process_layout(args))
     qcvv_logger.info(f"Using {num_workers} out of {num_physical_cores} physical cores")
 
     # Use Manager to handle shared data structures safely
     with mp.Manager() as manager:
-        plots = manager.dict()
-        observations = manager.list()
+        all_results = []
+        # Create a shared counter to track completed tasks
+        counter = manager.Value('i', 0)
+        total_layouts = len(dataset.attrs["qubit_layouts"])
+
+        # Define a callback function to update progress
+        def update_progress(result):
+            counter.value += 1
+            qcvv_logger.info(f"Completed estimation for {counter.value}/{total_layouts} qubit layouts")
 
         # Prepare arguments for each process
-        args_list = [(dataset, qubit_layout, pdim, plots, observations)
-                    for qubit_layout in dataset.attrs["qubit_layouts"]]
+        args_list = [(dataset, qubit_layout, pdim)
+                     for qubit_layout in dataset.attrs["qubit_layouts"]]
 
-        # Execute in parallel
+        # Execute in parallel using apply_async with callback
         with mp.Pool(num_workers) as pool:
-            results = pool.map(process_layout, args_list)
+            results = [pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list]
+            all_results = [res.get() for res in results]  # Wait for all results
 
-        # Collect results
-        num_layouts = len(dataset.attrs["qubit_layouts"])
-        qcvv_logger.info(f"Processed {num_layouts} layouts in parallel")
+    # Collect results
+    observations_list = []
+    df_g_list = []
+    df_o_list = []
+    df_g_evals_list = []
 
-        for qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals_final in results:
-            identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-            # Update dataset with results
-            dataset.attrs["results_layout_" + identifier] = results_dict
-            # Update plots
-            layout_plots = process_plots(dataset, results_dict, df_g_final, df_o_final, df_g_evals_final)
-            for key, fig in layout_plots.items():
-                plots[key] = fig
-            # Extend observations
-            observations.extend(layout_observations)
+    for qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals_final in all_results:
+        identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+        # Update dataset with results
+        dataset.attrs["results_layout_" + identifier] = results_dict
+        # Collect observations and dataframes
+        observations_list.extend(layout_observations)
+        df_g_list.append(df_g_final)
+        df_o_list.append(df_o_final)
+        df_g_evals_list.append(df_g_evals_final)
 
-        # Convert manager objects to standard Python objects
-        plots_dict = dict(plots)
-        observations_list = list(observations)
+    # Generate figures for each layout
+    for i, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
+        identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
+        results_dict = dataset.attrs["results_layout_" + identifier]
+        # Update plots
+        qcvv_logger.info(f"Generating figures for layout {i+1}/{len(dataset.attrs['qubit_layouts'])}")
+        layout_plots = process_plots(dataset, qubit_layout, results_dict, df_g_list[i], df_o_list[i], df_g_evals_list[i])
+        for key, fig in layout_plots.items():
+            plots[key] = fig
 
     # Generate additional figures for Hamiltonian parameters if rank is 1
     if dataset.attrs["rank"] == 1:
+        qcvv_logger.info(f"Generating additional rank 1 figures for all layouts")
         hamiltonian_plots = figure_gen.generate_hamiltonian_visualizations(dataset)
-        plots_dict.update(hamiltonian_plots)
+        plots.update(hamiltonian_plots)
     plt.close("all")
     qcvv_logger.info("Analysis completed")
 
-    return BenchmarkAnalysisResult(dataset=dataset, observations=observations_list, plots=plots_dict)
+    return BenchmarkAnalysisResult(dataset=dataset, observations=observations_list, plots=plots)

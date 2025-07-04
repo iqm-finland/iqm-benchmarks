@@ -74,6 +74,7 @@ class CompressiveGST(Benchmark):
         self.num_qubits = len(self.qubit_layouts[0])
         self.pdim = 2**self.num_qubits
         self.num_povm = self.pdim
+        self.verbose_level = configuration.verbose_level
 
         self.gate_set, self.gate_labels, self.num_gates = parse_gate_set(
             configuration, self.num_qubits, self.qubit_layouts
@@ -240,13 +241,14 @@ class CompressiveGST(Benchmark):
             dataset: xarray.Dataset to be used for further data storage
         """
         # Adding configuration entries and class variables, prioritizing the latter in case of conflicts
-        for key, value in (self.configuration.__dict__ | self.__dict__).items():
-            if key == "benchmark":  # Avoid saving the class objects
+        avoided_keys = ["runs", "configuration", "circuits"]
+        for key, value in (self.serializable_configuration.__dict__ | self.__dict__).items():
+            if key == "backend":
                 dataset.attrs[key] = value.name
-            elif key == "backend":
-                dataset.attrs[key] = value.name
-            else:
+            elif key not in avoided_keys:
                 dataset.attrs[key] = value
+            else:
+                pass
         dataset.attrs["gauge_weights"] = dict({f"G%i" % i: 1 for i in range(self.num_gates)}, **{"spam": 0.1})
 
     def execute(self, backend) -> xr.Dataset:
