@@ -46,5 +46,6 @@ class TestQV:
         benchmark.run()
         benchmark.analyze()
 
+
 class TestQVDeneb(TestQV):
     backend = IQMFakeDeneb()

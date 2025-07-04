@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.40
+============
+* Added optimise_single_qubit_gates option for crystal processors.
+
 Version 2.39
 ============
 * Relax `numba` dependency to allow easier interoperability with other client libraries.
