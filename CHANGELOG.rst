@@ -2,6 +2,15 @@
 Changelog
 =========
 
+Version 2.39
+============
+* Relax `numba` dependency to allow easier interoperability with other client libraries.
+
+Version 2.38
+============
+* Update `iqm-client` dependency to `29.0+`.
+* Added iqm-station-control-client dependency to ensure iqm-client version works with stations on resonance.
+
 Version 2.37
 ============
 * Update `iqm-client` dependency to `27.0+`.
