@@ -255,7 +255,7 @@ def generate_non_gate_results(
 def generate_unit_rank_gate_results(
     dataset: xr.Dataset, qubit_layout: List[int], df_g: DataFrame, X_opt: ndarray, K_target: ndarray,
         bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None
-) -> Tuple[DataFrame, DataFrame]:
+) -> Tuple[DataFrame, DataFrame, dict]:
     """
     Produces all result tables for Kraus rank 1 estimates
 
@@ -280,6 +280,9 @@ def generate_unit_rank_gate_results(
             The dataframe with properly formated results of standard gate errors
         df_g_rotation Pandas DataFrame
             A dataframe containing Hamiltonian (rotation) parameters
+        hamiltonian_params: dict
+            A dictionary containing the Hamiltonian parameters for each gate in the Pauli basis.
+            The keys are gate labels and the values are dictionaries with the parameters.
 
     """
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
@@ -296,8 +299,6 @@ def generate_unit_rank_gate_results(
             dataset, qubit_layout, X_opt, K_target
         )
 
-    # Store non-formated results in dictionary
-    dataset.attrs[f"results_layout_{identifier}"]["hamiltonian_params"] = hamiltonian_params
     df_g_final = DataFrame(
         {
             r"average_gate_fidelity": [
@@ -327,7 +328,7 @@ def generate_unit_rank_gate_results(
         }
     )
 
-    return df_g_final, df_g_rotation
+    return df_g_final, df_g_rotation, hamiltonian_params
 
 
 def generate_gate_results(
@@ -731,9 +732,11 @@ def process_layout(args):
 
     # Result table generation and full report
     if dataset.attrs["rank"] == 1:
-        df_g_final, _ = generate_unit_rank_gate_results(
+        df_g_final, _, hamiltonian_params = generate_unit_rank_gate_results(
             dataset, qubit_layout, df_g, X_opt, K_target, bootstrap_results
         )
+        results_dict.update({"hamiltonian_params": hamiltonian_params})
+        df_g_evals = {}
     else:
         df_g_final, df_g_evals = generate_gate_results(dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt, bootstrap_results)
         results_dict.update({"choi_evals": df_g_evals.to_dict()})
@@ -758,7 +761,8 @@ def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, d
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
-    fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
+    if bool(df_g_evals_final):
+        fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
     fig_o = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
 
 
