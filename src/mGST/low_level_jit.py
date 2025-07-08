@@ -104,7 +104,7 @@ def contract(X, j_vec):
     return res
 
 
-@njit(cache=True, fastmath=True, parallel=True)
+@njit(cache=True, fastmath=True)#, parallel=True)
 def objf(X, E, rho, J, y):
     """Calculate the objective function value for matrices, POVM elements, and target values.
 
@@ -242,7 +242,7 @@ def Mp_norm_lower(X_true, E_true, rho_true, X, E, rho, J, n_povm, p):
     return dist ** (1 / p) / m / n_povm, max_dist ** (1 / p)
 
 
-@njit(cache=True, parallel=True)
+@njit(cache=True)#, parallel=True)
 def dK(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivative of the objective function with respect to the Kraus tensor K.
 
@@ -301,7 +301,7 @@ def dK(X, K, E, rho, J, y, d, r, rK):
     return dK_.reshape(d, rK, pdim, pdim) * 2 / m / n_povm
 
 
-@njit(cache=True, parallel=False)
+@njit(cache=True)#, parallel=False)
 def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
     """Compute the derivatives of the objective function with respect to K and the
     product of derivatives of the measurement map with respect to K.
@@ -362,7 +362,7 @@ def dK_dMdM(X, K, E, rho, J, y, d, r, rK):
     return (dK_.reshape((d, rK, pdim, pdim)) * 2 / m / n_povm, 2 * dM10 / m / n_povm, 2 * dM11 / m / n_povm)
 
 
-@njit(cache=True, parallel=False)
+@njit(cache=True)#, parallel=False)
 def ddM(X, K, E, rho, J, y, d, r, rK):
     """Compute the second derivative of the objective function with respect to the Kraus tensor K.
 
@@ -488,7 +488,7 @@ def ddM(X, K, E, rho, J, y, d, r, rK):
     )
 
 
-@njit(parallel=True, cache=True)
+@njit(cache=True)#, parallel=True)
 def dA(X, A, B, J, y, r, pdim, n_povm):
     """Compute the derivative of to the objective function with respect to the POVM tensor A
 
@@ -537,7 +537,7 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
     return dA_ * 2 / m / n_povm
 
 
-@njit(parallel=True, cache=True)
+@njit(cache=True)#, parallel=True)
 def dB(X, A, B, J, y, pdim):
     """Compute the derivative of the objective function with respect to the state tensor B.
 
@@ -577,7 +577,7 @@ def dB(X, A, B, J, y, pdim):
     return dB_
 
 
-@njit(parallel=True, cache=True)
+@njit(cache=True)#, parallel=True)
 def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
     """Calculate all nonzero terms of the second derivatives with respect to the POVM tensor A.
 
@@ -642,7 +642,7 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm):
     return dA_ * 2 / m / n_povm, dMdM * 2 / m / n_povm, dMconjdM * 2 / m / n_povm, dconjdA * 2 / m / n_povm
 
 
-@njit(parallel=True, cache=True)
+@njit(cache=True)#, parallel=True)
 def ddB_derivs(X, A, B, J, y, r, pdim):
     """Calculate all nonzero terms of the second derivative with respect to the state tensor B.
 

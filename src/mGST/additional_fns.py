@@ -2,8 +2,10 @@
 Utility functions used by mGST modules
 """
 
+import contextlib
 import os
 import random
+import sys
 import warnings
 
 import numpy as np
@@ -11,6 +13,18 @@ import numpy.linalg as la
 from scipy.linalg import expm, qr
 
 from mGST.low_level_jit import Mp_norm_lower, MVE_lower, contract, local_basis
+
+
+@contextlib.contextmanager
+def suppress_stdout():
+    """Context manager to temporarily suppress stdout output."""
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
 
 
 def transp(dim1, dim2):
