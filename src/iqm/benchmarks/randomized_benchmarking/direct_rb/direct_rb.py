@@ -474,7 +474,7 @@ def direct_rb_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             fidelity = rb_fit_results.params["fidelity_drb"]
 
             processed_results = {
-                "average_gate_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
+                "entanglement_fidelity": {"value": fidelity.value, "uncertainty": fidelity.stderr},
             }
 
             dataset.attrs[q_array_idx].update(
