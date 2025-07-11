@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
 from scipy.optimize import curve_fit
 import xarray as xr
 
@@ -24,9 +24,7 @@ from iqm.benchmarks.benchmark_definition import (
     add_counts_to_dataset,
 )
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
-from qiskit import transpile
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
     perform_backend_transpilation,
     retrieve_all_counts,
@@ -37,6 +35,18 @@ from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
 def exp_decay(t, A, T, C):
+    """
+    Calculate the exponential decay at time t.
+
+    Parameters:
+    t (float or array-like): The time variable(s) at which to evaluate the decay.
+    A (float): The initial amplitude of the decay.
+    T (float): The time constant, which dictates the rate of decay.
+    C (float): The constant offset added to the decay.
+
+    Returns:
+    float or array-like: The value(s) of the exponential decay at time t.
+    """
     return A * np.exp(-t / T) + C
 
 
@@ -49,6 +59,7 @@ def plot_coherence(
     qubit_probs: dict[str, List[float]],
     timestamp: str,
     fitted_t_list: List[float],
+    t_err_list: List[float],
     qubit_to_plot: List[int] | None = None,
     coherence_exp: str = "t1",
 ) -> Tuple[str, Figure]:
@@ -80,13 +91,13 @@ def plot_coherence(
 
     fig, axs = plt.subplots(nrows, ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
 
-    for i, qubit in enumerate(qubit_to_plot):
-        row, col = divmod(i, ncols)
+    for idx, qubit in enumerate(qubit_to_plot or []):
+        row, col = divmod(idx, ncols)
         ax = axs[row][col]
         ydata = np.array(qubit_probs[str(qubit)])
-        A = amplitude_list[i]
-        C = offset_list[i]
-        T_fit = fitted_t_list[i]
+        A = amplitude_list[idx]
+        C = offset_list[idx]
+        T_fit = fitted_t_list[idx]
 
         # Plot raw data
         ax.plot(delays, ydata, "o", label="Measured P(1)", color="blue")
@@ -94,21 +105,29 @@ def plot_coherence(
         # Plot fit line
         t_fit = np.linspace(min(delays), max(delays), 200)
         fitted_curve = exp_decay(t_fit, A, T_fit, C)
-        ax.plot(t_fit, fitted_curve, "--", color="orange", label=f"Fit (T = {T_fit * 1e6:.1f} µs)")
-
+        ax.plot(
+            t_fit,
+            fitted_curve,
+            "--",
+            color="orange",
+            label=f"Fit (T = {T_fit * 1e6:.1f} ± {t_err_list[idx] * 1e6:.1f} µs)",
+        )
+        tick_list = np.linspace(min(delays), max(delays), 5)
+        ax.set_xticks(tick_list)
+        ax.set_xticklabels([f"{d * 1e6:.0f}" for d in tick_list])
         ax.set_title(f"Qubit {qubit}")
-        ax.set_xlabel("Delay (s)")
+        ax.set_xlabel("Delay (µs)")
         ax.set_ylabel("|1> Populatiuon")
         ax.grid(True)
         ax.legend()
 
     # Remove unused axes
-    for j in range(i + 1, nrows * ncols):
+    for j in range(idx + 1, nrows * ncols):  # pylint: disable=undefined-loop-variable
         row, col = divmod(j, ncols)
         fig.delaxes(axs[row][col])
 
     fig.suptitle(f"{coherence_exp.upper()}_decay_{backend_name}_{timestamp}", fontsize=14)
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    fig.tight_layout(rect=(0, 0.03, 1, 0.95))
 
     fig_name = f"{coherence_exp}_{backend_name}_{timestamp}.png"
     plt.close()
@@ -138,6 +157,20 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     groups = dataset.attrs["group"]
     all_counts_group: List[Dict[str, int]] = []
     qubit_probs: Dict[str, List[float]] = {}
+
+    def calculate_probabilities(counts, nqubits, coherence_exp):
+        p0_per_qubit = [0.0 for _ in range(nqubits)]
+        total_shots = sum(counts.values())
+        for bitstring, count in counts.items():
+            for q in range(nqubits):
+                if coherence_exp == "t1":
+                    if bitstring[::-1][q] == "1":
+                        p0_per_qubit[q] += count
+                else:
+                    if bitstring[::-1][q] == "0":
+                        p0_per_qubit[q] += count
+        return p0_per_qubit, total_shots
+
     qubits_to_plot = dataset.attrs["qubits_to_plot"]
     for group in groups:
         all_counts_group = xrvariable_to_counts(dataset, str(group), tot_circs)
@@ -145,29 +178,21 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         qubit_probs.update({str(q): [] for q in group})
 
         for counts in all_counts_group:
-            total_shots = sum(counts.values())
-            p0_per_qubit = [0.0 for _ in range(nqubits)]
-            for bitstring, count in counts.items():
-                for q in range(nqubits):
-                    if coherence_exp == "t1":
-                        if bitstring[::-1][q] == "1":
-                            p0_per_qubit[q] += count
-                    else:
-                        if bitstring[::-1][q] == "0":
-                            p0_per_qubit[q] += count
+            p0_per_qubit, total_shots = calculate_probabilities(counts, nqubits, coherence_exp)
             for q_idx, qubit in enumerate(group):
                 qubit_probs[str(qubit)].append(p0_per_qubit[q_idx] / total_shots)
 
     def fit_coherence_model(
         qubit: int, probs: np.ndarray, delays: np.ndarray, coherence_exp: str
-    ) -> List[BenchmarkObservation]:
+    ) -> Tuple[List[BenchmarkObservation], float, float, float, float]:
         """Fit the coherence model and return observations."""
         observations_per_qubit = []
         ydata = probs
         p0 = [0.5, 100e-6, 0.5]
-        popt, _ = curve_fit(exp_decay, delays, ydata, p0=p0)
+        popt, pcov = curve_fit(exp_decay, delays, ydata, p0=p0)  # pylint: disable=unbalanced-tuple-unpacking
         A, T_fit, C = popt
-        fit_fn = lambda t, A=A, T=T_fit, C=C: exp_decay(t, A, T, C)
+        perr = np.sqrt(np.diag(pcov))  # Standard deviation errors
+        T_fit_err = perr[1]
 
         observations_per_qubit.extend(
             [
@@ -175,22 +200,25 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                     name="T1" if coherence_exp == "t1" else "T2_echo",
                     value=T_fit,
                     identifier=BenchmarkObservationIdentifier(qubit),
+                    uncertainty=T_fit_err,
                 ),
             ]
         )
-        return observations_per_qubit, T_fit, A, C
+        return observations_per_qubit, T_fit, T_fit_err, A, C
 
     qubit_set = [item for sublist in groups for item in sublist]
     amplitude_list = []
     offset_list = []
     fitted_t_list = []
+    T_fit_err_list = []
     for qubit in qubit_set:
         probs = np.array(qubit_probs[str(qubit)])
         results = fit_coherence_model(qubit, probs, delays, coherence_exp)
         observations.extend(results[0])
         fitted_t_list.append(results[1])
-        amplitude_list.append(results[2])
-        offset_list.append(results[3])
+        T_fit_err_list.append(results[2])
+        amplitude_list.append(results[3])
+        offset_list.append(results[4])
 
     fig_name, fig = plot_coherence(
         amplitude_list,
@@ -201,6 +229,7 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         qubit_probs,
         timestamp,
         fitted_t_list,
+        T_fit_err_list,
         qubits_to_plot,
         coherence_exp,
     )
@@ -371,7 +400,7 @@ class CoherenceBenchmark(Benchmark):
             transpiled_qc_list, _ = perform_backend_transpilation(qc_coherence, **transpilation_params)
             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc_list}
             # Execute on the backend
-            if self.configuration.use_dd == True:
+            if self.configuration.use_dd is True:
                 raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
 
             jobs, _ = submit_execute(
@@ -408,7 +437,7 @@ class CoherenceBenchmark(Benchmark):
                 )
                 sorted_transpiled_qc_list = {tuple(group): transpiled_qc_list}
                 # Execute on the backend
-                if self.configuration.use_dd == True:
+                if self.configuration.use_dd is True:
                     raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
 
                 jobs, _ = submit_execute(
@@ -456,7 +485,6 @@ class CoherenceConfiguration(BenchmarkConfigurationBase):
 
     benchmark: Type[Benchmark] = CoherenceBenchmark
     delays: list[float]
-    qiskit_optim_level: int = 3
     optimize_sqg: bool = True
     qiskit_optim_level: int = 3
     coherence_exp: str = "t1"
