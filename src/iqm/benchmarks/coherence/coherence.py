@@ -25,7 +25,6 @@ from iqm.benchmarks.benchmark_definition import (
 )
 from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Circuits
 from qiskit import transpile
-from iqm.qiskit_iqm import IQMCircuit
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (  # execute_with_dd,
@@ -36,8 +35,10 @@ from iqm.benchmarks.utils import (  # execute_with_dd,
 )
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
+
 def exp_decay(t, A, T, C):
     return A * np.exp(-t / T) + C
+
 
 def plot_coherence(
     amplitude_list: List[float],
@@ -49,7 +50,7 @@ def plot_coherence(
     timestamp: str,
     fitted_t_list: List[float],
     qubit_to_plot: List[int] | None = None,
-    coherence_exp: str = "t1"
+    coherence_exp: str = "t1",
 ) -> Tuple[str, Figure]:
     """
     Plot coherence decay (T1 or T2_echo) for each qubit as subplots.
@@ -93,8 +94,7 @@ def plot_coherence(
         # Plot fit line
         t_fit = np.linspace(min(delays), max(delays), 200)
         fitted_curve = exp_decay(t_fit, A, T_fit, C)
-        ax.plot(t_fit, fitted_curve,
-                "--", color="orange", label=f"Fit (T = {T_fit * 1e6:.1f} µs)")
+        ax.plot(t_fit, fitted_curve, "--", color="orange", label=f"Fit (T = {T_fit * 1e6:.1f} µs)")
 
         ax.set_title(f"Qubit {qubit}")
         ax.set_xlabel("Delay (s)")
@@ -117,12 +117,12 @@ def plot_coherence(
 
 
 def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
-    """Analysis function for a QScore experiment
+    """Analysis function for a coherence experiment
 
     Args:
-        run (RunResult): A QScore experiment run for which analysis result is created
+        run (RunResult): A coherence experiment run for which analysis result is created
     Returns:
-        AnalysisResult corresponding to QScore
+        AnalysisResult corresponding to coherence
     """
 
     plots = {}
@@ -139,7 +139,6 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     all_counts_group: List[Dict[str, int]] = []
     qubit_probs: Dict[str, List[float]] = {}
     qubits_to_plot = dataset.attrs["qubits_to_plot"]
-    print(groups)
     for group in groups:
         all_counts_group = xrvariable_to_counts(dataset, str(group), tot_circs)
         nqubits = len(group)
@@ -151,27 +150,36 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             for bitstring, count in counts.items():
                 for q in range(nqubits):
                     if coherence_exp == "t1":
-                        if bitstring[::-1][q] == '1':
+                        if bitstring[::-1][q] == "1":
                             p0_per_qubit[q] += count
                     else:
-                        if bitstring[::-1][q] == '0':
+                        if bitstring[::-1][q] == "0":
                             p0_per_qubit[q] += count
             for q_idx, qubit in enumerate(group):
                 qubit_probs[str(qubit)].append(p0_per_qubit[q_idx] / total_shots)
 
-    def fit_coherence_model(qubit: int, probs: np.ndarray, delays: np.ndarray, coherence_exp: str) -> List[BenchmarkObservation]:
+    def fit_coherence_model(
+        qubit: int, probs: np.ndarray, delays: np.ndarray, coherence_exp: str
+    ) -> List[BenchmarkObservation]:
         """Fit the coherence model and return observations."""
         observations_per_qubit = []
         ydata = probs
-        p0 = [0.5, 50e-6, 0.5]
+        p0 = [0.5, 100e-6, 0.5]
         popt, _ = curve_fit(exp_decay, delays, ydata, p0=p0)
         A, T_fit, C = popt
         fit_fn = lambda t, A=A, T=T_fit, C=C: exp_decay(t, A, T, C)
 
-        observations_per_qubit.extend([
-            BenchmarkObservation(name="T1" if coherence_exp == "t1" else "T2_echo", value=T_fit, identifier=BenchmarkObservationIdentifier(qubit)),
-        ])
+        observations_per_qubit.extend(
+            [
+                BenchmarkObservation(
+                    name="T1" if coherence_exp == "t1" else "T2_echo",
+                    value=T_fit,
+                    identifier=BenchmarkObservationIdentifier(qubit),
+                ),
+            ]
+        )
         return observations_per_qubit, T_fit, A, C
+
     qubit_set = [item for sublist in groups for item in sublist]
     amplitude_list = []
     offset_list = []
@@ -211,7 +219,7 @@ class CoherenceBenchmark(Benchmark):
     name: str = "coherence"
 
     def __init__(self, backend_arg: IQMBackendBase, configuration: "CoherenceConfiguration"):
-        """Construct the QScoreBenchmark class.
+        """Construct the CoherenceBenchmark class.
 
         Args:
             backend_arg (IQMBackendBase): the backend to execute the benchmark on
@@ -222,7 +230,7 @@ class CoherenceBenchmark(Benchmark):
         self.backend_configuration_name = backend_arg if isinstance(backend_arg, str) else backend_arg.name
         self.delays = configuration.delays
         self.shots = configuration.shots
-        self.optimize_sqg= configuration.optimize_sqg
+        self.optimize_sqg = configuration.optimize_sqg
         self.coherence_exp = configuration.coherence_exp
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.qubits_to_plot = configuration.qubits_to_plot
@@ -230,16 +238,14 @@ class CoherenceBenchmark(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
 
-
-        # Initialize the variable to contain all QScore circuits
+        # Initialize the variable to contain all coherence circuits
         self.circuits = Circuits()
         self.untranspiled_circuits = BenchmarkCircuit(name="untranspiled_circuits")
         self.transpiled_circuits = BenchmarkCircuit(name="transpiled_circuits")
 
-
     def generate_coherence_circuits(
-            self,
-            nqubits: int,
+        self,
+        nqubits: int,
     ) -> list[QuantumCircuit]:
         """Generates coherence circuits for the given qubit set and delay times.
 
@@ -252,9 +258,9 @@ class CoherenceBenchmark(Benchmark):
         circuits = []
         for delay in self.delays:
             qc = QuantumCircuit(nqubits)
-            if self.coherence_exp == "t1":  
+            if self.coherence_exp == "t1":
                 self._generate_t1_circuits(qc, nqubits, delay)
-            elif self.coherence_exp == 't2_echo':
+            elif self.coherence_exp == "t2_echo":
                 self._generate_t2_echo_circuits(qc, nqubits, delay)
             qc.measure_all()
             circuits.append(qc)
@@ -310,10 +316,10 @@ class CoherenceBenchmark(Benchmark):
         """
         Assign Group A and B to qubits based on a checkerboard pattern
         inferred from the connectivity graph (assumed to be grid-like).
-        
+
         Args:
             coupling_map (list of tuple): List of 2-qubit connections (edges).
-        
+
         Returns:
             group_a (list): Qubit indices in Group A.
             group_b (list): Qubit indices in Group B.
@@ -347,10 +353,10 @@ class CoherenceBenchmark(Benchmark):
         qubit_set = list(range(backend.num_qubits))
         if self.coherence_exp not in ["t1", "t2_echo"]:
             raise ValueError("coherence_exp must be either 't1' or 't2_echo'.")
-        
+
         qcvv_logger.debug(f"Executing on {self.coherence_exp}.")
         qcvv_logger.setLevel(logging.WARNING)
-        
+
         if self.backend.has_resonators():
             qc_coherence = self.generate_coherence_circuits(self.backend.num_qubits)
             effective_coupling_map = self.backend.coupling_map.reduce(qubit_set)
@@ -367,7 +373,7 @@ class CoherenceBenchmark(Benchmark):
             # Execute on the backend
             if self.configuration.use_dd == True:
                 raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
-            
+
             jobs, _ = submit_execute(
                 sorted_transpiled_qc_list,
                 self.backend,
@@ -379,23 +385,32 @@ class CoherenceBenchmark(Benchmark):
             )
             qcvv_logger.setLevel(logging.INFO)
             execution_results = retrieve_all_counts(jobs)[0]
-            dataset, _ = add_counts_to_dataset(execution_results, str(qubit_set), dataset) 
-
+            dataset, _ = add_counts_to_dataset(execution_results, str(qubit_set), dataset)
+            dataset.attrs.update(
+                {
+                    "qubit_set": qubit_set,
+                    "delay_list": self.delays,
+                    "experiment": self.coherence_exp,
+                    "group": [qubit_set],
+                    "qubits_to_plot": self.qubits_to_plot,
+                }
+            )
 
         else:
-            print(1)
             transpiled_qc_list = []
             # For crystal topology, we use the checkerboard pattern
             group_a, group_b = self.checkerboard_groups_from_coupling(list(self.backend.coupling_map))
             for group in [group_a, group_b]:
                 nqubits_group = len(group)
                 qc_coherence = self.generate_coherence_circuits(nqubits_group)
-                transpiled_qc_list = transpile(qc_coherence, backend=self.backend, initial_layout=group, optimization_level=self.qiskit_optim_level)
+                transpiled_qc_list = transpile(
+                    qc_coherence, backend=self.backend, initial_layout=group, optimization_level=self.qiskit_optim_level
+                )
                 sorted_transpiled_qc_list = {tuple(group): transpiled_qc_list}
                 # Execute on the backend
                 if self.configuration.use_dd == True:
                     raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
-                
+
                 jobs, _ = submit_execute(
                     sorted_transpiled_qc_list,
                     self.backend,
@@ -409,15 +424,15 @@ class CoherenceBenchmark(Benchmark):
                 execution_results = retrieve_all_counts(jobs)[0]
                 dataset, _ = add_counts_to_dataset(execution_results, str(group), dataset)
 
-        dataset.attrs.update(
-            {
-                "qubit_set": qubit_set,
-                "delay_list": self.delays,
-                "experiment": self.coherence_exp,
-                "group":  [list(range(self.backend.num_qubits))] if self.backend.has_resonators else [group_a, group_b],
-                "qubits_to_plot": self.qubits_to_plot,
-            }
-        )
+            dataset.attrs.update(
+                {
+                    "qubit_set": qubit_set,
+                    "delay_list": self.delays,
+                    "experiment": self.coherence_exp,
+                    "group": [group_a, group_b],
+                    "qubits_to_plot": self.qubits_to_plot,
+                }
+            )
 
         qcvv_logger.debug(f"Adding counts for {self.coherence_exp} to the dataset")
         self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=self.coherence_exp, circuits=qc_coherence))
@@ -432,7 +447,7 @@ class CoherenceConfiguration(BenchmarkConfigurationBase):
     """Coherence configuration.
 
     Attributes:
-        benchmark (Type[Benchmark]): The benchmark class used for QScore analysis, defaulting to CoherenceBenchmark.
+        benchmark (Type[Benchmark]): The benchmark class used for coherence analysis, defaulting to CoherenceBenchmark.
         delays (list[float]): List of delay times used in the coherence experiments.
         qiskit_optim_level (int): Qiskit transpilation optimization level, default is 3.
         optimize_sqg (bool): Indicates whether Single Qubit Gate Optimization is applied during transpilation, default is True.
