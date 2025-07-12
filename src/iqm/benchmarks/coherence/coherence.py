@@ -198,7 +198,7 @@ def fit_coherence_model(
     bounds = ([0, 1e-6, 0], [1.2, 10.0, 1])
 
     try:
-        popt, pcov = curve_fit( # pylint: disable=unbalanced-tuple-unpacking
+        popt, pcov = curve_fit(  # pylint: disable=unbalanced-tuple-unpacking
             exp_decay, delays, ydata, p0=p0, bounds=bounds, maxfev=10000
         )
         A, T_fit, C = popt
