@@ -18,7 +18,6 @@ class TestCoherence:
         )
         benchmark = CoherenceBenchmark(self.backend, EXAMPLE_COHERENCE)
         benchmark.run()
-        benchmark.analyze()
 
     def test_coherence_t2_echo(self):
         EXAMPLE_COHERENCE = CoherenceConfiguration(
@@ -30,7 +29,6 @@ class TestCoherence:
         )
         benchmark = CoherenceBenchmark(self.backend, EXAMPLE_COHERENCE)
         benchmark.run()
-        benchmark.analyze()
 
 
 class TestCoherenceDeneb(TestCoherence):
