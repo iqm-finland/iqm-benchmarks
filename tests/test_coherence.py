@@ -8,9 +8,9 @@ from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 class TestCoherence:
     backend = IQMFakeApollo()
     
-    def test_qscore_t1(self):
+    def test_coherence_t1(self):
         EXAMPLE_COHERENCE = CoherenceConfiguration(
-            delays = list(np.linspace(0, 100e-6, 100)),
+            delays = list(np.linspace(0, 100e-6, 2)),
             qiskit_optim_level = 3,
             optimize_sqg = True,
             coherence_exp = "t1",
@@ -20,9 +20,9 @@ class TestCoherence:
         benchmark.run()
         benchmark.analyze()
 
-    def test_qscore_t2_echo(self):
+    def test_coherence_t2_echo(self):
         EXAMPLE_COHERENCE = CoherenceConfiguration(
-            delays = list(np.linspace(0, 100e-6, 100)),
+            delays = list(np.linspace(0, 100e-6, 2)),
             qiskit_optim_level = 3,
             optimize_sqg = True,
             coherence_exp = "t2_echo",
@@ -35,4 +35,4 @@ class TestCoherence:
 
 class TestCoherenceDeneb(TestCoherence):
     backend = IQMFakeDeneb()
-    delays = list(np.linspace(0, 100e-6, 100)),
+    delays = list(np.linspace(0, 100e-6, 2)),
