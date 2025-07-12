@@ -51,15 +51,15 @@ def exp_decay(t, A, T, C):
 
 
 def plot_coherence(
-    amplitude_list: List[float],
+    amplitude: Dict[str, float],
     backend_name: str,
     delays: List[float],
-    offset_list: List[float],
+    offset: Dict[str, float],
     qubit_set: List[int],
     qubit_probs: dict[str, List[float]],
     timestamp: str,
-    fitted_t_list: List[float],
-    t_err_list: List[float],
+    T_fit: Dict[str, float],
+    T_fit_err: Dict[str, float],
     qubit_to_plot: List[int] | None = None,
     coherence_exp: str = "t1",
 ) -> Tuple[str, Figure]:
@@ -67,16 +67,18 @@ def plot_coherence(
     Plot coherence decay (T1 or T2_echo) for each qubit as subplots.
 
     Args:
-        amplitude_list (List[float]): Fitted amplitudes (A) per qubit.
-        backend_name (str): Name of the backend used for the experiment.
-        delays (List[float]): List of delay times used in the coherence experiments.
-        offset_list (List[float]): Fitted offsets (C) for each qubit.
-        qubit_set (List[int]): List of qubit indices involved in the experiment.
-        qubit_probs (dict[str, List[float]]): Measured probabilities P(1) for each qubit at different delays.
-        timestamp (str): Timestamp for labeling the plot.
-        fitted_t_list (List[float]): Fitted time constants (T) for each qubit.
-        coherence_exp (str): Type of coherence experiment ('t1' or 't2_echo') for labeling and plotting logic.
-        qubit_to_plot (list[int] | None): Specific qubits to plot. If None, all qubits in `qubit_set` are plotted.
+        amplitude_list: Fitted amplitudes (A) per qubit.
+        backend_name: Name of the backend used for the experiment.
+        delays: List of delay times used in the coherence experiments.
+        offset: Fitted offsets (C) for each qubit.
+        qubit_set: List of qubit indices involved in the experiment.
+        qubit_probs: Measured probabilities P(1) for each qubit at different delays.
+        timestamp: Timestamp for labeling the plot.
+        T_fit: Fitted coherence time (T) for each qubit.
+        T_fit_err: Fitted coherence time error for each qubit.
+        qubit_to_plot: Specific qubits to plot. If None, all qubits in `qubit_set` are plotted.
+        coherence_exp: Type of coherence experiment ('t1' or 't2_echo') for labeling and plotting logic.
+
 
     Returns:
         Tuple[str, Figure]: Filename of the saved plot and the matplotlib figure object.
@@ -90,27 +92,23 @@ def plot_coherence(
     nrows = (num_qubits + ncols - 1) // ncols
 
     fig, axs = plt.subplots(nrows, ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
-
     for idx, qubit in enumerate(qubit_to_plot or []):
         row, col = divmod(idx, ncols)
         ax = axs[row][col]
         ydata = np.array(qubit_probs[str(qubit)])
-        A = amplitude_list[idx]
-        C = offset_list[idx]
-        T_fit = fitted_t_list[idx]
+        A = amplitude[str(qubit)]
+        C = offset[str(qubit)]
+        T_val = T_fit[str(qubit)]
 
-        # Plot raw data
         ax.plot(delays, ydata, "o", label="Measured P(1)", color="blue")
-
-        # Plot fit line
         t_fit = np.linspace(min(delays), max(delays), 200)
-        fitted_curve = exp_decay(t_fit, A, T_fit, C)
+        fitted_curve = exp_decay(t_fit, A, T_val, C)
         ax.plot(
             t_fit,
             fitted_curve,
             "--",
             color="orange",
-            label=f"Fit (T = {T_fit * 1e6:.1f} ± {t_err_list[idx] * 1e6:.1f} µs)",
+            label=f"Fit (T = {T_val * 1e6:.1f} ± {T_fit_err[str(qubit)] * 1e6:.1f} µs)",
         )
         tick_list = np.linspace(min(delays), max(delays), 5)
         ax.set_xticks(tick_list)
@@ -121,7 +119,6 @@ def plot_coherence(
         ax.grid(True)
         ax.legend()
 
-    # Remove unused axes
     for j in range(idx + 1, nrows * ncols):  # pylint: disable=undefined-loop-variable
         row, col = divmod(j, ncols)
         fig.delaxes(axs[row][col])
@@ -135,13 +132,102 @@ def plot_coherence(
     return fig_name, fig
 
 
+def calculate_probabilities(counts: dict[str, int], nqubits: int, coherence_exp: str) -> Tuple[List[float], int]:
+    """
+    Calculate the probabilities of measuring '0' for each qubit based on the provided counts.
+
+    Args:
+        counts: A dictionary where keys are bitstrings representing measurement outcomes,
+                       and values are the counts of those outcomes.
+        nqubits: The number of qubits being measured.
+        coherence_exp: A string indicating the coherence experiment type ('t1' or other).
+
+    Returns:
+        tuple: A tuple containing:
+            - A list of probabilities for measuring '0' for each qubit.
+            - The total number of shots (measurements).
+    """
+    p0_per_qubit = [0.0 for _ in range(nqubits)]
+    total_shots = sum(counts.values())
+    for bitstring, count in counts.items():
+        for q in range(nqubits):
+            if coherence_exp == "t1":
+                if bitstring[::-1][q] == "1":
+                    p0_per_qubit[q] += count
+            else:
+                if bitstring[::-1][q] == "0":
+                    p0_per_qubit[q] += count
+    return p0_per_qubit, total_shots
+
+
+def fit_coherence_model(
+    qubit: int, probs: np.ndarray, delays: np.ndarray, coherence_exp: str
+) -> Tuple[List[BenchmarkObservation], float, float, float, float]:
+    """Fit the coherence model and return observations.
+
+    This function fits a coherence model to the provided probability data
+    and returns the fitted parameters along with their uncertainties.
+
+    Args:
+        qubit : The index of the qubit being analyzed.
+        probs: An array of probability values corresponding to the qubit's coherence.
+        delays An array of delay times at which the probabilities were measured.
+        coherence_exp: A string indicating the type of coherence experiment ('t1' or 't2_echo').
+
+    Returns:
+        A tuple containing:
+            - A list of BenchmarkObservation objects for the fitted parameters.
+            - The fitted decay time (T_fit).
+            - The uncertainty in the fitted decay time (T_fit_err).
+            - The fitted amplitude (A).
+            - The fitted offset (C).
+    """
+    observations_per_qubit = []
+    ydata = probs
+
+    # Estimate initial parameters
+    A_guess = ydata[0] - ydata[-1]
+    C_guess = ydata[-1]
+    T_guess = delays[len(delays) // 2]
+    p0 = [A_guess, T_guess, C_guess]
+
+    # Set parameter bounds:
+    # - A must be positive (decay amplitude)
+    # - T must be positive (no negative decay time)
+    # - C between 0 and 1 (physical population values)
+    bounds = ([0, 1e-6, 0], [1.2, 10.0, 1])
+
+    try:
+        popt, pcov = curve_fit( # pylint: disable=unbalanced-tuple-unpacking
+            exp_decay, delays, ydata, p0=p0, bounds=bounds, maxfev=10000
+        )
+        A, T_fit, C = popt
+        perr = np.sqrt(np.diag(pcov))
+        T_fit_err = perr[1]
+
+    except RuntimeError:
+        A, T_fit, C, T_fit_err = np.nan, np.nan, np.nan, np.nan
+
+    observations_per_qubit.extend(
+        [
+            BenchmarkObservation(
+                name="T1" if coherence_exp == "t1" else "T2_echo",
+                value=T_fit,
+                identifier=BenchmarkObservationIdentifier(qubit),
+                uncertainty=T_fit_err,
+            ),
+        ]
+    )
+    return observations_per_qubit, T_fit, T_fit_err, A, C
+
+
 def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     """Analysis function for a coherence experiment
 
     Args:
-        run (RunResult): A coherence experiment run for which analysis result is created
+        run (RunResult): A coherence experiment run for which analysis result is created.
     Returns:
-        AnalysisResult corresponding to coherence
+        AnalysisResult corresponding to coherence experiment.
     """
 
     plots = {}
@@ -158,19 +244,6 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     all_counts_group: List[Dict[str, int]] = []
     qubit_probs: Dict[str, List[float]] = {}
 
-    def calculate_probabilities(counts, nqubits, coherence_exp):
-        p0_per_qubit = [0.0 for _ in range(nqubits)]
-        total_shots = sum(counts.values())
-        for bitstring, count in counts.items():
-            for q in range(nqubits):
-                if coherence_exp == "t1":
-                    if bitstring[::-1][q] == "1":
-                        p0_per_qubit[q] += count
-                else:
-                    if bitstring[::-1][q] == "0":
-                        p0_per_qubit[q] += count
-        return p0_per_qubit, total_shots
-
     qubits_to_plot = dataset.attrs["qubits_to_plot"]
     for group in groups:
         all_counts_group = xrvariable_to_counts(dataset, str(group), tot_circs)
@@ -182,54 +255,32 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             for q_idx, qubit in enumerate(group):
                 qubit_probs[str(qubit)].append(p0_per_qubit[q_idx] / total_shots)
 
-    def fit_coherence_model(
-        qubit: int, probs: np.ndarray, delays: np.ndarray, coherence_exp: str
-    ) -> Tuple[List[BenchmarkObservation], float, float, float, float]:
-        """Fit the coherence model and return observations."""
-        observations_per_qubit = []
-        ydata = probs
-        p0 = [0.5, 100e-6, 0.5]
-        popt, pcov = curve_fit(exp_decay, delays, ydata, p0=p0)  # pylint: disable=unbalanced-tuple-unpacking
-        A, T_fit, C = popt
-        perr = np.sqrt(np.diag(pcov))  # Standard deviation errors
-        T_fit_err = perr[1]
-
-        observations_per_qubit.extend(
-            [
-                BenchmarkObservation(
-                    name="T1" if coherence_exp == "t1" else "T2_echo",
-                    value=T_fit,
-                    identifier=BenchmarkObservationIdentifier(qubit),
-                    uncertainty=T_fit_err,
-                ),
-            ]
-        )
-        return observations_per_qubit, T_fit, T_fit_err, A, C
-
     qubit_set = [item for sublist in groups for item in sublist]
-    amplitude_list = []
-    offset_list = []
-    fitted_t_list = []
-    T_fit_err_list = []
+    amplitude = {str(qubit): 0.0 for qubit in qubit_set}
+    offset = {str(qubit): 0.0 for qubit in qubit_set}
+    T_fit = {str(qubit): 0.0 for qubit in qubit_set}
+    T_fit_err = {str(qubit): 0.0 for qubit in qubit_set}
+
     for qubit in qubit_set:
-        probs = np.array(qubit_probs[str(qubit)])
+        qubit_str = str(qubit)
+        probs = np.array(qubit_probs[qubit_str])
         results = fit_coherence_model(qubit, probs, delays, coherence_exp)
         observations.extend(results[0])
-        fitted_t_list.append(results[1])
-        T_fit_err_list.append(results[2])
-        amplitude_list.append(results[3])
-        offset_list.append(results[4])
+        T_fit[qubit_str] = results[1]
+        T_fit_err[qubit_str] = results[2]
+        amplitude[qubit_str] = results[3]
+        offset[qubit_str] = results[4]
 
     fig_name, fig = plot_coherence(
-        amplitude_list,
+        amplitude,
         backend_name,
         delays,
-        offset_list,
+        offset,
         qubit_set,
         qubit_probs,
         timestamp,
-        fitted_t_list,
-        T_fit_err_list,
+        T_fit,
+        T_fit_err,
         qubits_to_plot,
         coherence_exp,
     )
