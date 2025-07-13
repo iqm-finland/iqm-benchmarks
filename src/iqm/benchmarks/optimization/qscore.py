@@ -789,6 +789,7 @@ class QScoreBenchmark(Benchmark):
             virtual_node_list = []
             qubit_to_node_list = []
             no_edge_instances = []
+            qc_all = []  # all circuits, including those with no edges
             for instance in range(self.num_instances):
                 qcvv_logger.debug(f"Executing graph {instance} with {num_nodes} nodes.")
                 graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
@@ -839,68 +840,73 @@ class QScoreBenchmark(Benchmark):
                 theta_list.append(theta)
 
                 qc = self.generate_maxcut_ansatz(graph, theta)
-                qc_list.append(qc)
-                qubit_to_node_copy = self.qubit_to_node.copy()
-                qubit_to_node_list.append(qubit_to_node_copy)
-
-                if len(qc.count_ops()) == 0:
-                    counts = {"": 1.0}  # to handle the case of physical graph with no edges
-                    qc_transpiled_list.append([])
-                    execution_results.append(counts)
-                    qc_list.append([])
-                    qcvv_logger.debug(f"This graph instance has no edges.")
+                
+                if len(qc.count_ops()) != 0:
+                    qc_list.append(qc)
+                    qc_all.append(qc)
+                    qubit_to_node_copy = self.qubit_to_node.copy()
+                    qubit_to_node_list.append(qubit_to_node_copy)
                 else:
-                    qcvv_logger.setLevel(logging.WARNING)
-                    # Account for all-to-all connected backends like Sirius
-                    if "move" in backend.architecture.gates:
-                        # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
-                        active_qubit_set = qubit_set[: len(qc.qubits)]
-                        # All-to-all coupling map on the active qubits
-                        effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
-                    else:
-                        if self.choose_qubits_routine == "naive":
-                            active_qubit_set = None
-                            effective_coupling_map = self.backend.coupling_map
-                        else:
-                            active_qubit_set = qubit_set
-                            effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
-
-                    transpilation_params = {
-                        "backend": self.backend,
-                        "qubits": active_qubit_set,
-                        "coupling_map": effective_coupling_map,
-                        "qiskit_optim_level": self.qiskit_optim_level,
-                        "optimize_sqg": self.optimize_sqg,
-                        "routing_method": self.routing_method,
-                    }
-
-                    transpiled_qc, _ = perform_backend_transpilation([qc], **transpilation_params)
-
-                    sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
-                    # Execute on the backend
-                    jobs, _ = submit_execute(
-                        sorted_transpiled_qc_list,
-                        self.backend,
-                        self.shots,
-                        self.calset_id,
-                        max_gates_per_batch=self.max_gates_per_batch,
-                        max_circuits_per_batch=self.configuration.max_circuits_per_batch,
-                        circuit_compilation_options=self.circuit_compilation_options,
-                    )
-                    qc_transpiled_list.append(transpiled_qc)
-                    qcvv_logger.setLevel(logging.INFO)
-
-                    if self.REM:
-                        rem_counts = apply_readout_error_mitigation(
-                            backend, transpiled_qc, [retrieve_all_counts(jobs)[0][0]], self.mit_shots
-                        )
-                        rem_distribution = rem_counts[0][0].nearest_probability_distribution()
-                        execution_results.append(rem_distribution)
-                    else:
-                        execution_results.append(retrieve_all_counts(jobs)[0][0])
+                    qc_all.append([])
 
                 seed += 1
                 qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
+
+            # if len(qc.count_ops()) == 0:
+            #     counts = {"": 1.0}  # to handle the case of physical graph with no edges
+            #     qc_transpiled_list.append([])
+            #     execution_results.append(counts)
+            #     qc_list.append([])
+            #     qcvv_logger.debug(f"This graph instance has no edges.")
+            # else:
+            qcvv_logger.setLevel(logging.WARNING)
+            # Account for all-to-all connected backends like Sirius
+            if "move" in backend.architecture.gates:
+                # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
+                active_qubit_set = qubit_set[:len(qc.qubits)]
+                # All-to-all coupling map on the active qubits
+                effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
+            else:
+                if self.choose_qubits_routine == "naive":
+                    active_qubit_set = None
+                    effective_coupling_map = self.backend.coupling_map
+                else:
+                    active_qubit_set = qubit_set
+                    effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
+
+            transpilation_params = {
+                "backend": self.backend,
+                "qubits": active_qubit_set,
+                "coupling_map": effective_coupling_map,
+                "qiskit_optim_level": self.qiskit_optim_level,
+                "optimize_sqg": self.optimize_sqg,
+                "routing_method": self.routing_method,
+            }
+
+            transpiled_qc, _ = perform_backend_transpilation(qc_list, **transpilation_params)
+
+            sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
+            # Execute on the backend
+            jobs, _ = submit_execute(
+                sorted_transpiled_qc_list,
+                self.backend,
+                self.shots,
+                self.calset_id,
+                max_gates_per_batch=self.max_gates_per_batch,
+                max_circuits_per_batch=self.configuration.max_circuits_per_batch,
+                circuit_compilation_options=self.circuit_compilation_options,
+            )
+            qc_transpiled_list.append(transpiled_qc)
+            qcvv_logger.setLevel(logging.INFO)
+
+            if self.REM:
+                rem_counts = apply_readout_error_mitigation(
+                    backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
+                )
+                execution_results.extend(rem_counts[0][instance].nearest_probability_distribution() for instance in range(self.num_instances))
+                #execution_results.append(rem_distribution)
+            else:
+                execution_results.extend(retrieve_all_counts(jobs)[0])
 
             dataset.attrs.update(
                 {
@@ -921,7 +927,7 @@ class QScoreBenchmark(Benchmark):
 
             # self.untranspiled_circuits[str(num_nodes)].update({tuple(qubit_set): qc_list})
             # self.transpiled_circuits[str(num_nodes)].update(sorted_transpiled_qc_list)
-            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(num_nodes), circuits=qc_list))
+            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(num_nodes), circuits=qc_all))
             self.transpiled_circuits.circuit_groups.append(
                 CircuitGroup(name=str(num_nodes), circuits=qc_transpiled_list)
             )
