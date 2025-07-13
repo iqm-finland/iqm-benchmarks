@@ -840,7 +840,7 @@ class QScoreBenchmark(Benchmark):
                 theta_list.append(theta)
 
                 qc = self.generate_maxcut_ansatz(graph, theta)
-                
+
                 if len(qc.count_ops()) != 0:
                     qc_list.append(qc)
                     qc_all.append(qc)
@@ -863,7 +863,7 @@ class QScoreBenchmark(Benchmark):
             # Account for all-to-all connected backends like Sirius
             if "move" in backend.architecture.gates:
                 # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
-                active_qubit_set = qubit_set[:len(qc.qubits)]
+                active_qubit_set = qubit_set[: len(qc.qubits)]
                 # All-to-all coupling map on the active qubits
                 effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
             else:
@@ -903,8 +903,10 @@ class QScoreBenchmark(Benchmark):
                 rem_counts = apply_readout_error_mitigation(
                     backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
                 )
-                execution_results.extend(rem_counts[0][instance].nearest_probability_distribution() for instance in range(self.num_instances))
-                #execution_results.append(rem_distribution)
+                execution_results.extend(
+                    rem_counts[0][instance].nearest_probability_distribution() for instance in range(self.num_instances)
+                )
+                # execution_results.append(rem_distribution)
             else:
                 execution_results.extend(retrieve_all_counts(jobs)[0])
 
