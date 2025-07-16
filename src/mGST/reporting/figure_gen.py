@@ -55,7 +55,7 @@ def set_size(w, h, ax=None):
     ax.figure.set_size_inches(figw, figh)
 
 
-def plot_objf(res_list, delta, title):
+def plot_objf(res_list, title, delta = None):
     """Plots the objective function over iterations in the algorithm
 
     Parameters:
@@ -65,12 +65,15 @@ def plot_objf(res_list, delta, title):
 
     Returns:
     """
-    plt.semilogy(res_list)
+    if delta is not None:
+        plt.semilogy(res_list)
+        plt.axhline(delta, color="green", label="conv. threshold")
+        plt.legend()
+    else:
+        plt.plot(res_list)
     plt.ylabel(f"Objective function")
     plt.xlabel(f"Iterations")
-    plt.axhline(delta, color="green", label="conv. threshold")
     plt.title(title)
-    plt.legend()
     plt.show()
 
 

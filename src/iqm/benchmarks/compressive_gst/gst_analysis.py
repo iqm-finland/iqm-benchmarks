@@ -6,6 +6,7 @@ import ast
 from time import perf_counter
 from typing import Any, List, Tuple, Union
 
+import pandas as pd
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
@@ -13,7 +14,7 @@ from numpy import ndarray
 import numpy as np
 from pandas import DataFrame
 from pygsti.models.model import Model
-from tqdm import trange
+from tqdm import trange, tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 import xarray as xr
 
@@ -80,6 +81,39 @@ def dataframe_to_figure(
     table.set_figure(fig)
     return fig
 
+def process_bootstrap_samples(y_sampled, attrs, init, target_mdl, identifier):
+    _, X_, E_, rho_, _ = algorithm.run_mGST(y_sampled,
+                                            attrs["J"],
+                                            attrs["seq_len_list"][-1],
+                                            attrs["num_gates"],
+                                            attrs["pdim"] ** 2,
+                                            attrs["rank"],
+                                            attrs["num_povm"],
+                                            attrs["batch_size"],
+                                            attrs["shots"],
+                                            method=attrs["opt_method"],
+                                            max_inits=attrs["max_inits"],
+                                            max_iter=0,
+                                            final_iter=attrs["max_iterations"][1],
+                                            threshold_multiplier=attrs["convergence_criteria"][0],
+                                            target_rel_prec=attrs["convergence_criteria"][1],
+                                            init=init,
+                                            verbose_level=0
+                                            )
+
+    X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, attrs[f"gauge_weights"])
+    df_g, df_o = reporting.report(
+        X_opt,
+        E_opt,
+        rho_opt,
+        attrs["J"],
+        y_sampled,
+        target_mdl,
+        attrs["gate_labels"][identifier],
+    )
+
+    X_opt_pp, E_opt_pp, rho_opt_pp = compatibility.std2pp(X_opt, E_opt, rho_opt)
+    return X_opt_pp, E_opt_pp, rho_opt_pp, df_g.values, df_o.values
 
 def bootstrap_errors(
     dataset: xr.Dataset,
@@ -107,36 +141,37 @@ def bootstrap_errors(
         The list of qubits for the current GST experiment
     y: ndarray
         The circuit outcome probabilities as a num_povm x num_circuits array
-    K : ndarray
+    K: ndarray
         Each subarray along the first axis contains a set of Kraus operators.
         The second axis enumerates Kraus operators for a gate specified by the first axis.
-    X : 3D ndarray
+    X: 3D ndarray
         Array where reconstructed CPT superoperators in standard basis are stacked along the first axis.
-    E : ndarray
+    E: ndarray
         Current POVM estimate
-    rho : ndarray
+    rho: ndarray
         Current initial state estimate
-    target_mdl : pygsti model object
+    target_mdl: pygsti model object
         The target gate set
-    identifier : str
+    identifier: str
         The string identifier of the current benchmark
-    parametric : bool
+    parametric: bool
         If set to True, parametric bootstrapping is used, else non-parametric bootstrapping. Default: False
 
     Returns
     -------
-    X_array : ndarray
+    X_array: ndarray
         Array containing all estimated gate tensors of different bootstrapping repetitions along first axis
-    E_array : ndarray
+    E_array: ndarray
         Array containing all estimated POVM tensors of different bootstrapping repetitions along first axis
-    rho_array : ndarray
+    rho_array: ndarray
         Array containing all estimated initial states of different bootstrapping repetitions along first axis
-    df_g_array : ndarray
+    df_g_array: ndarray
         Contains gate quality measures of bootstrapping repetitions
-    df_o_array : ndarray
+    df_o_array: ndarray
         Contains SPAM and other quality measures of bootstrapping repetitions
 
     """
+    bootstrap_samples = dataset.attrs["bootstrap_samples"]
     if parametric:
         y = np.real(
             np.array(
@@ -146,54 +181,61 @@ def bootstrap_errors(
                 ]
             )
         )
-    X_array = np.zeros((dataset.attrs["bootstrap_samples"], *X.shape)).astype(complex)
-    E_array = np.zeros((dataset.attrs["bootstrap_samples"], *E.shape)).astype(complex)
-    rho_array = np.zeros((dataset.attrs["bootstrap_samples"], *rho.shape)).astype(complex)
+    X_array = np.zeros((bootstrap_samples, *X.shape)).astype(complex)
+    E_array = np.zeros((bootstrap_samples, *E.shape)).astype(complex)
+    rho_array = np.zeros((bootstrap_samples, *rho.shape)).astype(complex)
     df_g_list = []
     df_o_list = []
 
-    qcvv_logger.info(f"Analyzing bootstrap samples...")
-    with logging_redirect_tqdm(loggers=[qcvv_logger]):
-        for i in trange(dataset.attrs["bootstrap_samples"]):
-            y_sampled = additional_fns.sampled_measurements(y, dataset.attrs["shots"]).copy()
-            _, X_, E_, rho_, _ = algorithm.run_mGST(
-                y_sampled,
-                dataset.attrs["J"],
-                dataset.attrs["seq_len_list"][-1],
-                dataset.attrs["num_gates"],
-                dataset.attrs["pdim"] ** 2,
-                dataset.attrs["rank"],
-                dataset.attrs["num_povm"],
-                dataset.attrs["batch_size"],
-                dataset.attrs["shots"],
-                method=dataset.attrs["opt_method"],
-                max_inits=dataset.attrs["max_inits"],
-                max_iter=0,
-                final_iter=dataset.attrs["max_iterations"][1],
-                threshold_multiplier=dataset.attrs["convergence_criteria"][0],
-                target_rel_prec=dataset.attrs["convergence_criteria"][1],
-                init=[K, E, rho],
-                verbose_level=0,
-            )
+    num_physical_cores = psutil.cpu_count(logical=False)
+    num_workers = max(1, num_physical_cores - 1)
 
-            X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, dataset.attrs[f"gauge_weights"])
-            df_g, df_o = reporting.report(
-                X_opt,
-                E_opt,
-                rho_opt,
-                dataset.attrs["J"],
-                y_sampled,
-                target_mdl,
-                dataset.attrs["gate_labels"][identifier],
-            )
-            df_g_list.append(df_g.values)
-            df_o_list.append(df_o.values)
+    # Prepare arguments for each process
+    args_list = [(additional_fns.sampled_measurements(y, dataset.attrs["shots"]).copy(),
+                  dataset.attrs,
+                  [K,E,rho],
+                  target_mdl,
+                  identifier
+                  )
+                 for _ in range(bootstrap_samples)]
 
-            X_opt_pp, E_opt_pp, rho_opt_pp = compatibility.std2pp(X_opt, E_opt, rho_opt)
+    # process layouts sequentially if the parallelizing bootstrapping is faster
+    if dataset.attrs["parallelization_path"] == "layouts":
+        qcvv_logger.info(f"Bootstrapping of layout {identifier}")
+        all_results = []
+        with logging_redirect_tqdm(loggers=[qcvv_logger]):
+            for i in trange(len(args_list)):
+                arg = args_list[i]
+                all_results.append(process_bootstrap_samples(*arg))
+    else:
+        qcvv_logger.info(f"Parallel bootstrapping using {num_workers} out of {num_physical_cores} physical cores")
+        # Execute in parallel
+        with mp.Manager() as manager:
+            all_results = []
 
-            X_array[i] = X_opt_pp
-            E_array[i] = E_opt_pp
-            rho_array[i] = rho_opt_pp
+            # Create a shared counter to track completed tasks
+            counter = manager.Value('i', 0)
+
+            # Create a progress bar that will be updated by all processes
+            with logging_redirect_tqdm(loggers=[qcvv_logger]):
+                pbar = tqdm(total=bootstrap_samples, desc="Bootstrap samples")
+                def update_progress(result):
+                    counter.value += 1
+                    pbar.update(1)
+
+                # Execute in parallel
+                with mp.Pool(num_workers) as pool:
+                    results = [pool.apply_async(process_bootstrap_samples, args=arg, callback=update_progress) for arg in args_list]
+                    all_results = [res.get() for res in results]  # Wait for all results
+
+                pbar.close()
+
+    for i, (X_opt_pp, E_opt_pp, rho_opt_pp, df_g_values, df_o_values) in enumerate(all_results):
+        X_array[i] = X_opt_pp
+        E_array[i] = E_opt_pp
+        rho_array[i] = rho_opt_pp
+        df_g_list.append(df_g_values)
+        df_o_list.append(df_o_values)
 
     return X_array, E_array, rho_array, np.array(df_g_list), np.array(df_o_list)
 
@@ -217,7 +259,6 @@ def generate_non_gate_results(
         df_o_final: Pandas DataFrame
             The final formated results
     """
-    identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     if bootstrap_results is not None:
         _, _, _, _, df_o_array = bootstrap_results
         df_o_array[df_o_array == -1] = np.nan
@@ -643,12 +684,11 @@ def run_mGST_wrapper(
     ).astype(np.complex128)
 
     # Run mGST
-    if dataset.attrs["from_init"]:
+    if dataset.attrs["from_init"]==True:
         K_init = additional_fns.perturbed_target_init(X_target, dataset.attrs["rank"])
         init_params = [K_init, E_target, rho_target]
     else:
         init_params = None
-
     K, X, E, rho, _ = algorithm.run_mGST(
         y,
         dataset.attrs["J"],
@@ -736,7 +776,7 @@ def process_layout(args):
             dataset, qubit_layout, df_g, X_opt, K_target, bootstrap_results
         )
         results_dict.update({"hamiltonian_params": hamiltonian_params})
-        df_g_evals = {}
+        df_g_evals = pd.DataFrame
     else:
         df_g_final, df_g_evals = generate_gate_results(dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt, bootstrap_results)
         results_dict.update({"choi_evals": df_g_evals.to_dict()})
@@ -761,7 +801,7 @@ def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, d
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
     fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
-    if bool(df_g_evals_final):
+    if not df_g_evals_final.empty:
         fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
     fig_o = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
 
@@ -822,37 +862,44 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_physical_cores = psutil.cpu_count(logical=False)
     num_workers = max(1, num_physical_cores - 1)
 
+    # Prepare arguments for each process
     args_list = [(dataset, qubit_layout, pdim)
                  for qubit_layout in dataset.attrs["qubit_layouts"]]
 
-    # Execute in parallel
-    # all_results = []
-    # for args in args_list:
-    #     all_results.append(process_layout(args))
-    qcvv_logger.info(f"Using {num_workers} out of {num_physical_cores} physical cores")
+    # Determine whether layouts or bootstraps should be processed in parallel
+    n_layouts = len(args_list)
+    n_bootstraps = dataset.attrs["bootstrap_samples"]
 
-    # Use Manager to handle shared data structures safely
-    with mp.Manager() as manager:
+    # Number of cycles needed for parallel processing in either case; Factor 1/2 due to boostrap runs converging faster than original optimization
+    parallel_layout_cycles = np.ceil(n_layouts/num_physical_cores)*(1+n_bootstraps/2)
+    parallel_bootstrap_cycles = n_layouts*(1+np.ceil(n_bootstraps/num_physical_cores)/2)
+    dataset.attrs["parallelization_path"] = "layout" if parallel_layout_cycles < parallel_bootstrap_cycles else "bootstrap"
+
+    # process layouts sequentially if the parallelizing bootstrapping is faster
+    if dataset.attrs["parallelization_path"] == "bootstrap":
         all_results = []
-        # Create a shared counter to track completed tasks
-        counter = manager.Value('i', 0)
-        total_layouts = len(dataset.attrs["qubit_layouts"])
+        for args in args_list:
+            all_results.append(process_layout(args))
+    else:
+        qcvv_logger.info(f"Parallel layout processing using {num_workers} out of {num_physical_cores} physical cores")
+        # Execute in parallel
+        with mp.Manager() as manager:
+            all_results = []
+            # Create a shared counter to track completed tasks
+            counter = manager.Value('i', 0)
+            total_layouts = len(dataset.attrs["qubit_layouts"])
 
-        # Define a callback function to update progress
-        def update_progress(result):
-            counter.value += 1
-            qcvv_logger.info(f"Completed estimation for {counter.value}/{total_layouts} qubit layouts")
+            # Define a callback function to update progress
+            def update_progress(result):
+                counter.value += 1
+                qcvv_logger.info(f"Completed estimation for {counter.value}/{total_layouts} qubit layouts")
 
-        # Prepare arguments for each process
-        args_list = [(dataset, qubit_layout, pdim)
-                     for qubit_layout in dataset.attrs["qubit_layouts"]]
+            # Execute in parallel using apply_async with callback
+            with mp.Pool(num_workers) as pool:
+                results = [pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list]
+                all_results = [res.get() for res in results]  # Wait for all results
 
-        # Execute in parallel using apply_async with callback
-        with mp.Pool(num_workers) as pool:
-            results = [pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list]
-            all_results = [res.get() for res in results]  # Wait for all results
-
-    # Collect results
+        # Collect results
     observations_list = []
     df_g_list = []
     df_o_list = []

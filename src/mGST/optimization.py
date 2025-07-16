@@ -95,7 +95,7 @@ def update_K_geodesic(K, H, a):
     return K_new.reshape(d, rK, pdim, pdim)
 
 
-def lineobjf_isom_geodesic(a, H, K, E, rho, J, y):
+def lineobjf_isom_geodesic(a, H, K, E, rho, J, y, mle):
     """Compute objective function at position on geodesic
 
     Parameters
@@ -126,7 +126,7 @@ def lineobjf_isom_geodesic(a, H, K, E, rho, J, y):
     r = pdim**2
     K_test = update_K_geodesic(K, H, a)
     X_test = np.einsum("ijkl,ijnm -> iknlm", K_test, K_test.conj()).reshape((d, r, r))
-    return objf(X_test, E, rho, J, y)
+    return objf(X_test, E, rho, J, y, mle=mle)
 
 
 def update_A_geodesic(A, H, a):
@@ -196,7 +196,7 @@ def update_B_geodesic(B, H, a):
     return B_temp.reshape(pdim, pdim)
 
 
-def lineobjf_A_geodesic(a, H, X, A, rho, J, y):
+def lineobjf_A_geodesic(a, H, X, A, rho, J, y, mle=False):
     """Compute objective function at position on geodesic for POVM parametrization
 
     Parameters
@@ -225,10 +225,10 @@ def lineobjf_A_geodesic(a, H, X, A, rho, J, y):
     n_povm = A.shape[0]
     A_test = update_A_geodesic(A, H, a)
     E_test = np.array([(A_test[i].T.conj() @ A_test[i]).reshape(-1) for i in range(n_povm)])
-    return objf(X, E_test, rho, J, y)
+    return objf(X, E_test, rho, J, y, mle=mle)
 
 
-def lineobjf_B_geodesic(a, H, X, E, B, J, y):
+def lineobjf_B_geodesic(a, H, X, E, B, J, y, mle=False):
     """Compute objective function at position on geodesic for the initial state parametrization
 
     Parameters
@@ -256,7 +256,7 @@ def lineobjf_B_geodesic(a, H, X, E, B, J, y):
     """
     B_test = update_B_geodesic(B, H, a)
     rho_test = (B_test @ B_test.T.conj()).reshape(-1)
-    return objf(X, E, rho_test, J, y)
+    return objf(X, E, rho_test, J, y, mle=mle)
 
 
 def lineobjf_A_B(a, v, delta_v, X, C, y, J, argument):
