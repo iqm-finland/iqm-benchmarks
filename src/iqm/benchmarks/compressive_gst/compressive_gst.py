@@ -42,7 +42,6 @@ from iqm.benchmarks.utils import (
     get_active_qubits,
     perform_backend_transpilation,
     retrieve_all_counts,
-    set_coupling_map,
     submit_execute,
     timeit,
 )
@@ -80,19 +79,7 @@ class CompressiveGST(Benchmark):
             configuration, self.num_qubits, self.qubit_layouts
         )
         self.gate_context = configuration.gate_context
-        if self.gate_context is not None:
-            if isinstance(self.gate_context, list):
-                if len(self.gate_context) != len(self.gate_set):
-                    raise ValueError("If gate_context is a list, it must have the same length as gate_set.")
-                # Check that context circuits don't overlap with qubit layouts for GST circuits
-                context_qubits = [q for qc in self.gate_context for q in get_active_qubits(qc)]
-            else:
-                context_qubits = get_active_qubits(self.gate_context)
-            layout_qubits = [q for layout in self.qubit_layouts for q in layout]
-            if any(q in layout_qubits for q in context_qubits):
-                raise ValueError(
-                    f"Gate context qubits {set(context_qubits)} must not overlap with qubits in layouts {set(layout_qubits)}."
-                )
+        validate_gate_context(self)
 
         if configuration.opt_method not in ["GD", "SFN", "auto"]:
             raise ValueError("Invalid optimization method, valid options are: GD, SFN, auto")
@@ -407,6 +394,29 @@ def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List
         " or List[List[int]] for multiple layouts."
     )
 
+def validate_gate_context(self):
+    """Validate that the gate context is properly configured.
+
+    Checks that:
+    1. If gate_context is a list, it has the same length as gate_set
+    2. The qubits used in gate_context don't overlap with qubits in the layouts
+
+    Raises:
+        ValueError: If gate_context is invalid or if qubits in gate_context overlap with qubits in layouts
+    """
+    if self.gate_context is not None:
+        if isinstance(self.gate_context, list):
+            if len(self.gate_context) != len(self.gate_set):
+                raise ValueError("If gate_context is a list, it must have the same length as gate_set.")
+            # Check that context circuits don't overlap with qubit layouts for GST circuits
+            context_qubits = [q for qc in self.gate_context for q in get_active_qubits(qc)]
+        else:
+            context_qubits = get_active_qubits(self.gate_context)
+        layout_qubits = [q for layout in self.qubit_layouts for q in layout]
+        if any(q in layout_qubits for q in context_qubits):
+            raise ValueError(
+                f"Gate context qubits {set(context_qubits)} must not overlap with qubits in layouts {set(layout_qubits)}."
+            )
 
 def parse_gate_set(
     configuration: GSTConfiguration, num_qubits: int, qubit_layouts: List[List[int]]
@@ -469,7 +479,7 @@ def parse_gate_set(
         f" 3QXYCZ or provide a list of Qiskti circuits to define the gates."
     )
 
-
+# pylint: disable=too-many-statements
 def create_predefined_gate_set(
     gate_set: Union[str, List[Any]], num_qubits: int, qubit_layouts: List[List[int]]
 ) -> Tuple[List[QuantumCircuit], Dict[str, Dict[int, str]], int]:

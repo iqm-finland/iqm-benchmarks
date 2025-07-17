@@ -3,18 +3,20 @@ Data analysis code for compressive gate set tomography
 """
 
 import ast
+import multiprocessing as mp
 from time import perf_counter
 from typing import Any, List, Tuple, Union
 
-import pandas as pd
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 from numpy import ndarray
 import numpy as np
 from pandas import DataFrame
+import pandas as pd
+import psutil
 from pygsti.models.model import Model
-from tqdm import trange, tqdm
+from tqdm import tqdm, trange
 from tqdm.contrib.logging import logging_redirect_tqdm
 import xarray as xr
 
@@ -29,8 +31,6 @@ from mGST import additional_fns, algorithm, compatibility
 from mGST.low_level_jit import contract
 from mGST.qiskit_interface import qiskit_gate_to_operator
 from mGST.reporting import figure_gen, reporting
-import multiprocessing as mp
-import psutil
 
 
 def dataframe_to_figure(
@@ -81,29 +81,76 @@ def dataframe_to_figure(
     table.set_figure(fig)
     return fig
 
-def process_bootstrap_samples(y_sampled, attrs, init, target_mdl, identifier):
-    _, X_, E_, rho_, res_list = algorithm.run_mGST(y_sampled,
-                                            attrs["J"],
-                                            attrs["seq_len_list"][-1],
-                                            attrs["num_gates"],
-                                            attrs["pdim"] ** 2,
-                                            attrs["rank"],
-                                            attrs["num_povm"],
-                                            attrs["batch_size"],
-                                            attrs["shots"],
-                                            method=attrs["opt_method"],
-                                            max_inits=attrs["max_inits"],
-                                            max_iter=0,
-                                            final_iter=attrs["max_iterations"][1],
-                                            threshold_multiplier=attrs["convergence_criteria"][0],
-                                            target_rel_prec=attrs["convergence_criteria"][1],
-                                            init=init,
-                                            verbose_level=0
-                                            )
-    delta = attrs["convergence_criteria"][0] * (1 - y_sampled.reshape(-1)) @ y_sampled.reshape(-1) / len(attrs["J"]) / attrs["num_povm"] / attrs["shots"]
+
+def process_bootstrap_samples(
+    y_sampled: ndarray,
+    attrs: dict[str, Any],
+    init: list[ndarray],
+    target_mdl: Model,
+    identifier: str
+) -> tuple[ndarray, ndarray, ndarray, ndarray, ndarray, bool]:
+    """Process a single bootstrap sample for Gate Set Tomography.
+
+    This function performs a GST analysis on a sampled dataset, applies gauge optimization,
+    and generates result reports.
+
+    Args:
+        y_sampled: ndarray
+            A 2D array of measurement outcomes for sequences in J;
+            Each column contains the outcome probabilities for a fixed sequence
+        attrs: dict[str, Any]
+            Dictionary containing configuration parameters for the GST algorithm
+        init: list[ndarray]
+            Initial values for the gate set optimization [K, E, rho]
+        target_mdl: Model
+            The target gate set model
+        identifier: str
+            String identifier for the current qubit layout
+
+    Returns:
+        X_opt_pp: ndarray
+            Array of optimized gate tensors in Pauli basis
+        E_opt_pp: ndarray
+            Optimized POVM elements in Pauli basis
+        rho_opt_pp: ndarray
+            Optimized initial state in Pauli basis
+        df_g.values: ndarray
+            Array of gate quality measures
+        df_o.values: ndarray
+            Array of SPAM and other quality measures
+        opt_success: bool
+            Whether the optimization successfully converged below expected least-squares error
+    """
+    _, X_, E_, rho_, res_list = algorithm.run_mGST(
+        y_sampled,
+        attrs["J"],
+        attrs["seq_len_list"][-1],
+        attrs["num_gates"],
+        attrs["pdim"] ** 2,
+        attrs["rank"],
+        attrs["num_povm"],
+        attrs["batch_size"],
+        attrs["shots"],
+        method=attrs["opt_method"],
+        max_inits=attrs["max_inits"],
+        max_iter=0,
+        final_iter=attrs["max_iterations"][1],
+        threshold_multiplier=attrs["convergence_criteria"][0],
+        target_rel_prec=attrs["convergence_criteria"][1],
+        init=init,
+        verbose_level=0,
+    )
+    delta = (
+        attrs["convergence_criteria"][0]
+        * (1 - y_sampled.reshape(-1))
+        @ y_sampled.reshape(-1)
+        / len(attrs["J"])
+        / attrs["num_povm"]
+        / attrs["shots"]
+    )
     opt_success = True if (res_list[-1] < delta) else False
 
-    X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, attrs[f"gauge_weights"])
+    X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, attrs["gauge_weights"])
     df_g, df_o = reporting.report(
         X_opt,
         E_opt,
@@ -117,6 +164,7 @@ def process_bootstrap_samples(y_sampled, attrs, init, target_mdl, identifier):
     X_opt_pp, E_opt_pp, rho_opt_pp = compatibility.std2pp(X_opt, E_opt, rho_opt)
     return X_opt_pp, E_opt_pp, rho_opt_pp, df_g.values, df_o.values, opt_success
 
+
 def bootstrap_errors(
     dataset: xr.Dataset,
     y: ndarray,
@@ -126,7 +174,7 @@ def bootstrap_errors(
     rho: ndarray,
     target_mdl: Model,
     identifier: str,
-    parametric: bool = False,
+    parametric: bool = True,
 ) -> tuple[Any, Any, Any, Any, Any]:
     """Resamples circuit outcomes a number of times and computes GST estimates for each repetition
     All results are then returned in order to compute bootstrap-error bars for GST estimates.
@@ -193,13 +241,16 @@ def bootstrap_errors(
     num_workers = max(1, num_physical_cores - 1)
 
     # Prepare arguments for each process
-    args_list = [(additional_fns.sampled_measurements(y, dataset.attrs["shots"]).copy(),
-                  dataset.attrs,
-                  [K,E,rho],
-                  target_mdl,
-                  identifier
-                  )
-                 for _ in range(bootstrap_samples)]
+    args_list = [
+        (
+            additional_fns.sampled_measurements(y, dataset.attrs["shots"]).copy(),
+            dataset.attrs,
+            [K, E, rho],
+            target_mdl,
+            identifier,
+        )
+        for _ in range(bootstrap_samples)
+    ]
 
     # process layouts sequentially if the parallelizing bootstrapping is faster
     if dataset.attrs["parallelization_path"] == "layout":
@@ -216,18 +267,22 @@ def bootstrap_errors(
             all_results = []
 
             # Create a shared counter to track completed tasks
-            counter = manager.Value('i', 0)
+            counter = manager.Value("i", 0)
 
             # Create a progress bar that will be updated by all processes
             with logging_redirect_tqdm(loggers=[qcvv_logger]):
                 pbar = tqdm(total=bootstrap_samples, desc="Bootstrap samples")
+
                 def update_progress(result):
                     counter.value += 1
                     pbar.update(1)
 
                 # Execute in parallel
                 with mp.Pool(num_workers) as pool:
-                    results = [pool.apply_async(process_bootstrap_samples, args=arg, callback=update_progress) for arg in args_list]
+                    results = [
+                        pool.apply_async(process_bootstrap_samples, args=arg, callback=update_progress)
+                        for arg in args_list
+                    ]
                     all_results = [res.get() for res in results]  # Wait for all results
 
                 pbar.close()
@@ -299,8 +354,12 @@ def generate_non_gate_results(
 
 
 def generate_unit_rank_gate_results(
-    dataset: xr.Dataset, qubit_layout: List[int], df_g: DataFrame, X_opt: ndarray, K_target: ndarray,
-        bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None
+    dataset: xr.Dataset,
+    qubit_layout: List[int],
+    df_g: DataFrame,
+    X_opt: ndarray,
+    K_target: ndarray,
+    bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None,
 ) -> Tuple[DataFrame, DataFrame, dict]:
     """
     Produces all result tables for Kraus rank 1 estimates
@@ -350,11 +409,7 @@ def generate_unit_rank_gate_results(
             r"average_gate_fidelity": [
                 reporting.number_to_str(
                     df_g.values[i, 0],
-                    (
-                        [percentiles_g_high[i, 0], percentiles_g_low[i, 0]]
-                        if bootstrap_results is not None
-                        else None
-                    ),
+                    ([percentiles_g_high[i, 0], percentiles_g_low[i, 0]] if bootstrap_results is not None else None),
                     precision=5,
                 )
                 for i in range(len(dataset.attrs["gate_labels"][identifier]))
@@ -362,11 +417,7 @@ def generate_unit_rank_gate_results(
             r"diamond_distance": [
                 reporting.number_to_str(
                     df_g.values[i, 1],
-                    (
-                        [percentiles_g_high[i, 1], percentiles_g_low[i, 1]]
-                        if bootstrap_results is not None
-                        else None
-                    ),
+                    ([percentiles_g_high[i, 1], percentiles_g_low[i, 1]] if bootstrap_results is not None else None),
                     precision=5,
                 )
                 for i in range(dataset.attrs["num_gates"])
@@ -385,7 +436,7 @@ def generate_gate_results(
     E_opt: ndarray,
     rho_opt: ndarray,
     bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None,
-    max_evals: int = 6
+    max_evals: int = 6,
 ) -> Tuple[DataFrame, DataFrame]:
     """
     Produces all result tables for arbitrary Kraus rank estimates
@@ -419,13 +470,10 @@ def generate_gate_results(
         successful_bootstraps = len(X_array)
         df_g_array[df_g_array == -1] = np.nan
         percentiles_g_low, percentiles_g_high = np.nanpercentile(df_g_array, [2.5, 97.5], axis=0)
-        bootstrap_unitarities = np.array(
-            [reporting.unitarities(X_array[i]) for i in range(successful_bootstraps)]
-        )
+        bootstrap_unitarities = np.array([reporting.unitarities(X_array[i]) for i in range(successful_bootstraps)])
         percentiles_u_low, percentiles_u_high = np.nanpercentile(bootstrap_unitarities, [2.5, 97.5], axis=0)
         X_array_std = [
-            compatibility.pp2std(X_array[i], E_array[i], rho_array[i])[0]
-            for i in range(successful_bootstraps)
+            compatibility.pp2std(X_array[i], E_array[i], rho_array[i])[0] for i in range(successful_bootstraps)
         ]
         bootstrap_evals = np.array(
             [
@@ -690,7 +738,7 @@ def run_mGST_wrapper(
     ).astype(np.complex128)
 
     # Run mGST
-    if dataset.attrs["from_init"]==True:
+    if dataset.attrs["from_init"] == True:
         K_init = additional_fns.perturbed_target_init(X_target, dataset.attrs["rank"])
         init_params = [K_init, E_target, rho_target]
     else:
@@ -717,8 +765,9 @@ def run_mGST_wrapper(
 
     return K, X, E, rho, K_target, X_target, E_target, rho_target
 
+
 def process_layout(args):
-    """Process a single qubit layout in parallel"""
+    """Process a single qubit layout"""
     dataset, qubit_layout, pdim = args
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
@@ -784,20 +833,22 @@ def process_layout(args):
         results_dict.update({"hamiltonian_params": hamiltonian_params})
         df_g_evals = pd.DataFrame
     else:
-        df_g_final, df_g_evals = generate_gate_results(dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt, bootstrap_results)
+        df_g_final, df_g_evals = generate_gate_results(
+            dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt, bootstrap_results
+        )
         results_dict.update({"choi_evals": df_g_evals.to_dict()})
 
     layout_observations = pandas_results_to_observations(
         dataset, df_g_final, df_o_final, BenchmarkObservationIdentifier(qubit_layout)
     )
 
-    results_dict.update(
-        {"full_metrics": {"Gates": df_g_final.to_dict(), "Outcomes and SPAM": df_o_final.to_dict()}}
-    )
+    results_dict.update({"full_metrics": {"Gates": df_g_final.to_dict(), "Outcomes and SPAM": df_o_final.to_dict()}})
     return qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals
 
 
 def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, df_g_evals_final):
+    """Process all plots for a single qubit layout"""
+
     layout_plots = {}
     # Process matrix plots
     pdim = dataset.attrs["pdim"]
@@ -810,7 +861,6 @@ def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, d
     if not df_g_evals_final.empty:
         fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
     fig_o = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
-
 
     layout_plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
     layout_plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
@@ -827,9 +877,9 @@ def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, d
 
     layout_plots[f"layout_{qubit_layout}_SPAM_matrices_real"] = figure_gen.generate_spam_err_std_pdf(
         "",
-        results_dict["gauge_opt_POVM"].reshape((-1,pdim**2)).real,
+        results_dict["gauge_opt_POVM"].reshape((-1, pdim**2)).real,
         results_dict["gauge_opt_state"].reshape(-1).real,
-        results_dict["target_POVM"].reshape((-1,pdim**2)).real,
+        results_dict["target_POVM"].reshape((-1, pdim**2)).real,
         results_dict["target_state"].reshape(-1).real,
         basis_labels=std_labels,
         title=f"Real part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
@@ -837,9 +887,9 @@ def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, d
     )
     layout_plots[f"layout_{qubit_layout}_SPAM_matrices_imag"] = figure_gen.generate_spam_err_std_pdf(
         "",
-        results_dict["gauge_opt_POVM"].reshape((-1,pdim**2)).imag,
+        results_dict["gauge_opt_POVM"].reshape((-1, pdim**2)).imag,
         results_dict["gauge_opt_state"].reshape(-1).imag,
-        results_dict["target_POVM"].reshape((-1,pdim**2)).imag,
+        results_dict["target_POVM"].reshape((-1, pdim**2)).imag,
         results_dict["target_state"].reshape(-1).imag,
         basis_labels=std_labels,
         title=f"Imaginary part of state and measurement effects in the standard basis\n(red:<0; blue:>0)",
@@ -869,17 +919,18 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
     num_workers = max(1, num_physical_cores - 1)
 
     # Prepare arguments for each process
-    args_list = [(dataset, qubit_layout, pdim)
-                 for qubit_layout in dataset.attrs["qubit_layouts"]]
+    args_list = [(dataset, qubit_layout, pdim) for qubit_layout in dataset.attrs["qubit_layouts"]]
 
     # Determine whether layouts or bootstraps should be processed in parallel
     n_layouts = len(args_list)
     n_bootstraps = dataset.attrs["bootstrap_samples"]
 
     # Number of cycles needed for parallel processing in either case; Factor 1/2 due to boostrap runs converging faster than original optimization
-    parallel_layout_cycles = np.ceil(n_layouts/num_physical_cores)*(1+n_bootstraps/2)
-    parallel_bootstrap_cycles = n_layouts*(1+np.ceil(n_bootstraps/num_physical_cores)/2)
-    dataset.attrs["parallelization_path"] = "layout" if parallel_layout_cycles < parallel_bootstrap_cycles else "bootstrap"
+    parallel_layout_cycles = np.ceil(n_layouts / num_physical_cores) * (1 + n_bootstraps / 2)
+    parallel_bootstrap_cycles = n_layouts * (1 + np.ceil(n_bootstraps / num_physical_cores) / 2)
+    dataset.attrs["parallelization_path"] = (
+        "layout" if parallel_layout_cycles < parallel_bootstrap_cycles else "bootstrap"
+    )
 
     # process layouts sequentially if the parallelizing bootstrapping is faster
     if dataset.attrs["parallelization_path"] == "bootstrap":
@@ -892,7 +943,7 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         with mp.Manager() as manager:
             all_results = []
             # Create a shared counter to track completed tasks
-            counter = manager.Value('i', 0)
+            counter = manager.Value("i", 0)
             total_layouts = len(dataset.attrs["qubit_layouts"])
 
             # Define a callback function to update progress
@@ -901,9 +952,31 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                 qcvv_logger.info(f"Completed estimation for {counter.value}/{total_layouts} qubit layouts")
 
             # Execute in parallel using apply_async with callback
+            # with mp.Pool(num_workers) as pool:
+            #     results = [pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list]
+            #     all_results = [res.get() for res in results]  # Wait for all results
             with mp.Pool(num_workers) as pool:
-                results = [pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list]
-                all_results = [res.get() for res in results]  # Wait for all results
+                async_results = [
+                    pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list
+                ]
+                all_results = []
+                for i, res in enumerate(async_results):
+                    try:
+                        result = res.get()
+                        all_results.append(result)
+                    except Exception as e:
+                        qcvv_logger.error(f"Error processing layout {i}: {str(e)}")
+                        # Create an error placeholder with the same structure
+                        qubit_layout = args_list[i][1]  # Extract qubit_layout from args
+                        error_result = (
+                            qubit_layout,
+                            {"error": str(e)},
+                            [],
+                            pd.DataFrame(),
+                            pd.DataFrame(),
+                            pd.DataFrame(),
+                        )
+                        all_results.append(error_result)
 
         # Collect results
     observations_list = []
@@ -926,8 +999,11 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
         results_dict = dataset.attrs["results_layout_" + identifier]
         # Update plots
-        qcvv_logger.info(f"Generating figures for layout {i+1}/{len(dataset.attrs['qubit_layouts'])}")
-        layout_plots = process_plots(dataset, qubit_layout, results_dict, df_g_list[i], df_o_list[i], df_g_evals_list[i])
+        N_layouts = len(dataset.attrs["qubit_layouts"])
+        qcvv_logger.info(f"Generating figures for layout {i+1}/{N_layouts}")
+        layout_plots = process_plots(
+            dataset, qubit_layout, results_dict, df_g_list[i], df_o_list[i], df_g_evals_list[i]
+        )
         for key, fig in layout_plots.items():
             plots[key] = fig
 

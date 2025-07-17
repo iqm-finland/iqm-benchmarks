@@ -55,7 +55,7 @@ def set_size(w, h, ax=None):
     ax.figure.set_size_inches(figw, figh)
 
 
-def plot_objf(res_list, title, delta = None):
+def plot_objf(res_list, title, delta=None):
     """Plots the objective function over iterations in the algorithm
 
     Parameters:

@@ -341,7 +341,7 @@ def perturbed_target_init(X_target, rK):
     """
     d, r, _ = X_target.shape
     pdim = int(np.sqrt(r))
-    K_perturb = randKrausSet(d, r, rK, a=0.1)
+    K_perturb = randKrausSet(d, r, rK, a=0.05)
     X_perturb = np.einsum("ijkl,ijnm -> iknlm", K_perturb, K_perturb.conj()).reshape((d, r, r))
     X_init = np.einsum("ikl,ilm ->ikm", X_perturb, X_target)
     K_init = Kraus_rep(X_init, d, pdim, rK)

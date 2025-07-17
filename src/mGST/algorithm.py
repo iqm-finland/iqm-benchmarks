@@ -137,6 +137,7 @@ def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     A_new = update_A_geodesic(A, Delta, a)
     return A_new
 
+
 def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     """Riemannian saddle free Newton step on the initial state parametrization
 
@@ -238,7 +239,9 @@ def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     Delta = (H_abs_inv @ G)[:nt]
     # Projection onto tangent space
     Delta = Delta - Y * (Y.T.conj() @ Delta + Delta.T.conj() @ Y) / 2
-    res = minimize(lineobjf_B_geodesic, 1e-9, args=(Delta, X, E, B, J, y, mle), method="COBYLA", options={"maxiter": 20})
+    res = minimize(
+        lineobjf_B_geodesic, 1e-9, args=(Delta, X, E, B, J, y, mle), method="COBYLA", options={"maxiter": 20}
+    )
     a = res.x
     B_new = update_B_geodesic(B, Delta, a)
     return B_new
@@ -299,7 +302,9 @@ def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA", mle=False):
     # Additional projection onto tangent space to avoid numerical instability
     Delta = tangent_proj(K, Delta, d, rK)
 
-    res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200})
+    res = minimize(
+        lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200}
+    )
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
 
@@ -408,7 +413,9 @@ def SFN_riem_Hess(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=
 
     Delta = tangent_proj(K, Delta_K, d, rK)
 
-    res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200})
+    res = minimize(
+        lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200}
+    )
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
 
@@ -583,7 +590,9 @@ def optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=F
     if any(((f"G%i" % i in fixed_elements) for i in range(d))):
         fixed_gates = np.array([(f"G%i" % i in fixed_elements) for i in range(d)])
         if method == "SFN":
-            K_new = SFN_riem_Hess(K, E_new, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=fixed_gates, mle=mle)
+            K_new = SFN_riem_Hess(
+                K, E_new, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=fixed_gates, mle=mle
+            )
         else:
             K_new = gd(K, E_new, rho, y, J, d, r, rK, ls="COBYLA", fixed_gates=fixed_gates, mle=mle)
     else:
@@ -707,7 +716,7 @@ def run_mGST(
                         success = True
                         break
             if verbose_level == 2:
-                plot_objf(res_list, f"Objective function for batch optimization", delta = delta)
+                plot_objf(res_list, f"Objective function for batch optimization", delta=delta)
             if success:
                 break
             if verbose_level > 0:
@@ -721,10 +730,13 @@ def run_mGST(
             K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=True)
             res_list.append(objf(X, E, rho, J, y))
             res_list_mle.append(objf(X, E, rho, J, y, mle=True))
-            if len(res_list_mle) >= 2 and np.abs(res_list_mle[-2] - res_list_mle[-1]) < res_list_mle[-1] * target_rel_prec:
+            if (
+                len(res_list_mle) >= 2
+                and np.abs(res_list_mle[-2] - res_list_mle[-1]) < res_list_mle[-1] * target_rel_prec
+            ):
                 break
     if verbose_level == 2:
-        plot_objf(res_list,f"Least squares error over batches and full data", delta = delta)
+        plot_objf(res_list, f"Least squares error over batches and full data", delta=delta)
         plot_objf(res_list_mle, f"Negative log-likelihood over full data")
     if verbose_level > 0:
         if success or (res_list[-1] < delta):
