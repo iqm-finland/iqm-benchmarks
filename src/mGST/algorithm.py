@@ -137,42 +137,6 @@ def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     A_new = update_A_geodesic(A, Delta, a)
     return A_new
 
-def check_array_validity(arr, name="array"):
-    """
-    Check if array contains NaN or inf values and print details if found.
-
-    Parameters:
-    ----------
-    arr : numpy.ndarray
-        The array to check
-    name : str
-        Name to identify the array in output messages
-
-    Returns:
-    -------
-    bool
-        True if array is valid (no NaN/inf), False otherwise
-    """
-    has_nan = np.isnan(arr).any()
-    has_inf = np.isinf(arr).any()
-
-    if has_nan or has_inf:
-        print(f"WARNING: {name} contains invalid values:")
-        if has_nan:
-            nan_indices = np.where(np.isnan(arr))
-            print(f"  - NaN values found at indices: {nan_indices}")
-            if arr.size < 100:  # Only print full array if small
-                print(f"  - Array: {arr}")
-
-        if has_inf:
-            inf_indices = np.where(np.isinf(arr))
-            print(f"  - Infinity values found at indices: {inf_indices}")
-            if arr.size < 100:  # Only print full array if small
-                print(f"  - Array: {arr}")
-
-        return False
-    return True
-
 def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     """Riemannian saddle free Newton step on the initial state parametrization
 
@@ -259,7 +223,6 @@ def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     H = H.reshape(2 * nt, 2 * nt) @ P_T.reshape(2 * nt, 2 * nt)
 
     # saddle free newton method
-    check_array_validity(H, name="State Hessian")
     H = (H + H.T.conj()) / 2
     evals, U = eigh(H)
 
@@ -332,6 +295,10 @@ def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA", mle=False):
         # Riem. gradient taken from conjugate derivative
         rGrad = 2 * (Fy.conj() - Y @ Fy.T @ Y)
         Delta[k] = rGrad
+
+    # Additional projection onto tangent space to avoid numerical instability
+    Delta = tangent_proj(K, Delta, d, rK)
+
     res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200})
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
@@ -613,7 +580,6 @@ def optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=F
     else:
         A_new = A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, mle=mle)
         E_new = np.array([(A_new[i].T.conj() @ A_new[i]).reshape(-1) for i in range(n_povm)])
-
     if any(((f"G%i" % i in fixed_elements) for i in range(d))):
         fixed_gates = np.array([(f"G%i" % i in fixed_elements) for i in range(d)])
         if method == "SFN":
@@ -626,7 +592,6 @@ def optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=F
         else:
             fixed_gates = np.array([(f"G%i" % i in fixed_elements) for i in range(d)])
             K_new = gd(K, E_new, rho, y, J, d, r, rK, fixed_gates=fixed_gates, ls="COBYLA", mle=mle)
-
     if "rho" in fixed_elements:
         rho_new = rho
         B_new = B

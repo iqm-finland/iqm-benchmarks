@@ -123,6 +123,8 @@ def objf(X, E, rho, J, y, mle=False):
         A 2D array representing the indices for which the objective function will be evaluated.
     y : numpy.ndarray
         A 2D array of shape (n_povm, len(J)) containing the target values.
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
@@ -271,6 +273,8 @@ def dK(X, K, E, rho, J, y, d, r, rK, mle=False):
         The rank of the problem.
     rK : int
         The number of rows in the reshaped Kraus operator K.
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
@@ -334,6 +338,8 @@ def dK_dMdM(X, K, E, rho, J, y, d, r, rK, mle=False):
         The number of rows for the matrix K.
     rK : int
         The number of columns for the matrix K.
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
@@ -412,6 +418,8 @@ def ddM(X, K, E, rho, J, y, d, r, rK, mle=False):
         Dimension of the local basis.
     rK : int
         Number of rows in the Kraus operator matrix.
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
@@ -626,6 +634,8 @@ def ddA_derivs(X, A, B, J, y, r, pdim, n_povm, mle=False):
         The dimension of the input matrices A and B.
     n_povm : int
         The number of POVM elements.
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------

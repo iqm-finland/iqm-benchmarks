@@ -70,7 +70,7 @@ def plot_objf(res_list, title, delta = None):
         plt.axhline(delta, color="green", label="conv. threshold")
         plt.legend()
     else:
-        plt.plot(res_list)
+        plt.semilogy(res_list)
     plt.ylabel(f"Objective function")
     plt.xlabel(f"Iterations")
     plt.title(title)

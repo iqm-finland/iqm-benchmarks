@@ -641,8 +641,7 @@ def sampled_measurements(y, n):
         y_new = np.maximum(np.minimum(y, 1), 0)
         if np.sum(np.abs(y_new - y)) > 1e-6:
             warnings.warn(
-                f"Warning: Probabilities capped to interval [0,1]",
-                f"l1-difference to input:%f" % np.sum(np.abs(y_new - y)),
+                f"Warning: Probabilities capped to interval [0,1], l1-difference to input: {np.sum(np.abs(y_new - y))}"
             )
         y = y_new
     rng = np.random.default_rng()

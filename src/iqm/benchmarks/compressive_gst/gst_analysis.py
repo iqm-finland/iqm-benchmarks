@@ -82,7 +82,7 @@ def dataframe_to_figure(
     return fig
 
 def process_bootstrap_samples(y_sampled, attrs, init, target_mdl, identifier):
-    _, X_, E_, rho_, _ = algorithm.run_mGST(y_sampled,
+    _, X_, E_, rho_, res_list = algorithm.run_mGST(y_sampled,
                                             attrs["J"],
                                             attrs["seq_len_list"][-1],
                                             attrs["num_gates"],
@@ -100,6 +100,8 @@ def process_bootstrap_samples(y_sampled, attrs, init, target_mdl, identifier):
                                             init=init,
                                             verbose_level=0
                                             )
+    delta = attrs["convergence_criteria"][0] * (1 - y_sampled.reshape(-1)) @ y_sampled.reshape(-1) / len(attrs["J"]) / attrs["num_povm"] / attrs["shots"]
+    opt_success = True if (res_list[-1] < delta) else False
 
     X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, attrs[f"gauge_weights"])
     df_g, df_o = reporting.report(
@@ -113,7 +115,7 @@ def process_bootstrap_samples(y_sampled, attrs, init, target_mdl, identifier):
     )
 
     X_opt_pp, E_opt_pp, rho_opt_pp = compatibility.std2pp(X_opt, E_opt, rho_opt)
-    return X_opt_pp, E_opt_pp, rho_opt_pp, df_g.values, df_o.values
+    return X_opt_pp, E_opt_pp, rho_opt_pp, df_g.values, df_o.values, opt_success
 
 def bootstrap_errors(
     dataset: xr.Dataset,
@@ -181,9 +183,9 @@ def bootstrap_errors(
                 ]
             )
         )
-    X_array = np.zeros((bootstrap_samples, *X.shape)).astype(complex)
-    E_array = np.zeros((bootstrap_samples, *E.shape)).astype(complex)
-    rho_array = np.zeros((bootstrap_samples, *rho.shape)).astype(complex)
+    X_list = []
+    E_list = []
+    rho_list = []
     df_g_list = []
     df_o_list = []
 
@@ -200,7 +202,7 @@ def bootstrap_errors(
                  for _ in range(bootstrap_samples)]
 
     # process layouts sequentially if the parallelizing bootstrapping is faster
-    if dataset.attrs["parallelization_path"] == "layouts":
+    if dataset.attrs["parallelization_path"] == "layout":
         qcvv_logger.info(f"Bootstrapping of layout {identifier}")
         all_results = []
         with logging_redirect_tqdm(loggers=[qcvv_logger]):
@@ -230,14 +232,17 @@ def bootstrap_errors(
 
                 pbar.close()
 
-    for i, (X_opt_pp, E_opt_pp, rho_opt_pp, df_g_values, df_o_values) in enumerate(all_results):
-        X_array[i] = X_opt_pp
-        E_array[i] = E_opt_pp
-        rho_array[i] = rho_opt_pp
-        df_g_list.append(df_g_values)
-        df_o_list.append(df_o_values)
+    for i, (X_opt_pp, E_opt_pp, rho_opt_pp, df_g_values, df_o_values, success) in enumerate(all_results):
+        if success:
+            X_list.append(X_opt_pp)
+            E_list.append(E_opt_pp)
+            rho_list.append(rho_opt_pp)
+            df_g_list.append(df_g_values)
+            df_o_list.append(df_o_values)
+        else:
+            qcvv_logger.info(f"Bootstrap sample {i} failed to converge below expected lsq error. Skipping this sample.")
 
-    return X_array, E_array, rho_array, np.array(df_g_list), np.array(df_o_list)
+    return np.array(X_list), np.array(E_list), np.array(rho_list), np.array(df_g_list), np.array(df_o_list)
 
 
 def generate_non_gate_results(
@@ -411,20 +416,21 @@ def generate_gate_results(
 
     if bootstrap_results is not None:
         X_array, E_array, rho_array, df_g_array, _ = bootstrap_results
+        successful_bootstraps = len(X_array)
         df_g_array[df_g_array == -1] = np.nan
         percentiles_g_low, percentiles_g_high = np.nanpercentile(df_g_array, [2.5, 97.5], axis=0)
         bootstrap_unitarities = np.array(
-            [reporting.unitarities(X_array[i]) for i in range(dataset.attrs["bootstrap_samples"])]
+            [reporting.unitarities(X_array[i]) for i in range(successful_bootstraps)]
         )
         percentiles_u_low, percentiles_u_high = np.nanpercentile(bootstrap_unitarities, [2.5, 97.5], axis=0)
         X_array_std = [
             compatibility.pp2std(X_array[i], E_array[i], rho_array[i])[0]
-            for i in range(dataset.attrs["bootstrap_samples"])
+            for i in range(successful_bootstraps)
         ]
         bootstrap_evals = np.array(
             [
                 reporting.generate_Choi_EV_table(X_array_std[i], n_evals, dataset.attrs["gate_labels"][identifier])
-                for i in range(dataset.attrs["bootstrap_samples"])
+                for i in range(successful_bootstraps)
             ]
         )
         percentiles_evals_low, percentiles_evals_high = np.nanpercentile(bootstrap_evals, [2.5, 97.5], axis=0)
@@ -762,7 +768,7 @@ def process_layout(args):
     # Bootstrap
     bootstrap_results = None
     if dataset.attrs["bootstrap_samples"] > 0:
-        bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl, identifier, parametric=True)
+        bootstrap_results = bootstrap_errors(dataset, y, K, X, E, rho, target_mdl, identifier, parametric=False)
         results_dict.update({"bootstrap_data": bootstrap_results})
 
     _, df_o_full = reporting.report(

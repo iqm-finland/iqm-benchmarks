@@ -115,6 +115,8 @@ def lineobjf_isom_geodesic(a, H, K, E, rho, J, y, mle):
     y : numpy array
         2D array of measurement outcomes for sequences in J;
         The columns contain the outcome probabilities for different povm elements
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
@@ -216,6 +218,8 @@ def lineobjf_A_geodesic(a, H, X, A, rho, J, y, mle=False):
     y : numpy array
         2D array of measurement outcomes for sequences in J;
         The columns contain the outcome probabilities for different povm elements
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
@@ -248,6 +252,8 @@ def lineobjf_B_geodesic(a, H, X, E, B, J, y, mle=False):
     y : numpy array
         2D array of measurement outcomes for sequences in J;
         The columns contain the outcome probabilities for different povm elements
+    mle : bool
+        If True, the log-likelihood objective function is used, otherwise the least squares objective function is used
 
     Returns
     -------
