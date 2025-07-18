@@ -18,7 +18,7 @@ from mGST.low_level_jit import Mp_norm_lower, MVE_lower, contract, local_basis
 @contextlib.contextmanager
 def suppress_stdout():
     """Context manager to temporarily suppress stdout output."""
-    with open(os.devnull, "w") as devnull:
+    with open(os.devnull, "w", encoding="utf-8") as devnull:
         old_stdout = sys.stdout
         sys.stdout = devnull
         try:
@@ -275,6 +275,10 @@ def random_gs(d, r, rK, n_povm):
         The second axis enumerates Kraus operators for a gate specified by the first axis.
     X: 3D numpy array
         Array where random CPT superoperators are stacked along the first axis.
+    E: 2D numpy array
+        Randomly generated POVM elements stacked along the first axis.
+    rho: 1D numpy array
+        Random initial state vector
 
     Notes:
         The Kraus operators are generated from random unitaries, see function randKrausSet

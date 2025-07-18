@@ -1,6 +1,7 @@
 """Tests for compressive GST benchmark"""
 
 from unittest.mock import patch
+import multiprocessing as mp
 
 from iqm.benchmarks.compressive_gst.compressive_gst import CompressiveGST, GSTConfiguration
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
@@ -13,6 +14,7 @@ class TestGST:
 
     @patch('matplotlib.pyplot.figure')
     def test_1q(self, mock_fig):
+        mp.set_start_method("spawn", force=True)
         # Testing minimal gate context
         gate_context = [QuantumCircuit(self.backend.num_qubits) for _ in range(3)]
         gate_context[0].h(0)
@@ -36,6 +38,7 @@ class TestGST:
 
     @patch('matplotlib.pyplot.figure')
     def test_2q(self, mock_fig):
+        mp.set_start_method("spawn", force=True)
         minimal_2Q_GST = GSTConfiguration(
             qubit_layouts=[[2, 3]],
             gate_set="2QXYICZ",

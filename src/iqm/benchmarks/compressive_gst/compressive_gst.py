@@ -288,6 +288,7 @@ class CompressiveGST(Benchmark):
 
         self.circuits.benchmark_circuits = [transpiled_circuits, untranspiled_circuits]
         self.add_configuration_to_dataset(dataset)
+        qcvv_logger.info(f"Execution completed")
         return dataset
 
 
@@ -394,6 +395,7 @@ def parse_layouts(qubit_layouts: Union[List[int], List[List[int]]]) -> List[List
         " or List[List[int]] for multiple layouts."
     )
 
+
 def validate_gate_context(self):
     """Validate that the gate context is properly configured.
 
@@ -417,6 +419,7 @@ def validate_gate_context(self):
             raise ValueError(
                 f"Gate context qubits {set(context_qubits)} must not overlap with qubits in layouts {set(layout_qubits)}."
             )
+
 
 def parse_gate_set(
     configuration: GSTConfiguration, num_qubits: int, qubit_layouts: List[List[int]]
@@ -478,6 +481,7 @@ def parse_gate_set(
         f"Invalid gate set, choose among 1QXYI, 2QXYICZ, 2QXYCZ_extended,"
         f" 3QXYCZ or provide a list of Qiskti circuits to define the gates."
     )
+
 
 # pylint: disable=too-many-statements
 def create_predefined_gate_set(

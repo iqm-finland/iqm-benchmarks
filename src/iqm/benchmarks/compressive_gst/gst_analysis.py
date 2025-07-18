@@ -9,7 +9,6 @@ from typing import Any, List, Tuple, Union
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-from matplotlib.transforms import Bbox
 from numpy import ndarray
 import numpy as np
 from pandas import DataFrame
@@ -33,61 +32,8 @@ from mGST.qiskit_interface import qiskit_gate_to_operator
 from mGST.reporting import figure_gen, reporting
 
 
-def dataframe_to_figure(
-    df: DataFrame, row_labels: Union[List[str], None] = None, col_width: float = 2, fontsize: int = 12
-) -> Figure:
-    """Turns a pandas DataFrame into a figure
-    This is needed to conform with the standard file saving routine of QCVV.
-
-    Args:
-        df: Pandas DataFrame
-            A dataframe table containing GST results
-        row_labels: List[str]
-            The row labels for the dataframe
-        col_width: int
-            Used to control cell width in the table
-        fontsize: int
-            Font size of text/numbers in table cells
-
-    Returns:
-        figure: Matplotlib figure object
-            A figure representing the dataframe.
-    """
-
-    if row_labels is None:
-        row_labels = list(np.arange(df.shape[0]))
-
-    row_height = fontsize / 70 * 2
-    n_cols = df.shape[1]
-    n_rows = df.shape[0]
-    figsize = np.array([n_cols + 1, n_rows + 1]) * np.array([col_width, row_height])
-
-    fig, ax = plt.subplots(figsize=figsize)
-
-    fig.patch.set_visible(False)
-    ax.axis("off")
-    ax.axis("tight")
-    data_array = (df.to_numpy(dtype="str")).copy()
-    column_names = df.columns.tolist()
-    table = ax.table(
-        cellText=data_array,
-        colLabels=column_names,
-        rowLabels=row_labels,
-        cellLoc="center",
-        colColours=["#7FA1C3" for _ in range(n_cols)],
-        bbox=Bbox([[0, 0], [1, 1]]),
-    )
-    table.set_fontsize(fontsize)
-    table.set_figure(fig)
-    return fig
-
-
 def process_bootstrap_samples(
-    y_sampled: ndarray,
-    attrs: dict[str, Any],
-    init: list[ndarray],
-    target_mdl: Model,
-    identifier: str
+    y_sampled: ndarray, attrs: dict[str, Any], init: list[ndarray], target_mdl: Model, identifier: str
 ) -> tuple[ndarray, ndarray, ndarray, ndarray, ndarray, bool]:
     """Process a single bootstrap sample for Gate Set Tomography.
 
@@ -148,7 +94,7 @@ def process_bootstrap_samples(
         / attrs["num_povm"]
         / attrs["shots"]
     )
-    opt_success = True if (res_list[-1] < delta) else False
+    opt_success = res_list[-1] < delta
 
     X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, attrs["gauge_weights"])
     df_g, df_o = reporting.report(
@@ -187,8 +133,6 @@ def bootstrap_errors(
     ----------
     dataset: xarray.Dataset
         A dataset containing counts from the experiment and configurations
-    qubit_layout: List[int]
-        The list of qubits for the current GST experiment
     y: ndarray
         The circuit outcome probabilities as a num_povm x num_circuits array
     K: ndarray
@@ -273,7 +217,7 @@ def bootstrap_errors(
             with logging_redirect_tqdm(loggers=[qcvv_logger]):
                 pbar = tqdm(total=bootstrap_samples, desc="Bootstrap samples")
 
-                def update_progress(result):
+                def update_progress(_=None):
                     counter.value += 1
                     pbar.update(1)
 
@@ -301,20 +245,17 @@ def bootstrap_errors(
 
 
 def generate_non_gate_results(
-    qubit_layout: List[int], df_o: DataFrame, bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None
+    df_o: DataFrame, bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]] = None
 ) -> DataFrame:
     """
     Creates error bars (if bootstrapping was used) and formats results for non-gate errors.
     The resulting tables are also turned into figures, so that they can be saved automatically.
 
     Args:
-        dataset: xr.Dataset
-            A dataset containing counts from the experiment and configurations
-        qubit_layout: List[int]
-                The list of qubits for the current GST experiment
         df_o: Pandas DataFrame
             A dataframe containing the non-gate quality metrics (SPAM errors and fit quality)
-
+        bootstrap_results: Union[None, tuple[Any, Any, Any, Any, Any]]
+            If provided, contains the results of the bootstrap analysis.
     Returns:
         df_o_final: Pandas DataFrame
             The final formated results
@@ -553,29 +494,6 @@ def generate_gate_results(
     return df_g_final, df_g_evals_final
 
 
-def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
-    """Converts formated string results from mgst to float (value, uncertainty) pairs
-
-    Args:
-        result_str: str
-            The value of a result parameter formated as str
-        err: str
-            The error interval of the parameters
-
-    Returns:
-        value: float
-            The parameter value as float
-        uncertainty: float
-            A single uncertainty value
-    """
-    if err:
-        value = float(result_str.split("[")[0])
-        rest = result_str.split("[")[1].split(",")
-        uncertainty = float(rest[1][:-1]) - float(rest[0])
-        return value, uncertainty
-    return float(result_str), np.NaN
-
-
 def pandas_results_to_observations(
     dataset: xr.Dataset, df_g: DataFrame, df_o: DataFrame, identifier: BenchmarkObservationIdentifier
 ) -> List[BenchmarkObservation]:
@@ -606,8 +524,8 @@ def pandas_results_to_observations(
                 BenchmarkObservation(
                     name=f"{name}_{gate_label}:crosstalk_components={qubits}",
                     identifier=identifier,
-                    value=result_str_to_floats(df_g[name].iloc[idx], err)[0],
-                    uncertainty=result_str_to_floats(df_g[name].iloc[idx], err)[1],
+                    value=reporting.result_str_to_floats(df_g[name].iloc[idx], err)[0],
+                    uncertainty=reporting.result_str_to_floats(df_g[name].iloc[idx], err)[1],
                 )
                 for name in df_g.columns.tolist()
             ]
@@ -617,8 +535,8 @@ def pandas_results_to_observations(
             BenchmarkObservation(
                 name=f"{name}",
                 identifier=identifier,
-                value=result_str_to_floats(df_o[name].iloc[0], err)[0],
-                uncertainty=result_str_to_floats(df_o[name].iloc[0], err)[1],
+                value=reporting.result_str_to_floats(df_o[name].iloc[0], err)[0],
+                uncertainty=reporting.result_str_to_floats(df_o[name].iloc[0], err)[1],
             )
             for name in df_o.columns.tolist()
         ]
@@ -738,7 +656,7 @@ def run_mGST_wrapper(
     ).astype(np.complex128)
 
     # Run mGST
-    if dataset.attrs["from_init"] == True:
+    if dataset.attrs["from_init"]:
         K_init = additional_fns.perturbed_target_init(X_target, dataset.attrs["rank"])
         init_params = [K_init, E_target, rho_target]
     else:
@@ -766,8 +684,42 @@ def run_mGST_wrapper(
     return K, X, E, rho, K_target, X_target, E_target, rho_target
 
 
-def process_layout(args):
-    """Process a single qubit layout"""
+def process_layout(
+    args: Tuple[xr.Dataset, List[int], int]
+) -> Tuple[List[int], dict[str, Any], List[BenchmarkObservation], DataFrame, DataFrame, DataFrame]:
+    """Process a single qubit layout for Gate Set Tomography analysis.
+
+    This function performs the full GST workflow for a single qubit layout:
+    1. Convert counts to mGST format
+    2. Run mGST reconstruction
+    3. Perform gauge optimization
+    4. Generate reports and metrics
+    5. Run bootstrap analysis if configured
+    6. Format results into dataframes and observations
+
+    Args:
+        args: Tuple containing:
+            dataset: xr.Dataset
+                Dataset containing experiment results and configuration
+            qubit_layout: List[int]
+                List of qubit indices for the current layout
+            pdim: int
+                Dimension of the quantum system (e.g., 2 for qubits)
+
+    Returns:
+        qubit_layout: List[int]
+            The input qubit layout being processed
+        results_dict: dict[str, Any]
+            Dictionary containing all raw and processed results
+        layout_observations: List[BenchmarkObservation]
+            List of benchmark observations for this layout
+        df_g_final: DataFrame
+            DataFrame containing gate metrics (fidelity, diamond distance, etc.)
+        df_o_final: DataFrame
+            DataFrame containing non-gate metrics (SPAM errors, fit quality)
+        df_g_evals: DataFrame
+            DataFrame containing Choi matrix eigenvalues (for rank > 1)
+    """
     dataset, qubit_layout, pdim = args
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
@@ -784,7 +736,7 @@ def process_layout(args):
     # Gauge optimization
     start_timer = perf_counter()
     target_mdl = compatibility.arrays_to_pygsti_model(X_target, E_target, rho_target, basis="std")
-    X_opt, E_opt, rho_opt = reporting.gauge_opt(X, E, rho, target_mdl, dataset.attrs[f"gauge_weights"])
+    X_opt, E_opt, rho_opt = reporting.gauge_opt(X, E, rho, target_mdl, dataset.attrs["gauge_weights"])
     gauge_optimization_time = perf_counter() - start_timer
 
     # Quick report
@@ -823,7 +775,7 @@ def process_layout(args):
     _, df_o_full = reporting.report(
         X_opt, E_opt, rho_opt, dataset.attrs["J"], y, target_mdl, dataset.attrs["gate_labels"][identifier]
     )
-    df_o_final = generate_non_gate_results(qubit_layout, df_o_full, bootstrap_results)
+    df_o_final = generate_non_gate_results(df_o_full, bootstrap_results)
 
     # Result table generation and full report
     if dataset.attrs["rank"] == 1:
@@ -831,7 +783,7 @@ def process_layout(args):
             dataset, qubit_layout, df_g, X_opt, K_target, bootstrap_results
         )
         results_dict.update({"hamiltonian_params": hamiltonian_params})
-        df_g_evals = pd.DataFrame
+        df_g_evals = pd.DataFrame()
     else:
         df_g_final, df_g_evals = generate_gate_results(
             dataset, qubit_layout, df_g, X_opt, E_opt, rho_opt, bootstrap_results
@@ -846,9 +798,33 @@ def process_layout(args):
     return qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals
 
 
-def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, df_g_evals_final):
-    """Process all plots for a single qubit layout"""
+def process_plots(
+    dataset: xr.Dataset,
+    qubit_layout: List[int],
+    results_dict: dict[str, Any],
+    df_g_final: DataFrame,
+    df_o_final: DataFrame,
+    df_g_evals_final: DataFrame,
+) -> dict[str, Figure]:
+    """Process and generate all plots for a single qubit layout.
 
+    This function creates various visualization plots for gate set tomography results,
+    including gate metrics tables, process matrices, and SPAM (State Preparation And
+    Measurement) matrices in both real and imaginary parts.
+
+    Args:
+        dataset: xarray Dataset containing experimental data and configuration attributes
+        qubit_layout: List of qubit indices defining the current layout
+        results_dict: Dictionary containing gauge-optimized gates, POVM elements, and states
+            in both standard and Pauli basis
+        df_g_final: DataFrame containing gate metrics such as fidelity and diamond distance
+        df_o_final: DataFrame containing non-gate metrics such as SPAM errors
+        df_g_evals_final: DataFrame containing Choi matrix eigenvalues (can be empty)
+
+    Returns:
+        layout_plots: Dictionary mapping plot names to matplotlib Figure objects.
+            Keys follow the pattern "layout_{qubit_layout}_{plot_type}"
+    """
     layout_plots = {}
     # Process matrix plots
     pdim = dataset.attrs["pdim"]
@@ -857,10 +833,11 @@ def process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, d
 
     identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
 
-    fig_g = dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
+    fig_g = figure_gen.dataframe_to_figure(df_g_final, dataset.attrs["gate_labels"][identifier])
     if not df_g_evals_final.empty:
-        fig_choi = dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
-    fig_o = dataframe_to_figure(df_o_final, [""])  # dataframe_to_figure(df_o_final, [""])
+        fig_choi = figure_gen.dataframe_to_figure(df_g_evals_final, dataset.attrs["gate_labels"][identifier])
+        layout_plots[f"layout_{qubit_layout}_choi_eigenvalues"] = fig_choi
+    fig_o = figure_gen.dataframe_to_figure(df_o_final, [""])
 
     layout_plots[f"layout_{qubit_layout}_gate_metrics"] = fig_g
     layout_plots[f"layout_{qubit_layout}_other_metrics"] = fig_o
@@ -947,14 +924,11 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
             total_layouts = len(dataset.attrs["qubit_layouts"])
 
             # Define a callback function to update progress
-            def update_progress(result):
+            def update_progress(_=None):
                 counter.value += 1
                 qcvv_logger.info(f"Completed estimation for {counter.value}/{total_layouts} qubit layouts")
 
             # Execute in parallel using apply_async with callback
-            # with mp.Pool(num_workers) as pool:
-            #     results = [pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list]
-            #     all_results = [res.get() for res in results]  # Wait for all results
             with mp.Pool(num_workers) as pool:
                 async_results = [
                     pool.apply_async(process_layout, args=(arg,), callback=update_progress) for arg in args_list
@@ -964,12 +938,13 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                     try:
                         result = res.get()
                         all_results.append(result)
-                    except Exception as e:
+                    except Exception as e:  # pylint: disable=broad-exception-caught
                         qcvv_logger.error(f"Error processing layout {i}: {str(e)}")
                         # Create an error placeholder with the same structure
-                        qubit_layout = args_list[i][1]  # Extract qubit_layout from args
-                        error_result = (
-                            qubit_layout,
+                        error_result: Tuple[
+                            List[int], dict[str, Any], List[BenchmarkObservation], DataFrame, DataFrame, DataFrame
+                        ] = (
+                            args_list[i][1],  # qubit_layout
                             {"error": str(e)},
                             [],
                             pd.DataFrame(),
@@ -979,14 +954,13 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
                         all_results.append(error_result)
 
         # Collect results
-    observations_list = []
-    df_g_list = []
-    df_o_list = []
-    df_g_evals_list = []
+    observations_list, df_g_list, df_o_list, df_g_evals_list = [], [], [], []
 
-    for qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals_final in all_results:
+    for i, (qubit_layout, results_dict, layout_observations, df_g_final, df_o_final, df_g_evals_final) in enumerate(
+        all_results
+    ):
         identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        # Update dataset with results
+        # Update dataset
         dataset.attrs["results_layout_" + identifier] = results_dict
         # Collect observations and dataframes
         observations_list.extend(layout_observations)
@@ -994,18 +968,11 @@ def mgst_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         df_o_list.append(df_o_final)
         df_g_evals_list.append(df_g_evals_final)
 
-    # Generate figures for each layout
-    for i, qubit_layout in enumerate(dataset.attrs["qubit_layouts"]):
-        identifier = BenchmarkObservationIdentifier(qubit_layout).string_identifier
-        results_dict = dataset.attrs["results_layout_" + identifier]
-        # Update plots
+        # Generate figures for this layout
         N_layouts = len(dataset.attrs["qubit_layouts"])
         qcvv_logger.info(f"Generating figures for layout {i+1}/{N_layouts}")
-        layout_plots = process_plots(
-            dataset, qubit_layout, results_dict, df_g_list[i], df_o_list[i], df_g_evals_list[i]
-        )
-        for key, fig in layout_plots.items():
-            plots[key] = fig
+        layout_plots = process_plots(dataset, qubit_layout, results_dict, df_g_final, df_o_final, df_g_evals_final)
+        plots.update(layout_plots)
 
     # Generate additional figures for Hamiltonian parameters if rank is 1
     if dataset.attrs["rank"] == 1:

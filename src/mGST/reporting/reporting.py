@@ -453,7 +453,7 @@ def generate_rotation_param_results(
     U_opt = phase_opt(X_opt, K_target)
     pauli_coeffs = compute_sparsest_Pauli_Hamiltonian(U_opt)
 
-    bootstrap = True if X_array is not None and E_array is not None and rho_array is not None else False
+    bootstrap = X_array is not None and E_array is not None and rho_array is not None
 
     if bootstrap:
         bootstrap_pauli_coeffs = np.zeros((len(X_array), dataset.attrs["num_gates"], dataset.attrs["pdim"] ** 2))
@@ -506,7 +506,7 @@ def compute_matched_ideal_hamiltonian_params(dataset: xr.Dataset) -> Tuple[np.nd
 
     qubit_layouts = dataset.attrs["qubit_layouts"]
     param_list_layouts = [
-        dataset.attrs[f'results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}'][
+        dataset.attrs[f"results_layout_{BenchmarkObservationIdentifier(layout).string_identifier}"][
             "hamiltonian_params"
         ]["values"]
         for layout in qubit_layouts
@@ -719,12 +719,12 @@ def bootstrap_errors(K, X, E, rho, mGST_args, bootstrap_samples, weights, gate_l
 
     Parameters
     ----------
-    K : numpy array
+    K: numpy array
         Each subarray along the first axis contains a set of Kraus operators.
         The second axis enumerates Kraus operators for a gate specified by the first axis.
-    X : 3D numpy array
+    X: 3D numpy array
         Array where reconstructed CPT superoperators in standard basis are stacked along the first axis.
-    E : numpy array
+    E: numpy array
         Current POVM estimate
     rho : numpy array
         Current initial state estimate
@@ -787,7 +787,6 @@ def bootstrap_errors(K, X, E, rho, mGST_args, bootstrap_samples, weights, gate_l
             threshold_multiplier=ns.threshold_multiplier,
             target_rel_prec=ns.target_rel_prec,
             init=[K, E, rho],
-            testing=False,
         )
 
         X_opt, E_opt, rho_opt = gauge_opt(X_, E_, rho_, target_mdl, weights)
@@ -887,3 +886,26 @@ def number_to_str(number, uncertainty=None, precision=3):
         return f"{number:.{precision}f}"
 
     return f"{number:.{precision}f} [{uncertainty[1]:.{precision}f},{uncertainty[0]:.{precision}f}]"
+
+
+def result_str_to_floats(result_str: str, err: str) -> Tuple[float, float]:
+    """Converts formated string results from mgst to float (value, uncertainty) pairs
+
+    Args:
+        result_str: str
+            The value of a result parameter formated as str
+        err: str
+            The error interval of the parameters
+
+    Returns:
+        value: float
+            The parameter value as float
+        uncertainty: float
+            A single uncertainty value
+    """
+    if err:
+        value = float(result_str.split("[")[0])
+        rest = result_str.split("[")[1].split(",")
+        uncertainty = float(rest[1][:-1]) - float(rest[0])
+        return value, uncertainty
+    return float(result_str), np.NaN

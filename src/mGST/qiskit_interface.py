@@ -159,6 +159,8 @@ def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layou
         If parallel=False: A list of lists of QuantumCircuits, where the outer list corresponds
         to qubit layouts and the inner list corresponds to gate sequences.
     """
+    if gate_context is not None and not isinstance(gate_context, list):
+        gate_context = [gate_context] * len(gate_set)
     qiskit_circuits = []
     if parallel:
         all_qubits = [q for qubits in qubit_layouts for q in qubits]
@@ -167,10 +169,7 @@ def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layou
             qc = QuantumCircuit(n_qubits, len(all_clbits))
             for gate_num in gate_sequence:
                 if gate_context is not None:
-                    if isinstance(gate_context, list):
-                        qc.compose(gate_context[gate_num], inplace=True)
-                    else:
-                        qc.compose(gate_context, inplace=True)
+                    qc.compose(gate_context[gate_num], inplace=True)
                 for qubits in qubit_layouts:
                     qc.compose(gate_set[gate_num], qubits, inplace=True)
                 qc.barrier()
@@ -184,10 +183,7 @@ def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layou
                 qc = QuantumCircuit(n_qubits, len(clbits))
                 for gate_num in gate_sequence:
                     if gate_context is not None:
-                        if isinstance(gate_context, list):
-                            qc.compose(gate_context[gate_num], inplace=True)
-                        else:
-                            qc.compose(gate_context, inplace=True)
+                        qc.compose(gate_context[gate_num], inplace=True)
                     qc.compose(gate_set[gate_num], qubits, inplace=True)
                     qc.barrier()
                 qc.measure(qubits, clbits)

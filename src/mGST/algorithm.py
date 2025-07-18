@@ -622,7 +622,7 @@ def run_mGST(
     fixed_elements=None,
     init=None,
     verbose_level=0,
-):  # pylint: disable=too-many-branches
+):  # pylint: disable=too-many-branches, too-many-statements
     """Main mGST routine
 
     Parameters
@@ -660,11 +660,11 @@ def run_mGST(
 
     Returns
     -------
-    K : numpy array
+    K: numpy array
         Updated estimates of Kraus operators
-    X : numpy array
+    X: numpy array
         Updated estimates of superoperatos corresponding to K_new
-    E : numpy array
+    E: numpy array
         Updated POVM estimate
     rho : numpy array
         Updated initial state estimate
@@ -707,7 +707,7 @@ def run_mGST(
             B = la.cholesky(rho.reshape(pdim, pdim))
             res_list = [objf(X, E, rho, J, y)]
             with logging_redirect_tqdm(loggers=[qcvv_logger] if verbose_level > 0 else None):
-                for _ in trange(max_iter, disable=(verbose_level == 0)):
+                for _ in trange(max_iter, disable=verbose_level == 0):
                     yb, Jb = batch(y, J, bsize)
                     K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
                     res_list.append(objf(X, E, rho, J, y))
@@ -726,7 +726,7 @@ def run_mGST(
         qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
     with logging_redirect_tqdm(loggers=[qcvv_logger] if verbose_level > 0 else None):
         res_list_mle = []
-        for _ in trange(final_iter, disable=(verbose_level == 0)):
+        for _ in trange(final_iter, disable=verbose_level == 0):
             K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=True)
             res_list.append(objf(X, E, rho, J, y))
             res_list_mle.append(objf(X, E, rho, J, y, mle=True))
@@ -742,7 +742,7 @@ def run_mGST(
         if success or (res_list[-1] < delta):
             qcvv_logger.info(f"Convergence criterion satisfied")
         else:
-            qcvv_logger.warn(
+            qcvv_logger.warning(
                 f"Convergence criterion not satisfied. Potential causes include too low max_iterations, bad initialization or model mismatch."
             )
         qcvv_logger.info(

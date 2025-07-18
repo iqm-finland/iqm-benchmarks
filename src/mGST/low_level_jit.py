@@ -363,14 +363,12 @@ def dK_dMdM(X, K, E, rho, J, y, d, r, rK, mle=False):
     K = K.reshape(d, rK, -1)
     pdim = int(np.sqrt(r))
     n = d * rK * r
-    nt = rK * r
     n_povm = y.shape[0]
     dK_ = np.zeros((d, rK, r)).astype(np.complex128)
     dM11 = np.zeros(n**2).astype(np.complex128)
     dM10 = np.zeros(n**2).astype(np.complex128)
     m = len(J)
     for n in range(m):
-        # for o in range(n_povm):
         j = J[n][J[n] >= 0]
         dM = np.ascontiguousarray(np.zeros((n_povm, d, rK, r)).astype(np.complex128))
         p_ind_array = np.zeros(n_povm).astype(np.complex128)
@@ -383,18 +381,18 @@ def dK_dMdM(X, K, E, rho, J, y, d, r, rK, mle=False):
                 for ind in j[:i]:
                     L = L @ X[ind]
                 dM_loc = K[k].conj() @ np.kron(L.reshape((pdim, pdim)).T, R.reshape((pdim, pdim)).T)
+                p_ind = L @ X[k] @ R
                 if mle:
-                    p_ind = L @ X[k] @ R
                     dM[o, k] += dM_loc
                     dK_[k] -= dM_loc * y[o, n] / p_ind
                 else:
                     dM[o, k] += dM_loc
-                    D_ind = L @ X[k] @ R - y[o, n]
+                    D_ind = p_ind - y[o, n]
                     dK_[k] += D_ind * dM_loc * 2 / m / n_povm
             if len(j) == 0:
                 p_ind_array[o] = E[o].conj() @ rho
             else:
-                p_ind_array[o] = L @ X[k] @ R
+                p_ind_array[o] = p_ind
         for o in range(n_povm):
             if mle:
                 dM11 += np.kron(dM[o].conj().reshape(-1), dM[o].reshape(-1)) * y[o, n] / p_ind_array[o] ** 2
@@ -575,7 +573,8 @@ def dA(X, A, B, J, y, r, pdim, n_povm):
     rho = (B @ B.T.conj()).reshape(-1)
     dA_ = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
     m = len(J)
-    for n in prange(m):  # pylint: disable=not-an-iterable
+    # pylint: disable=not-an-iterable
+    for n in prange(m):
         j = J[n][J[n] >= 0]
         inner_deriv = contract(X, j) @ rho
         dA_step = np.zeros((n_povm, pdim, pdim)).astype(np.complex128)
