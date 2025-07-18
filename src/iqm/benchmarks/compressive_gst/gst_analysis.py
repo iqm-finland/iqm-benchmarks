@@ -86,14 +86,10 @@ def process_bootstrap_samples(
         init=init,
         verbose_level=0,
     )
-    delta = (
-        attrs["convergence_criteria"][0]
-        * (1 - y_sampled.reshape(-1))
-        @ y_sampled.reshape(-1)
-        / len(attrs["J"])
-        / attrs["num_povm"]
-        / attrs["shots"]
-    )
+    # Compute ideal least squares error that only includes shot noise and no model mismatch
+    delta = (1 - y_sampled.reshape(-1)) @ y_sampled.reshape(-1) / len(attrs["J"]) / attrs["num_povm"] / attrs["shots"]
+    # Account for model mismatch depending on the Kraus rank (heuristic factor)
+    delta *= attrs["convergence_criteria"][0] * np.max([(attrs["pdim"] ** 2 - attrs["rank"])/attrs["pdim"], 1])
     opt_success = res_list[-1] < delta
 
     X_opt, E_opt, rho_opt = reporting.gauge_opt(X_, E_, rho_, target_mdl, attrs["gauge_weights"])

@@ -345,8 +345,8 @@ def generate_gate_err_pdf(filename, gates1, gates2, basis_labels=False, gate_lab
         axes[2].set_title(plot3_title + "\n(renormalized)", fontsize="large")
         fig.suptitle(f"Process matrices in the Pauli basis\n(red:<0; blue:>0)")
 
-        # Configure layout based on dimension size
-        rect = [0, 0, 1, 0.90 if is_large_dim else 0.85]
+        # Configure layout based on dimension size - reduce top margin
+        rect = [0, 0, 1, 0.85 if dim < 5 else 0.95]
         fig.tight_layout(rect=rect)
 
         width = 0.5 * np.sqrt(dim) if is_large_dim else 2 * np.sqrt(dim)
@@ -582,17 +582,17 @@ def generate_hamiltonian_visualizations(
 
                         # Display upper bound above the parameter value
                         ax.text(
-                            i, j - 0.2, f"{param_split_high:.3e}", va="center", ha="center", color="black", fontsize=6
+                            i, j - 0.2, f"{param_split_high:.1e}", va="center", ha="center", color="black", fontsize=6
                         )
                         # Display parameter value in the middle
-                        ax.text(i, j, f"{param_value:.3e}", va="center", ha="center", color="black", fontweight="bold")
+                        ax.text(i, j, f"{param_value:.1e}", va="center", ha="center", color="black", fontweight="bold", fontsize=6)
                         # Display lower bound below the parameter value
                         ax.text(
-                            i, j + 0.2, f"{param_split_low:.3e}", va="center", ha="center", color="black", fontsize=6
+                            i, j + 0.2, f"{param_split_low:.1e}", va="center", ha="center", color="black", fontsize=6
                         )
                     else:
                         # Just display the parameter value if no uncertainties
-                        ax.text(i, j, f"{param_value:.3e}", va="center", ha="center", color="black")
+                        ax.text(i, j, f"{param_value:.1e}", va="center", ha="center", color="black", fontsize=6)
 
             plt.title(f"Hamiltonian parameters for {gate_label}", fontsize=10)
 
