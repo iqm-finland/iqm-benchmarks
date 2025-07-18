@@ -83,9 +83,9 @@ def calculate_optimal_angles_for_QAOA_p1(graph: Graph) -> List[float]:
     x_init = [0.15, -0.28]
 
     minimizer_kwargs = {"method": "L-BFGS-B", "bounds": bounds}
-    res = basinhopping(get_expected_zz_edgedensity, x_init, minimizer_kwargs=minimizer_kwargs, niter=10, T=2)
+    res = basinhopping(get_expected_zz_edgedensity, x_init, minimizer_kwargs=minimizer_kwargs, niter=10, T=2)  # type: ignore
 
-    return res.x
+    return list(res.x)
 
 
 def cut_cost_function(x: str, graph: Graph) -> int:

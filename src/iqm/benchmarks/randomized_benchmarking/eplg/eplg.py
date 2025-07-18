@@ -116,7 +116,7 @@ def plot_layered_fidelities_graph(
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, ax=ax, shrink=0.5, label="Layered Fidelity (%)", format="%.2f")
-    cbar.set_ticks(np.linspace(min(fidelity_values), max(fidelity_values), 5, endpoint=True))
+    cbar.set_ticks(list(np.linspace(min(fidelity_values), max(fidelity_values), 5, endpoint=True)))
 
     station_string = "IQM Backend" if station is None else station.capitalize()
 
