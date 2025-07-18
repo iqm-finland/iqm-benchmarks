@@ -698,13 +698,8 @@ def process_layout(
     6. Format results into dataframes and observations
 
     Args:
-        args: Tuple containing:
-            dataset: xr.Dataset
-                Dataset containing experiment results and configuration
-            qubit_layout: List[int]
-                List of qubit indices for the current layout
-            pdim: int
-                Dimension of the quantum system (e.g., 2 for qubits)
+        args: Tuple
+            containing: dataset: xr.Dataset, qubit_layout: List[int], pdim: int
 
     Returns:
         qubit_layout: List[int]

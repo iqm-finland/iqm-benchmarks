@@ -363,7 +363,7 @@ class GSTConfiguration(BenchmarkConfigurationBase):
     max_inits: int = 20
     opt_method: str = "auto"
     max_iterations: Union[str, List[int], int] = "auto"
-    convergence_criteria: Union[str, List[float]] = [4, 1e-4]
+    convergence_criteria: Union[str, List[float]] = [4, 1e-6]
     batch_size: Union[str, int] = "auto"
     bootstrap_samples: int = 0
     verbose_level: int = 1
