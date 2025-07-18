@@ -6,6 +6,7 @@ from iqm.benchmarks.entanglement.ghz import GHZBenchmark, GHZConfiguration
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
+
 class TestGHZ:
     backend = IQMFakeApollo()
 
@@ -25,7 +26,7 @@ class TestGHZ:
             num_RMs=10,
             rem=False,
             mit_shots=10,
-            use_dd = True
+            use_dd=True,
         )
         benchmark = GHZBenchmark(self.backend, MINIMAL_GHZ)
         benchmark.run()
@@ -69,6 +70,7 @@ class TestGHZ:
             benchmark.run()
             benchmark.analyze()
             mock_fig.assert_called()
+
 
 class TestGHZDeneb(TestGHZ):
     backend = IQMFakeDeneb()

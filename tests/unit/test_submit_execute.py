@@ -1,12 +1,11 @@
 import unittest
-from unittest.mock import Mock, patch, call
+from unittest.mock import Mock, call, patch
 
+from iqm.benchmarks.utils import submit_execute
+from iqm.iqm_client.models import CircuitCompilationOptions
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 from iqm.qiskit_iqm.iqm_job import IQMJob
-from iqm.iqm_client.models import CircuitCompilationOptions
-from iqm.benchmarks.utils import submit_execute
-
 
 
 class TestSubmitExecute(unittest.TestCase):
@@ -53,7 +52,7 @@ class TestSubmitExecute(unittest.TestCase):
     @patch('iqm.benchmarks.utils.qcvv_logger')
     def test_submit_execute_no_restrictions(self, mock_logger):
         """Test with no batch size restrictions."""
-        jobs,_ = submit_execute(self.sorted_circuits, self.mock_backend, shots=1000)
+        jobs, _ = submit_execute(self.sorted_circuits, self.mock_backend, shots=1000)
 
         # Should return after first batch
         self.assertEqual(len(jobs), 2)
@@ -61,21 +60,14 @@ class TestSubmitExecute(unittest.TestCase):
         # Check that backend.run was called with each circuit list
         expected_calls = []
         for key in self.sorted_circuits.keys():
-            expected_calls.append(call(
-                self.sorted_circuits[key], shots=1000, calibration_set_id=None
-            ))
+            expected_calls.append(call(self.sorted_circuits[key], shots=1000, calibration_set_id=None))
         self.mock_backend.run.assert_has_calls(expected_calls, any_order=True)
 
     @patch('iqm.benchmarks.utils.qcvv_logger')
     def test_submit_execute_max_circuits(self, mock_logger):
         """Test with max_circuits_per_batch restriction."""
 
-        jobs, _ = submit_execute(
-            self.sorted_circuits,
-            self.mock_backend,
-            shots=1000,
-            max_circuits_per_batch=2
-        )
+        jobs, _ = submit_execute(self.sorted_circuits, self.mock_backend, shots=1000, max_circuits_per_batch=2)
 
         # Check that backend.run was called with correct batches
         expected_calls = [
@@ -101,12 +93,7 @@ class TestSubmitExecute(unittest.TestCase):
 
         # Each small circuit has 5 operations, each large has 10
         # Set max_gates_per_batch to a value that will test different batch sizes
-        jobs,_ = submit_execute(
-            self.sorted_circuits,
-            self.mock_backend,
-            shots=1000,
-            max_gates_per_batch=15
-        )
+        jobs, _ = submit_execute(self.sorted_circuits, self.mock_backend, shots=1000, max_gates_per_batch=15)
 
         # For large circuits (12 operations each), batches should have 1 circuit per batch
         # For small circuits (5 operations each), batches should have 3 circuits per batch
@@ -117,8 +104,7 @@ class TestSubmitExecute(unittest.TestCase):
         actual_batch_sizes = [len(args[0]) for args, _ in self.mock_backend.run.call_args_list]
 
         # Verify we have the right number of batches
-        self.assertEqual(len(actual_batch_sizes),
-                         len(expected_batch_sizes_large) + len(expected_batch_sizes_small))
+        self.assertEqual(len(actual_batch_sizes), len(expected_batch_sizes_large) + len(expected_batch_sizes_small))
 
         # Verify batch sizes match our expectations
         self.assertEqual(actual_batch_sizes[4:], expected_batch_sizes_large)
@@ -132,12 +118,8 @@ class TestSubmitExecute(unittest.TestCase):
     def test_submit_execute_both_restrictions(self, mock_logger):
         """Test with both max_gates_per_batch and max_circuits_per_batch restrictions."""
 
-        jobs,_ = submit_execute(
-            self.sorted_circuits,
-            self.mock_backend,
-            shots=1000,
-            max_gates_per_batch=15,
-            max_circuits_per_batch=2
+        jobs, _ = submit_execute(
+            self.sorted_circuits, self.mock_backend, shots=1000, max_gates_per_batch=15, max_circuits_per_batch=2
         )
 
         # For large circuits:
@@ -167,6 +149,7 @@ class TestSubmitExecute(unittest.TestCase):
         for batch_size in actual_batch_sizes:
             # Circuits per batch should not exceed max_circuits_per_batch
             self.assertLessEqual(batch_size, 2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,7 +7,7 @@ from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
 
 class TestQScore:
     backend = IQMFakeApollo()
-    custom_qubits_array = [[0, 1, 3], [0, 1, 2, 3] , [0, 1, 2, 3, 4]]
+    custom_qubits_array = [[0, 1, 3], [0, 1, 2, 3], [0, 1, 2, 3, 4]]
 
     def test_qscore(self):
         EXAMPLE_QSCORE = QScoreConfiguration(
@@ -28,6 +28,7 @@ class TestQScore:
         benchmark = QScoreBenchmark(self.backend, EXAMPLE_QSCORE)
         benchmark.run()
         benchmark.analyze()
+
 
 class TestQScoreDeneb(TestQScore):
     backend = IQMFakeDeneb()
