@@ -436,7 +436,6 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         instances_with_edges = set(range(num_instances)) - set(no_edge_instances)
         num_instances_with_edges = len(instances_with_edges)
         execution_results = xrvariable_to_counts(dataset, num_nodes, num_instances_with_edges)
-        
 
         for inst_idx, instance in enumerate(list(instances_with_edges)):
             cut_sizes = run_QAOA(
@@ -771,7 +770,7 @@ class QScoreBenchmark(Benchmark):
         for num_nodes in node_numbers:
             qc_list = []
             qc_transpiled_list: List[QuantumCircuit] = []
-            execution_results = []
+            execution_results: List[Dict[str, int]] = []
             graph_list = []
             qubit_set_list = []
             theta_list = []
@@ -853,24 +852,7 @@ class QScoreBenchmark(Benchmark):
                 seed += 1
                 qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
 
-            # if len(qc.count_ops()) == 0:
-            #     counts = {"": 1.0}  # to handle the case of physical graph with no edges
-            #     qc_transpiled_list.append([])
-            #     execution_results.append(counts)
-            #     qc_list.append([])
-            #     qcvv_logger.debug(f"This graph instance has no edges.")
-            # else:
             qcvv_logger.setLevel(logging.WARNING)
-            # Account for all-to-all connected backends like Sirius
-            # if "move" in backend.architecture.gates:
-            #     # If the circuit is defined on a subset of qubit_set, choose the first qubtis in the set
-            #     active_qubit_set = qubit_set#[: len(qc.qubits)]
-            #     print(active_qubit_set)
-            #     # All-to-all coupling map on the active qubits
-            #     #effective_coupling_map = [[x, y] for x in active_qubit_set for y in active_qubit_set if x != y]
-            #     effective_coupling_map = backend.coupling_map.reduce(mapping=active_qubit_set)
-            #     print(effective_coupling_map)
-            # else:
             if self.choose_qubits_routine == "naive":
                 active_qubit_set = None
                 effective_coupling_map = self.backend.coupling_map
@@ -909,7 +891,8 @@ class QScoreBenchmark(Benchmark):
                     backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
                 )
                 execution_results.extend(
-                    rem_counts[0][instance].nearest_probability_distribution() for instance in range(num_instances_with_edges)
+                    rem_counts[0][instance].nearest_probability_distribution()
+                    for instance in range(num_instances_with_edges)
                 )
                 # execution_results.append(rem_distribution)
             else:

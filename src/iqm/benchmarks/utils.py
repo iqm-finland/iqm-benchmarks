@@ -580,22 +580,17 @@ def perform_backend_transpilation(
         if backend.has_resonators():
             transpiled = transpile_to_IQM(
                 qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
-            )                
+            )
         if aux_qc is not None:
             if backend.has_resonators():
+                reduced_cmap = backend.coupling_map.reduce(qubits[: qc.num_qubits])
                 transpiled = transpile_to_IQM(
-                    qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz, initial_layout=qubits,
+                    qc,
+                    backend=backend,
+                    optimize_single_qubits=optimize_sqg,
+                    remove_final_rzs=drop_final_rz,
+                    coupling_map=reduced_cmap,
                 )
-                # if backend.num_qubits in qubits:
-                #     raise ValueError(
-                #         f"Label {backend.num_qubits} is reserved for Resonator - "
-                #         f"Please specify computational qubit labels {np.arange(backend.num_qubits)}"
-                #     )
-                # backend_topology = "star"
-                # transpiled = reduce_to_active_qubits(transpiled, backend_topology, backend.num_qubits)
-                # transpiled = aux_qc.compose(
-                #     transpiled, qubits=qubits + [backend.num_qubits + 1], clbits=list(range(qc.num_clbits))
-                # )
             else:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
 
