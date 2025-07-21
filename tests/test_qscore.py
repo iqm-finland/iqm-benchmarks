@@ -17,7 +17,7 @@ class TestQScore:
             calset_id=None,  # calibration set ID, default is None
             min_num_nodes=3,
             max_num_nodes=5,
-            use_virtual_node=False,
+            use_virtual_node=True,
             use_classically_optimized_angles=True,
             choose_qubits_routine="custom",
             custom_qubits_array=self.custom_qubits_array,
@@ -32,4 +32,4 @@ class TestQScore:
 
 class TestQScoreDeneb(TestQScore):
     backend = IQMFakeDeneb()
-    custom_qubits_array = [[1, 2], [1, 2, 3, 4], [1, 2, 3, 4, 5]]
+    custom_qubits_array = [[1, 2, 3], [1, 2, 3, 4], [1, 2, 3, 4, 5]]
