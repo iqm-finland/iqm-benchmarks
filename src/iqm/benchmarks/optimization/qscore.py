@@ -914,9 +914,6 @@ class QScoreBenchmark(Benchmark):
 
             qcvv_logger.debug(f"Adding counts for the random graph for {num_nodes} nodes to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(num_nodes), dataset)
-
-            # self.untranspiled_circuits[str(num_nodes)].update({tuple(qubit_set): qc_list})
-            # self.transpiled_circuits[str(num_nodes)].update(sorted_transpiled_qc_list)
             self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(num_nodes), circuits=qc_all))
             self.transpiled_circuits.circuit_groups.append(
                 CircuitGroup(name=str(num_nodes), circuits=qc_transpiled_list)
