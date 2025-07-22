@@ -502,8 +502,7 @@ def plot_fidelities(
     layout_short = {str(qubit_layout): f" L{i}" for i, qubit_layout in enumerate(qubit_layouts)}
     recorded_labels = []
     x_positions = []
-    cmap = plt.cm.get_cmap("winter")
-    # colors = [cmap(0), cmap(1)]
+    cmap = plt.colormaps["winter"]
     for i, obs in enumerate(observations):
         label = "With REM" if "rem" in obs.name else "Unmitigated"
         if label in recorded_labels:

@@ -305,7 +305,7 @@ def plot_max_negativities(
     y = [a["value"] for a in sorted_negativities.values()]
     yerr = [a["uncertainty"] for a in sorted_negativities.values()]
 
-    cmap = plt.get_cmap("winter")
+    cmap = plt.colormaps["winter"]
 
     fig = plt.figure()
     ax = plt.axes()
@@ -434,7 +434,7 @@ def plot_max_negativities_graph(
 
     negativity_edges = dict(zip(qubit_pairs, negativity_values))
 
-    cmap = plt.cm.get_cmap("winter")
+    cmap = plt.colormaps["winter"]
 
     fig = plt.figure()
     ax = plt.axes()

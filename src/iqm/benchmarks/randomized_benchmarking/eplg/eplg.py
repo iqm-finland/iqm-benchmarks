@@ -71,7 +71,7 @@ def plot_layered_fidelities_graph(
 
     fidelity_edges = dict(zip(qubit_pairs, fidelity_values))
 
-    cmap = plt.cm.get_cmap("winter")
+    cmap = plt.colormaps["winter"]
 
     fig = plt.figure()
     ax = plt.axes()
