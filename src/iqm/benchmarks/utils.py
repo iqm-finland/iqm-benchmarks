@@ -568,7 +568,9 @@ def perform_backend_transpilation(
     # and whether the coupling map is reduced (whether final physical layout must be fixed onto an auxiliary QC)
     def transpile_and_optimize(qc, aux_qc=None):
         if backend.has_resonators():
-            coupling_map_red = backend.coupling_map.reduce(qubits[: qc.num_qubits]) if aux_qc is not None else coupling_map
+            coupling_map_red = (
+                backend.coupling_map.reduce(qubits[: qc.num_qubits]) if aux_qc is not None else coupling_map
+            )
             transpiled = transpile_to_IQM(
                 qc,
                 backend=backend,
