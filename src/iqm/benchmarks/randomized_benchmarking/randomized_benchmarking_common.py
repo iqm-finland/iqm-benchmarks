@@ -266,7 +266,7 @@ def exponential_rb(
     Returns:
         np.ndarray: the exponential fit function
     """
-    return (amplitude - offset) * (1 - depolarization_probability) ** depths + offset
+    return (amplitude - offset) * (1 - depolarization_probability) ** np.array(depths) + offset
 
 
 def fit_decay_lmfit(

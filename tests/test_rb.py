@@ -6,6 +6,7 @@ from iqm.benchmarks.randomized_benchmarking.clifford_rb.clifford_rb import (
     CliffordRandomizedBenchmarking,
     CliffordRBConfiguration,
 )
+from iqm.benchmarks.randomized_benchmarking.eplg.eplg import EPLGBenchmark, EPLGConfiguration
 from iqm.benchmarks.randomized_benchmarking.interleaved_rb.interleaved_rb import (
     InterleavedRandomizedBenchmarking,
     InterleavedRBConfiguration,
@@ -14,12 +15,9 @@ from iqm.benchmarks.randomized_benchmarking.mirror_rb.mirror_rb import (
     MirrorRandomizedBenchmarking,
     MirrorRBConfiguration,
 )
-from iqm.benchmarks.randomized_benchmarking.eplg.eplg import (
-    EPLGConfiguration,
-    EPLGBenchmark,
-)
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
+
 
 class TestRB:
     backend = IQMFakeApollo()
@@ -70,7 +68,7 @@ class TestRB:
 
     def test_eplg(self):
         EXAMPLE_EPLG = EPLGConfiguration(
-            custom_qubits_array=[[0,1],[1,4],[4,5]],
+            custom_qubits_array=[[0, 1], [1, 4], [4, 5]],
             drb_depths=sorted(list(set(np.geomspace(1, 100, num=5, endpoint=True, dtype=int).tolist())), reverse=True),
             drb_circuit_samples=5,
             shots=2**8,
@@ -80,6 +78,7 @@ class TestRB:
         benchmark = EPLGBenchmark(self.backend, EXAMPLE_EPLG)
         benchmark.run()
         benchmark.analyze()
+
 
 class TestRBDeneb(TestRB):
     backend = IQMFakeDeneb()

@@ -81,7 +81,7 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     all_data.update(observations[1])
 
     # Define colors
-    cmap = mpl.pyplot.get_cmap("winter")
+    cmap = plt.colormaps["winter"]
     colors = [cmap(i) for i in np.linspace(0, 1, len(job_keys) + len(user_keys) + len(total_keys) + 1)]
 
     # Plotting parameters

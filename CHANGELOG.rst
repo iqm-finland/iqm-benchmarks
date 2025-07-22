@@ -2,11 +2,28 @@
 Changelog
 =========
 
-Version 2.38
+Version 2.42
 ============
 * Added qubit positions for Emerald
 * Visibility improvements for Graph state and EPLG plots
 * Add visualization of single qubit errors (Fidelity, readout, T1, T2) to the layout fidelity graph plot
+
+Version 2.41
+============
+* Fixed deprecated colormap usage in several benchmarks.
+
+Version 2.40
+============
+* Added optimise_single_qubit_gates option for crystal processors.
+
+Version 2.39
+============
+* Relax `numba` dependency to allow easier interoperability with other client libraries.
+
+Version 2.38
+============
+* Update `iqm-client` dependency to `29.0+`.
+* Added iqm-station-control-client dependency to ensure iqm-client version works with stations on resonance.
 
 Version 2.37
 ============
