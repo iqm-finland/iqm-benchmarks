@@ -567,33 +567,29 @@ def perform_backend_transpilation(
     # Helper function considering whether optimize_sqg is done,
     # and whether the coupling map is reduced (whether final physical layout must be fixed onto an auxiliary QC)
     def transpile_and_optimize(qc, aux_qc=None):
-        transpiled = transpile(
-            qc,
-            basis_gates=basis_gates,
-            coupling_map=coupling_map,
-            optimization_level=qiskit_optim_level,
-            initial_layout=qubits if aux_qc is None else None,
-            routing_method=routing_method,
-        )
-        if optimize_sqg:
-            transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
         if backend.has_resonators():
+            coupling_map_red = backend.coupling_map.reduce(qubits[: qc.num_qubits]) if aux_qc is not None else coupling_map
             transpiled = transpile_to_IQM(
-                qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
+                qc,
+                backend=backend,
+                optimize_single_qubits=optimize_sqg,
+                remove_final_rzs=drop_final_rz,
+                coupling_map=coupling_map_red,
+                # initial_layout=qubits if aux_qc is None else None,
             )
-        if aux_qc is not None:
-            if backend.has_resonators():
-                reduced_cmap = backend.coupling_map.reduce(qubits[: qc.num_qubits])
-                transpiled = transpile_to_IQM(
-                    qc,
-                    backend=backend,
-                    optimize_single_qubits=optimize_sqg,
-                    remove_final_rzs=drop_final_rz,
-                    coupling_map=reduced_cmap,
-                )
-            else:
+        else:
+            transpiled = transpile(
+                qc,
+                basis_gates=basis_gates,
+                coupling_map=coupling_map,
+                optimization_level=qiskit_optim_level,
+                initial_layout=qubits if aux_qc is None else None,
+                routing_method=routing_method,
+            )
+            if aux_qc is not None:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
-
+            if optimize_sqg:
+                transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
         return transpiled
 
     qcvv_logger.info(
