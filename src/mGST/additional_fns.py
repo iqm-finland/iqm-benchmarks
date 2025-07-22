@@ -2,8 +2,10 @@
 Utility functions used by mGST modules
 """
 
+import contextlib
 import os
 import random
+import sys
 import warnings
 
 import numpy as np
@@ -11,6 +13,18 @@ import numpy.linalg as la
 from scipy.linalg import expm, qr
 
 from mGST.low_level_jit import Mp_norm_lower, MVE_lower, contract, local_basis
+
+
+@contextlib.contextmanager
+def suppress_stdout():
+    """Context manager to temporarily suppress stdout output."""
+    with open(os.devnull, "w", encoding="utf-8") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
 
 
 def transp(dim1, dim2):
@@ -261,6 +275,10 @@ def random_gs(d, r, rK, n_povm):
         The second axis enumerates Kraus operators for a gate specified by the first axis.
     X: 3D numpy array
         Array where random CPT superoperators are stacked along the first axis.
+    E: 2D numpy array
+        Randomly generated POVM elements stacked along the first axis.
+    rho: 1D numpy array
+        Random initial state vector
 
     Notes:
         The Kraus operators are generated from random unitaries, see function randKrausSet
@@ -327,7 +345,7 @@ def perturbed_target_init(X_target, rK):
     """
     d, r, _ = X_target.shape
     pdim = int(np.sqrt(r))
-    K_perturb = randKrausSet(d, r, rK, a=0.1)
+    K_perturb = randKrausSet(d, r, rK, a=0.05)
     X_perturb = np.einsum("ijkl,ijnm -> iknlm", K_perturb, K_perturb.conj()).reshape((d, r, r))
     X_init = np.einsum("ikl,ilm ->ikm", X_perturb, X_target)
     K_init = Kraus_rep(X_init, d, pdim, rK)
@@ -627,8 +645,7 @@ def sampled_measurements(y, n):
         y_new = np.maximum(np.minimum(y, 1), 0)
         if np.sum(np.abs(y_new - y)) > 1e-6:
             warnings.warn(
-                f"Warning: Probabilities capped to interval [0,1]",
-                f"l1-difference to input:%f" % np.sum(np.abs(y_new - y)),
+                f"Warning: Probabilities capped to interval [0,1], l1-difference to input: {np.sum(np.abs(y_new - y))}"
             )
         y = y_new
     rng = np.random.default_rng()

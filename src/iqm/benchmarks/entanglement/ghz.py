@@ -96,7 +96,7 @@ def fidelity_ghz_randomized_measurements(
         p_sum = []
         for sb in c_id_keys:
             for sa in c_keys:
-                exponent = hamming(list(sa), list(sb)) * num_qubits
+                exponent = hamming(np.array(list(sa)), np.array(list(sb))) * num_qubits
                 p_sum.append(np.power(-2, -exponent) * probabilities_sample[sa] * ideal_probabilities[u][sb])
         fid_rm.append((2**num_qubits) * sum(p_sum))
     values = {"fidelity": np.mean(fid_rm)}
@@ -117,7 +117,7 @@ def fidelity_ghz_randomized_measurements(
             p_sum = []
             for sb in c_id_keys:
                 for sa in c_keys:
-                    exponent = hamming(list(sa), list(sb)) * num_qubits
+                    exponent = hamming(np.array(list(sa)), np.array(list(sb))) * num_qubits
                     p_sum.append(np.power(-2, -exponent) * probabilities_sample[sa] * ideal_probabilities[u][sb])
             fid_rm_rem.append((2**num_qubits) * sum(p_sum))
         values = values | {"fidelity_rem": np.mean(fid_rm_rem)}
