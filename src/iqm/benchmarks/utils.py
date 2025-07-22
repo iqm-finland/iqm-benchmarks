@@ -567,35 +567,31 @@ def perform_backend_transpilation(
     # Helper function considering whether optimize_sqg is done,
     # and whether the coupling map is reduced (whether final physical layout must be fixed onto an auxiliary QC)
     def transpile_and_optimize(qc, aux_qc=None):
-        transpiled = transpile(
-            qc,
-            basis_gates=basis_gates,
-            coupling_map=coupling_map,
-            optimization_level=qiskit_optim_level,
-            initial_layout=qubits if aux_qc is None else None,
-            routing_method=routing_method,
-        )
-        if optimize_sqg:
-            transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
         if backend.has_resonators():
-            transpiled = transpile_to_IQM(
-                qc, backend=backend, optimize_single_qubits=optimize_sqg, remove_final_rzs=drop_final_rz
+            coupling_map_red = (
+                backend.coupling_map.reduce(qubits[: qc.num_qubits]) if aux_qc is not None else coupling_map
             )
-        if aux_qc is not None:
-            if backend.has_resonators():
-                if backend.num_qubits in qubits:
-                    raise ValueError(
-                        f"Label {backend.num_qubits} is reserved for Resonator - "
-                        f"Please specify computational qubit labels {np.arange(backend.num_qubits)}"
-                    )
-                backend_topology = "star"
-                transpiled = reduce_to_active_qubits(transpiled, backend_topology, backend.num_qubits)
-                transpiled = aux_qc.compose(
-                    transpiled, qubits=qubits + [backend.num_qubits], clbits=list(range(qc.num_clbits))
-                )
-            else:
+            transpiled = transpile_to_IQM(
+                qc,
+                backend=backend,
+                optimize_single_qubits=optimize_sqg,
+                remove_final_rzs=drop_final_rz,
+                coupling_map=coupling_map_red,
+                # initial_layout=qubits if aux_qc is None else None,
+            )
+        else:
+            transpiled = transpile(
+                qc,
+                basis_gates=basis_gates,
+                coupling_map=coupling_map,
+                optimization_level=qiskit_optim_level,
+                initial_layout=qubits if aux_qc is None else None,
+                routing_method=routing_method,
+            )
+            if aux_qc is not None:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
-
+            if optimize_sqg:
+                transpiled = optimize_single_qubit_gates(transpiled, drop_final_rz=drop_final_rz)
         return transpiled
 
     qcvv_logger.info(
@@ -607,7 +603,7 @@ def perform_backend_transpilation(
         transpiled_qc_list = [transpile_and_optimize(qc) for qc in qc_list]
     else:  # The coupling map will be reduced if the physical layout is to be fixed
         if backend.has_resonators():
-            aux_qc_list = [QuantumCircuit(backend.num_qubits + 1, q.num_clbits) for q in qc_list]
+            aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
         else:
             aux_qc_list = [QuantumCircuit(backend.num_qubits, q.num_clbits) for q in qc_list]
         transpiled_qc_list = [transpile_and_optimize(qc, aux_qc=aux_qc_list[idx]) for idx, qc in enumerate(qc_list)]

@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.42
+============
+* Improved run-time execution for QScore benchmark.
+
 Version 2.41
 ============
 * Fixed deprecated colormap usage in several benchmarks.
