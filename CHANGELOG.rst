@@ -9,7 +9,7 @@ Version 2.43
 * Add visualization of single qubit errors (Fidelity, readout, T1, T2) to the layout fidelity graph plot
 
 Version 2.42
-=======
+============
 * Improved run-time execution for QScore benchmark.
 
 Version 2.41
