@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.41
+============
+* Fixed deprecated colormap usage in several benchmarks.
+
 Version 2.40
 ============
 * Added optimise_single_qubit_gates option for crystal processors.
