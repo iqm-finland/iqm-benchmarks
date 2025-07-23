@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 2.42
+============
+* Improved run-time execution for QScore benchmark.
+
+Version 2.41
+============
+* Fixed deprecated colormap usage in several benchmarks.
+
 Version 2.40
 ============
 * Added optimise_single_qubit_gates option for crystal processors.
