@@ -140,7 +140,7 @@ def calculate_probabilities(counts: dict[str, int], nqubits: int, coherence_exp:
         counts: A dictionary where keys are bitstrings representing measurement outcomes and values are the counts of those outcomes.
         nqubits: The number of qubits being measured.
         coherence_exp: A string indicating the coherence experiment type ('t1' or other).
-        
+
     Returns:
         tuple: A tuple containing:
             - A list of occurrences of measuring '0' for each qubit.
