@@ -452,9 +452,9 @@ class CoherenceBenchmark(Benchmark):
             # Execute on the backend
             if self.configuration.use_dd is True:
                 raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
-            
+
             qcvv_logger.debug(f"Executing on {self.coherence_exp}.")
-            qcvv_logger.setLevel(logging.WARNING) 
+            qcvv_logger.setLevel(logging.WARNING)
 
             jobs, _ = submit_execute(
                 sorted_transpiled_qc_list,
@@ -507,7 +507,7 @@ class CoherenceBenchmark(Benchmark):
                 qcvv_logger.setLevel(logging.INFO)
                 execution_results = retrieve_all_counts(jobs)[0]
                 identifier = BenchmarkObservationIdentifier(group)
-                dataset, _ = add_counts_to_dataset(execution_results,identifier.string_identifier, dataset)
+                dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
 
             dataset.attrs.update(
                 {
