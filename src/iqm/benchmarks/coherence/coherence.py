@@ -134,17 +134,15 @@ def plot_coherence(
 
 def calculate_probabilities(counts: dict[str, int], nqubits: int, coherence_exp: str) -> Tuple[List[float], int]:
     """
-    Calculate the probabilities of measuring '0' for each qubit based on the provided counts.
-
+    Calculate the number of times '0' was measured for each qubit based on the provided counts.
     Args:
         counts: A dictionary where keys are bitstrings representing measurement outcomes,
                        and values are the counts of those outcomes.
         nqubits: The number of qubits being measured.
         coherence_exp: A string indicating the coherence experiment type ('t1' or other).
-
     Returns:
         tuple: A tuple containing:
-            - A list of probabilities for measuring '0' for each qubit.
+            - A list of occurrences of measuring '0' for each qubit.
             - The total number of shots (measurements).
     """
     p0_per_qubit = [0.0 for _ in range(nqubits)]
@@ -186,7 +184,7 @@ def fit_coherence_model(
     ydata = probs
 
     # Estimate initial parameters
-    A_guess = ydata[0] - ydata[-1]
+    A_guess = np.max([ydata[0] - ydata[-1], 0])
     C_guess = ydata[-1]
     T_guess = delays[len(delays) // 2]
     p0 = [A_guess, T_guess, C_guess]
@@ -246,7 +244,8 @@ def coherence_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
     qubits_to_plot = dataset.attrs["qubits_to_plot"]
     for group in groups:
-        all_counts_group = xrvariable_to_counts(dataset, str(group), tot_circs)
+        identifier = BenchmarkObservationIdentifier(group)
+        all_counts_group = xrvariable_to_counts(dataset, identifier.string_identifier, tot_circs)
         nqubits = len(group)
         qubit_probs.update({str(q): [] for q in group})
 
@@ -453,6 +452,9 @@ class CoherenceBenchmark(Benchmark):
             # Execute on the backend
             if self.configuration.use_dd is True:
                 raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
+            
+            qcvv_logger.debug(f"Executing on {self.coherence_exp}.")
+            qcvv_logger.setLevel(logging.WARNING) 
 
             jobs, _ = submit_execute(
                 sorted_transpiled_qc_list,
@@ -463,9 +465,11 @@ class CoherenceBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
+
             qcvv_logger.setLevel(logging.INFO)
             execution_results = retrieve_all_counts(jobs)[0]
-            dataset, _ = add_counts_to_dataset(execution_results, str(qubit_set), dataset)
+            identifier = BenchmarkObservationIdentifier(qubit_set)
+            dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
             dataset.attrs.update(
                 {
                     "qubit_set": qubit_set,
@@ -502,7 +506,8 @@ class CoherenceBenchmark(Benchmark):
                 )
                 qcvv_logger.setLevel(logging.INFO)
                 execution_results = retrieve_all_counts(jobs)[0]
-                dataset, _ = add_counts_to_dataset(execution_results, str(group), dataset)
+                identifier = BenchmarkObservationIdentifier(group)
+                dataset, _ = add_counts_to_dataset(execution_results,identifier.string_identifier, dataset)
 
             dataset.attrs.update(
                 {

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Q-score estimates the size of combinatorial optimization problems a given number of qubits can execute with meaningful results.
+Estimation of the coherence properties of the qubits and computational resonator.
 """
 
 from . import coherence
