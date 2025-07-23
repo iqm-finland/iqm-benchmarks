@@ -135,11 +135,12 @@ def plot_coherence(
 def calculate_probabilities(counts: dict[str, int], nqubits: int, coherence_exp: str) -> Tuple[List[float], int]:
     """
     Calculate the number of times '0' was measured for each qubit based on the provided counts.
+
     Args:
-        counts: A dictionary where keys are bitstrings representing measurement outcomes,
-                       and values are the counts of those outcomes.
+        counts: A dictionary where keys are bitstrings representing measurement outcomes and values are the counts of those outcomes.
         nqubits: The number of qubits being measured.
         coherence_exp: A string indicating the coherence experiment type ('t1' or other).
+        
     Returns:
         tuple: A tuple containing:
             - A list of occurrences of measuring '0' for each qubit.
