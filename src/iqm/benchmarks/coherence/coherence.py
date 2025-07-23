@@ -481,7 +481,6 @@ class CoherenceBenchmark(Benchmark):
             )
 
         else:
-            transpiled_qc_list = []
             # For crystal topology, we use the checkerboard pattern
             group_a, group_b = self.checkerboard_groups_from_coupling(list(self.backend.coupling_map))
             for group in [group_a, group_b]:
