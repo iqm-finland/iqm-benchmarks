@@ -824,18 +824,18 @@ ipykernel==6.29.5 \
 ipython==8.31.0 \
     --hash=sha256:46ec58f8d3d076a61d128fe517a51eb730e3aaf0c184ea8c17d16e366660c6a6 \
     --hash=sha256:b6a2274606bec6166405ff05e54932ed6e5cfecaca1fc05f2cacde7bb074d70b
-iqm-client==29.7.0 \
-    --hash=sha256:19bbeb5c389b1865c6721319936caa98809a2dc64dd3012ea10b3ed9e491a6df \
-    --hash=sha256:ac74274e377a1da3082789be55cfcdb3829f00a859f927c60bdc3e8314b8cad5
+iqm-client==29.8.0 \
+    --hash=sha256:d6e999d74783e2879724af151c0bfa2ddc1e53fc74d190166182f17bb5abee29 \
+    --hash=sha256:dc572d8dd9abb1e3dcf4079324170e61eb3ec522d54065274d38f91e0e3af98c
 iqm-data-definitions==2.13 \
     --hash=sha256:0de52e2a1ffdc63375b13825b28170d0868b12cda011e782b9348bb143083a0e \
     --hash=sha256:be6a71ab2e5b04c6e6c4d53094c89c088cc4b6e8e293f412f9fa937cf8dc980c
 iqm-exa-common==26.24.0 \
     --hash=sha256:92e880913589015b78baf8e0267f82cadc8a52cb090c8e7b5226d1d9a8ddbd26 \
     --hash=sha256:fc3edd89b501961b3ad034f4c37983bb879735626df4f342ea0edcab3bce8182
-iqm-station-control-client==9.8.0 \
-    --hash=sha256:373466ea6ecdae15c3453d81a896efbf2dc9015a1ef38dd8b1031ee28f263fea \
-    --hash=sha256:db579780bbf73a9b9f173572a184e367e1fbea85449c37c474b37b56e693c0c6
+iqm-station-control-client==9.9.0 \
+    --hash=sha256:847b09032add8e703eef31f0914ffbe3fb3269d128baeeddc83afd9b40bbf0d7 \
+    --hash=sha256:ad22d9ff7ea0b7c87796a1eab37557a45bdf1f1fd605c54a424f87d3802983ab
 isoduration==20.11.0 \
     --hash=sha256:ac2f9015137935279eac671f94f89eb00584f940f5dc49462a0c4ee692ba1bd9 \
     --hash=sha256:b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042
