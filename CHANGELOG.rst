@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.43
+============
+* Added coherence benchmark for T1 and T2 estimations.
+
 Version 2.42
 ============
 * Improved run-time execution for QScore benchmark.
