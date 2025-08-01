@@ -228,14 +228,11 @@ def bootstrap_errors(
                 pbar.close()
 
     for i, (X_opt_pp, E_opt_pp, rho_opt_pp, df_g_values, df_o_values, success) in enumerate(all_results):
-        if success:
-            X_list.append(X_opt_pp)
-            E_list.append(E_opt_pp)
-            rho_list.append(rho_opt_pp)
-            df_g_list.append(df_g_values)
-            df_o_list.append(df_o_values)
-        else:
-            qcvv_logger.info(f"Bootstrap sample {i} failed to converge below expected lsq error. Skipping this sample.")
+        X_list.append(X_opt_pp)
+        E_list.append(E_opt_pp)
+        rho_list.append(rho_opt_pp)
+        df_g_list.append(df_g_values)
+        df_o_list.append(df_o_values)
 
     return np.array(X_list), np.array(E_list), np.array(rho_list), np.array(df_g_list), np.array(df_o_list)
 
