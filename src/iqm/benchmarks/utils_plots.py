@@ -255,7 +255,7 @@ class GraphPositions:
         if station is not None and station.lower() in GraphPositions.predefined_stations:
             qubit_positions = cast(Dict[int, Tuple[float, float]], GraphPositions.predefined_stations[station.lower()])
         else:
-            qubit_station_dict = {7: "deneb", 20: "garnet", 24: "sirius", 17: "sirius", 54: "emerald"}
+            qubit_station_dict = {6: "deneb", 7: "deneb", 20: "garnet", 24: "sirius", 17: "sirius", 54: "emerald"}
             if num_qubits is not None and num_qubits in qubit_station_dict:
                 station = qubit_station_dict[num_qubits]
                 qubit_positions = cast(Dict[int, Tuple[float, float]], GraphPositions.predefined_stations[station])
