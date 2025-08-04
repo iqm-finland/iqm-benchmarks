@@ -145,7 +145,6 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circui
     phases = [np.pi * i / (num_qubits + 1) for i in range(2 * num_qubits + 2)]
     idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     transpiled_circuits = circuits["transpiled_circuits"]
-    num_shots = dataset.attrs["shots"]
     num_circuits = len(transpiled_circuits[f"{qubit_layout}_native_ghz"].circuits)
 
     # Computing the phase acquired by the |11...1> component for each interval

@@ -329,8 +329,16 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
         i, j = cal_keys["cz_gate_fidelity"]
         topology = "crystal"
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
-        qb1 = int(item["locus"][0][2:]) if "COMPR" not in item["locus"][0] else 0
-        qb2 = int(item["locus"][1][2:]) if "COMPR" not in item["locus"][1] else 0
+        qb1 = (
+            int(item["locus"][0][2:])
+            if (("COMPR" not in item["locus"][0]) and ("COMP_R" not in item["locus"][0]))
+            else 0
+        )
+        qb2 = (
+            int(item["locus"][1][2:])
+            if (("COMPR" not in item["locus"][1]) and ("COMP_R" not in item["locus"][1]))
+            else 0
+        )
         list_couplings.append([qb1, qb2])
         list_fids.append(float(item["value"]))
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
@@ -353,13 +361,13 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
             if "component" in item:
                 # Single qubit metric
                 component = item["component"]
-                qb_idx = int(component[2:]) if "COMPR" not in component else 0
+                qb_idx = int(component[2:]) if (("COMPR" not in component) and ("COMP_R" not in component)) else 0
                 metrics_dict[metric_key][qubit_mapping[qb_idx]] = float(item["value"])
             if "locus" in item and len(item["locus"]) == 2:
-                # Two qubit metric
+                # Two qubit metric(
                 locus = item["locus"]
-                qb1_idx = int(locus[0][2:]) if "COMPR" not in locus[0] else 0
-                qb2_idx = int(locus[1][2:]) if "COMPR" not in locus[1] else 0
+                qb1_idx = int(locus[0][2:]) if (("COMPR" not in locus[0]) and ("COMP_R" not in locus[0])) else 0
+                qb2_idx = int(locus[1][2:]) if (("COMPR" not in locus[1]) and ("COMP_R" not in locus[1])) else 0
                 metrics_dict[metric_key][(qubit_mapping[qb1_idx], qubit_mapping[qb2_idx])] = float(item["value"])
 
     return list_couplings, list_fids, topology, qubit_mapping, metrics_dict

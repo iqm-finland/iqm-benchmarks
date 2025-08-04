@@ -21,7 +21,6 @@ from math import floor, pi
 from time import perf_counter, strftime
 from typing import Any, Dict, List, Sequence, Tuple, Type
 
-import matplotlib as mpl
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
