@@ -320,6 +320,7 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
     cal_keys = {
         el2["key"]: (i, j) for i, el1 in enumerate(calibration["calibrations"]) for j, el2 in enumerate(el1["metrics"])
     }
+    resonator_names = ["COMPR", "COMP_R", "MPR1", "MPR_1"]
     list_couplings = []
     list_fids = []
     if "double_move_gate_fidelity" in cal_keys.keys():
@@ -331,24 +332,17 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
     for item in calibration["calibrations"][i]["metrics"][j]["metrics"]:
         qb1 = (
             int(item["locus"][0][2:])
-            if (("COMPR" not in item["locus"][0]) and ("COMP_R" not in item["locus"][0]))
+            if not any(resonator in item["locus"][0] for resonator in resonator_names)
             else 0
         )
         qb2 = (
             int(item["locus"][1][2:])
-            if (("COMPR" not in item["locus"][1]) and ("COMP_R" not in item["locus"][1]))
+            if not any(resonator in item["locus"][1] for resonator in resonator_names)
             else 0
         )
         list_couplings.append([qb1, qb2])
         list_fids.append(float(item["value"]))
     calibrated_qubits = set(np.array(list_couplings).reshape(-1))
-    # Enumerate all calibrated qubits starting from 0
-    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
-    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
-
-    # If all_metrics is False, only return everything related to CZ fidelites
-    if not all_metrics:
-        return list_couplings, list_fids, topology, qubit_mapping
 
     # Process all metrics if all_metrics is True
     metrics_dict: Dict[str, Dict[Union[int, Tuple[int, int]], float]] = {}
@@ -361,14 +355,38 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
             if "component" in item:
                 # Single qubit metric
                 component = item["component"]
-                qb_idx = int(component[2:]) if (("COMPR" not in component) and ("COMP_R" not in component)) else 0
-                metrics_dict[metric_key][qubit_mapping[qb_idx]] = float(item["value"])
+                if not any(resonator in component for resonator in resonator_names):
+                    qb = int(component[2:])
+                    metrics_dict[metric_key][qb] = float(item["value"])
+                    calibrated_qubits.add(qb) # Add qubits that have a single qubit metric
             if "locus" in item and len(item["locus"]) == 2:
-                # Two qubit metric(
+                # Two qubit metric
                 locus = item["locus"]
-                qb1_idx = int(locus[0][2:]) if (("COMPR" not in locus[0]) and ("COMP_R" not in locus[0])) else 0
-                qb2_idx = int(locus[1][2:]) if (("COMPR" not in locus[1]) and ("COMP_R" not in locus[1])) else 0
-                metrics_dict[metric_key][(qubit_mapping[qb1_idx], qubit_mapping[qb2_idx])] = float(item["value"])
+                if not (any(resonator in locus[0] for resonator in resonator_names) or any(resonator in locus[1] for resonator in resonator_names)):
+                    qb1 = int(locus[0][2:])
+                    qb2 = int(locus[1][2:])
+                    metrics_dict[metric_key][(qb1, qb2)] = float(item["value"])
+
+    # Enumerate all calibrated qubits starting from 0
+    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
+
+    # Apply the qubit mapping to metrics_dict
+    remapped_metrics_dict = {}
+    for metric_key, metric_values in metrics_dict.items():
+        remapped_metrics_dict[metric_key] = {}
+        for key, value in metric_values.items():
+            if isinstance(key, tuple):
+                # Two-qubit metric
+                remapped_metrics_dict[metric_key][(qubit_mapping[key[0]], qubit_mapping[key[1]])] = value
+            else:
+                # Single-qubit metric
+                remapped_metrics_dict[metric_key][qubit_mapping[key]] = value
+    metrics_dict = remapped_metrics_dict
+
+    # If all_metrics is False, only return everything related to CZ fidelites
+    if not all_metrics:
+        return list_couplings, list_fids, topology, qubit_mapping
 
     return list_couplings, list_fids, topology, qubit_mapping, metrics_dict
 

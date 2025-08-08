@@ -127,8 +127,6 @@ class GraphPositions:
     }
 
     sirius_positions = {
-        # Node 0 in the middle
-        0: (16.5, 3),
         # Even nodes on the bottom
         2: (1, 5),
         4: (3, 5),
@@ -161,6 +159,8 @@ class GraphPositions:
     previous_nodes = list(sirius_positions.keys())
     for node in previous_nodes:
         sirius_positions.update({node + max_qubit_number: (sirius_positions[node][0], 3)})
+    # Node 0 in the middle
+    sirius_positions.update({0: (16.5, 3)})
 
     deneb_positions = {
         # Even nodes on the bottom
@@ -177,6 +177,7 @@ class GraphPositions:
     previous_nodes = list(deneb_positions.keys())
     for node in previous_nodes:
         deneb_positions.update({node + max_qubit_number: (deneb_positions[node][0], 3)})
+    # Node 0 in the middle
     deneb_positions.update({0: (2.5, 3)})
 
     predefined_stations = {
@@ -424,12 +425,12 @@ def evaluate_hamiltonian_paths(
     return path_costs
 
 
-def calculate_node_radii(metric_dict, qubit_nodes, sq_metric):
+def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: List[int], sq_metric: str) -> np.ndarray:
     """Calculate node radii based on the specified single qubit metric. For the coherence metric, the fidelity is calculated as the idling fidelity of a single qubit gate duration.
 
     Args:
-        metric_dict (dict): Dictionary containing various qubit metrics.
-        qubit_nodes (list): List of qubits to calculate the radius for.
+        metric_dict (Dict[str, Dict[int, float]]): Dictionary containing various qubit metrics.
+        qubit_nodes (List[int]): List of qubits to calculate the radius for.
         sq_metric (str): Metric to use for radius calculation.
                          Options: "fidelity", "coherence", or "readout".
 
@@ -441,13 +442,25 @@ def calculate_node_radii(metric_dict, qubit_nodes, sq_metric):
     """
     if sq_metric == "fidelity":
         radii = -np.log(np.array([metric_dict["fidelity_1qb_gates_averaged"][node] for node in qubit_nodes]))
+        if "fidelity_1qb_gates_averaged" not in metric_dict:
+            raise ValueError(
+                "The metric 'fidelity_1qb_gates_averaged' is not available in the backend metrics."
+            )
     elif sq_metric == "coherence":
+        if "t1_time" not in metric_dict or "t2_time" not in metric_dict:
+            raise ValueError(
+                "At least one of the metrics 't1_time' and 't2_time' is not available in the backend metrics."
+            )
         sqg_time = 32e-9
         t1_times = [metric_dict["t1_time"][node] for node in qubit_nodes]
         t2_times = [metric_dict["t2_time"][node] for node in qubit_nodes]
         idle_fidelities = (3 + np.exp(-sqg_time / np.array(t1_times)) + 2 * np.exp(-sqg_time / np.array(t2_times))) / 6
         radii = -np.log(idle_fidelities)
     elif sq_metric == "readout":
+        if "single_shot_readout_fidelity" not in metric_dict:
+            raise ValueError(
+                "The metric 'single_shot_readout_fidelity' is both available in the backend metrics."
+            )
         readout_fidelities = [metric_dict["single_shot_readout_fidelity"][node] for node in qubit_nodes]
         radii = -np.log(readout_fidelities)
     else:
@@ -455,7 +468,6 @@ def calculate_node_radii(metric_dict, qubit_nodes, sq_metric):
             f"Unsupported single qubit metric: {sq_metric}, supported metrics are: fidelity, coherence, readout"
         )
     return radii
-
 
 def plot_layout_fidelity_graph(
     cal_url: str,
