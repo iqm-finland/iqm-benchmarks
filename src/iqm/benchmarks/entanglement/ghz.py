@@ -145,7 +145,6 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circui
     phases = [np.pi * i / (num_qubits + 1) for i in range(2 * num_qubits + 2)]
     idx = BenchmarkObservationIdentifier(qubit_layout).string_identifier
     transpiled_circuits = circuits["transpiled_circuits"]
-    num_shots = dataset.attrs["shots"]
     num_circuits = len(transpiled_circuits[f"{qubit_layout}_native_ghz"].circuits)
 
     # Computing the phase acquired by the |11...1> component for each interval
@@ -155,8 +154,9 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circui
     counts = xrvariable_to_counts(dataset, f"{idx}", num_circuits)
     all_zero_probability_list = []  # An ordered list for storing the probabilities of returning to the |00..0> state
     for count in counts[1:]:
+        normalization = np.sum(list(count.values()))
         if "0" * num_qubits in count.keys():
-            probability = count["0" * num_qubits] / num_shots
+            probability = count["0" * num_qubits] / normalization
         else:
             probability = 0
         all_zero_probability_list.append(probability)
@@ -165,7 +165,7 @@ def fidelity_ghz_coherences(dataset: xr.Dataset, qubit_layout: List[int], circui
     i_n = np.abs(np.dot(complex_coefficients, np.array(all_zero_probability_list))) / (len(phases))
 
     # Extracting the probabilities of the 00...0 and 11...1 bit strings
-    probs_direct = {label: count / num_shots for label, count in counts[0].items()}
+    probs_direct = {label: count / np.sum(list(counts[0].values())) for label, count in counts[0].items()}
 
     # Computing GHZ state fidelity from i_n and the probabilities according to the method in [Mooney, 2021]
     p0 = probs_direct["0" * num_qubits] if "0" * num_qubits in probs_direct.keys() else 0

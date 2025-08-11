@@ -21,7 +21,6 @@ from math import floor, pi
 from time import perf_counter, strftime
 from typing import Any, Dict, List, Sequence, Tuple, Type
 
-import matplotlib as mpl
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -178,8 +177,8 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
                 # submit_i = datetime.strptime(x["submit_start"], job_time_format)
                 execution_f = datetime.strptime(x["execution_end"], job_time_format)
                 execution_i = datetime.strptime(x["execution_start"], job_time_format)
-                job_f = datetime.strptime(x["job_end"], job_time_format)
-                job_i = datetime.strptime(x["job_start"], job_time_format)
+                job_f = datetime.strptime(x["ready"], job_time_format)
+                job_i = datetime.strptime(x["received"], job_time_format)
 
                 all_job_elapsed[update][batch] = {
                     "job_total": job_f - job_i,
