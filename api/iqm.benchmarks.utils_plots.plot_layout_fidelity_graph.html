@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.utils_plots.plot_layout_fidelity_graph &#8212; IQM Benchmarks 2.43 documentation</title>
+    <title>iqm.benchmarks.utils_plots.plot_layout_fidelity_graph &#8212; IQM Benchmarks 2.44 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=484ca5b3"></script>
+    <script src="../_static/documentation_options.js?v=dd592762"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths" href="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.43" />
-    <meta name="docbuild:last-update" content="2025-07-26"/>
+  <meta name="docsearch:version" content="2.44" />
+    <meta name="docbuild:last-update" content="2025-08-11"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.43 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.43 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.44 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.44 documentation - Home"/>
   
   
 </a></div>
@@ -269,6 +269,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.calculate_node_radii.html">iqm.benchmarks.utils_plots.calculate_node_radii</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.draw_graph_edges.html">iqm.benchmarks.utils_plots.draw_graph_edges</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html">iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
@@ -452,7 +453,7 @@
 <h1>iqm.benchmarks.utils_plots.plot_layout_fidelity_graph<a class="headerlink" href="#iqm-benchmarks-utils-plots-plot-layout-fidelity-graph" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph">
-<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.utils_plots.</span></span><span class="sig-name descname"><span class="pre">plot_layout_fidelity_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cal_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_layouts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.utils_plots.plot_layout_fidelity_graph" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.utils_plots.</span></span><span class="sig-name descname"><span class="pre">plot_layout_fidelity_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cal_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_layouts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sq_metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'coherence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.utils_plots.plot_layout_fidelity_graph" title="Link to this definition">#</a></dt>
 <dd><p>Plot a graph showing the quantum chip layout with fidelity information.</p>
 <p>Creates a visualization of the quantum chip topology where nodes represent qubits
 and edges represent connections between qubits. Edge thickness indicates gate errors
@@ -464,6 +465,8 @@ and edges represent connections between qubits. Edge thickness indicates gate er
 <li><p><strong>qubit_layouts</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – List of qubit layouts where each layout is a list of qubit indices</p></li>
 <li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – Name of the quantum computing station to use predefined positions for.
 If None, positions will be generated algorithmically.</p></li>
+<li><p><strong>sq_metric</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – Optional single qubit metric to use for the visualization, can be either “fidelity”, “coherence”,
+or “readout”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -557,7 +560,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-26.
+  Last updated on 2025-08-11.
   <br/>
 </p>
   </div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.utils_plots &#8212; IQM Benchmarks 2.43 documentation</title>
+    <title>iqm.benchmarks.utils_plots &#8212; IQM Benchmarks 2.44 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=484ca5b3"></script>
+    <script src="../_static/documentation_options.js?v=dd592762"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -49,12 +49,12 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.utils_plots.draw_graph_edges" href="iqm.benchmarks.utils_plots.draw_graph_edges.html" />
+    <link rel="next" title="iqm.benchmarks.utils_plots.calculate_node_radii" href="iqm.benchmarks.utils_plots.calculate_node_radii.html" />
     <link rel="prev" title="iqm.benchmarks.utils.xrvariable_to_counts" href="iqm.benchmarks.utils.xrvariable_to_counts.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.43" />
-    <meta name="docbuild:last-update" content="2025-07-26"/>
+  <meta name="docsearch:version" content="2.44" />
+    <meta name="docbuild:last-update" content="2025-08-11"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.43 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.43 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.44 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.44 documentation - Home"/>
   
   
 </a></div>
@@ -269,6 +269,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">iqm.benchmarks.utils_plots</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.calculate_node_radii.html">iqm.benchmarks.utils_plots.calculate_node_radii</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.draw_graph_edges.html">iqm.benchmarks.utils_plots.draw_graph_edges</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html">iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
@@ -444,16 +445,19 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.draw_graph_edges.html#iqm.benchmarks.utils_plots.draw_graph_edges" title="iqm.benchmarks.utils_plots.draw_graph_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_graph_edges</span></code></a>(backend_coupling_map, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.calculate_node_radii.html#iqm.benchmarks.utils_plots.calculate_node_radii" title="iqm.benchmarks.utils_plots.calculate_node_radii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_node_radii</span></code></a>(metric_dict, ...)</p></td>
+<td><p>Calculate node radii based on the specified single qubit metric.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.draw_graph_edges.html#iqm.benchmarks.utils_plots.draw_graph_edges" title="iqm.benchmarks.utils_plots.draw_graph_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_graph_edges</span></code></a>(backend_coupling_map, ...)</p></td>
 <td><p>Draw given edges on a graph within the given backend.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html#iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths" title="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_hamiltonian_paths</span></code></a>(N, path_samples, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html#iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths" title="iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_hamiltonian_paths</span></code></a>(N, path_samples, ...)</p></td>
 <td><p>Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html#iqm.benchmarks.utils_plots.plot_layout_fidelity_graph" title="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_layout_fidelity_graph</span></code></a>(cal_url[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html#iqm.benchmarks.utils_plots.plot_layout_fidelity_graph" title="iqm.benchmarks.utils_plots.plot_layout_fidelity_graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_layout_fidelity_graph</span></code></a>(cal_url[, ...])</p></td>
 <td><p>Plot a graph showing the quantum chip layout with fidelity information.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.rx_to_nx_graph.html#iqm.benchmarks.utils_plots.rx_to_nx_graph" title="iqm.benchmarks.utils_plots.rx_to_nx_graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rx_to_nx_graph</span></code></a>(backend_coupling_map)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils_plots.rx_to_nx_graph.html#iqm.benchmarks.utils_plots.rx_to_nx_graph" title="iqm.benchmarks.utils_plots.rx_to_nx_graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rx_to_nx_graph</span></code></a>(backend_coupling_map)</p></td>
 <td><p>Convert the Rustworkx graph returned by a backend to a Networkx graph.</p></td>
 </tr>
 </tbody>
@@ -495,11 +499,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.utils_plots.draw_graph_edges.html"
+       href="iqm.benchmarks.utils_plots.calculate_node_radii.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.utils_plots.draw_graph_edges</p>
+        <p class="prev-next-title">iqm.benchmarks.utils_plots.calculate_node_radii</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -538,7 +542,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-26.
+  Last updated on 2025-08-11.
   <br/>
 </p>
   </div>

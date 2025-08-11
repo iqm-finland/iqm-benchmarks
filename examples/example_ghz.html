@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.43 documentation</title>
+    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.44 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=484ca5b3"></script>
+    <script src="../_static/documentation_options.js?v=dd592762"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Circuit Layer Operations Per Second (CLOPS)" href="example_clops.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.43" />
-    <meta name="docbuild:last-update" content="2025-07-26"/>
+  <meta name="docsearch:version" content="2.44" />
+    <meta name="docbuild:last-update" content="2025-08-11"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.43 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.43 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.44 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.44 documentation - Home"/>
   
   
 </a></div>
@@ -271,6 +271,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.calculate_node_radii.html">iqm.benchmarks.utils_plots.calculate_node_radii</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.draw_graph_edges.html">iqm.benchmarks.utils_plots.draw_graph_edges</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths.html">iqm.benchmarks.utils_plots.evaluate_hamiltonian_paths</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.plot_layout_fidelity_graph.html">iqm.benchmarks.utils_plots.plot_layout_fidelity_graph</a></li>
@@ -516,9 +517,10 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <p>Use of the plot:</p>
 <ul class="simple">
 <li><p>If the <code class="docutils literal notranslate"><span class="pre">qubit_layouts</span></code> argument is provided, the selected qubits are marked in orange.</p></li>
-<li><p>CZ errors are indicated with edge width, <strong>thinner is better</strong>, where the edge width is given by <span class="math notranslate nohighlight">\(w_{ij} = - \mathrm{log}(\mathcal{F}_{\mathrm{CZ}}^{ij})\)</span>.</p></li>
+<li><p>CZ errors are indicated with edge width (<strong>thinner edge is better</strong>), where the edge width is given by <span class="math notranslate nohighlight">\(w_{ij} = - \mathrm{log}(\mathcal{F}_{\mathrm{CZ}}^{ij})\)</span>.</p></li>
 <li><p>Each edge is also labeled with the width value.</p></li>
 <li><p>Some graph layouts are predefined to match the layout as shown in IQM-Resonance. If the layout is not predefined, a graph in grid or star layout will be automatically generated, dependeing on the backend. Automatically generated graphs might need to be rerun a few times until a nice node layout is found.</p></li>
+<li><p>Single qubit errors are visualized as node size (<strong>smaller radius is better</strong>), with the node size being determined by <span class="math notranslate nohighlight">\(- \mathrm{log}(\mathcal{F})\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is either the single qubit average gate fidelity, the single qubit readout fidelity, or the single qubit idle gate fidelity. Which of these is used can be controlled by the <code class="docutils literal notranslate"><span class="pre">sq_metric</span></code> argument, which can be set to “fidelity” “readout”, or “coherence”, where the latter option leads to the idle fidelities being shown.</p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -528,7 +530,7 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check if access token environment variable is set: </span><span class="si">{</span><span class="s1">&#39;IQM_TOKEN&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">cal_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://api.resonance.meetiqm.com/quantum-computers/v1/garnet/calibrations&quot;</span> 
 <span class="n">qubit_layouts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">6</span><span class="p">]]</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_layout_fidelity_graph</span><span class="p">(</span><span class="n">cal_url</span><span class="p">,</span> <span class="n">qubit_layouts</span> <span class="o">=</span> <span class="n">qubit_layouts</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;garnet&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_layout_fidelity_graph</span><span class="p">(</span><span class="n">cal_url</span><span class="p">,</span> <span class="n">qubit_layouts</span> <span class="o">=</span> <span class="n">qubit_layouts</span><span class="p">,</span> <span class="n">sq_metric</span><span class="o">=</span><span class="s2">&quot;coherence&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -536,7 +538,7 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Check if access token environment variable is set: True
 </pre></div>
 </div>
-<img alt="../_images/b997e2c23f0a57817d50447244647345fd8d043ae005e0154ad87420e2c186ef.png" src="../_images/b997e2c23f0a57817d50447244647345fd8d043ae005e0154ad87420e2c186ef.png" />
+<img alt="../_images/78aae61e0aa0d1ad29eaa1fbcf259a8b7407d541cef8d442f42d072e5d6f035c.png" src="../_images/78aae61e0aa0d1ad29eaa1fbcf259a8b7407d541cef8d442f42d072e5d6f035c.png" />
 </div>
 </div>
 </section>
@@ -695,7 +697,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-07-26.
+  Last updated on 2025-08-11.
   <br/>
 </p>
   </div>

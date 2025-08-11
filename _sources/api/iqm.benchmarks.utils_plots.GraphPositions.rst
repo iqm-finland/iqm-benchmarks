@@ -14,8 +14,13 @@ iqm.benchmarks.utils\_plots.GraphPositions
    .. autosummary::
    
       ~GraphPositions.deneb_positions
+      ~GraphPositions.emerald_positions
       ~GraphPositions.garnet_positions
+      ~GraphPositions.max_qubit_number
+      ~GraphPositions.node
       ~GraphPositions.predefined_stations
+      ~GraphPositions.previous_nodes
+      ~GraphPositions.sirius_positions
    
    
 
@@ -29,5 +34,6 @@ iqm.benchmarks.utils\_plots.GraphPositions
       ~GraphPositions.__eq__
       ~GraphPositions.__repr__
       ~GraphPositions.create_positions
+      ~GraphPositions.get_positions
    
    
