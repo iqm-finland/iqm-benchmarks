@@ -17,9 +17,10 @@ Plotting and visualization utility functions
 """
 from dataclasses import dataclass
 import os
-from typing import Dict, List, Literal, Optional, Sequence, Tuple
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
 
 from matplotlib.figure import Figure
+from matplotlib.patches import Circle, FancyBboxPatch
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -40,9 +41,9 @@ class GraphPositions:
     provides methods to generate positions for different layout types.
 
     Attributes:
-        garnet_positions (Dict[int, Tuple[int, int]]): Mapping of node indices to (x,y) positions for Garnet chip.
-        deneb_positions (Dict[int, Tuple[int, int]]): Mapping of node indices to (x,y) positions for Deneb chip.
-        predefined_stations (Dict[str, Dict[int, Tuple[int, int]]]): Mapping of chip names to their position dictionaries.
+        garnet_positions (Dict[int, Tuple[float, float]]): Mapping of node indices to (x,y) positions for Garnet chip.
+        deneb_positions (Dict[int, Tuple[float, float]]): Mapping of node indices to (x,y) positions for Deneb chip.
+        predefined_stations (Dict[str, Dict[int, Tuple[float, float]]]): Mapping of chip names to their position dictionaries.
     """
 
     garnet_positions = {
@@ -68,15 +69,116 @@ class GraphPositions:
         19: (3.0, 1.0),
     }
 
-    deneb_positions = {
-        0: (2.0, 2.0),
-        1: (1.0, 1.0),
-        3: (2.0, 1.0),
-        5: (3.0, 1.0),
-        2: (1.0, 3.0),
-        4: (2.0, 3.0),
-        6: (3.0, 3.0),
+    emerald_positions = {
+        0: (10, 10),
+        1: (11, 9),
+        2: (7, 11),
+        3: (8, 10),
+        4: (9, 9),
+        5: (10, 8),
+        6: (11, 7),
+        7: (5, 11),
+        8: (6, 10),
+        9: (7, 9),
+        10: (8, 8),
+        11: (9, 7),
+        12: (10, 6),
+        13: (11, 5),
+        14: (3, 11),
+        15: (4, 10),
+        16: (5, 9),
+        17: (6, 8),
+        18: (7, 7),
+        19: (8, 6),
+        20: (9, 5),
+        21: (10, 4),
+        22: (2, 10),
+        23: (3, 9),
+        24: (4, 8),
+        25: (5, 7),
+        26: (6, 6),
+        27: (7, 5),
+        28: (8, 4),
+        29: (9, 3),
+        30: (10, 2),
+        31: (2, 8),
+        32: (3, 7),
+        33: (4, 6),
+        34: (5, 5),
+        35: (6, 4),
+        36: (7, 3),
+        37: (8, 2),
+        38: (9, 1),
+        39: (1, 7),
+        40: (2, 6),
+        41: (3, 5),
+        42: (4, 4),
+        43: (5, 3),
+        44: (6, 2),
+        45: (7, 1),
+        46: (1, 5),
+        47: (2, 4),
+        48: (3, 3),
+        49: (4, 2),
+        50: (5, 1),
+        51: (1, 3),
+        52: (2, 2),
+        53: (3, 1),
     }
+
+    sirius_positions = {
+        # Even nodes on the bottom
+        2: (1, 5),
+        4: (3, 5),
+        6: (5, 5),
+        8: (7, 5),
+        10: (9, 5),
+        12: (11, 5),
+        14: (13, 5),
+        16: (15, 5),
+        18: (17, 5),
+        20: (19, 5),
+        22: (21, 5),
+        24: (23, 5),
+        # Odd nodes on the top
+        1: (1, 1),
+        3: (3, 1),
+        5: (5, 1),
+        7: (7, 1),
+        9: (9, 1),
+        11: (11, 1),
+        13: (13, 1),
+        15: (15, 1),
+        17: (17, 1),
+        19: (19, 1),
+        21: (21, 1),
+        23: (23, 1),
+    }
+    # Add dummy indices for the resonator
+    max_qubit_number = np.max(list(sirius_positions.keys()))
+    previous_nodes = list(sirius_positions.keys())
+    for node in previous_nodes:
+        sirius_positions.update({node + max_qubit_number: (sirius_positions[node][0], 3)})
+    # Node 0 in the middle
+    sirius_positions.update({0: (16.5, 3)})
+
+    deneb_positions = {
+        # Even nodes on the bottom
+        2: (1, 5),
+        4: (3, 5),
+        6: (5, 5),
+        # Odd nodes on the top
+        1: (1, 1),
+        3: (3, 1),
+        5: (5, 1),
+    }
+    # Add dummy indices for the resonator
+    max_qubit_number = np.max(list(deneb_positions.keys()))
+    previous_nodes = list(deneb_positions.keys())
+    for node in previous_nodes:
+        deneb_positions.update({node + max_qubit_number: (deneb_positions[node][0], 3)})
+    # Node 0 in the middle
+    deneb_positions.update({0: (2.5, 3)})
 
     predefined_stations = {
         "garnet": garnet_positions,
@@ -85,6 +187,8 @@ class GraphPositions:
         "deneb": deneb_positions,
         "fakedeneb": deneb_positions,
         "iqmfakedeneb": deneb_positions,
+        "emerald": emerald_positions,
+        "sirius": sirius_positions,
     }
 
     @staticmethod
@@ -128,6 +232,40 @@ class GraphPositions:
             }
         return pos
 
+    @staticmethod
+    def get_positions(
+        station: Optional[str] = None, graph: Optional[PyGraph] = None, num_qubits: Optional[int] = None
+    ) -> Dict[int, Tuple[float, float]]:
+        """Get predefined positions for a specific station or generate positions for a custom graph.
+
+        Args:
+            station (Optional[str]): The name of the station to get predefined positions for.
+                If None, positions will be generated algorithmically.
+            graph (Optional[PyGraph]): The graph to generate positions for if no predefined positions exist.
+                Used only when station is None and num_qubits doesn't match any predefined layout.
+            num_qubits (Optional[int]): The number of qubits to get a layout for.
+                If matches a known system, predefined positions will be used.
+
+        Returns:
+            Dict[int, Tuple[float, float]]: A dictionary mapping node indices to (x,y) coordinates.
+
+        Raises:
+            ValueError: If none of station, graph, or num_qubits are provided, or if num_qubits doesn't
+                match any predefined layout and graph is None.
+        """
+        if station is not None and station.lower() in GraphPositions.predefined_stations:
+            qubit_positions = cast(Dict[int, Tuple[float, float]], GraphPositions.predefined_stations[station.lower()])
+        else:
+            qubit_station_dict = {6: "deneb", 7: "deneb", 20: "garnet", 24: "sirius", 17: "sirius", 54: "emerald"}
+            if num_qubits is not None and num_qubits in qubit_station_dict:
+                station = qubit_station_dict[num_qubits]
+                qubit_positions = cast(Dict[int, Tuple[float, float]], GraphPositions.predefined_stations[station])
+            elif graph is not None:
+                qubit_positions = GraphPositions.create_positions(graph)
+            else:
+                raise ValueError("Either a station name, a graph, or a qubit count must be provided to get positions.")
+        return qubit_positions
+
 
 def draw_graph_edges(
     backend_coupling_map: CouplingMap,
@@ -165,23 +303,7 @@ def draw_graph_edges(
     fig = plt.figure()
     ax = plt.axes()
 
-    if station is not None:
-        if station.lower() in GraphPositions.predefined_stations:
-            qubit_positions = GraphPositions.predefined_stations[station.lower()]
-        else:
-            if backend_num_qubits in (6, 20):
-                station = "garnet" if backend_num_qubits == 20 else "deneb"
-                qubit_positions = GraphPositions.predefined_stations[station]
-            else:
-                graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-                qubit_positions = GraphPositions.create_positions(graph_backend)
-    else:
-        graph_backend = backend_coupling_map.graph.to_undirected(multigraph=False)
-        if backend_num_qubits in (6, 20):
-            station = "garnet" if backend_num_qubits == 20 else "deneb"
-            qubit_positions = GraphPositions.predefined_stations[station]
-        else:
-            qubit_positions = GraphPositions.create_positions(graph_backend)
+    qubit_positions = GraphPositions.get_positions(station=station, graph=None, num_qubits=backend_num_qubits)
 
     label_station = station if station is not None else f"{backend_num_qubits}-qubit IQM Backend"
     if disjoint_layers is None:
@@ -226,6 +348,7 @@ def draw_graph_edges(
             f"\n{timestamp}"
         )
     ax.set_aspect(0.925)
+    plt.gca().invert_yaxis()
     plt.close()
 
     return fig_name, fig
@@ -302,8 +425,55 @@ def evaluate_hamiltonian_paths(
     return path_costs
 
 
+def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: List[int], sq_metric: str) -> np.ndarray:
+    """Calculate node radii based on the specified single qubit metric. For the coherence metric, the fidelity is calculated as the idling fidelity of a single qubit gate duration.
+
+    Args:
+        metric_dict (Dict[str, Dict[int, float]]): Dictionary containing various qubit metrics.
+        qubit_nodes (List[int]): List of qubits to calculate the radius for.
+        sq_metric (str): Metric to use for radius calculation.
+                         Options: "fidelity", "coherence", or "readout".
+
+    Returns:
+        numpy.ndarray: Array of radii values for each qubit node.
+
+    Raises:
+        ValueError: If an unsupported metric type is provided.
+    """
+    if sq_metric == "fidelity":
+        radii = -np.log(np.array([metric_dict["fidelity_1qb_gates_averaged"][node] for node in qubit_nodes]))
+        if "fidelity_1qb_gates_averaged" not in metric_dict:
+            raise ValueError(
+                "The metric 'fidelity_1qb_gates_averaged' is not available in the backend metrics."
+            )
+    elif sq_metric == "coherence":
+        if "t1_time" not in metric_dict or "t2_time" not in metric_dict:
+            raise ValueError(
+                "At least one of the metrics 't1_time' and 't2_time' is not available in the backend metrics."
+            )
+        sqg_time = 32e-9
+        t1_times = [metric_dict["t1_time"][node] for node in qubit_nodes]
+        t2_times = [metric_dict["t2_time"][node] for node in qubit_nodes]
+        idle_fidelities = (3 + np.exp(-sqg_time / np.array(t1_times)) + 2 * np.exp(-sqg_time / np.array(t2_times))) / 6
+        radii = -np.log(idle_fidelities)
+    elif sq_metric == "readout":
+        if "single_shot_readout_fidelity" not in metric_dict:
+            raise ValueError(
+                "The metric 'single_shot_readout_fidelity' is both available in the backend metrics."
+            )
+        readout_fidelities = [metric_dict["single_shot_readout_fidelity"][node] for node in qubit_nodes]
+        radii = -np.log(readout_fidelities)
+    else:
+        raise ValueError(
+            f"Unsupported single qubit metric: {sq_metric}, supported metrics are: fidelity, coherence, readout"
+        )
+    return radii
+
 def plot_layout_fidelity_graph(
-    cal_url: str, qubit_layouts: Optional[list[list[int]]] = None, station: Optional[str] = None
+    cal_url: str,
+    qubit_layouts: Optional[list[list[int]]] = None,
+    station: Optional[str] = None,
+    sq_metric: Optional[str] = "coherence",
 ):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
@@ -316,57 +486,75 @@ def plot_layout_fidelity_graph(
         qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
         station: Name of the quantum computing station to use predefined positions for.
                 If None, positions will be generated algorithmically.
+        sq_metric: Optional single qubit metric to use for the visualization, can be either "fidelity", "coherence",
+                or "readout".
 
     Returns:
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
     """
-    edges_cal, fidelities_cal, topology = extract_fidelities(cal_url)
+    # pylint: disable=unbalanced-tuple-unpacking, disable=too-many-statements
+    edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url, all_metrics=True)
+    if topology == "star":
+        idx_to_qubit = {idx: qubit for qubit, idx in qubit_mapping.items()}
+        qubit_nodes = list(idx_to_qubit.keys())[1:]
+        fig, ax = plt.subplots(figsize=(len(qubit_nodes), 3))
+    else:
+        # For other topologies, qubits are indexed starting from 0 as per the Qiskit convention
+        idx_to_qubit = {idx: qubit - 1 for qubit, idx in qubit_mapping.items()}
+        qubit_nodes = list(idx_to_qubit.keys())
+        fig, ax = plt.subplots(figsize=(1.5 * np.sqrt(len(qubit_nodes)), 1.5 * np.sqrt(len(qubit_nodes))))
+
     weights = -np.log(np.array(fidelities_cal))
-    edges_graph = [tuple(edge) + (weight,) for edge, weight in zip(edges_cal, weights)]
-
-    graph = PyGraph()
-
-    # Add nodes
-    nodes: set[int] = set()
-    for edge in edges_graph:
-        nodes.update(edge[:2])
-    graph.add_nodes_from(list(nodes))
-
-    # Add edges
-    graph.add_edges_from(edges_graph)
+    calibrated_nodes = list(idx_to_qubit.keys())
 
     # Define qubit positions in plot
-    if station is not None and station.lower() in GraphPositions.predefined_stations:
-        pos = GraphPositions.predefined_stations[station.lower()]
-    else:
-        pos = GraphPositions.create_positions(graph, topology)
+    qubit_positions = GraphPositions.get_positions(station=station, graph=None, num_qubits=len(calibrated_nodes))
 
-    # Define node colors
-    node_colors = ["lightgrey" for _ in range(len(nodes))]
+    graph = PyGraph()
+    nodes = list(set(qubit_positions.keys()))
+    graph.add_nodes_from(nodes)
+    for edge, weight in zip(edges_cal, weights):
+        if topology == "star":
+            max_qubit_number = (np.max(list(qubit_positions.keys())) + 1) // 2
+            graph.add_edge(idx_to_qubit[edge[0]], idx_to_qubit[edge[0]] + max_qubit_number, weight)
+        else:
+            graph.add_edge(idx_to_qubit[edge[0]], idx_to_qubit[edge[1]], weight)
+
+    # Draw the main graph
+    visualization.mpl_draw(
+        graph,
+        ax=ax,
+        with_labels=True,
+        node_color="none",  # No node color since we're using circles
+        pos=qubit_positions,
+        labels=lambda node: node,
+        font_color="white",
+        width=graph.edges() / np.max(graph.edges()) * 10,
+    )  # type: ignore[call-arg]
+
+    # Draw nodes as circles with varying radii given by the single qubit metric
+    radii = calculate_node_radii(metric_dict, qubit_nodes, sq_metric)
+    node_colors = ["darkgray" for _ in range(len(nodes))]
     if qubit_layouts is not None:
         for qb in {qb for layout in qubit_layouts for qb in layout}:
             node_colors[qb] = "orange"
+    max_radius = 0.12 + np.max(radii) / np.max(radii) / 2.5
 
-    plt.subplots(figsize=(1.5 * np.sqrt(len(nodes)), 1.5 * np.sqrt(len(nodes))))
-
-    # Draw the graph
-    visualization.mpl_draw(
-        graph,
-        with_labels=True,
-        node_color=node_colors,
-        pos=pos,
-        labels=lambda node: node,
-        width=7 * weights / np.max(weights),
-    )  # type: ignore[call-arg]
+    for idx, node in enumerate(qubit_nodes):
+        position = qubit_positions[idx_to_qubit[node]]
+        radius = 0.12 + radii[idx] / np.max(radii) / 2.5
+        circle = Circle(position, radius=radius, color=node_colors[idx_to_qubit[node]], fill=True, alpha=1)
+        ax.add_patch(circle)
 
     # Add edge labels using matplotlib's annotate
-    for edge in edges_graph:
-        x1, y1 = pos[edge[0]]
-        x2, y2 = pos[edge[1]]
+    # for idx, edge in enumerate(edges_cal):
+    for edge, weight in zip(list(graph.edge_list()), graph.edges()):
+        x1, y1 = qubit_positions[edge[0]]
+        x2, y2 = qubit_positions[edge[1]]
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         plt.annotate(
-            f"{edge[2]:.1e}",
+            f"{weight:.1e}",
             xy=(x, y),
             xytext=(0, 0),
             textcoords="offset points",
@@ -375,12 +563,68 @@ def plot_layout_fidelity_graph(
             bbox={"boxstyle": "round,pad=0.2", "fc": "white", "ec": "none", "alpha": 0.6},
         )
 
-    plt.gca().invert_yaxis()
-    plt.title(
-        "Chip layout with selected qubits in orange\n"
-        + "and gate errors indicated by edge thickness (thinner is better)"
+    # Add horizontal bar representing resonator
+    if topology == "star":
+        resonator_height = 3
+        resonator_thickness = 0.8
+        x_min = 0.5
+        x_max = qubit_positions[idx_to_qubit[qubit_nodes[-1]]][0] + 0.5
+        resonator_width = x_max - x_min
+
+        # Create rectangle with rounded corners
+        resonator = FancyBboxPatch(
+            (x_min, resonator_height - resonator_thickness / 2),
+            resonator_width,
+            resonator_thickness,
+            boxstyle="round,pad=0.01,rounding_size=0.3",
+            color="lightsteelblue",
+            zorder=10,
+        )
+        ax.add_patch(resonator)
+
+        # Add "Resonator" label in the center
+        plt.annotate(
+            "Resonator",
+            xy=((x_min + x_max) / 2, resonator_height),
+            xytext=(0, 0),
+            textcoords="offset points",
+            ha="center",
+            va="center",
+            color="black",
+            fontsize=10,
+            zorder=11,
+            bbox={"boxstyle": "round,pad=0.2", "fc": "white", "ec": "none", "alpha": 0.8},
+        )
+
+    # Calculate axis limits to ensure all circles are visible
+    all_x = [pos[0] for pos in qubit_positions.values()]
+    all_y = [pos[1] for pos in qubit_positions.values()]
+    x_min, x_max = min(all_x), max(all_x)
+    y_min, y_max = min(all_y), max(all_y)
+
+    # Add padding for circles
+    padding = max_radius * 1.5
+    ax.set_xlim(x_min - padding, x_max + padding)
+    ax.set_ylim(y_min - padding, y_max + padding)
+
+    # Adjust layout first
+    plt.tight_layout(pad=2.0)
+    ax.set_aspect("equal")
+    ax.invert_yaxis()
+
+    plt.figtext(
+        0.5,
+        0.99,  # x=0.5 (center), y=0.01 (bottom)
+        f"Qubit connectivity with selected qubits in orange\n"
+        f"CZ errors -log(F) indicated by edge thickness (thinner is better)\n"
+        f"Single qubit errors -log(F) shown as node size with F computed from {sq_metric} metrics",
+        fontsize=10,
+        ha="center",
+        wrap=True,
     )
+
     plt.show()
+    return fig
 
 
 def rx_to_nx_graph(backend_coupling_map: CouplingMap) -> nx.Graph:

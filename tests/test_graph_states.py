@@ -15,8 +15,8 @@ class TestGraphState:
     @patch('matplotlib.pyplot.figure')
     def test_state_tomo(self, mock_fig):
         MINIMAL_GRAPHSTATE = GraphStateConfiguration(
-            qubits=list(range(5)),
-            shots=2**10,
+            qubits=[3,4,5],
+            shots=2 ** 10,
             tomography="state_tomography",
             num_bootstraps=10,
         )

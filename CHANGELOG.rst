@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 2.44
+============
+* Added qubit positions for Emerald
+* Visibility improvements for Graph state and EPLG plots
+* Add visualization of single qubit errors (Fidelity, readout, T1, T2) to the layout fidelity graph plot
+
 Version 2.43
 ============
 * Added coherence benchmark for T1 and T2 estimations.
