@@ -914,6 +914,7 @@ def submit_execute(
         List[IQMJob]: a list of IQMJob objects corresponding to the submitted circuits.
     """
     final_jobs = []
+    final_job_ids = []
     for k in sorted(
         sorted_transpiled_qc_list.keys(),
         key=lambda x: len(sorted_transpiled_qc_list[x]),
@@ -958,6 +959,7 @@ def submit_execute(
                     restriction = "max_gates_per_batch"
 
             final_batch_jobs = []
+            final_batch_job_ids = []
             for index, qc_batch in enumerate(chunked(sorted_transpiled_qc_list[k], batching_size)):
                 qcvv_logger.info(
                     f"{restriction} restriction: submitting subbatch #{index + 1} with {len(qc_batch)} circuits corresponding to qubits {list(k)}"
@@ -969,9 +971,10 @@ def submit_execute(
                     circuit_compilation_options=circuit_compilation_options,
                 )
                 final_batch_jobs.append(batch_jobs)
+                final_batch_job_ids.append(batch_jobs.job_id())
             final_jobs.extend(final_batch_jobs)
-
-    return final_jobs
+            final_job_ids.extend(final_batch_job_ids)
+    return final_jobs, final_job_ids
 
 
 def xrvariable_to_counts(dataset: xr.Dataset, identifier: str, counts_range: int) -> List[Dict[str, int]]:

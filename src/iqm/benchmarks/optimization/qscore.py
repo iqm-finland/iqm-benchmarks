@@ -873,7 +873,7 @@ class QScoreBenchmark(Benchmark):
 
             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
             # Execute on the backend
-            jobs, _ = submit_execute(
+            jobs, job_ids = submit_execute(
                 sorted_transpiled_qc_list,
                 self.backend,
                 self.shots,

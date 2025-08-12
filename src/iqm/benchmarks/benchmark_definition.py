@@ -187,6 +187,31 @@ def add_counts_to_dataset(counts: List[Dict[str, int]], identifier: str, dataset
     dataset_merged = dataset.merge(dataset_new, compat="override")
     return dataset_merged
 
+@timeit
+def add_job_ids_to_dataset(job_ids: List[str], identifier: str, dataset: xr.Dataset):
+    """Adds job IDs from a list to the given dataset.
+    If job IDs with the same identifier are already present in the old dataset, then both job IDs are added together.
+
+    Args:
+        job_ids (List[str]): A list of job IDs.
+        identifier (str): A string to identify the current data, for instance the job type.
+        dataset (xr.Dataset): Dataset to add results to.
+    Returns:
+        dataset_merged: xarray.Dataset
+            A merged dataset where the new job IDs are added to the input dataset.
+    """
+    if not isinstance(job_ids, list):
+        job_ids = [job_ids]
+    datasets = []
+    ds_temp = xr.Dataset()
+    job_ids_array = xr.DataArray(job_ids, {f"{identifier}_job_id": range(len(job_ids))})
+    if f"{identifier}_job_ids" in dataset.variables:
+        job_ids_array = xr.concat([dataset[f"{identifier}_job_ids"], job_ids_array], dim=f"{identifier}_job_id")
+    ds_temp.update({f"{identifier}_job_ids": job_ids_array})
+    datasets.append(ds_temp)
+    dataset_new = merge_datasets_dac(datasets)
+    dataset_merged = dataset.merge(dataset_new, compat="override")
+    return dataset_merged
 
 def show_figure(fig):
     """
