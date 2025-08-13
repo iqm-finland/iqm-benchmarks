@@ -436,12 +436,11 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         instances_with_edges = set(range(num_instances)) - set(no_edge_instances)
         num_instances_with_edges = len(instances_with_edges)
         execution_results = xrvariable_to_counts(dataset, num_nodes, num_instances_with_edges)
-
         for inst_idx, instance in enumerate(list(instances_with_edges)):
             cut_sizes = run_QAOA(
                 execution_results[inst_idx],
                 graph_list[instance],
-                qubit_to_node_list[instance],
+                qubit_to_node_list[inst_idx],
                 use_classically_optimized_angles,
                 num_qaoa_layers,
                 virtual_node_list[instance],
@@ -848,6 +847,7 @@ class QScoreBenchmark(Benchmark):
                     qubit_to_node_list.append(qubit_to_node_copy)
                 else:
                     qc_all.append([])
+                    no_edge_instances.append(instance)
 
                 seed += 1
                 qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
@@ -886,6 +886,7 @@ class QScoreBenchmark(Benchmark):
             qcvv_logger.setLevel(logging.INFO)
             instance_with_edges = set(range(self.num_instances)) - set(no_edge_instances)
             num_instances_with_edges = len(instance_with_edges)
+
             if self.REM:
                 rem_counts = apply_readout_error_mitigation(
                     backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
