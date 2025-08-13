@@ -4,7 +4,7 @@ Qscore benchmark
 
 import itertools
 import logging
-from time import strftime
+from time import strftime, time
 from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
 from matplotlib.figure import Figure
@@ -742,6 +742,8 @@ class QScoreBenchmark(Benchmark):
     ) -> xr.Dataset:
         """Executes the benchmark."""
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
@@ -873,6 +875,7 @@ class QScoreBenchmark(Benchmark):
 
             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
             # Execute on the backend
+            t_start = time()
             jobs, _ = submit_execute(
                 sorted_transpiled_qc_list,
                 self.backend,
@@ -882,10 +885,12 @@ class QScoreBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
+            total_submit += time() - t_start
             qc_transpiled_list.append(transpiled_qc)
             qcvv_logger.setLevel(logging.INFO)
             instance_with_edges = set(range(self.num_instances)) - set(no_edge_instances)
             num_instances_with_edges = len(instance_with_edges)
+            t_start = time()
             if self.REM:
                 rem_counts = apply_readout_error_mitigation(
                     backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
@@ -897,7 +902,7 @@ class QScoreBenchmark(Benchmark):
                 # execution_results.append(rem_distribution)
             else:
                 execution_results.extend(retrieve_all_counts(jobs)[0])
-
+            total_retrieve += time() - t_start
             dataset.attrs.update(
                 {
                     num_nodes: {
@@ -920,6 +925,8 @@ class QScoreBenchmark(Benchmark):
             )
 
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
 
         return dataset
 

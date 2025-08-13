@@ -17,7 +17,7 @@ Quantum Volume benchmark
 """
 
 from copy import deepcopy
-from time import strftime
+from time import strftime, time
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
 
 from matplotlib.figure import Figure
@@ -716,6 +716,8 @@ class QuantumVolumeBenchmark(Benchmark):
         """Executes the benchmark."""
 
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
@@ -780,7 +782,9 @@ class QuantumVolumeBenchmark(Benchmark):
             all_op_counts[str(qubits)] = count_native_gates(backend, transpiled_qc_list)
 
             # Submit
+            t_start = time()
             all_qv_jobs.append(self.submit_single_qv_job(backend, qubits, sorted_transpiled_qc_list))
+            total_submit += time() - t_start
             qcvv_logger.info(f"Job for layout {qubits} submitted successfully!")
 
         # Retrieve counts of jobs for all qubit layouts
@@ -788,10 +792,11 @@ class QuantumVolumeBenchmark(Benchmark):
         for job_idx, job_dict in enumerate(all_qv_jobs):
             qubits = job_dict["qubits"]
             # Retrieve counts
+            t_start = time()
             execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], str(qubits))
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
-
+            total_retrieve += time() - t_start
             # Export all to dataset
             dataset.attrs.update(
                 {
@@ -829,7 +834,8 @@ class QuantumVolumeBenchmark(Benchmark):
                     self.mit_shots,
                 )
             dataset.attrs.update({"REM_quasidistributions": rem_quasidistros})
-
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         qcvv_logger.info(f"QV experiment execution concluded !")
         return dataset
 
