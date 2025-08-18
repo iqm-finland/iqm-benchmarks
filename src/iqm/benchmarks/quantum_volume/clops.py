@@ -171,12 +171,12 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
             if job_meta[update][batch]["timestamps"] is not None:
                 x = job_meta[update][batch]["timestamps"]
                 job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"  # Is it possible to extract this automatically?
-                compile_f = datetime.strptime(x["compile_end"], job_time_format)
-                compile_i = datetime.strptime(x["compile_start"], job_time_format)
+                compile_f = datetime.strptime(x["compilation_ended"], job_time_format)
+                compile_i = datetime.strptime(x["compilation_started"], job_time_format)
                 # submit_f = datetime.strptime(x["submit_end"], job_time_format)
                 # submit_i = datetime.strptime(x["submit_start"], job_time_format)
-                execution_f = datetime.strptime(x["execution_end"], job_time_format)
-                execution_i = datetime.strptime(x["execution_start"], job_time_format)
+                execution_f = datetime.strptime(x["execution_ended"], job_time_format)
+                execution_i = datetime.strptime(x["execution_started"], job_time_format)
                 job_f = datetime.strptime(x["ready"], job_time_format)
                 job_i = datetime.strptime(x["received"], job_time_format)
 
@@ -457,7 +457,7 @@ class CLOPSBenchmark(Benchmark):
 
     @timeit
     def generate_circuit_list(
-        self,
+            self,
     ) -> List[QuantumCircuit]:
         """Generate a list of parametrized QV quantum circuits, with measurements at the end.
 
@@ -477,11 +477,11 @@ class CLOPSBenchmark(Benchmark):
 
     @timeit
     def assign_random_parameters_to_all(
-        self,
-        dict_parametrized_circs: Dict[Tuple, List[QuantumCircuit]],
-        optimize_sqg: bool,
+            self,
+            dict_parametrized_circs: Dict[Tuple, List[QuantumCircuit]],
+            optimize_sqg: bool,
     ) -> Tuple[List[List[float]], Dict[Tuple, List[QuantumCircuit]]]:
-        """
+        """Assigns random parameters to all parametrized circuits.
 
         Args:
             dict_parametrized_circs (Dict[Tuple, List[QuantumCircuit]]): Dictionary with list of int (qubits) as keys and lists of parametrized quantum circuits as values
@@ -491,30 +491,37 @@ class CLOPSBenchmark(Benchmark):
             - lists of list of float parameter values corresponding to param updates
             - dictionary with lists of int (qubits) as keys and lists of quantum circuits as values
         """
-        # Store parametrized circuits in a separate dictionary
-        sorted_dict_parametrized: Dict[Tuple, List[QuantumCircuit]] = {k: [] for k in dict_parametrized_circs.keys()}
-        param_values: List[List[float]] = []
-        for k in dict_parametrized_circs.keys():
-            for qc in dict_parametrized_circs[k]:
-                # Update parameters
-                parameters = self.generate_random_parameters()
+        # Pre-check if optimization is needed to avoid repeated condition checks
+        can_optimize = optimize_sqg and "move" not in self.backend.architecture.gates
 
-                # Star can't use optimize_sqg as is, yet -> complains about MOVE gate not being IQM native!
-                if optimize_sqg and "move" not in self.backend.architecture.gates:
+        # Pre-allocate the result dictionaries
+        sorted_dict_parametrized = {k: [] for k in dict_parametrized_circs}
+        param_values = []
+
+        # Generate all parameter sets at once
+        total_circuits = sum(len(circuits) for circuits in dict_parametrized_circs.values())
+        all_parameters = [self.generate_random_parameters() for _ in range(total_circuits)]
+        param_idx = 0
+
+        for k, circuits in dict_parametrized_circs.items():
+            for qc in circuits:
+                # Get pre-generated parameters
+                parameters = all_parameters[param_idx]
+                param_idx += 1
+
+                # Create parameter dictionary once
+                param_dict = dict(zip(qc.parameters, parameters))
+
+                # Assign parameters and optionally optimize
+                if can_optimize:
                     sorted_dict_parametrized[k].append(
-                        optimize_single_qubit_gates(  # Optimize SQG seems worth it AFTER assignment
-                            qc.assign_parameters(
-                                dict(zip(qc.parameters, parameters)),
-                                inplace=False,  # Leave the template intact for next updates
-                            )
+                        optimize_single_qubit_gates(
+                            qc.assign_parameters(param_dict, inplace=False)
                         )
                     )
                 else:
                     sorted_dict_parametrized[k].append(
-                        qc.assign_parameters(
-                            dict(zip(qc.parameters, parameters)),
-                            inplace=False,  # Leave the template intact for next updates
-                        )
+                        qc.assign_parameters(param_dict, inplace=False)
                     )
 
                 param_values.append(list(parameters))
@@ -537,7 +544,10 @@ class CLOPSBenchmark(Benchmark):
         """
         # Assign parameters to all quantum circuits
         qcvv_logger.info(
-            f"Update {(update + 1)}/{self.num_updates}\nAssigning random parameters to all {self.num_circuits} circuits"
+            f"Update {(update + 1)}/{self.num_updates}"
+        )
+        qcvv_logger.info(
+            f"Assigning random parameters to all {self.num_circuits} circuits"
         )
         (all_param_updates, sorted_transpiled_qc_list_parametrized), time_parameter_assign = (
             self.assign_random_parameters_to_all(sorted_transpiled_qc_list, self.optimize_sqg)
