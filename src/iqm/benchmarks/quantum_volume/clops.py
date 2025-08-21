@@ -613,7 +613,7 @@ class CLOPSBenchmark(Benchmark):
 
         self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=self.qubits, circuits=qc_list))
         for key in sorted_transpiled_qc_list.keys():
-            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=f"{self.qubits}_{key}", circuits=qc_list))
+            self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=f"{self.qubits}_{key}", circuits=transpiled_qc_list))
 
         return sorted_transpiled_qc_list
 
