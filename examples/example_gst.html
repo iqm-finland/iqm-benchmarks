@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Compressive Gate Set Tomography (GST) &#8212; IQM Benchmarks 2.44 documentation</title>
+    <title>Compressive Gate Set Tomography (GST) &#8212; IQM Benchmarks 2.45 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=dd592762"></script>
+    <script src="../_static/documentation_options.js?v=66a5a57f"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Graph State Bipartite Entanglement" href="example_graphstate.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.44" />
-    <meta name="docbuild:last-update" content="2025-08-11"/>
+  <meta name="docsearch:version" content="2.45" />
+    <meta name="docbuild:last-update" content="2025-08-25"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.44 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.44 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.45 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.45 documentation - Home"/>
   
   
 </a></div>
@@ -445,10 +445,14 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-the-results">Examine the results</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-results-stored-at-result-observations">High level results stored at result.observations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-final-gate-set-estimates-for-further-processing">Accessing the final gate set estimates for further processing</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plots">Plots</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-custom-gate-set">Creating a custom gate set</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plots">Plots</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-of-rank-1-results">Interpretation of rank 1 results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-custom-gate-set-with-context-circuits">Creating a custom gate set with context circuits</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-context-circuit-for-each-gate">Define a context circuit for each gate</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis">Checking out the process matrix corresponding to the pi rotation around the y-axis</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#all-plots-for-the-custom-gate-set">All plots for the custom gate set</a></li>
 </ul>
@@ -472,11 +476,11 @@ For background, see the journal reference at https://journals.aps.org/prxquantum
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 <span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.compressive_gst.compressive_gst</span><span class="w"> </span><span class="kn">import</span> <span class="n">GSTConfiguration</span><span class="p">,</span> <span class="n">CompressiveGST</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.benchmark_definition</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_figure</span>
 </pre></div>
 </div>
 </div>
@@ -513,15 +517,15 @@ A low rank has the benefit of needing less circuits and less computing time, whi
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Minimal_1Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
     <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">]],</span>
     <span class="n">gate_set</span><span class="o">=</span><span class="s2">&quot;1QXYI&quot;</span><span class="p">,</span>
-    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">num_circuits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">rank</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">Minimal_2Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
     <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span>
-    <span class="n">gate_set</span><span class="o">=</span><span class="s2">&quot;2QXYCZ&quot;</span><span class="p">,</span>
+    <span class="n">gate_set</span><span class="o">=</span><span class="s2">&quot;2QXYICZ&quot;</span><span class="p">,</span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">rank</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
@@ -537,23 +541,28 @@ A low rank has the benefit of needing less circuits and less computing time, whi
 <p>Be prepared that the first execution on a new system will take an extra 1-2 minutes to compile the lower level optimization code.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">CompressiveGST</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">Minimal_1Q_GST</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">CompressiveGST</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">Minimal_2Q_GST</span><span class="p">)</span>
 <span class="n">benchmark</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-01 16:06:42,999 - iqm.benchmarks.logging_config - INFO - Now generating 50 random GST circuits...
-2025-04-01 16:06:43,430 - iqm.benchmarks.logging_config - INFO - Will transpile all 50 circuits according to fixed physical layout
-2025-04-01 16:06:43,430 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
-2025-04-01 16:06:44,259 - iqm.benchmarks.logging_config - INFO - Submitting batch with 50 circuits corresponding to qubits [0]
-2025-04-01 16:06:44,338 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
-2025-04-01 16:06:44,434 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-04-01 16:06:46,644 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
- 26%|██▌       | 64/250 [00:01&lt;00:05, 36.20it/s]
-2025-04-01 16:06:48,462 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
-2025-04-01 16:06:48,462 - iqm.benchmarks.logging_config - INFO - Final objective 1.56e-4 in time 1.82s
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-07-18 17:02:28,787 - iqm.benchmarks.logging_config - INFO - Generating 1000 random GST circuits
+2025-07-18 17:02:29,823 - iqm.benchmarks.logging_config - INFO - Will transpile all 1000 circuits according to fixed physical layout
+2025-07-18 17:02:30,504 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
+2025-07-18 17:02:36,603 - iqm.benchmarks.logging_config - INFO - Submitting batch with 1000 circuits corresponding to qubits [0, 1]
+2025-07-18 17:02:37,107 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
+2025-07-18 17:02:37,303 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-07-18 17:02:40,470 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
+2025-07-18 17:02:44,143 - iqm.benchmarks.logging_config - INFO - Execution completed
+2025-07-18 17:02:44,146 - iqm.benchmarks.logging_config - INFO - Running mGST analysis for layout [0, 1]
+2025-07-18 17:02:47,092 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 16%|█▋        | 41/250 [00:27&lt;02:20,  1.49it/s]
+2025-07-18 17:03:14,656 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-07-18 17:03:14,656 - iqm.benchmarks.logging_config - INFO - Final objective 1.90e-4 in time 27.56s
+2025-07-18 17:03:17,958 - iqm.benchmarks.logging_config - INFO - Generating figures for layout 1/1
+2025-07-18 17:03:22,767 - iqm.benchmarks.logging_config - INFO - Analysis completed
 </pre></div>
 </div>
 </div>
@@ -570,10 +579,14 @@ The analysis will give a Hamiltonian parametrization of the gate set and produce
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-01 16:07:55,034 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
- 11%|█         | 27/250 [00:01&lt;00:08, 24.83it/s]
-2025-04-01 16:07:56,147 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
-2025-04-01 16:07:56,148 - iqm.benchmarks.logging_config - INFO - Final objective 1.99e-4 in time 1.11s
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-07-18 17:03:24,808 - iqm.benchmarks.logging_config - INFO - Running mGST analysis for layout [0, 1]
+2025-07-18 17:03:28,172 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 11%|█         | 27/250 [00:16&lt;02:16,  1.63it/s]
+2025-07-18 17:03:44,739 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-07-18 17:03:44,739 - iqm.benchmarks.logging_config - INFO - Final objective 2.18e-4 in time 16.57s
+2025-07-18 17:03:48,582 - iqm.benchmarks.logging_config - INFO - Generating figures for layout 1/1
+2025-07-18 17:03:52,639 - iqm.benchmarks.logging_config - INFO - Generating additional rank 1 figures for all layouts
+2025-07-18 17:03:52,879 - iqm.benchmarks.logging_config - INFO - Analysis completed
 </pre></div>
 </div>
 </div>
@@ -587,7 +600,7 @@ The analysis will give a Hamiltonian parametrization of the gate set and produce
 To access only those observations corresponding to a specific qubit layout, one can use the identifier attribute:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">observation</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">observation</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">string_identifier</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">qubit_layout</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -595,19 +608,28 @@ To access only those observations corresponding to a specific qubit layout, one 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Avg. gate fidelity - Idle:QB1: 0.99693 +/- nan
-Diamond distance - Idle:QB1: 0.00703 +/- nan
-Unitarity - Idle:QB1: 0.98781 +/- nan
-Avg. gate fidelity - Rx(pi/2):QB1: 0.99918 +/- nan
-Diamond distance - Rx(pi/2):QB1: 0.0013 +/- nan
-Unitarity - Rx(pi/2):QB1: 0.99674 +/- nan
-Avg. gate fidelity - Ry(pi/2):QB1: 0.99509 +/- nan
-Diamond distance - Ry(pi/2):QB1: 0.01332 +/- nan
-Unitarity - Ry(pi/2):QB1: 0.98074 +/- nan
-Mean TVD: estimate - data: 0.00698 +/- nan
-Mean TVD: target - data: 0.03296 +/- nan
-POVM - diamond dist.: 0.00601 +/- nan
-State - trace dist.: 0.04366 +/- nan
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>average_gate_fidelity_Idle:QB1:crosstalk_components=QB1__QB2: 0.99786 +/- nan
+diamond_distance_Idle:QB1:crosstalk_components=QB1__QB2: 0.00482 +/- nan
+unitarity_Idle:QB1:crosstalk_components=QB1__QB2: 0.99433 +/- nan
+average_gate_fidelity_Rx_pi_2:QB1:crosstalk_components=QB1__QB2: 0.99423 +/- nan
+diamond_distance_Rx_pi_2:QB1:crosstalk_components=QB1__QB2: 0.00819 +/- nan
+unitarity_Rx_pi_2:QB1:crosstalk_components=QB1__QB2: 0.98472 +/- nan
+average_gate_fidelity_Rx_pi_2:QB2:crosstalk_components=QB1__QB2: 0.99594 +/- nan
+diamond_distance_Rx_pi_2:QB2:crosstalk_components=QB1__QB2: 0.00645 +/- nan
+unitarity_Rx_pi_2:QB2:crosstalk_components=QB1__QB2: 0.98929 +/- nan
+average_gate_fidelity_Ry_pi_2:QB1:crosstalk_components=QB1__QB2: 0.99514 +/- nan
+diamond_distance_Ry_pi_2:QB1:crosstalk_components=QB1__QB2: 0.00755 +/- nan
+unitarity_Ry_pi_2:QB1:crosstalk_components=QB1__QB2: 0.98716 +/- nan
+average_gate_fidelity_Ry_pi_2:QB2:crosstalk_components=QB1__QB2: 0.99569 +/- nan
+diamond_distance_Ry_pi_2:QB2:crosstalk_components=QB1__QB2: 0.00566 +/- nan
+unitarity_Ry_pi_2:QB2:crosstalk_components=QB1__QB2: 0.9886 +/- nan
+average_gate_fidelity_cz:QB1__QB2:crosstalk_components=QB1__QB2: 0.9903 +/- nan
+diamond_distance_cz:QB1__QB2:crosstalk_components=QB1__QB2: 0.01348 +/- nan
+unitarity_cz:QB1__QB2:crosstalk_components=QB1__QB2: 0.97447 +/- nan
+mean_tvd_estimate_data: 0.02108 +/- nan
+mean_tvd_target_data: 0.05824 +/- nan
+povm_diamond_distance: 0.05872 +/- nan
+state_trace_distance: 0.02263 +/- nan
 </pre></div>
 </div>
 </div>
@@ -618,13 +640,13 @@ State - trace dist.: 0.04366 +/- nan
 <p>In addition to the high level observations above, the full process matrices for each gate and the full parametrizations for initial state and measurement are stored. They can be accessed under <code class="docutils literal notranslate"><span class="pre">result.dataset.attrs[f&quot;results_layout_{qubit_layout}&quot;]</span></code> as follows.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;results_layout_</span><span class="si">{</span><span class="n">qubit_layout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;raw_Kraus_operators&#39;, &#39;raw_gates&#39;, &#39;raw_POVM&#39;, &#39;raw_state&#39;, &#39;gauge_opt_gates&#39;, &#39;gauge_opt_gates_Pauli_basis&#39;, &#39;gauge_opt_POVM&#39;, &#39;gauge_opt_state&#39;, &#39;main_mGST_time&#39;, &#39;gauge_optimization_time&#39;, &#39;choi_evals&#39;, &#39;full_metrics&#39;])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;raw_Kraus_operators&#39;, &#39;raw_gates&#39;, &#39;raw_POVM&#39;, &#39;raw_state&#39;, &#39;gauge_opt_gates&#39;, &#39;gauge_opt_gates_Pauli_basis&#39;, &#39;gauge_opt_POVM&#39;, &#39;gauge_opt_state&#39;, &#39;target_gates&#39;, &#39;target_gates_Pauli_basis&#39;, &#39;target_POVM&#39;, &#39;target_state&#39;, &#39;main_mGST_time&#39;, &#39;gauge_optimization_time&#39;, &#39;choi_evals&#39;, &#39;full_metrics&#39;])
 </pre></div>
 </div>
 </div>
@@ -647,17 +669,78 @@ In most instances the gauge-optimized gate set should be used for further proces
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.995+0.j    -0.002-0.002j -0.002+0.002j  0.002+0.j   ]
- [ 0.005-0.002j  0.994-0.003j  0.002-0.002j -0.005+0.004j]
- [ 0.005+0.002j  0.002+0.002j  0.994+0.003j -0.005-0.004j]
- [ 0.005+0.j     0.002+0.002j  0.002-0.002j  0.998+0.j   ]]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.995+0.j     0.   +0.j    -0.002+0.001j -0.001-0.001j  0.   -0.j
+   0.001+0.j     0.   +0.j     0.   +0.j    -0.002-0.001j  0.   -0.j
+   0.001+0.j     0.   +0.j    -0.001+0.001j  0.   -0.j     0.   -0.j
+   0.   +0.j   ]
+ [-0.002-0.002j  0.995-0.003j  0.001-0.002j  0.001+0.001j -0.001-0.001j
+  -0.001-0.j     0.   +0.j     0.   +0.j    -0.   +0.j    -0.002-0.001j
+  -0.   -0.j    -0.   +0.j    -0.   -0.j    -0.001+0.001j  0.   +0.j
+   0.   +0.j   ]
+ [ 0.001+0.002j -0.001-0.002j  0.997-0.004j  0.002-0.j    -0.   -0.j
+   0.   -0.j    -0.   -0.j     0.   +0.j    -0.   +0.j     0.   -0.j
+  -0.002-0.001j  0.   -0.j     0.   -0.j    -0.   -0.j    -0.001+0.001j
+  -0.   -0.j   ]
+ [ 0.001-0.001j -0.001+0.001j -0.002-0.j     0.997+0.j    -0.   -0.j
+  -0.   +0.j    -0.001-0.j    -0.   -0.j    -0.   +0.j     0.   +0.j
+  -0.   +0.j    -0.002-0.002j  0.   +0.j     0.   -0.j    -0.   +0.j
+  -0.001+0.001j]
+ [-0.002+0.002j -0.001+0.001j -0.   -0.j    -0.   +0.j     0.995+0.003j
+  -0.001+0.j    -0.002+0.001j -0.001-0.001j  0.001+0.002j  0.   -0.j
+  -0.   +0.j     0.   -0.j     0.001-0.001j  0.   -0.j    -0.   -0.j
+   0.   -0.j   ]
+ [ 0.002+0.j    -0.   +0.j    -0.   +0.j    -0.   +0.j    -0.   -0.j
+   0.998+0.j     0.001-0.002j  0.001+0.001j -0.   -0.j     0.001+0.002j
+   0.   +0.j     0.   +0.j    -0.   -0.j     0.001-0.001j  0.   -0.j
+   0.   +0.j   ]
+ [ 0.   +0.j    -0.   +0.j    -0.001+0.001j -0.001+0.j     0.001+0.001j
+  -0.002-0.002j  0.998-0.001j  0.001-0.j    -0.   -0.j     0.   +0.j
+   0.001+0.002j  0.   +0.j     0.   -0.j     0.   -0.j     0.001-0.001j
+   0.   -0.j   ]
+ [ 0.   +0.j     0.   -0.j     0.001-0.j    -0.001+0.001j  0.001-0.001j
+  -0.001+0.001j -0.001+0.j     0.998+0.003j -0.   -0.j    -0.   +0.j
+  -0.   +0.j     0.001+0.002j  0.   -0.j    -0.   -0.j    -0.   -0.j
+   0.001-0.001j]
+ [ 0.001-0.002j -0.   +0.j    -0.   -0.j     0.   +0.j    -0.001+0.002j
+   0.   +0.j     0.   +0.j    -0.   +0.j     0.997+0.004j -0.   +0.j
+  -0.002+0.001j -0.001-0.001j  0.002+0.j     0.   -0.j     0.   +0.j
+  -0.   +0.j   ]
+ [ 0.   -0.j     0.001-0.001j -0.   +0.j     0.   +0.j    -0.   -0.j
+  -0.002+0.002j  0.   -0.j     0.   +0.j    -0.001-0.001j  0.998+0.001j
+   0.001-0.002j  0.001+0.001j -0.001-0.j     0.001+0.j     0.   -0.j
+   0.   +0.j   ]
+ [ 0.002+0.j    -0.   -0.j     0.002-0.001j  0.   -0.j    -0.   +0.j
+   0.   +0.j    -0.001+0.002j  0.   +0.j     0.002+0.001j -0.001-0.002j
+   0.999+0.j     0.001-0.j     0.   +0.j     0.   -0.j     0.001+0.j
+   0.001+0.j   ]
+ [ 0.   +0.j     0.001+0.j    -0.   -0.j     0.001-0.001j -0.   -0.j
+  -0.   +0.j    -0.   -0.j    -0.001+0.002j  0.001-0.001j -0.001+0.001j
+  -0.001-0.j     0.999+0.005j -0.   -0.j    -0.   +0.j    -0.   -0.j
+   0.001+0.j   ]
+ [ 0.001+0.001j -0.   +0.j    -0.   -0.j     0.   -0.j    -0.001-0.001j
+  -0.   -0.j     0.   -0.j     0.   +0.j    -0.002+0.j    -0.001+0.j
+  -0.   -0.j    -0.   -0.j     0.997-0.j    -0.   +0.j    -0.002+0.002j
+  -0.001-0.001j]
+ [ 0.   -0.j     0.001+0.001j -0.   +0.j     0.   +0.j     0.   +0.j
+  -0.001-0.001j -0.   -0.j    -0.   +0.j     0.001+0.j    -0.001-0.j
+  -0.   -0.j    -0.   +0.j    -0.001-0.001j  0.998-0.003j  0.001-0.002j
+   0.001+0.001j]
+ [ 0.   -0.j    -0.   +0.j     0.001+0.001j -0.   +0.j     0.001-0.j
+  -0.   -0.j    -0.001-0.001j -0.   -0.j    -0.   +0.j    -0.   +0.j
+  -0.001+0.j    -0.   +0.j     0.001+0.001j -0.001-0.002j  0.999-0.005j
+   0.001-0.j   ]
+ [ 0.   +0.j     0.   -0.j     0.   -0.j     0.001+0.001j  0.   +0.j
+   0.001+0.j     0.   +0.j    -0.001-0.001j  0.   +0.j     0.   -0.j
+   0.001+0.j    -0.001+0.j     0.001-0.001j -0.001+0.001j -0.001-0.j
+   0.999+0.j   ]]
 </pre></div>
 </div>
 </div>
 </div>
 </section>
+</section>
 <section id="plots">
-<h3>Plots<a class="headerlink" href="#plots" title="Link to this heading">#</a></h3>
+<h2>Plots<a class="headerlink" href="#plots" title="Link to this heading">#</a></h2>
 <p>The plots can be accessed in the notebook via result.plots, a dictionary containing all figure objects. These can then be diplayed as shown below, or saved to disc from the notebook.
 Currently all gauge optimized gate superoperators are shown as matrix plots in their Pauli basis representation, while the state preparation and measurement outcomes are shown as matrix plots in standard basis.
 For reference, a sinlge qubit superoperator for gate <span class="math notranslate nohighlight">\(G\)</span> in the Pauli-basis has entries <span class="math notranslate nohighlight">\(G_{ij}\)</span> defined via
@@ -670,39 +753,60 @@ where \)</span>P_i, P_j$ are Pauli matrices.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-<span class="n">result</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0]_gate_metrics&#39;</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0, 1]_gate_metrics&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;layout_[0]_choi_eigenvalues&#39;, &#39;layout_[0]_gate_metrics&#39;, &#39;layout_[0]_other_metrics&#39;, &#39;layout_[0]_process_matrix_0&#39;, &#39;layout_[0]_process_matrix_1&#39;, &#39;layout_[0]_process_matrix_2&#39;, &#39;layout_[0]_SPAM_matrices_real&#39;, &#39;layout_[0]_SPAM_matrices_imag&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;layout_[0, 1]_choi_eigenvalues&#39;, &#39;layout_[0, 1]_gate_metrics&#39;, &#39;layout_[0, 1]_other_metrics&#39;, &#39;layout_[0, 1]_process_matrix_0&#39;, &#39;layout_[0, 1]_process_matrix_1&#39;, &#39;layout_[0, 1]_process_matrix_2&#39;, &#39;layout_[0, 1]_process_matrix_3&#39;, &#39;layout_[0, 1]_process_matrix_4&#39;, &#39;layout_[0, 1]_process_matrix_5&#39;, &#39;layout_[0, 1]_SPAM_matrices_real&#39;, &#39;layout_[0, 1]_SPAM_matrices_imag&#39;]
 </pre></div>
 </div>
-<img alt="../_images/85973b8a8da2e8539b4c570bd26a3cf94b41010b39267c1e8e3108bc9f05b932.png" src="../_images/85973b8a8da2e8539b4c570bd26a3cf94b41010b39267c1e8e3108bc9f05b932.png" />
+<img alt="../_images/08ca6db66dfeeb2e7bcd9e582550329c6b82c569be5a679311a218d18f8aced1.png" src="../_images/08ca6db66dfeeb2e7bcd9e582550329c6b82c569be5a679311a218d18f8aced1.png" />
 </div>
 </div>
-<p>Rank 1 results (for example the gate Hamiltonians in the Pauli basis)</p>
+<section id="interpretation-of-rank-1-results">
+<h3>Interpretation of rank 1 results<a class="headerlink" href="#interpretation-of-rank-1-results" title="Link to this heading">#</a></h3>
+<p>The rank 1 results are parametrized gate Hamiltonians in the Pauli basis, which for two qubits is defined as
+$<span class="math notranslate nohighlight">\(
+U = e^{i H} \quad \text{with} \quad H = \frac{\pi}{2} \sum_{a, a' \in \{I, X, Y, Z\}} h_{a, a'}\, \sigma_{a} \otimes \sigma_{a'}.
+\)</span><span class="math notranslate nohighlight">\(
+Here \)</span>\sigma_I<span class="math notranslate nohighlight">\( is the single qubit identity operator, \)</span>\sigma_X<span class="math notranslate nohighlight">\(, \)</span>\sigma_Y<span class="math notranslate nohighlight">\(, and \)</span>\sigma_Z<span class="math notranslate nohighlight">\( are the Pauli operators, and \)</span>h_{a, a’}<span class="math notranslate nohighlight">\( are the Hamiltonian parameters.
+For example, the CZ gate in this parametrization is defined by the Hamiltonian
+\)</span><span class="math notranslate nohighlight">\(
+H_{\text{CZ}} = \frac{\pi}{2} \left(-\frac{1}{2}\sigma_{I}\otimes \sigma_{I} +\frac{1}{2}\sigma_{Z} \otimes \sigma_{I} +\frac{1}{2}\sigma_{I} \otimes \sigma_{Z} - \frac{1}{2}\sigma_{Z} \otimes \sigma_{Z} \right).
+\)</span><span class="math notranslate nohighlight">\(
+So for instance, a perfect single qubit \)</span>\pi/2<span class="math notranslate nohighlight">\( pulse on the first qubit is given by \)</span>h_{X, I} = 0.5<span class="math notranslate nohighlight">\( and \)</span>h_{a, a’} = 0 \enspace \forall \enspace (a,a’)\neq (X,I)$.</p>
+<p>Two plots are generated for each gate, one showing the Hamiltonian parameters in the Pauli basis, and one showing the largest deviations from the ideal Hamiltonian.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result_rK1</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-<span class="n">result_rK1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0]_hamiltonian_parameters&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display all plot names</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result_rK1</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="c1"># Show two exammple plots for the Rx_pi/2 gate on qubit 0</span>
+<span class="n">fig_1</span> <span class="o">=</span> <span class="n">result_rK1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0, 1]_Rx_pi_2:QB1_Hamiltonian&#39;</span><span class="p">)</span>
+<span class="n">fig_2</span> <span class="o">=</span> <span class="n">result_rK1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;layout_[0, 1]_Rx_pi_2:QB1_largest_coherent_errs&#39;</span><span class="p">)</span>
+<span class="n">show_figure</span><span class="p">(</span><span class="n">fig_1</span><span class="p">),</span> <span class="n">show_figure</span><span class="p">(</span><span class="n">fig_2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;layout_[0]_hamiltonian_parameters&#39;, &#39;layout_[0]_gate_metrics&#39;, &#39;layout_[0]_other_metrics&#39;, &#39;layout_[0]_process_matrix_0&#39;, &#39;layout_[0]_process_matrix_1&#39;, &#39;layout_[0]_process_matrix_2&#39;, &#39;layout_[0]_SPAM_matrices_real&#39;, &#39;layout_[0]_SPAM_matrices_imag&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;layout_[0, 1]_gate_metrics&#39;, &#39;layout_[0, 1]_other_metrics&#39;, &#39;layout_[0, 1]_process_matrix_0&#39;, &#39;layout_[0, 1]_process_matrix_1&#39;, &#39;layout_[0, 1]_process_matrix_2&#39;, &#39;layout_[0, 1]_process_matrix_3&#39;, &#39;layout_[0, 1]_process_matrix_4&#39;, &#39;layout_[0, 1]_process_matrix_5&#39;, &#39;layout_[0, 1]_SPAM_matrices_real&#39;, &#39;layout_[0, 1]_SPAM_matrices_imag&#39;, &#39;layout_[0, 1]_Idle:QB1_Hamiltonian&#39;, &#39;layout_[0, 1]_Idle:QB1_largest_coherent_errs&#39;, &#39;layout_[0, 1]_Rx_pi_2:QB1_Hamiltonian&#39;, &#39;layout_[0, 1]_Rx_pi_2:QB1_largest_coherent_errs&#39;, &#39;layout_[0, 1]_Rx_pi_2:QB2_Hamiltonian&#39;, &#39;layout_[0, 1]_Rx_pi_2:QB2_largest_coherent_errs&#39;, &#39;layout_[0, 1]_Ry_pi_2:QB1_Hamiltonian&#39;, &#39;layout_[0, 1]_Ry_pi_2:QB1_largest_coherent_errs&#39;, &#39;layout_[0, 1]_Ry_pi_2:QB2_Hamiltonian&#39;, &#39;layout_[0, 1]_Ry_pi_2:QB2_largest_coherent_errs&#39;, &#39;layout_[0, 1]_cz:QB1__QB2_Hamiltonian&#39;, &#39;layout_[0, 1]_cz:QB1__QB2_largest_coherent_errs&#39;]
 </pre></div>
 </div>
-<img alt="../_images/fb8fc196a1797b6e27812197746f860defc9cc60b0468dcac5a05751c2608120.png" src="../_images/fb8fc196a1797b6e27812197746f860defc9cc60b0468dcac5a05751c2608120.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(None, None)
+</pre></div>
+</div>
+<img alt="../_images/0a3616216a3e3aa2a1805dc19180658abc190fa30f873edc8ce93ca4efa7eb5c.png" src="../_images/0a3616216a3e3aa2a1805dc19180658abc190fa30f873edc8ce93ca4efa7eb5c.png" />
+<img alt="../_images/bd045ea2cca4be340ce9f97bd622b30ba93ab13def388782b4bc153d98671e24.png" src="../_images/bd045ea2cca4be340ce9f97bd622b30ba93ab13def388782b4bc153d98671e24.png" />
 </div>
 </div>
 <p>Alternatively, all plots (of all layouts) can be displayed via <code class="docutils literal notranslate"><span class="pre">result.plot_all()</span></code>.</p>
 </section>
 </section>
-<section id="creating-a-custom-gate-set">
-<h2>Creating a custom gate set<a class="headerlink" href="#creating-a-custom-gate-set" title="Link to this heading">#</a></h2>
+<section id="creating-a-custom-gate-set-with-context-circuits">
+<h2>Creating a custom gate set with context circuits<a class="headerlink" href="#creating-a-custom-gate-set-with-context-circuits" title="Link to this heading">#</a></h2>
 <p>In this example we define a gate set ourselves as a list of quantum circuits. The example gate set chosen here is the “XYI” gate set with the addition of <span class="math notranslate nohighlight">\(\pi\)</span>-rotations around the X- and Y-axis.
-Note that we also increased the number of random GST sequences in the GST configuration from 50 to 100 to account for the larger gate set.</p>
+Note the number of random gate sequences also needs to be increased if the gate set is extended.</p>
+<p>To account for realistic noise, we can add gates that act simultaneously on other qubits, for instance, a layer of CZ gates. We refer to this as a “context” for the gate set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span>
@@ -743,16 +847,44 @@ q: ┤ R(π,π/2) ├
 </div>
 </div>
 </div>
+<section id="define-a-context-circuit-for-each-gate">
+<h3>Define a context circuit for each gate<a class="headerlink" href="#define-a-context-circuit-for-each-gate" title="Link to this heading">#</a></h3>
+<p>The context can be either a single circuit that is added to all gates, or a list of circuits with the same length as the gate set. Each context circuit is defined on the whole backend, while in contrast we defined the gate set above just on one qubit. The reason is that we can now control on which qubits the actual GST gates are applied with the <code class="docutils literal notranslate"><span class="pre">qubit_layouts</span></code> parameter in the GST configuration. It is also possible to run GST in parallel on multiple qubit layouts, while applying the context circuits on qubits outside the layout simultaneously.</p>
+<p>In case there is a conflict between qubits used for GST and the qubits on which the context circuit is defined, an error will be raised.
+Both the gate set and the context circuits are only transpiled to the backend but not optimized in any way, since this could lead to inconsistency in the result interpretation.</p>
+<p>Furthermore, the context circuits need to be defined on the whole backend, to ensure that they are applied on the correct qubits.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># First get the backend object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_iqm_backend</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="n">get_iqm_backend</span><span class="p">(</span><span class="s2">&quot;IQMFakeApollo&quot;</span><span class="p">)</span>
+<span class="c1"># Define context circuits for each gate</span>
+<span class="n">gate_context</span> <span class="o">=</span> <span class="p">[</span><span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="c1"># Add a CZ gate between qubits 1 and 2 to each context circuit</span>
+<span class="k">for</span> <span class="n">gate</span> <span class="ow">in</span> <span class="n">gate_context</span><span class="p">:</span>
+    <span class="n">gate</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># Visualize the circuit ignoring idling qubits</span>
+<span class="n">gate_context</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">idle_wires</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="word-wrap: normal;white-space: pre;background: #fff0;line-height: 1.1;font-family: &quot;Courier New&quot;,Courier,monospace">        
+q_1: ─■─
+      │ 
+q_2: ─■─
+        </pre></div></div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CUSTOM_1Q_GST</span> <span class="o">=</span> <span class="n">GSTConfiguration</span><span class="p">(</span>
     <span class="n">qubit_layouts</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">]],</span>
     <span class="n">gate_set</span><span class="o">=</span><span class="n">gate_set</span><span class="p">,</span>
     <span class="n">gate_labels</span> <span class="o">=</span> <span class="n">gate_labels</span><span class="p">,</span>
+    <span class="n">gate_context</span><span class="o">=</span><span class="n">gate_context</span><span class="p">,</span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">rank</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">bootstrap_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -768,20 +900,26 @@ q: ┤ R(π,π/2) ├
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-01-08 12:51:46,758 - iqm.benchmarks.logging_config - INFO - Now generating 100 random GST circuits...
-2025-01-08 12:51:46,806 - iqm.benchmarks.logging_config - INFO - Will transpile all 100 circuits according to fixed physical layout
-2025-01-08 12:51:46,806 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
-2025-01-08 12:51:47,075 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [0]
-2025-01-08 12:51:47,075 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
-2025-01-08 12:51:47,391 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-01-08 12:51:49,408 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
- 12%|█████████▋                                                                       | 12/100 [00:19&lt;02:22,  1.61s/it]
-2025-01-08 12:52:08,800 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
-2025-01-08 12:52:08,803 - iqm.benchmarks.logging_config - INFO - Final objective 2.42e-4 in time 19.39s
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-07-18 17:03:56,615 - iqm.benchmarks.logging_config - INFO - Generating 100 random GST circuits
+2025-07-18 17:03:56,642 - iqm.benchmarks.logging_config - INFO - Will transpile all 100 circuits according to fixed physical layout
+2025-07-18 17:03:56,690 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 0, sabre routing method all circuits
+2025-07-18 17:03:57,546 - iqm.benchmarks.logging_config - INFO - Submitting batch with 100 circuits corresponding to qubits [0]
+2025-07-18 17:03:57,626 - iqm.benchmarks.logging_config - INFO - Now executing the corresponding circuit batch
+2025-07-18 17:03:57,753 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2025-07-18 17:03:58,320 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
+2025-07-18 17:03:58,572 - iqm.benchmarks.logging_config - INFO - Run completed
+2025-07-18 17:03:58,575 - iqm.benchmarks.logging_config - INFO - Running mGST analysis for layout [0]
+2025-07-18 17:03:58,889 - iqm.benchmarks.logging_config - INFO - Starting mGST optimization...
+ 12%|█▏        | 29/250 [00:01&lt;00:14, 15.43it/s]
+2025-07-18 17:04:00,772 - iqm.benchmarks.logging_config - INFO - Convergence criterion satisfied
+2025-07-18 17:04:00,772 - iqm.benchmarks.logging_config - INFO - Final objective 1.88e-4 in time 1.88s
+2025-07-18 17:04:01,006 - iqm.benchmarks.logging_config - INFO - Generating figures for layout 1/1
+2025-07-18 17:04:02,050 - iqm.benchmarks.logging_config - INFO - Analysis completed
 </pre></div>
 </div>
 </div>
 </div>
+</section>
 <section id="checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis">
 <h3>Checking out the process matrix corresponding to the pi rotation around the y-axis<a class="headerlink" href="#checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
@@ -792,10 +930,10 @@ q: ┤ R(π,π/2) ├
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.011+0.j    -0.001-0.002j -0.001+0.002j  0.998+0.j   ]
- [-0.003-0.008j -0.   -0.004j -0.989-0.001j  0.003-0.001j]
- [-0.003+0.008j -0.989+0.001j -0.   +0.004j  0.003+0.001j]
- [ 0.989+0.j     0.001+0.002j  0.001-0.002j  0.002+0.j   ]]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.005+0.j     0.   +0.001j  0.   -0.001j  0.998+0.j   ]
+ [ 0.   -0.001j  0.   +0.001j -0.996+0.004j  0.001+0.002j]
+ [ 0.   +0.001j -0.996-0.004j  0.   -0.001j  0.001-0.002j]
+ [ 0.995+0.j    -0.   -0.001j -0.   +0.001j  0.002+0.j   ]]
 </pre></div>
 </div>
 </div>
@@ -810,16 +948,16 @@ q: ┤ R(π,π/2) ├
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/d1b965e9c8b5fc07749f1c7684339bd57ca0a9800c169ac91ea2a7ac68b64369.png" src="../_images/d1b965e9c8b5fc07749f1c7684339bd57ca0a9800c169ac91ea2a7ac68b64369.png" />
-<img alt="../_images/56d729004c20df034e43a33bd493f9c8e298609c841b87800cf5c301e029fcb1.png" src="../_images/56d729004c20df034e43a33bd493f9c8e298609c841b87800cf5c301e029fcb1.png" />
-<img alt="../_images/5867fdf371ca5a7d2dd6efbcdd71cbc35902f250c09e85982e171132a34e3dc8.png" src="../_images/5867fdf371ca5a7d2dd6efbcdd71cbc35902f250c09e85982e171132a34e3dc8.png" />
-<img alt="../_images/dc02c6e6ae2ee4e7a1ec2ad3e9dd7ca027ca5a8fe59b7f8192a751271363322d.png" src="../_images/dc02c6e6ae2ee4e7a1ec2ad3e9dd7ca027ca5a8fe59b7f8192a751271363322d.png" />
-<img alt="../_images/d94b860faf9e2f85c365d1fe46446f0a8992270785ca0bca0c43e4a00b59e3d8.png" src="../_images/d94b860faf9e2f85c365d1fe46446f0a8992270785ca0bca0c43e4a00b59e3d8.png" />
-<img alt="../_images/ed3c5716b3ee706d57efc0761a5f6c857ca1df3aa633291252d7697bf8bebfa6.png" src="../_images/ed3c5716b3ee706d57efc0761a5f6c857ca1df3aa633291252d7697bf8bebfa6.png" />
-<img alt="../_images/3d85a31dd89d74a84e813104d2caeeef849238687c09a099b2c70be12a31c3d6.png" src="../_images/3d85a31dd89d74a84e813104d2caeeef849238687c09a099b2c70be12a31c3d6.png" />
-<img alt="../_images/ce4ebb4b07dd8368a0a58e4897c0715f769acb20055ecd3e2036fde7ade85707.png" src="../_images/ce4ebb4b07dd8368a0a58e4897c0715f769acb20055ecd3e2036fde7ade85707.png" />
-<img alt="../_images/f114e5448332b4d898042c166e1baf2c7be8a9f318d34e48b089cb299cad7608.png" src="../_images/f114e5448332b4d898042c166e1baf2c7be8a9f318d34e48b089cb299cad7608.png" />
-<img alt="../_images/bcc049ab4010d634817b39e2f5796ec8959564f81544c859ba16653d3e37f913.png" src="../_images/bcc049ab4010d634817b39e2f5796ec8959564f81544c859ba16653d3e37f913.png" />
+<img alt="../_images/a253fd3212dd32e4defb737260ac8100f465170a23a408a67704f28822051572.png" src="../_images/a253fd3212dd32e4defb737260ac8100f465170a23a408a67704f28822051572.png" />
+<img alt="../_images/8ef23d4e949d3590cd915bcbc02fc4e62c267e5a38792d198f520e5f9aef44a9.png" src="../_images/8ef23d4e949d3590cd915bcbc02fc4e62c267e5a38792d198f520e5f9aef44a9.png" />
+<img alt="../_images/f6e64d99e2151836335d5a27f43afad4dfa640ba17d4798ce44913e4a6e30eda.png" src="../_images/f6e64d99e2151836335d5a27f43afad4dfa640ba17d4798ce44913e4a6e30eda.png" />
+<img alt="../_images/42c7919a5f851b8c304416cea8807f490d197ef9e8398dc61790affb994b0c6f.png" src="../_images/42c7919a5f851b8c304416cea8807f490d197ef9e8398dc61790affb994b0c6f.png" />
+<img alt="../_images/a81c907ae51886fee9cc65d0f4283b6a357f712438b24cbbe80da51afacde3c7.png" src="../_images/a81c907ae51886fee9cc65d0f4283b6a357f712438b24cbbe80da51afacde3c7.png" />
+<img alt="../_images/ec8d88db01c3e2f687e73014036bfa17e80b01f72a0fae379edd2978b354aacc.png" src="../_images/ec8d88db01c3e2f687e73014036bfa17e80b01f72a0fae379edd2978b354aacc.png" />
+<img alt="../_images/b7a037a0d300d3e78bb27e64d257d6636c9d9677d15f3e76bfbfff7bf2655142.png" src="../_images/b7a037a0d300d3e78bb27e64d257d6636c9d9677d15f3e76bfbfff7bf2655142.png" />
+<img alt="../_images/611ca62d02831cb37a001b76cc05b265d1ae5fcddedb69544e6c9f2d21d06656.png" src="../_images/611ca62d02831cb37a001b76cc05b265d1ae5fcddedb69544e6c9f2d21d06656.png" />
+<img alt="../_images/3ab178256fa059723a62b44a367dabe79ddad4aba063d43addc5c1f5bfd336ad.png" src="../_images/3ab178256fa059723a62b44a367dabe79ddad4aba063d43addc5c1f5bfd336ad.png" />
+<img alt="../_images/cb76dbe17d52f7800c9c24158eb0cb94eb065a61de33e9b43e76cc317536bec0.png" src="../_images/cb76dbe17d52f7800c9c24158eb0cb94eb065a61de33e9b43e76cc317536bec0.png" />
 </div>
 </div>
 </section>
@@ -878,10 +1016,14 @@ q: ┤ R(π,π/2) ├
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-the-results">Examine the results</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-results-stored-at-result-observations">High level results stored at result.observations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-final-gate-set-estimates-for-further-processing">Accessing the final gate set estimates for further processing</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plots">Plots</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-custom-gate-set">Creating a custom gate set</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plots">Plots</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-of-rank-1-results">Interpretation of rank 1 results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-custom-gate-set-with-context-circuits">Creating a custom gate set with context circuits</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-context-circuit-for-each-gate">Define a context circuit for each gate</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-out-the-process-matrix-corresponding-to-the-pi-rotation-around-the-y-axis">Checking out the process matrix corresponding to the pi rotation around the y-axis</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#all-plots-for-the-custom-gate-set">All plots for the custom gate set</a></li>
 </ul>
@@ -919,7 +1061,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-08-11.
+  Last updated on 2025-08-25.
   <br/>
 </p>
   </div>

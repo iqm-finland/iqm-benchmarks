@@ -17,6 +17,7 @@ iqm.benchmarks.compressive\_gst.compressive\_gst.GSTConfiguration
       ~GSTConfiguration.benchmark
       ~GSTConfiguration.qubit_layouts
       ~GSTConfiguration.gate_set
+      ~GSTConfiguration.gate_context
       ~GSTConfiguration.num_circuits
       ~GSTConfiguration.rank
       ~GSTConfiguration.shots
@@ -29,7 +30,7 @@ iqm.benchmarks.compressive\_gst.compressive\_gst.GSTConfiguration
       ~GSTConfiguration.convergence_criteria
       ~GSTConfiguration.batch_size
       ~GSTConfiguration.bootstrap_samples
-      ~GSTConfiguration.testing
+      ~GSTConfiguration.verbose_level
       ~GSTConfiguration.parallel_execution
       ~GSTConfiguration.max_gates_per_batch
       ~GSTConfiguration.max_circuits_per_batch

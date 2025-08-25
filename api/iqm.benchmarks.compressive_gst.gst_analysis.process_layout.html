@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels &#8212; IQM Benchmarks 2.44 documentation</title>
+    <title>iqm.benchmarks.compressive_gst.gst_analysis.process_layout &#8212; IQM Benchmarks 2.45 documentation</title>
   
   
   
@@ -41,20 +41,20 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=dd592762"></script>
+    <script src="../_static/documentation_options.js?v=66a5a57f"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/iqm.benchmarks.compressive_gst.gst_analysis.process_layout';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iqm.benchmarks.compressive_gst.gst_analysis.generate_gate_results" href="iqm.benchmarks.compressive_gst.gst_analysis.generate_gate_results.html" />
-    <link rel="prev" title="iqm.benchmarks.compressive_gst.gst_analysis.dataset_counts_to_mgst_format" href="iqm.benchmarks.compressive_gst.gst_analysis.dataset_counts_to_mgst_format.html" />
+    <link rel="next" title="iqm.benchmarks.compressive_gst.gst_analysis.process_plots" href="iqm.benchmarks.compressive_gst.gst_analysis.process_plots.html" />
+    <link rel="prev" title="iqm.benchmarks.compressive_gst.gst_analysis.process_bootstrap_samples" href="iqm.benchmarks.compressive_gst.gst_analysis.process_bootstrap_samples.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.44" />
-    <meta name="docbuild:last-update" content="2025-08-11"/>
+  <meta name="docsearch:version" content="2.45" />
+    <meta name="docbuild:last-update" content="2025-08-25"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.44 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.44 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.45 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.45 documentation - Home"/>
   
   
 </a></div>
@@ -351,7 +351,7 @@
       
       
       
-      <li><a href="../_sources/api/iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels.rst" target="_blank"
+      <li><a href="../_sources/api/iqm.benchmarks.compressive_gst.gst_analysis.process_layout.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -427,7 +427,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels</h1>
+    <h1>iqm.benchmarks.compressive_gst.gst_analysis.process_layout</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -437,7 +437,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels"><code class="docutils literal notranslate"><span class="pre">generate_basis_labels()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.compressive_gst.gst_analysis.process_layout"><code class="docutils literal notranslate"><span class="pre">process_layout()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -449,31 +449,43 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="iqm-benchmarks-compressive-gst-gst-analysis-generate-basis-labels">
-<h1>iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels<a class="headerlink" href="#iqm-benchmarks-compressive-gst-gst-analysis-generate-basis-labels" title="Link to this heading">#</a></h1>
+  <section id="iqm-benchmarks-compressive-gst-gst-analysis-process-layout">
+<h1>iqm.benchmarks.compressive_gst.gst_analysis.process_layout<a class="headerlink" href="#iqm-benchmarks-compressive-gst-gst-analysis-process-layout" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels">
-<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.compressive_gst.gst_analysis.</span></span><span class="sig-name descname"><span class="pre">generate_basis_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels" title="Link to this definition">#</a></dt>
-<dd><p>Generate a list of labels for the Pauli basis or the standard basis</p>
+<dt class="sig sig-object py" id="iqm.benchmarks.compressive_gst.gst_analysis.process_layout">
+<span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.compressive_gst.gst_analysis.</span></span><span class="sig-name descname"><span class="pre">process_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Dataset</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="iqm.benchmarks.benchmark_definition.BenchmarkObservation.html#iqm.benchmarks.benchmark_definition.BenchmarkObservation" title="iqm.benchmarks.benchmark_definition.BenchmarkObservation"><span class="pre">BenchmarkObservation</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.compressive_gst.gst_analysis.process_layout" title="Link to this definition">#</a></dt>
+<dd><p>Process a single qubit layout for Gate Set Tomography analysis.</p>
+<p>This function performs the full GST workflow for a single qubit layout:
+1. Convert counts to mGST format
+2. Run mGST reconstruction
+3. Perform gauge optimization
+4. Generate reports and metrics
+5. Run bootstrap analysis if configured
+6. Format results into dataframes and observations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pdim</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – int
-Physical dimension</p></li>
-<li><p><strong>basis</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – str
-Which basis the labels correspond to, currently default is standard basis and “Pauli” can be choose
-for Pauli basis labels like “II”, “IX”, “XX”, …</p></li>
-</ul>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><em>Tuple</em></a><em>[</em><em>Dataset</em><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Tuple
+containing: dataset: xr.Dataset, qubit_layout: List[int], pdim: int</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>List[str]</dt><dd><p>A list of all string combinations for the given dimension and basis</p>
+<dt>List[int]</dt><dd><p>The input qubit layout being processed</p>
+</dd>
+<dt>results_dict: dict[str, Any]</dt><dd><p>Dictionary containing all raw and processed results</p>
+</dd>
+<dt>layout_observations: List[BenchmarkObservation]</dt><dd><p>List of benchmark observations for this layout</p>
+</dd>
+<dt>df_g_final: DataFrame</dt><dd><p>DataFrame containing gate metrics (fidelity, diamond distance, etc.)</p>
+</dd>
+<dt>df_o_final: DataFrame</dt><dd><p>DataFrame containing non-gate metrics (SPAM errors, fit quality)</p>
+</dd>
+<dt>df_g_evals: DataFrame</dt><dd><p>DataFrame containing Choi matrix eigenvalues (for rank &gt; 1)</p>
 </dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>labels</p>
+<dd class="field-odd"><p>qubit_layout</p>
 </dd>
 </dl>
 </dd></dl>
@@ -492,20 +504,20 @@ for Pauli basis labels like “II”, “IX”, “XX”, …</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iqm.benchmarks.compressive_gst.gst_analysis.dataset_counts_to_mgst_format.html"
+       href="iqm.benchmarks.compressive_gst.gst_analysis.process_bootstrap_samples.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">iqm.benchmarks.compressive_gst.gst_analysis.dataset_counts_to_mgst_format</p>
+        <p class="prev-next-title">iqm.benchmarks.compressive_gst.gst_analysis.process_bootstrap_samples</p>
       </div>
     </a>
     <a class="right-next"
-       href="iqm.benchmarks.compressive_gst.gst_analysis.generate_gate_results.html"
+       href="iqm.benchmarks.compressive_gst.gst_analysis.process_plots.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iqm.benchmarks.compressive_gst.gst_analysis.generate_gate_results</p>
+        <p class="prev-next-title">iqm.benchmarks.compressive_gst.gst_analysis.process_plots</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -526,7 +538,7 @@ for Pauli basis labels like “II”, “IX”, “XX”, …</p></li>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.compressive_gst.gst_analysis.generate_basis_labels"><code class="docutils literal notranslate"><span class="pre">generate_basis_labels()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.compressive_gst.gst_analysis.process_layout"><code class="docutils literal notranslate"><span class="pre">process_layout()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -560,7 +572,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-08-11.
+  Last updated on 2025-08-25.
   <br/>
 </p>
   </div>

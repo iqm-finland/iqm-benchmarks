@@ -15,15 +15,15 @@ iqm.benchmarks.compressive\_gst.gst\_analysis
       :toctree:
    
       bootstrap_errors
-      dataframe_to_figure
       dataset_counts_to_mgst_format
-      generate_basis_labels
       generate_gate_results
       generate_non_gate_results
       generate_unit_rank_gate_results
       mgst_analysis
       pandas_results_to_observations
-      result_str_to_floats
+      process_bootstrap_samples
+      process_layout
+      process_plots
       run_mGST_wrapper
    
    

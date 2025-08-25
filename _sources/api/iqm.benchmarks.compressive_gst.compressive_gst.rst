@@ -17,6 +17,7 @@ iqm.benchmarks.compressive\_gst.compressive\_gst
       create_predefined_gate_set
       parse_gate_set
       parse_layouts
+      validate_gate_context
    
    
 
