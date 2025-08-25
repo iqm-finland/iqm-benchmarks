@@ -19,7 +19,7 @@ Graph states benchmark
 """
 from collections import defaultdict
 import itertools
-from time import strftime
+from time import strftime, time
 from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple, Type, cast
 
 from matplotlib.figure import Figure
@@ -1151,6 +1151,8 @@ class GraphStateBenchmark(Benchmark):
         Executes the benchmark.
         """
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
@@ -1277,10 +1279,11 @@ class GraphStateBenchmark(Benchmark):
             # It shouldn't be a problem [anymore] that different qubits are being measured in a single batch.
             # Post-processing will take care of separating MoMs samples and identifying all unitary (Clifford) labels.
             sorted_transpiled_qc_list = {tuple(unprojected_qubits[idx]): circuits_transpiled[idx]}
+            t_start = time()
             graph_jobs, time_submit = submit_execute(
                 sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch
             )
-
+            total_submit += time() - t_start
             all_graph_submit_results.append(
                 {
                     "unprojected_qubits": unprojected_qubits[idx],
@@ -1295,7 +1298,7 @@ class GraphStateBenchmark(Benchmark):
             unprojected_qubits = job_dict["unprojected_qubits"]
             # Retrieve counts
             execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier=str(unprojected_qubits))
-
+            total_retrieve += time_retrieve
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
 
@@ -1320,7 +1323,8 @@ class GraphStateBenchmark(Benchmark):
         # if self.rem:  TODO: add REM functionality
 
         qcvv_logger.info(f"Graph State benchmark experiment execution concluded !")
-
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         return dataset
 
 
