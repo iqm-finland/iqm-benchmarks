@@ -9,9 +9,7 @@ from qiskit.circuit.library import IGate
 from qiskit.quantum_info import Operator
 
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
-from mGST import additional_fns, algorithm, low_level_jit
-from mGST.compatibility import arrays_to_pygsti_model
-from mGST.reporting.reporting import gauge_opt, quick_report
+from mGST import low_level_jit
 
 
 def qiskit_gate_to_operator(gate_set):
@@ -131,6 +129,69 @@ def get_qiskit_circuits(gate_sequences, gate_set, n_qubits, active_qubits):
     return qiskit_circuits
 
 
+def get_composed_qiskit_circuits(gate_sequences, gate_set, n_qubits, qubit_layouts, gate_context=None, parallel=False):
+    """Turn GST sequences into Qiskit circuits, adding context gates if provided.
+
+    For each GST sequence, either a single circuit is created for all qubit layouts if `parallel=True`, or a separate circuit if
+    `parallel=False`.
+
+    Parameters
+    ----------
+    gate_sequences : list of list of int
+        Sequences of gate indices to apply. Each integer corresponds to a gate in the gate_set.
+    gate_set : list
+        The gate set defined as a list of Qiskit quantum circuits.
+    n_qubits : int
+        Total number of qubits in the system.
+    qubit_layouts : list of list of int
+        Lists of qubits on which the GST experiment is run.
+    gate_context : QuantumCircuit or list of QuantumCircuit, optional
+        Optional context circuit(s) to apply during each gate on qubits that are not measured for GST.
+    parallel : bool, optional
+        Whether GST for all qubits layouts is done in parallel on the backend.
+        If True, applies gates to all qubit layouts in a single circuit.
+        If False, creates separate circuits for each layout. Default is False.
+
+    Returns
+    -------
+    list or list of list of QuantumCircuit
+        If parallel=True: A list of QuantumCircuits, one for each gate sequence.
+        If parallel=False: A list of lists of QuantumCircuits, where the outer list corresponds
+        to qubit layouts and the inner list corresponds to gate sequences.
+    """
+    if gate_context is not None and not isinstance(gate_context, list):
+        gate_context = [gate_context] * len(gate_set)
+    qiskit_circuits = []
+    if parallel:
+        all_qubits = [q for qubits in qubit_layouts for q in qubits]
+        all_clbits = [i for i, _ in enumerate(all_qubits)]
+        for gate_sequence in gate_sequences:
+            qc = QuantumCircuit(n_qubits, len(all_clbits))
+            for gate_num in gate_sequence:
+                if gate_context is not None:
+                    qc.compose(gate_context[gate_num], inplace=True)
+                for qubits in qubit_layouts:
+                    qc.compose(gate_set[gate_num], qubits, inplace=True)
+                qc.barrier()
+            qc.measure(all_qubits, all_clbits)
+            qiskit_circuits.append(qc)
+    else:
+        for qubits in qubit_layouts:
+            clbits = [i for i, _ in enumerate(qubits)]
+            layout_circuits = []
+            for gate_sequence in gate_sequences:
+                qc = QuantumCircuit(n_qubits, len(clbits))
+                for gate_num in gate_sequence:
+                    if gate_context is not None:
+                        qc.compose(gate_context[gate_num], inplace=True)
+                    qc.compose(gate_set[gate_num], qubits, inplace=True)
+                    qc.barrier()
+                qc.measure(qubits, clbits)
+                layout_circuits.append(qc)
+            qiskit_circuits.append(layout_circuits)
+    return qiskit_circuits
+
+
 def get_gate_sequence(sequence_number, sequence_length, gate_set_length):
     """Generate a set of random gate sequences.
 
@@ -196,87 +257,3 @@ def job_counts_to_mgst_format(active_qubits, n_povm, result_dict):
         y.append(row / np.sum(row))
     y = np.array(y).T
     return y
-
-
-def get_gate_estimation(gate_set, gate_sequences, sequence_results, shots, rK=4):
-    """Estimate quantum gates using a modified Gate Set Tomography (mGST) algorithm.
-
-    This function simulates quantum gates, applies noise, and then uses the mGST algorithm
-    to estimate the gates. It calculates and prints the Mean Variation Error (MVE) of the
-    estimation.
-
-    Parameters
-    ----------
-    gate_set : array_like
-        The set of quantum gates to be estimated.
-    gate_sequences : array_like
-        The sequences of gates applied in the quantum circuit.
-    sequence_results : array_like
-        The results of executing the gate sequences.
-    shots : int
-        The number of shots (repetitions) for each measurement.
-    """
-
-    K_target = qiskit_gate_to_operator(gate_set)
-    gate_set_length = len(gate_set)
-    pdim = K_target.shape[-1]  # Physical dimension
-    r = pdim**2  # Matrix dimension of gate superoperators
-    n_povm = pdim  # Number of POVM elements
-    sequence_length = gate_sequences.shape[0]
-
-    X_target = np.einsum("ijkl,ijnm -> iknlm", K_target, K_target.conj()).reshape(
-        (gate_set_length, pdim**2, pdim**2)
-    )  # tensor of superoperators
-
-    # Initial state |0>
-    rho_target = (
-        np.kron(additional_fns.basis(pdim, 0).T.conj(), additional_fns.basis(pdim, 0)).reshape(-1).astype(np.complex128)
-    )
-
-    # Computational basis measurement:
-    E_target = np.array(
-        [
-            np.kron(additional_fns.basis(pdim, i).T.conj(), additional_fns.basis(pdim, i)).reshape(-1)
-            for i in range(pdim)
-        ]
-    ).astype(np.complex128)
-    target_mdl = arrays_to_pygsti_model(X_target, E_target, rho_target, basis="std")
-
-    K_init = additional_fns.perturbed_target_init(X_target, rK)
-
-    bsize = 30 * pdim  # Batch size for optimization
-    _, X, E, rho, _ = algorithm.run_mGST(
-        sequence_results,
-        gate_sequences,
-        sequence_length,
-        gate_set_length,
-        r,
-        rK,
-        n_povm,
-        bsize,
-        shots,
-        method="SFN",
-        max_inits=10,
-        max_iter=100,
-        final_iter=50,
-        target_rel_prec=1e-4,
-        init=[K_init, E_target, rho_target],
-    )
-
-    # Output the final mean variation error
-    mean_var_error = additional_fns.MVE(
-        X_target, E_target, rho_target, X, E, rho, gate_set_length, sequence_length, n_povm
-    )[0]
-    print(f"Mean variation error:", mean_var_error)
-    print(f"Optimizing gauge...")
-    weights = dict({f"G%i" % i: 1 for i in range(gate_set_length)}, **{"spam": 1})
-    X_opt, E_opt, rho_opt = gauge_opt(X, E, rho, target_mdl, weights)
-    print("Compressive GST routine complete")
-
-    # Making sense of the outcomes
-    df_g, df_o = quick_report(X_opt, E_opt, rho_opt, gate_sequences, sequence_results, target_mdl)
-    print("First results:")
-    print(df_g.to_string())
-    print(df_o.T.to_string())
-
-    return X_opt, E_opt, rho_opt
