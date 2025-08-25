@@ -2,6 +2,17 @@
 Changelog
 =========
 
+Version 2.45
+============
+* GST overhaul:
+* Added gate context
+* Updated and fixed Hinton diagrams for process matrices
+* Added dominant coherent errors plot
+* Updated Jupyter tutorial: Running for different ranks, new plot, context explanation
+* Properly defined idle gates with delay and added idle gate to default two qubit gate set
+* Parallel post-processing of layouts
+* Maximum likelihood optimization for the final estimate
+
 Version 2.44
 ============
 * Added qubit positions for Emerald
