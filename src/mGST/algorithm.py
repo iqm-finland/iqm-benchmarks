@@ -28,7 +28,7 @@ from mGST.optimization import (
 from mGST.reporting.figure_gen import plot_objf
 
 
-def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
+def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     """Riemannian saddle free Newton step on the POVM parametrization
 
     Parameters
@@ -73,7 +73,7 @@ def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     Fyy = np.zeros((n_povm, r, n_povm, r)).astype(np.complex128)
 
     X = np.einsum("ijkl,ijnm -> iknlm", K, K.conj()).reshape((d, r, r))
-    dA_, dMdM, dMconjdM, dconjdA = ddA_derivs(X, A, B, J, y, r, pdim, n_povm)
+    dA_, dMdM, dMconjdM, dconjdA = ddA_derivs(X, A, B, J, y, r, pdim, n_povm, mle=mle)
 
     # Second derivatives
     for i in range(n_povm):
@@ -133,12 +133,12 @@ def A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
 
     Delta = tangent_proj(A, Delta_A, 1, n_povm)[0]
 
-    a = minimize(lineobjf_A_geodesic, 1e-9, args=(Delta, X, A, rho, J, y), method="COBYLA").x
+    a = minimize(lineobjf_A_geodesic, 1e-9, args=(Delta, X, A, rho, J, y, mle), method="COBYLA").x
     A_new = update_A_geodesic(A, Delta, a)
     return A_new
 
 
-def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
+def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3, mle=False):
     """Riemannian saddle free Newton step on the initial state parametrization
 
     Parameters
@@ -180,11 +180,9 @@ def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     E = np.array([(A[i].T.conj() @ A[i]).reshape(-1) for i in range(n_povm)])
     H = np.zeros((2, nt, 2, nt)).astype(np.complex128)
     P_T = np.zeros((2, nt, 2, nt)).astype(np.complex128)
-    Fyconjy = np.zeros((r, r)).astype(np.complex128)
-    Fyy = np.zeros((r, r)).astype(np.complex128)
 
     X = np.einsum("ijkl,ijnm -> iknlm", K, K.conj()).reshape((d, r, r))
-    dB_, dMdM, dMconjdM, dconjdB = ddB_derivs(X, A, B, J, y, r, pdim)
+    dB_, dMdM, dMconjdM, dconjdB = ddB_derivs(X, A, B, J, y, r, pdim, mle=mle)
 
     # Second derivatives
     Fyconjy = dMconjdM + dconjdB
@@ -241,14 +239,15 @@ def B_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, lam=1e-3):
     Delta = (H_abs_inv @ G)[:nt]
     # Projection onto tangent space
     Delta = Delta - Y * (Y.T.conj() @ Delta + Delta.T.conj() @ Y) / 2
-    res = minimize(lineobjf_B_geodesic, 1e-9, args=(Delta, X, E, B, J, y), method="COBYLA", options={"maxiter": 20})
+    res = minimize(
+        lineobjf_B_geodesic, 1e-9, args=(Delta, X, E, B, J, y, mle), method="COBYLA", options={"maxiter": 20}
+    )
     a = res.x
-
     B_new = update_B_geodesic(B, Delta, a)
     return B_new
 
 
-def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA"):
+def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA", mle=False):
     """Do Riemannian gradient descent optimization step on gates
 
     Parameters
@@ -291,7 +290,7 @@ def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA"):
     Delta = np.zeros((d, n, pdim)).astype(np.complex128)
     X = np.einsum("ijkl,ijnm -> iknlm", K, K.conj()).reshape((d, r, r))
 
-    dK_ = dK(X, K, E, rho, J, y, d, r, rK)
+    dK_ = dK(X, K, E, rho, J, y, d, r, rK, mle=mle)
     for k in np.where(~fixed_gates)[0]:
         # derivative
         Fy = dK_[k].reshape(n, pdim)
@@ -299,14 +298,20 @@ def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA"):
         # Riem. gradient taken from conjugate derivative
         rGrad = 2 * (Fy.conj() - Y @ Fy.T @ Y)
         Delta[k] = rGrad
-    res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y), method=ls, options={"maxiter": 200})
+
+    # Additional projection onto tangent space to avoid numerical instability
+    Delta = tangent_proj(K, Delta, d, rK)
+
+    res = minimize(
+        lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200}
+    )
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
 
     return K_new
 
 
-def SFN_riem_Hess(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=None):
+def SFN_riem_Hess(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=None, mle=False):
     """Riemannian saddle free Newton step on each gate individually
 
     Parameters
@@ -355,8 +360,8 @@ def SFN_riem_Hess(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=
         fixed_gates = []
 
     # compute derivatives
-    dK_, dM10, dM11 = dK_dMdM(X, K, E, rho, J, y, d, r, rK)
-    dd, dconjd = ddM(X, K, E, rho, J, y, d, r, rK)
+    dK_, dM10, dM11 = dK_dMdM(X, K, E, rho, J, y, d, r, rK, mle=mle)
+    dd, dconjd = ddM(X, K, E, rho, J, y, d, r, rK, mle=mle)
 
     # Second derivatives
     Fyconjy = dM11.reshape(d, nt, d, nt) + np.einsum("ijklmnop->ikmojlnp", dconjd).reshape((d, nt, d, nt))
@@ -408,14 +413,16 @@ def SFN_riem_Hess(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=
 
     Delta = tangent_proj(K, Delta_K, d, rK)
 
-    res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y), method=ls, options={"maxiter": 200})
+    res = minimize(
+        lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200}
+    )
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
 
     return K_new
 
 
-def SFN_riem_Hess_full(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA"):
+def SFN_riem_Hess_full(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", mle=False):
     """Riemannian saddle free Newton step on product manifold of all gates
 
     Parameters
@@ -459,8 +466,8 @@ def SFN_riem_Hess_full(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA"):
     X = np.einsum("ijkl,ijnm -> iknlm", K, K.conj()).reshape((d, r, r))
 
     # compute derivatives
-    dK_, dM10, dM11 = dK_dMdM(X, K, E, rho, J, y, d, r, rK)
-    dd, dconjd = ddM(X, K, E, rho, J, y, d, r, rK)
+    dK_, dM10, dM11 = dK_dMdM(X, K, E, rho, J, y, d, r, rK, mle=mle)
+    dd, dconjd = ddM(X, K, E, rho, J, y, d, r, rK, mle=mle)
 
     # Second derivatives
     Fyconjy = dM11.reshape(d, nt, d, nt) + np.einsum("ijklmnop->ikmojlnp", dconjd).reshape((d, nt, d, nt))
@@ -522,13 +529,13 @@ def SFN_riem_Hess_full(K, E, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA"):
 
     # Delta_K is already in tangent space but not to sufficient numerical accuracy
     Delta = tangent_proj(K, Delta_K, d, rK)
-    res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y), method=ls, options={"maxiter": 20})
+    res = minimize(lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 20})
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
     return K_new
 
 
-def optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements):
+def optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=False):
     """Full gate set optimization update alternating on E, K and rho
 
     Parameters
@@ -578,27 +585,27 @@ def optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements):
         A_new = A
         E_new = np.array([(A_new[i].T.conj() @ A_new[i]).reshape(-1) for i in range(n_povm)])
     else:
-        A_new = A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm)
+        A_new = A_SFN_riem_Hess(K, A, B, y, J, d, r, n_povm, mle=mle)
         E_new = np.array([(A_new[i].T.conj() @ A_new[i]).reshape(-1) for i in range(n_povm)])
-
     if any(((f"G%i" % i in fixed_elements) for i in range(d))):
         fixed_gates = np.array([(f"G%i" % i in fixed_elements) for i in range(d)])
         if method == "SFN":
-            K_new = SFN_riem_Hess(K, E_new, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=fixed_gates)
+            K_new = SFN_riem_Hess(
+                K, E_new, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", fixed_gates=fixed_gates, mle=mle
+            )
         else:
-            K_new = gd(K, E_new, rho, y, J, d, r, rK, ls="COBYLA", fixed_gates=fixed_gates)
+            K_new = gd(K, E_new, rho, y, J, d, r, rK, ls="COBYLA", fixed_gates=fixed_gates, mle=mle)
     else:
         if method == "SFN":
-            K_new = SFN_riem_Hess_full(K, E_new, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA")
+            K_new = SFN_riem_Hess_full(K, E_new, rho, y, J, d, r, rK, lam=1e-3, ls="COBYLA", mle=mle)
         else:
             fixed_gates = np.array([(f"G%i" % i in fixed_elements) for i in range(d)])
-            K_new = gd(K, E_new, rho, y, J, d, r, rK, fixed_gates=fixed_gates, ls="COBYLA")
-
+            K_new = gd(K, E_new, rho, y, J, d, r, rK, fixed_gates=fixed_gates, ls="COBYLA", mle=mle)
     if "rho" in fixed_elements:
         rho_new = rho
         B_new = B
     else:
-        B_new = B_SFN_riem_Hess(K_new, A_new, B, y, J, d, r, n_povm, lam=1e-3)
+        B_new = B_SFN_riem_Hess(K_new, A_new, B, y, J, d, r, n_povm, lam=1e-3, mle=mle)
         rho_new = (B_new @ B_new.T.conj()).reshape(-1)
     X_new = np.einsum("ijkl,ijnm -> iknlm", K_new, K_new.conj()).reshape((d, r, r))
     return K_new, X_new, E_new, rho_new, A_new, B_new
@@ -609,13 +616,13 @@ def run_mGST(
     method="SFN",
     max_inits=10,
     max_iter=200,
-    final_iter=70,
-    target_rel_prec=1e-4,
-    threshold_multiplier=3,
+    final_iter=120,
+    target_rel_prec=1e-5,
+    threshold_multiplier=5,
     fixed_elements=None,
     init=None,
-    testing=False,
-):  # pylint: disable=too-many-branches
+    verbose_level=0,
+):  # pylint: disable=too-many-branches, too-many-statements
     """Main mGST routine
 
     Parameters
@@ -653,11 +660,11 @@ def run_mGST(
 
     Returns
     -------
-    K : numpy array
+    K: numpy array
         Updated estimates of Kraus operators
-    X : numpy array
+    X: numpy array
         Updated estimates of superoperatos corresponding to K_new
-    E : numpy array
+    E: numpy array
         Updated POVM estimate
     rho : numpy array
         Updated initial state estimate
@@ -682,7 +689,8 @@ def run_mGST(
         )
 
     success = False
-    qcvv_logger.info(f"Starting mGST optimization...")
+    if verbose_level > 0:
+        qcvv_logger.info(f"Starting mGST optimization...")
 
     if init:
         K, E = (init[0], init[1])
@@ -698,8 +706,8 @@ def run_mGST(
             A = np.array([la.cholesky(E[k].reshape(pdim, pdim) + 1e-14 * np.eye(pdim)).T.conj() for k in range(n_povm)])
             B = la.cholesky(rho.reshape(pdim, pdim))
             res_list = [objf(X, E, rho, J, y)]
-            with logging_redirect_tqdm(loggers=[qcvv_logger]):
-                for _ in trange(max_iter):
+            with logging_redirect_tqdm(loggers=[qcvv_logger] if verbose_level > 0 else None):
+                for _ in trange(max_iter, disable=verbose_level == 0):
                     yb, Jb = batch(y, J, bsize)
                     K, X, E, rho, A, B = optimize(yb, Jb, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
                     res_list.append(objf(X, E, rho, J, y))
@@ -707,29 +715,37 @@ def run_mGST(
                         qcvv_logger.info(f"Batch optimization successful, improving estimate over full data....")
                         success = True
                         break
-            if testing:
-                plot_objf(res_list, delta, f"Objective function for batch optimization")
+            if verbose_level == 2:
+                plot_objf(res_list, f"Objective function for batch optimization", delta=delta)
             if success:
                 break
-            qcvv_logger.info(f"Run {i+1}/{max_inits} failed, trying new initialization...")
+            if verbose_level > 0:
+                qcvv_logger.info(f"Run {i+1}/{max_inits} failed, trying new initialization...")
 
-    if not success and max_inits > 0:
+    if not success and init is None and verbose_level > 0:
         qcvv_logger.info(f"Success threshold not reached, attempting optimization over full data set...")
-    with logging_redirect_tqdm(loggers=[qcvv_logger]):
-        for _ in trange(final_iter):
-            K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements)
+    with logging_redirect_tqdm(loggers=[qcvv_logger] if verbose_level > 0 else None):
+        res_list_mle = []
+        for _ in trange(final_iter, disable=verbose_level == 0):
+            K, X, E, rho, A, B = optimize(y, J, d, r, rK, n_povm, method, K, rho, A, B, fixed_elements, mle=True)
             res_list.append(objf(X, E, rho, J, y))
-            if len(res_list) >= 2 and np.abs(res_list[-2] - res_list[-1]) < delta * target_rel_prec:
+            res_list_mle.append(objf(X, E, rho, J, y, mle=True))
+            if (
+                len(res_list_mle) >= 2
+                and np.abs(res_list_mle[-2] - res_list_mle[-1]) < res_list_mle[-1] * target_rel_prec
+            ):
                 break
-    if testing:
-        plot_objf(res_list, delta, f"Objective function over batches and full data")
-    if success or (res_list[-1] < delta):
-        qcvv_logger.info(f"Convergence criterion satisfied")
-    else:
+    if verbose_level == 2:
+        plot_objf(res_list, f"Least squares error over batches and full data", delta=delta)
+        plot_objf(res_list_mle, f"Negative log-likelihood over full data")
+    if verbose_level > 0:
+        if success or (res_list[-1] < delta):
+            qcvv_logger.info(f"Convergence criterion satisfied")
+        else:
+            qcvv_logger.warning(
+                f"Convergence criterion not satisfied. Potential causes include too low max_iterations, bad initialization or model mismatch."
+            )
         qcvv_logger.info(
-            f"Convergence criterion not satisfied, inspect results and consider increasing max_iter or using new initializations.",
+            f"Final objective {Decimal(res_list[-1]):.2e} in time {(time.time() - t0):.2f}s",
         )
-    qcvv_logger.info(
-        f"Final objective {Decimal(res_list[-1]):.2e} in time {(time.time() - t0):.2f}s",
-    )
     return K, X, E, rho, res_list
