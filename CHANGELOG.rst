@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.46
+============
+* Bug fixes encorporated for Q-score benchmark.
+
 Version 2.45
 ============
 * GST overhaul:
