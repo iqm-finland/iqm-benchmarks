@@ -114,5 +114,5 @@ class BenchmarkConfigurationBase(BaseModel):
     calset_id: Optional[str] = None
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "sabre"
     physical_layout: Literal["fixed", "batching"] = "fixed"
-    use_dd: Optional[bool] = True
+    use_dd: Optional[bool] = False
     dd_strategy: Optional[DDStrategy] = None
