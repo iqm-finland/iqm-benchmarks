@@ -887,7 +887,6 @@ class QScoreBenchmark(Benchmark):
             qcvv_logger.setLevel(logging.INFO)
             instance_with_edges = set(range(self.num_instances)) - set(no_edge_instances)
             num_instances_with_edges = len(instance_with_edges)
-            print(len(qc_list))
             if self.REM:
                 rem_counts = apply_readout_error_mitigation(
                     backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
