@@ -436,12 +436,11 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
         instances_with_edges = set(range(num_instances)) - set(no_edge_instances)
         num_instances_with_edges = len(instances_with_edges)
         execution_results = xrvariable_to_counts(dataset, num_nodes, num_instances_with_edges)
-
         for inst_idx, instance in enumerate(list(instances_with_edges)):
             cut_sizes = run_QAOA(
                 execution_results[inst_idx],
                 graph_list[instance],
-                qubit_to_node_list[instance],
+                qubit_to_node_list[inst_idx],
                 use_classically_optimized_angles,
                 num_qaoa_layers,
                 virtual_node_list[instance],
@@ -790,6 +789,7 @@ class QScoreBenchmark(Benchmark):
             qubit_to_node_list = []
             no_edge_instances = []
             qc_all = []  # all circuits, including those with no edges
+            start_seed = seed
             for instance in range(self.num_instances):
                 qcvv_logger.debug(f"Executing graph {instance} with {num_nodes} nodes.")
                 graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
@@ -848,6 +848,7 @@ class QScoreBenchmark(Benchmark):
                     qubit_to_node_list.append(qubit_to_node_copy)
                 else:
                     qc_all.append([])
+                    no_edge_instances.append(instance)
 
                 seed += 1
                 qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
@@ -902,7 +903,7 @@ class QScoreBenchmark(Benchmark):
                 {
                     num_nodes: {
                         "qubit_set": qubit_set_list,
-                        "seed_start": seed,
+                        "seed_start": start_seed,
                         "graph": graph_list,
                         "virtual_nodes": virtual_node_list,
                         "qubit_to_node": qubit_to_node_list,
@@ -914,7 +915,7 @@ class QScoreBenchmark(Benchmark):
 
             qcvv_logger.debug(f"Adding counts for the random graph for {num_nodes} nodes to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, str(num_nodes), dataset)
-            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(num_nodes), circuits=qc_all))
+            self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=str(num_nodes), circuits=qc_list))
             self.transpiled_circuits.circuit_groups.append(
                 CircuitGroup(name=str(num_nodes), circuits=qc_transpiled_list)
             )
