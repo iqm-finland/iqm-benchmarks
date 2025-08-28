@@ -2,7 +2,7 @@
 Mirror Randomized Benchmarking.
 """
 
-from time import strftime
+from time import strftime, time
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type
 import warnings
 
@@ -592,6 +592,8 @@ class MirrorRandomizedBenchmarking(Benchmark):
         # Submit jobs for all qubit layouts
         all_mrb_jobs: List[Dict[str, Any]] = []
         time_circuit_generation: Dict[str, float] = {}
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         # The depths should be assigned to each set of qubits!
         # The real final MRB depths are twice the originally specified, must be taken into account here!
@@ -653,7 +655,9 @@ class MirrorRandomizedBenchmarking(Benchmark):
 
                 # Submit
                 sorted_transpiled_qc_list = {tuple(qubits): mrb_transpiled_circuits_lists[depth]}
+                t_start = time()
                 all_mrb_jobs.append(self.submit_single_mrb_job(backend, qubits, depth, sorted_transpiled_qc_list))
+                total_retrieve += time() - t_start
                 qcvv_logger.info(f"Job for layout {qubits} & depth {depth} submitted successfully!")
 
                 self.untranspiled_circuits.circuit_groups.append(
@@ -670,11 +674,13 @@ class MirrorRandomizedBenchmarking(Benchmark):
             qubits = job_dict["qubits"]
             depth = job_dict["depth"]
             # Retrieve counts
+            t_start = time()
             execution_results, time_retrieve = retrieve_all_counts(
                 job_dict["jobs"], f"qubits_{str(qubits)}_depth_{str(depth)}"
             )
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
+            total_retrieve += time() - t_start
             # Export all to dataset
             dataset.attrs[qubit_idx[str(qubits)]].update(
                 {
@@ -690,6 +696,8 @@ class MirrorRandomizedBenchmarking(Benchmark):
             qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, f"qubits_{str(qubits)}_depth_{str(depth)}", dataset)
 
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 
         qcvv_logger.info(f"MRB experiment execution concluded !")
