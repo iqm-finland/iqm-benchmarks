@@ -740,24 +740,22 @@ def is_positive(X, E, rho):
     eigvals = np.array([la.eigvals(X_choi[i]) for i in range(d)])
     partial_traces = np.einsum("aiikl -> akl", X.reshape(d, pdim, pdim, pdim, pdim))
     povm_eigvals = np.array([la.eigvals(E[i].reshape(pdim, pdim)) for i in range(n_povm)])
-    if np.any(np.imag(eigvals.reshape(-1) > 1e-10)):
-        print("Gates are not all hermitian.")
-    else:
-        for i in range(d):
-            print(f"Gate %i positive:" % i, np.all(eigvals[i, :] > -1e-10))
-            print(f"Gate %i trace preserving:" % i, la.norm(partial_traces[i] - np.eye(pdim)) < 1e-10)
-    print(f"Initial state positive:", np.all(la.eigvals(rho.reshape(pdim, pdim)) > -1e-10))
-    print(f"Initial state normalization:", np.trace(rho.reshape(pdim, pdim)))
-    print(
-        "fPOVM valid:",
-        np.all(
-            [
-                la.norm(np.sum(E, axis=0).reshape(pdim, pdim) - np.eye(pdim)) < 1e-10,
-                np.all(povm_eigvals.reshape(-1) > -1e-10),
-            ]
-        ),
-    )
 
+    # Check if gates are hermitian
+    assert np.all(np.imag(eigvals.reshape(-1)) < 1e-10)
+
+    # Check if gates are positive and trace preserving
+    for i in range(d):
+        assert np.all(eigvals[i, :] > -1e-10)
+        assert la.norm(partial_traces[i] - np.eye(pdim)) < 1e-10
+
+    # Initial state positivity and normalization
+    assert np.all(la.eigvals(rho.reshape(pdim, pdim)) > -1e-10)
+    assert np.abs(np.trace(rho.reshape(pdim, pdim))) - 1 < 1e-10
+
+    # POVM positivity and normalization
+    assert la.norm(np.sum(E, axis=0).reshape(pdim, pdim) - np.eye(pdim)) < 1e-6
+    assert np.all(povm_eigvals.reshape(-1) > -1e-10)
 
 def tvd(X, E, rho, J, y_data):
     """Return the total variation distance between model probabilities for the circuits in J
