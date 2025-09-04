@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.46
+============
+* Updated qiskit and iqm-client dependencies
+
 Version 2.45
 ============
 * GST overhaul:
