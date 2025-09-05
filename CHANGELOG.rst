@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.47
+============
+* Updated qiskit and iqm-client dependencies
+
 Version 2.46
 ============
 * Bug fixes encorporated for Q-score benchmark.
