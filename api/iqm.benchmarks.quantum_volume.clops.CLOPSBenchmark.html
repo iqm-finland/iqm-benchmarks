@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark &#8212; IQM Benchmarks 2.46 documentation</title>
+    <title>iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark &#8212; IQM Benchmarks 2.47 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=71d12519"></script>
+    <script src="../_static/documentation_options.js?v=ca2da704"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.quantum_volume.clops.retrieve_clops_elapsed_times" href="iqm.benchmarks.quantum_volume.clops.retrieve_clops_elapsed_times.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.46" />
-    <meta name="docbuild:last-update" content="2025-08-27"/>
+  <meta name="docsearch:version" content="2.47" />
+    <meta name="docbuild:last-update" content="2025-09-05"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.46 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.46 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.47 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.47 documentation - Home"/>
   
   
 </a></div>
@@ -490,12 +490,7 @@
 <td><p>Append a decomposed, parametrized SU(4) gate using CX gates to the given quantum circuit.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.assign_random_parameters_to_all" title="iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.assign_random_parameters_to_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_random_parameters_to_all</span></code></a>(...)</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param dict_parametrized_circs<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary with list of int (qubits) as keys and lists of parametrized quantum circuits as values</p>
-</dd>
-</dl>
-</p></td>
+<td><p>Assigns random parameters to all parametrized circuits.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.clops_cycle" title="iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.clops_cycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clops_cycle</span></code></a>(backend, ...)</p></td>
 <td><p>Executes a single CLOPS cycle (parameter assignment and execution) for the given update :param backend: the backend to execute the jobs with :type backend: IQMBackendBase :param sorted_transpiled_qc_list: A dictionary of lists of transpiled quantum circuits :type sorted_transpiled_qc_list: Dict[str, List[QuantumCircuit]] :param update: The current cycle update :type update: int</p></td>
@@ -619,7 +614,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.assign_random_parameters_to_all">
 <span class="sig-name descname"><span class="pre">assign_random_parameters_to_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_parametrized_circs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">IQMCircuit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_sqg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">IQMCircuit</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#iqm.benchmarks.quantum_volume.clops.CLOPSBenchmark.assign_random_parameters_to_all" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Assigns random parameters to all parametrized circuits.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dict_parametrized_circs</strong> (<em>Dict</em><em>[</em><em>Tuple</em><em>, </em><em>List</em><em>[</em><em>QuantumCircuit</em><em>]</em><em>]</em>) – Dictionary with list of int (qubits) as keys and lists of parametrized quantum circuits as values</p></li>
@@ -790,7 +786,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-08-27.
+  Last updated on 2025-09-05.
   <br/>
 </p>
   </div>
