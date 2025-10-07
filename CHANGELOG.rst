@@ -2,6 +2,11 @@
 Changelog
 =========
 
+
+Version 2.46
+============
+* Added logging of execution time to all benchmarks.
+
 Version 2.45
 ============
 * GST overhaul:
