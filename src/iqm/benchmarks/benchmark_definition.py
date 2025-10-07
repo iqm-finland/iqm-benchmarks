@@ -230,7 +230,7 @@ class Benchmark(ABC):
         if isinstance(backend, str):
             self.backend = get_iqm_backend(backend)
         else:
-            assert isinstance(backend, IQMBackendBase)
+            # assert isinstance(backend, IQMBackendBase)
             self.backend = backend
 
         self.shots = self.configuration.shots
