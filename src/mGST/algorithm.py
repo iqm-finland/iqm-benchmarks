@@ -303,7 +303,7 @@ def gd(K, E, rho, y, J, d, r, rK, fixed_gates, ls="COBYLA", mle=False):
     Delta = tangent_proj(K, Delta, d, rK)
 
     res = minimize(
-        lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), method=ls, options={"maxiter": 200}
+        lineobjf_isom_geodesic, 1e-8, args=(Delta, K, E, rho, J, y, mle), options={"maxiter": 200}
     )
     a = res.x
     K_new = update_K_geodesic(K, Delta, a)
