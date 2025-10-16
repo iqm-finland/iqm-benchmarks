@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.48
+============
+* Updated iqm-client and supported python versions.
+
 Version 2.47
 ============
 * Updated qiskit and iqm-client dependencies
