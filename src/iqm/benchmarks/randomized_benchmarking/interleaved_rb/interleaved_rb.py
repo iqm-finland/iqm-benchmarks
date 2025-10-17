@@ -572,11 +572,10 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 depth = job_dict["depth"]
                 # Retrieve counts
                 identifier = f"{rb_type}_qubits_{str(qubits)}_depth_{str(depth)}"
-                t_start = time()
                 execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier)
                 # Retrieve all job meta data
                 all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
-                total_retrieve += time() - t_start
+                total_retrieve += time_retrieve
                 # Export all to dataset
                 dataset.attrs[qubit_idx[str(qubits)]].update(
                     {

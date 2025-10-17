@@ -918,11 +918,10 @@ class DirectRandomizedBenchmarking(Benchmark):
             qubits = job_dict["qubits"]
             depth = job_dict["depth"]
             # Retrieve counts
-            t_start = time()
             execution_results, time_retrieve = retrieve_all_counts(
                 job_dict["jobs"], f"qubits_{str(qubits)}_depth_{str(depth)}"
             )
-            total_retrieve += time() - t_start
+            total_retrieve += time_retrieve
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
             # Export all to dataset

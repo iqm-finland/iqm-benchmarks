@@ -4,7 +4,7 @@ Qscore benchmark
 
 import itertools
 import logging
-from time import strftime, time
+from time import strftime
 from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
 from matplotlib.figure import Figure
@@ -876,8 +876,7 @@ class QScoreBenchmark(Benchmark):
 
             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
             # Execute on the backend
-            t_start = time()
-            jobs, _ = submit_execute(
+            jobs, time_submit = submit_execute(
                 sorted_transpiled_qc_list,
                 self.backend,
                 self.shots,
@@ -886,15 +885,15 @@ class QScoreBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
-            total_submit += time() - t_start
+            total_submit += time_submit
             qc_transpiled_list.append(transpiled_qc)
             qcvv_logger.setLevel(logging.INFO)
             instance_with_edges = set(range(self.num_instances)) - set(no_edge_instances)
             num_instances_with_edges = len(instance_with_edges)
-            t_start = time()
             if self.REM:
+                counts_retrieved, time_retrieve = retrieve_all_counts(jobs)
                 rem_counts = apply_readout_error_mitigation(
-                    backend, transpiled_qc, retrieve_all_counts(jobs)[0], self.mit_shots
+                    backend, transpiled_qc, counts_retrieved, self.mit_shots
                 )
                 execution_results.extend(
                     rem_counts[0][instance].nearest_probability_distribution()
@@ -902,8 +901,9 @@ class QScoreBenchmark(Benchmark):
                 )
                 # execution_results.append(rem_distribution)
             else:
-                execution_results.extend(retrieve_all_counts(jobs)[0])
-            total_retrieve += time() - t_start
+                counts_retrieved, time_retrieve = retrieve_all_counts(jobs)
+                execution_results.extend(counts_retrieved)
+            total_retrieve += time_retrieve
             dataset.attrs.update(
                 {
                     num_nodes: {

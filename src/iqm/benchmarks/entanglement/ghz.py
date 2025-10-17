@@ -17,7 +17,7 @@ GHZ state benchmark
 """
 
 from itertools import chain
-from time import strftime, time
+from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
 
 from matplotlib.figure import Figure
@@ -846,8 +846,7 @@ class GHZBenchmark(Benchmark):
             qubit_count = len(qubit_layout)
             circuit_group: CircuitGroup = self.generate_readout_circuit(qubit_layout, qubit_count)
             transpiled_circuit_dict = {tuple(qubit_layout): circuit_group.circuits}
-            t_start = time()
-            all_jobs[idx], _ = submit_execute(
+            all_jobs[idx], time_submit = submit_execute(
                 transpiled_circuit_dict,
                 backend,
                 self.shots,
@@ -856,7 +855,7 @@ class GHZBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
-            total_submit += time() - t_start
+            total_submit += time_submit
 
         # Retrieve all
         for qubit_layout in aux_custom_qubits_array:
@@ -864,9 +863,8 @@ class GHZBenchmark(Benchmark):
             Id = BenchmarkObservationIdentifier(qubit_layout)
             idx = Id.string_identifier
             qubit_count = len(qubit_layout)
-            t_start = time()
-            counts, _ = retrieve_all_counts(all_jobs[idx])
-            total_retrieve += time() - t_start
+            counts, time_retrieve = retrieve_all_counts(all_jobs[idx])
+            total_retrieve += time_retrieve
             dataset, _ = add_counts_to_dataset(counts, idx, dataset)
             if self.rem:
                 qcvv_logger.info(f"Applying readout error mitigation")

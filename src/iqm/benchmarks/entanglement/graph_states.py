@@ -19,7 +19,7 @@ Graph states benchmark
 """
 from collections import defaultdict
 import itertools
-from time import strftime, time
+from time import strftime
 from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple, Type, cast
 
 from matplotlib.figure import Figure
@@ -1279,11 +1279,10 @@ class GraphStateBenchmark(Benchmark):
             # It shouldn't be a problem [anymore] that different qubits are being measured in a single batch.
             # Post-processing will take care of separating MoMs samples and identifying all unitary (Clifford) labels.
             sorted_transpiled_qc_list = {tuple(unprojected_qubits[idx]): circuits_transpiled[idx]}
-            t_start = time()
             graph_jobs, time_submit = submit_execute(
                 sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch
             )
-            total_submit += time() - t_start
+            total_submit += time_submit
             all_graph_submit_results.append(
                 {
                     "unprojected_qubits": unprojected_qubits[idx],

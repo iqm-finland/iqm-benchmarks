@@ -792,11 +792,10 @@ class QuantumVolumeBenchmark(Benchmark):
         for job_idx, job_dict in enumerate(all_qv_jobs):
             qubits = job_dict["qubits"]
             # Retrieve counts
-            t_start = time()
             execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], str(qubits))
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
-            total_retrieve += time() - t_start
+            total_retrieve += time_retrieve
             # Export all to dataset
             dataset.attrs.update(
                 {

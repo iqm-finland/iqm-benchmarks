@@ -3,7 +3,7 @@ Coherence benchmark
 """
 
 import logging
-from time import strftime, time
+from time import strftime
 from typing import Dict, List, Tuple, Type
 
 from matplotlib.figure import Figure
@@ -459,8 +459,7 @@ class CoherenceBenchmark(Benchmark):
             qcvv_logger.debug(f"Executing on {self.coherence_exp}.")
             qcvv_logger.setLevel(logging.WARNING)
 
-            t_start = time()
-            jobs, _ = submit_execute(
+            jobs, time_submit = submit_execute(
                 sorted_transpiled_qc_list,
                 self.backend,
                 self.shots,
@@ -469,12 +468,11 @@ class CoherenceBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
-            total_submit += time() - t_start
+            total_submit += time_submit
 
             qcvv_logger.setLevel(logging.INFO)
-            t_start = time()
-            execution_results = retrieve_all_counts(jobs)[0]
-            total_retrieve += time() - t_start
+            execution_results, time_retrieve = retrieve_all_counts(jobs)[0]
+            total_retrieve += time_retrieve
             identifier = BenchmarkObservationIdentifier(qubit_set)
             dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
             dataset.attrs.update(
@@ -500,8 +498,7 @@ class CoherenceBenchmark(Benchmark):
                 # Execute on the backend
                 if self.configuration.use_dd is True:
                     raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
-                t_start = time()
-                jobs, _ = submit_execute(
+                jobs, time_submit = submit_execute(
                     sorted_transpiled_qc_list,
                     self.backend,
                     self.shots,
@@ -510,11 +507,10 @@ class CoherenceBenchmark(Benchmark):
                     max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                     circuit_compilation_options=self.circuit_compilation_options,
                 )
-                total_submit += time() - t_start
+                total_submit += time_submit
                 qcvv_logger.setLevel(logging.INFO)
-                t_start = time()
-                execution_results = retrieve_all_counts(jobs)[0]
-                total_retrieve += time() - t_start
+                execution_results, time_retrieve = retrieve_all_counts(jobs)[0]
+                total_retrieve += time_retrieve
                 identifier = BenchmarkObservationIdentifier(group)
                 dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
 
