@@ -3,7 +3,7 @@ Direct Randomized Benchmarking.
 """
 
 import random
-from time import strftime
+from time import strftime, time
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Type, cast
 
 import numpy as np
@@ -751,6 +751,8 @@ class DirectRandomizedBenchmarking(Benchmark):
             xr.Dataset: Dataset containing benchmark results and metadata
         """
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         dataset = xr.Dataset()
 
@@ -816,6 +818,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                     # Submit all
                     flat_qubits_array = [x for y in loop_qubits_sequence for x in y]
                     sorted_transpiled_qc_list = {tuple(flat_qubits_array): parallel_drb_circuits[depth]["transpiled"]}
+                    t_start = time()
                     all_drb_jobs.append(
                         submit_parallel_rb_job(
                             backend,
@@ -828,6 +831,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                             max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                         )
                     )
+                    total_submit += time() - t_start
                     qcvv_logger.info(f"Job for depth {depth} submitted successfully!")
 
                     self.untranspiled_circuits.circuit_groups.append(
@@ -884,6 +888,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                         sorted_transpiled_qc_list = {
                             cast(Tuple[int, ...], tuple(qubits)): drb_transpiled_circuits_lists[depth]
                         }
+                        t_start = time()
                         all_drb_jobs.append(
                             self.submit_single_drb_job(
                                 backend,
@@ -892,7 +897,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                                 cast(dict[tuple[int, ...], list[Any]], sorted_transpiled_qc_list),
                             )
                         )
-
+                        total_submit += time() - t_start
                         qcvv_logger.info(f"Job for layout {qubits} & depth {depth} submitted successfully!")
 
                         self.untranspiled_circuits.circuit_groups.append(
@@ -916,6 +921,7 @@ class DirectRandomizedBenchmarking(Benchmark):
             execution_results, time_retrieve = retrieve_all_counts(
                 job_dict["jobs"], f"qubits_{str(qubits)}_depth_{str(depth)}"
             )
+            total_retrieve += time_retrieve
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
             # Export all to dataset
@@ -934,7 +940,8 @@ class DirectRandomizedBenchmarking(Benchmark):
             dataset, _ = add_counts_to_dataset(execution_results, f"qubits_{str(qubits)}_depth_{str(depth)}", dataset)
 
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
-
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         qcvv_logger.info(f"DRB experiment execution concluded!")
 
         return dataset

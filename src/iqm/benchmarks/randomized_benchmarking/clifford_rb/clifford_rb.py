@@ -16,7 +16,7 @@
 'Standard' Clifford Randomized Benchmarking.
 """
 
-from time import strftime
+from time import strftime, time
 from typing import Any, Dict, List, Sequence, Type
 
 import numpy as np
@@ -252,6 +252,8 @@ class CliffordRandomizedBenchmarking(Benchmark):
         # Submit jobs for all qubit layouts
         all_rb_jobs: List[Dict[str, Any]] = []
         time_circuit_generation: Dict[str, float] = {}
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         # Initialize the variable to contain the circuits for each layout
         self.untranspiled_circuits = BenchmarkCircuit("untranspiled_circuits")
@@ -290,6 +292,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                 # Submit all
                 flat_qubits_array = [x for y in self.qubits_array for x in y]
                 sorted_transpiled_qc_list = {tuple(flat_qubits_array): parallel_transpiled_rb_circuits[seq_length]}
+                t_start = time()
                 all_rb_jobs.append(
                     submit_parallel_rb_job(
                         backend,
@@ -302,6 +305,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         self.configuration.max_circuits_per_batch,
                     )
                 )
+                total_submit += time() - t_start
                 qcvv_logger.info(f"Job for sequence length {seq_length} submitted successfully!")
 
                 self.untranspiled_circuits.circuit_groups.append(
@@ -351,6 +355,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                 )
 
                 # Submit
+                t_start = time()
                 all_rb_jobs.extend(
                     submit_sequential_rb_jobs(
                         qubits,
@@ -363,6 +368,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )
+                total_submit += time() - t_start
                 qcvv_logger.info(
                     f"All jobs for qubits {qubits} and sequence lengths {self.sequence_lengths} submitted successfully!"
                 )
@@ -386,6 +392,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
             execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier)
             # Retrieve all job meta data
             all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
+            total_retrieve += time_retrieve
             # Export all to dataset
             dataset.attrs[qubit_idx[str(qubits)]].update(
                 {
@@ -401,6 +408,8 @@ class CliffordRandomizedBenchmarking(Benchmark):
             qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
             dataset, _ = add_counts_to_dataset(execution_results, identifier, dataset)
 
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         qcvv_logger.info(f"RB experiment concluded !")
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 

@@ -32,6 +32,7 @@ from typing import Any, Dict, List, Tuple, Type, Union
 import numpy as np
 from qiskit.circuit.library import CZGate, RGate
 import xarray as xr
+from time import strftime
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import Benchmark, BenchmarkObservationIdentifier, add_counts_to_dataset
@@ -242,7 +243,9 @@ class CompressiveGST(Benchmark):
         """
         The main GST execution routine
         """
-
+        self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
         dataset = xr.Dataset()
         qcvv_logger.info(f"Generating {self.configuration.num_circuits} random GST circuits")
 
@@ -255,7 +258,7 @@ class CompressiveGST(Benchmark):
             transpiled_circuit_dict = {
                 tuple(range(self.backend.num_qubits)): transpiled_circuits[str(self.qubit_layouts[0])].circuits
             }
-            all_jobs_parallel, _ = submit_execute(
+            all_jobs_parallel, time_submit = submit_execute(
                 transpiled_circuit_dict,
                 backend,
                 self.configuration.shots,
@@ -264,15 +267,17 @@ class CompressiveGST(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
+            total_submit += time_submit
             # Retrieve
             qcvv_logger.info(f"Now executing the corresponding circuit batch")
-            counts, _ = retrieve_all_counts(all_jobs_parallel)
+            counts, time_retrieve = retrieve_all_counts(all_jobs_parallel)
+            total_retrieve += time_retrieve
             dataset, _ = add_counts_to_dataset(counts, f"parallel_results", dataset)
         else:
             all_jobs: Dict = {}
             for qubit_layout in self.qubit_layouts:
                 transpiled_circuit_dict = {tuple(qubit_layout): transpiled_circuits[str(qubit_layout)].circuits}
-                all_jobs[str(qubit_layout)], _ = submit_execute(
+                all_jobs[str(qubit_layout)], time_submit = submit_execute(
                     transpiled_circuit_dict,
                     backend,
                     self.configuration.shots,
@@ -280,14 +285,18 @@ class CompressiveGST(Benchmark):
                     max_gates_per_batch=self.configuration.max_gates_per_batch,
                     max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 )
+                total_submit += time_submit
             # Retrieve all
             qcvv_logger.info(f"Now executing the corresponding circuit batch")
             for qubit_layout in self.qubit_layouts:
-                counts, _ = retrieve_all_counts(all_jobs[str(qubit_layout)])
+                counts, time_retrieve = retrieve_all_counts(all_jobs[str(qubit_layout)])
+                total_retrieve += time_retrieve
                 dataset, _ = add_counts_to_dataset(counts, str(qubit_layout), dataset)
 
         self.circuits.benchmark_circuits = [transpiled_circuits, untranspiled_circuits]
         self.add_configuration_to_dataset(dataset)
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         qcvv_logger.info(f"Run completed")
         return dataset
 
