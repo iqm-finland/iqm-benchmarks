@@ -16,12 +16,13 @@
 Interleaved Clifford Randomized Benchmarking.
 """
 
-from time import strftime
+from time import strftime, time
 from typing import Any, Dict, List, Literal, Optional, Sequence, Type
 
 from matplotlib.figure import Figure
 import numpy as np
 import xarray as xr
+from pycparser.ply.ctokens import t_STRING
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
@@ -323,6 +324,8 @@ class InterleavedRandomizedBenchmarking(Benchmark):
         # Submit jobs for all qubit layouts
         all_rb_jobs: Dict[str, List[Dict[str, Any]]] = {}  # Label by Clifford or Interleaved
         time_circuit_generation: Dict[str, float] = {}
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         # Initialize the variable to contain the circuits for each layout
 
@@ -398,6 +401,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 sorted_transpiled_interleaved_rb_qc_list = {
                     tuple(flat_qubits_array): parallel_transpiled_interleaved_rb_circuits[seq_length]
                 }
+                t_start = time()
                 all_rb_jobs["clifford"].append(
                     submit_parallel_rb_job(
                         backend,
@@ -422,6 +426,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         self.configuration.max_circuits_per_batch,
                     )
                 )
+                total_submit += time() - t_start
                 qcvv_logger.info(f"Both jobs for sequence length {seq_length} submitted successfully!")
 
             self.untranspiled_circuits.circuit_groups.append(
@@ -507,6 +512,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 time_circuit_generation[str(qubits)] = t_clifford + t_inter
 
                 # Submit Clifford then Interleaved
+                t_start = time()
                 all_rb_jobs["clifford"].extend(
                     submit_sequential_rb_jobs(
                         qubits,
@@ -531,6 +537,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                         circuit_compilation_options=self.circuit_compilation_options,
                     )
                 )
+                total_submit += time() - t_start
                 qcvv_logger.info(
                     f"All jobs for qubits {qubits} and sequence lengths {self.sequence_lengths} submitted successfully!"
                 )
@@ -568,6 +575,7 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 execution_results, time_retrieve = retrieve_all_counts(job_dict["jobs"], identifier)
                 # Retrieve all job meta data
                 all_job_metadata = retrieve_all_job_metadata(job_dict["jobs"])
+                total_retrieve += time_retrieve
                 # Export all to dataset
                 dataset.attrs[qubit_idx[str(qubits)]].update(
                     {
@@ -585,6 +593,8 @@ class InterleavedRandomizedBenchmarking(Benchmark):
                 qcvv_logger.info(f"Adding counts of qubits {qubits} and depth {depth} run to the dataset")
                 dataset, _ = add_counts_to_dataset(execution_results, identifier, dataset)
 
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         qcvv_logger.info(f"Interleaved RB experiment concluded !")
         self.circuits = Circuits([self.transpiled_circuits, self.untranspiled_circuits])
 

@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.49
+============
+* Added logging of execution time to all benchmarks.
+
 Version 2.48
 ============
 * Updated iqm-client and supported python versions.

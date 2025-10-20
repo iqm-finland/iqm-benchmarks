@@ -422,6 +422,8 @@ class CoherenceBenchmark(Benchmark):
     ) -> xr.Dataset:
         """Executes the benchmark."""
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
 
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
@@ -457,7 +459,7 @@ class CoherenceBenchmark(Benchmark):
             qcvv_logger.debug(f"Executing on {self.coherence_exp}.")
             qcvv_logger.setLevel(logging.WARNING)
 
-            jobs, _ = submit_execute(
+            jobs, time_submit = submit_execute(
                 sorted_transpiled_qc_list,
                 self.backend,
                 self.shots,
@@ -466,9 +468,11 @@ class CoherenceBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
+            total_submit += time_submit
 
             qcvv_logger.setLevel(logging.INFO)
-            execution_results = retrieve_all_counts(jobs)[0]
+            execution_results, time_retrieve = retrieve_all_counts(jobs)
+            total_retrieve += time_retrieve
             identifier = BenchmarkObservationIdentifier(qubit_set)
             dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
             dataset.attrs.update(
@@ -494,8 +498,7 @@ class CoherenceBenchmark(Benchmark):
                 # Execute on the backend
                 if self.configuration.use_dd is True:
                     raise ValueError("Coherence benchmarks should not be run with dynamical decoupling.")
-
-                jobs, _ = submit_execute(
+                jobs, time_submit = submit_execute(
                     sorted_transpiled_qc_list,
                     self.backend,
                     self.shots,
@@ -504,8 +507,10 @@ class CoherenceBenchmark(Benchmark):
                     max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                     circuit_compilation_options=self.circuit_compilation_options,
                 )
+                total_submit += time_submit
                 qcvv_logger.setLevel(logging.INFO)
-                execution_results = retrieve_all_counts(jobs)[0]
+                execution_results, time_retrieve = retrieve_all_counts(jobs)
+                total_retrieve += time_retrieve
                 identifier = BenchmarkObservationIdentifier(group)
                 dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
 
@@ -524,6 +529,8 @@ class CoherenceBenchmark(Benchmark):
         self.transpiled_circuits.circuit_groups.append(
             CircuitGroup(name=self.coherence_exp, circuits=transpiled_qc_list)
         )
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
 
         return dataset
 
