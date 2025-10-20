@@ -471,7 +471,7 @@ class CoherenceBenchmark(Benchmark):
             total_submit += time_submit
 
             qcvv_logger.setLevel(logging.INFO)
-            execution_results, time_retrieve = retrieve_all_counts(jobs)[0]
+            execution_results, time_retrieve = retrieve_all_counts(jobs)
             total_retrieve += time_retrieve
             identifier = BenchmarkObservationIdentifier(qubit_set)
             dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
@@ -509,7 +509,7 @@ class CoherenceBenchmark(Benchmark):
                 )
                 total_submit += time_submit
                 qcvv_logger.setLevel(logging.INFO)
-                execution_results, time_retrieve = retrieve_all_counts(jobs)[0]
+                execution_results, time_retrieve = retrieve_all_counts(jobs)
                 total_retrieve += time_retrieve
                 identifier = BenchmarkObservationIdentifier(group)
                 dataset, _ = add_counts_to_dataset(execution_results, identifier.string_identifier, dataset)
