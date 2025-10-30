@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.50
+============
+* Update iqm-client and iqm-station-control-client dependency versions as part of IQM OS 4.3 release.
+
 Version 2.49
 ============
 * Added logging of execution time to all benchmarks.
