@@ -303,7 +303,7 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
     qc.measure_all()
     return qc
 
-
+## can introduce another fucntion to time order here CZ and pick the best MOVE qubit.
 def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
     """
     Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
