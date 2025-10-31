@@ -1048,7 +1048,24 @@ class QScoreBenchmark(Benchmark):
                 transpiled_qc = [transpile_to_IQM(qc, self.backend, optimize_single_qubits=self.optimize_sqg, existing_moves_handling=ExistingMoveHandlingOptions.KEEP) for qc in qc_list]
             else:
                 transpiled_qc, _ = perform_backend_transpilation(qc_list, **transpilation_params)
-            
+
+                # qc_list_temp = []
+                # cz_count_temp = []
+                # for _ in range(num_trials):
+                #     perm = np.random.permutation(num_nodes)
+                #     mapping = dict(zip(graph.nodes, perm))
+                #     G1_permuted = nx.relabel_nodes(graph, mapping)
+                #     theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
+                #     qc_qaoa = self.generate_maxcut_ansatz(G1_permuted, theta)
+                #     transpiled_qc_temp, _ = perform_backend_transpilation([qc_qaoa], **transpilation_params)
+                #     cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
+                #     qc_list_temp.append(transpiled_qc_temp[0])
+                # min_cz_index = cz_count_temp.index(min(cz_count_temp))
+                # transpiled_qc = qc_list_temp[min_cz_index]
+
+                # qcvv_logger.info(print(transpiled_qc.count_ops().get("cz", 0)))
+
+                # sorted_transpiled_qc_list = {tuple(qubit_set): [transpiled_qc]}
 
             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
             # Execute on the backend
