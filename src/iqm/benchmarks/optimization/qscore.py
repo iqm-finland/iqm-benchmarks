@@ -672,6 +672,7 @@ class QScoreBenchmark(Benchmark):
         self.session_timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
         self.seed = configuration.seed
+        self.num_trials = configuration.num_trials
 
         self.graph_physical: Graph
         self.virtual_nodes: List[Tuple[int, int]]
@@ -963,6 +964,15 @@ class QScoreBenchmark(Benchmark):
             no_edge_instances = []
             qc_all = []  # all circuits, including those with no edges
             start_seed = seed
+
+            transpilation_params = {
+                "backend": self.backend,
+                "qubits": active_qubit_set,
+                "coupling_map": effective_coupling_map,
+                "qiskit_optim_level": self.qiskit_optim_level,
+                "optimize_sqg": self.optimize_sqg,
+                "routing_method": self.routing_method,
+            }
             for instance in range(self.num_instances):
                 qcvv_logger.debug(f"Executing graph {instance} with {num_nodes} nodes.")
                 graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
@@ -1015,10 +1025,28 @@ class QScoreBenchmark(Benchmark):
                 if self.backend.has_resonators():
                     qc = self.generate_maxcut_ansatz_star(graph, theta)
                 else:
-                    qc = self.generate_maxcut_ansatz(graph, theta)
+                    if self.backend.has_resonators():
+                        qc_opt = self.generate_maxcut_ansatz(graph, theta)
+                    else:
+                        qc_list_temp = []
+                        cz_count_temp = []
+                        for _ in range(self.num_trials):
+                            perm = np.random.permutation(num_nodes)
+                            mapping = dict(zip(graph.nodes, perm))
+                            G1_permuted = nx.relabel_nodes(graph, mapping)
+                            theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
+                            qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
+                            transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params)
+                            cz_count_temp.append(transpiled_qc_temp.count_ops().get("cz", 0))
+                            qc_list_temp.append(qc_perm)
+                        min_cz_index = cz_count_temp.index(min(cz_count_temp))
+                        qc_opt = qc_list_temp[min_cz_index]
+
+                qcvv_logger.info(print(transpiled_qc.count_ops().get("cz", 0)))
+
                 if len(qc.count_ops()) != 0:
-                    qc_list.append(qc)
-                    qc_all.append(qc)
+                    qc_list.append(qc_opt)
+                    qc_all.append(qc_opt)
                     qubit_to_node_copy = self.qubit_to_node.copy()
                     qubit_to_node_list.append(qubit_to_node_copy)
                 else:
@@ -1036,36 +1064,11 @@ class QScoreBenchmark(Benchmark):
                 active_qubit_set = qubit_set
                 effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
 
-            transpilation_params = {
-                "backend": self.backend,
-                "qubits": active_qubit_set,
-                "coupling_map": effective_coupling_map,
-                "qiskit_optim_level": self.qiskit_optim_level,
-                "optimize_sqg": self.optimize_sqg,
-                "routing_method": self.routing_method,
-            }
+
             if self.backend.has_resonators():
                 transpiled_qc = [transpile_to_IQM(qc, self.backend, optimize_single_qubits=self.optimize_sqg, existing_moves_handling=ExistingMoveHandlingOptions.KEEP) for qc in qc_list]
             else:
                 transpiled_qc, _ = perform_backend_transpilation(qc_list, **transpilation_params)
-
-                # qc_list_temp = []
-                # cz_count_temp = []
-                # for _ in range(num_trials):
-                #     perm = np.random.permutation(num_nodes)
-                #     mapping = dict(zip(graph.nodes, perm))
-                #     G1_permuted = nx.relabel_nodes(graph, mapping)
-                #     theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
-                #     qc_qaoa = self.generate_maxcut_ansatz(G1_permuted, theta)
-                #     transpiled_qc_temp, _ = perform_backend_transpilation([qc_qaoa], **transpilation_params)
-                #     cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
-                #     qc_list_temp.append(transpiled_qc_temp[0])
-                # min_cz_index = cz_count_temp.index(min(cz_count_temp))
-                # transpiled_qc = qc_list_temp[min_cz_index]
-
-                # qcvv_logger.info(print(transpiled_qc.count_ops().get("cz", 0)))
-
-                # sorted_transpiled_qc_list = {tuple(qubit_set): [transpiled_qc]}
 
             sorted_transpiled_qc_list = {tuple(qubit_set): transpiled_qc}
             # Execute on the backend
@@ -1148,6 +1151,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
                             * Default is 3.
         optimize_sqg (bool): Whether Single Qubit Gate Optimization is performed upon transpilation.
                             * Default is True.
+        num_trials (Optional[int]): Number of trials to perform when choosing graph permutations to minimize CZ gates.
         seed (int): The random seed.
                             * Default is 1.
         REM (bool): Use readout error mitigation.
@@ -1168,6 +1172,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     custom_qubits_array: Optional[Sequence[Sequence[int]]] = None
     qiskit_optim_level: int = 3
     optimize_sqg: bool = True
+    num_trials: int = 10
     seed: int = 1
     REM: bool = False
     mit_shots: int = 1000
