@@ -10,7 +10,7 @@ class TestCoherence:
     
     def test_coherence_t1(self):
         EXAMPLE_COHERENCE = CoherenceConfiguration(
-            delays = list(np.linspace(0, 100e-6, 2)),
+            delays = list(np.linspace(0, 100e-6, 20)),
             qiskit_optim_level = 3,
             optimize_sqg = True,
             coherence_exp = "t1",
@@ -22,7 +22,7 @@ class TestCoherence:
 
     def test_coherence_t2_echo(self):
         EXAMPLE_COHERENCE = CoherenceConfiguration(
-            delays = list(np.linspace(0, 100e-6, 2)),
+            delays = list(np.linspace(0, 100e-6, 20)),
             qiskit_optim_level = 3,
             optimize_sqg = True,
             coherence_exp = "t2_echo",

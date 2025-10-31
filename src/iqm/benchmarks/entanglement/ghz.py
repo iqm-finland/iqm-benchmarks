@@ -828,6 +828,8 @@ class GHZBenchmark(Benchmark):
         Executes the benchmark.
         """
         self.execution_timestamp = strftime("%Y%m%d-%H%M%S")
+        total_submit: float = 0
+        total_retrieve: float = 0
         aux_custom_qubits_array = cast(List[List[int]], self.custom_qubits_array).copy()
         dataset = xr.Dataset()
 
@@ -844,7 +846,7 @@ class GHZBenchmark(Benchmark):
             qubit_count = len(qubit_layout)
             circuit_group: CircuitGroup = self.generate_readout_circuit(qubit_layout, qubit_count)
             transpiled_circuit_dict = {tuple(qubit_layout): circuit_group.circuits}
-            all_jobs[idx], _ = submit_execute(
+            all_jobs[idx], time_submit = submit_execute(
                 transpiled_circuit_dict,
                 backend,
                 self.shots,
@@ -853,6 +855,7 @@ class GHZBenchmark(Benchmark):
                 max_circuits_per_batch=self.configuration.max_circuits_per_batch,
                 circuit_compilation_options=self.circuit_compilation_options,
             )
+            total_submit += time_submit
 
         # Retrieve all
         for qubit_layout in aux_custom_qubits_array:
@@ -860,7 +863,8 @@ class GHZBenchmark(Benchmark):
             Id = BenchmarkObservationIdentifier(qubit_layout)
             idx = Id.string_identifier
             qubit_count = len(qubit_layout)
-            counts, _ = retrieve_all_counts(all_jobs[idx])
+            counts, time_retrieve = retrieve_all_counts(all_jobs[idx])
+            total_retrieve += time_retrieve
             dataset, _ = add_counts_to_dataset(counts, idx, dataset)
             if self.rem:
                 qcvv_logger.info(f"Applying readout error mitigation")
@@ -870,6 +874,8 @@ class GHZBenchmark(Benchmark):
                 dataset, _ = add_counts_to_dataset(rem_results_dist, f"{idx}_rem", dataset)
 
         self.add_configuration_to_dataset(dataset)
+        dataset.attrs["total_submit_time"] = total_submit
+        dataset.attrs["total_retrieve_time"] = total_retrieve
         return dataset
 
 
