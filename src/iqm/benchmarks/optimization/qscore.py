@@ -968,6 +968,15 @@ class QScoreBenchmark(Benchmark):
             qc_all = []  # all circuits, including those with no edges
             start_seed = seed
 
+            # Choose the qubit layout
+            if self.choose_qubits_routine.lower() == "naive":
+                qubit_set = self.choose_qubits_naive(updated_num_nodes)
+            elif self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic":
+                qubit_set = self.choose_qubits_custom(updated_num_nodes)
+            else:
+                raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
+            qubit_set_list.append(qubit_set)
+
             qcvv_logger.setLevel(logging.WARNING)
             if self.choose_qubits_routine == "naive":
                 active_qubit_set = None
@@ -1012,17 +1021,6 @@ class QScoreBenchmark(Benchmark):
                 if graph.number_of_edges() == 0:
                     no_edge_instances.append(instance)
                     qcvv_logger.debug(f"Graph {instance+1}/{self.num_instances} had no edges: cut size = 0.")
-
-                # Choose the qubit layout
-                if self.choose_qubits_routine.lower() == "naive":
-                    qubit_set = self.choose_qubits_naive(updated_num_nodes)
-                elif (
-                    self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic"
-                ):
-                    qubit_set = self.choose_qubits_custom(updated_num_nodes)
-                else:
-                    raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
-                qubit_set_list.append(qubit_set)
 
                 if self.use_classically_optimized_angles:
                     if graph.number_of_edges() != 0:
