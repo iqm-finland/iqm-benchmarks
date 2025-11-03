@@ -22,6 +22,7 @@ class TestQScore:
             choose_qubits_routine="custom",
             custom_qubits_array=self.custom_qubits_array,
             seed=1,
+            num_trials = 2,
             REM=True,
             mit_shots=10,
         )

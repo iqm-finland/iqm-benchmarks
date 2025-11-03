@@ -1,5 +1,5 @@
-"""
-Qscore benchmark
+""" # pylint: disable=too-many-lines
+This module contains functions and classes for the Qscore benchmarking process. # pylint: disable=too-many-lines
 """
 
 import itertools
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from networkx import Graph
 import networkx as nx
 import numpy as np
-from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.circuit.library import RZZGate
 from scipy.optimize import basinhopping, minimize
 import xarray as xr
@@ -198,7 +198,7 @@ def get_optimal_angles(num_layers: int) -> List[float]:
     # "The fixed angle conjecture for QAOA on regular MaxCut graphs."
     # arXiv preprint arXiv:2107.00677 (2021).
 
-    OPTIMAL_INITIAL_ANGLES = {
+    OPTIMAL_INITIAL_ANGLES = {  # pylint: disable=undefined-variable
         "1": [-0.616, 0.393 / 2],
         "2": [-0.488, 0.898 / 2, 0.555 / 2, 0.293 / 2],
         "3": [-0.422, 0.798 / 2, 0.937 / 2, 0.609 / 2, 0.459 / 2, 0.235 / 2],
@@ -753,13 +753,13 @@ class QScoreBenchmark(Benchmark):
 
         covermap = self.greedy_vertex_cover_with_mapping(self.graph_physical)
         new_covermap = {}
-        for key in covermap.keys():
-            new_covermap[self.node_to_qubit[key]] = [self.node_to_qubit[i] for i in covermap[key]]
+        for key, value in covermap.items():
+            new_covermap[self.node_to_qubit[key]] = [self.node_to_qubit[i] for i in value]
         covermap = new_covermap
 
-        compr = QuantumRegister(1, 'compr')
-        q = QuantumRegister(num_qubits, 'q')
-        c = ClassicalRegister(num_qubits, 'c')
+        compr = QuantumRegister(1, "compr")
+        q = QuantumRegister(num_qubits, "q")
+        c = ClassicalRegister(num_qubits, "c")
         qaoa_qc = IQMCircuit(compr, q, c)  # num_qb+1,num_qb)
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
@@ -767,9 +767,9 @@ class QScoreBenchmark(Benchmark):
         for i in range(1, num_qubits):
             qaoa_qc.h(i)
         for layer in range(self.num_qaoa_layers):
-            for move_qubit in covermap.keys():
+            for move_qubit, edge_qubits in covermap.items():
                 qaoa_qc.move(move_qubit + 1, 0)
-                for edge_qubit in covermap[move_qubit]:
+                for edge_qubit in edge_qubits:
                     qaoa_qc.rzz(2 * gamma[layer], 0, edge_qubit + 1)
                 qaoa_qc.move(move_qubit + 1, 0)
 
