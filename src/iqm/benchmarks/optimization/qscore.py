@@ -967,6 +967,14 @@ class QScoreBenchmark(Benchmark):
             qc_all = []  # all circuits, including those with no edges
             start_seed = seed
 
+            qcvv_logger.setLevel(logging.WARNING)
+            if self.choose_qubits_routine == "naive":
+                active_qubit_set = None
+                effective_coupling_map = self.backend.coupling_map
+            else:
+                active_qubit_set = qubit_set
+                effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
+
             transpilation_params = {
                 "backend": self.backend,
                 "qubits": active_qubit_set,
@@ -975,6 +983,7 @@ class QScoreBenchmark(Benchmark):
                 "optimize_sqg": self.optimize_sqg,
                 "routing_method": self.routing_method,
             }
+
             for instance in range(self.num_instances):
                 qcvv_logger.debug(f"Executing graph {instance} with {num_nodes} nodes.")
                 graph = nx.generators.erdos_renyi_graph(num_nodes, 0.5, seed=seed)
@@ -1025,7 +1034,7 @@ class QScoreBenchmark(Benchmark):
                 theta_list.append(theta)
 
                 if self.backend.has_resonators():
-                    qc = self.generate_maxcut_ansatz_star(graph, theta)
+                    qc_opt = self.generate_maxcut_ansatz_star(graph, theta)
                 else:
                     if self.backend.has_resonators():
                         qc_opt = self.generate_maxcut_ansatz(graph, theta)
@@ -1039,14 +1048,12 @@ class QScoreBenchmark(Benchmark):
                             theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
                             qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
                             transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params)
-                            cz_count_temp.append(transpiled_qc_temp.count_ops().get("cz", 0))
+                            cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
                             qc_list_temp.append(qc_perm)
                         min_cz_index = cz_count_temp.index(min(cz_count_temp))
                         qc_opt = qc_list_temp[min_cz_index]
 
-                qcvv_logger.info(print(transpiled_qc.count_ops().get("cz", 0)))
-
-                if len(qc.count_ops()) != 0:
+                if len(qc_opt.count_ops()) != 0:
                     qc_list.append(qc_opt)
                     qc_all.append(qc_opt)
                     qubit_to_node_copy = self.qubit_to_node.copy()
@@ -1057,14 +1064,6 @@ class QScoreBenchmark(Benchmark):
 
                 seed += 1
                 qcvv_logger.debug(f"Solved the MaxCut on graph {instance+1}/{self.num_instances}.")
-
-            qcvv_logger.setLevel(logging.WARNING)
-            if self.choose_qubits_routine == "naive":
-                active_qubit_set = None
-                effective_coupling_map = self.backend.coupling_map
-            else:
-                active_qubit_set = qubit_set
-                effective_coupling_map = self.backend.coupling_map.reduce(active_qubit_set)
 
 
             if self.backend.has_resonators():
