@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 import networkx
 from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spanning_tree
 import numpy as np
-from qiskit import QuantumRegister
+from qiskit import QuantumRegister, ClassicalRegister
 from qiskit.quantum_info import random_clifford
 from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
@@ -55,6 +55,7 @@ from iqm.benchmarks.utils import (
     xrvariable_to_counts,
 )
 from iqm.qiskit_iqm import IQMCircuit as QuantumCircuit
+from iqm.qiskit_iqm import transpile_to_IQM
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -304,6 +305,55 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
     return qc
 
 ## can introduce another fucntion to time order here CZ and pick the best MOVE qubit.
+
+def generate_ghz_star_optimal(qubit_layout: List[int], cal_url: str, backend: IQMBackendBase) -> QuantumCircuit:
+    """
+    Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
+    
+    Args:
+        qubit_layout: List[int]
+            The layout of qubits for the GHZ state.
+        cal_url: str
+            The calibration URL for extracting fidelities.
+        backend: IQMBackendBase
+            The backend to be used for the quantum circuit.
+
+    Returns:
+        QuantumCircuit: A quantum circuit generating a GHZ state on a given number of qubits.
+    """
+    num_qubits = len(qubit_layout)
+    print(num_qubits)
+    print(backend.num_qubits)
+
+    # Initialize quantum and classical registers
+    comp_r = QuantumRegister(1, 'comp_r')  # Computational resonator
+    q = QuantumRegister(backend.num_qubits, 'q')  # Qubits 
+    c = ClassicalRegister(num_qubits, 'c')
+    qc = QuantumCircuit(comp_r, q, c, name="GHZ_star_optimal")
+
+    # Extract calibration data
+    cal_data = extract_fidelities(cal_url, all_metrics=True)
+
+    # Determine the best move qubit
+    move_indices = [cal_data[1][q] for q in qubit_layout]
+    best_move = np.argmax(move_indices) + 1
+    T2 = cal_data[-1]["t2_time"]
+    t2_dict = {qubit + 1: T2[qubit + 1] for qubit in qubit_layout} ## +1 to match qubit indexing in cal data
+    cz_order = dict(sorted(t2_dict.items(), key=lambda item: item[1], reverse=True))
+    qubits_to_measure = list(cz_order.keys())
+    cz_order.pop(best_move)
+
+    # Construct the quantum circuit
+    qc.h(best_move)
+    qc.move(best_move, 0)
+    for qubit in cz_order.keys():
+        qc.cx(best_move, qubit)   
+    qc.move(best_move, 0)
+    qc.barrier()
+    qc.measure(sorted(qubits_to_measure), list(range(num_qubits)))
+
+    return qc
+
 def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
     """
     Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
@@ -648,7 +698,19 @@ class GHZBenchmark(Benchmark):
                 optimize_sqg=self.optimize_sqg,
             )
             final_ghz = ghz_native_transpiled
-
+        elif routine == "star_optimal":
+            ghz = generate_ghz_star(qubit_count)
+            circuit_group.add_circuit(ghz)
+            ghz_native_transpiled = transpile_to_IQM(
+                ghz,
+                self.backend,
+                existing_moves_handling=True,
+                perform_move_routing=False,
+                optimize_single_qubits=self.optimize_sqg,
+                optimization_level=self.qiskit_optim_level,
+                initial_layout= qubit_layout,
+            )
+            final_ghz = ghz_native_transpiled
         else:
             ghz_log = [generate_ghz_log_cruz(qubit_count), generate_ghz_log_mooney(qubit_count)]
             ghz_native_transpiled, _ = perform_backend_transpilation(
