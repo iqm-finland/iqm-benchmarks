@@ -1,5 +1,6 @@
-""" # pylint: disable=too-many-lines
-This module contains functions and classes for the Qscore benchmarking process. # pylint: disable=too-many-lines
+# pylint: disable=too-many-lines
+"""
+This module contains functions and classes for the Qscore benchmarking process.
 """
 
 import itertools
@@ -764,7 +765,7 @@ class QScoreBenchmark(Benchmark):
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
             return QuantumCircuit(1)
-        for i in range(1, num_qubits):
+        for i in range(1, num_qubits + 1):
             qaoa_qc.h(i)
         for layer in range(self.num_qaoa_layers):
             for move_qubit, edge_qubits in covermap.items():
@@ -1035,22 +1036,19 @@ class QScoreBenchmark(Benchmark):
                 if self.backend.has_resonators():
                     qc_opt = self.generate_maxcut_ansatz_star(graph, theta)
                 else:
-                    if self.backend.has_resonators():
-                        qc_opt = self.generate_maxcut_ansatz(graph, theta)
-                    else:
-                        qc_list_temp = []
-                        cz_count_temp = []
-                        for _ in range(self.num_trials):
-                            perm = np.random.permutation(num_nodes)
-                            mapping = dict(zip(graph.nodes, perm))
-                            G1_permuted = nx.relabel_nodes(graph, mapping)
-                            theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
-                            qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
-                            transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params)
-                            cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
-                            qc_list_temp.append(qc_perm)
-                        min_cz_index = cz_count_temp.index(min(cz_count_temp))
-                        qc_opt = qc_list_temp[min_cz_index]
+                    qc_list_temp = []
+                    cz_count_temp = []
+                    for _ in range(self.num_trials):
+                        perm = np.random.permutation(num_nodes)
+                        mapping = dict(zip(graph.nodes, perm))
+                        G1_permuted = nx.relabel_nodes(graph, mapping)
+                        theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
+                        qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
+                        transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params)
+                        cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
+                        qc_list_temp.append(qc_perm)
+                    min_cz_index = cz_count_temp.index(min(cz_count_temp))
+                    qc_opt = qc_list_temp[min_cz_index]
 
                 if len(qc_opt.count_ops()) != 0:
                     qc_list.append(qc_opt)
@@ -1071,6 +1069,8 @@ class QScoreBenchmark(Benchmark):
                         self.backend,
                         optimize_single_qubits=self.optimize_sqg,
                         existing_moves_handling=ExistingMoveHandlingOptions.KEEP,
+                        perform_move_routing=False,
+                        optimization_level=self.qiskit_optim_level,
                     )
                     for qc in qc_list
                 ]
