@@ -699,13 +699,13 @@ class QScoreBenchmark(Benchmark):
 
     def greedy_vertex_cover_with_mapping(self, G: nx.Graph):
         """
-        Approximate minimum vertex cover with mapping of nodes -> edges they cover.
+        Approximate a minimum vertex cover for a given graph, providing a mapping of nodes to the edges they cover.
 
         Args:
-            G (nx.Graph): input graph
+            G (nx.Graph): The input graph for which the vertex cover is to be computed.
 
         Returns:
-            cover_map (dict): {node: [(u,v), ...]} showing which edges each node covers
+            dict: A dictionary where keys are nodes and values are lists of edges that each node covers.
         """
 
         G = G.copy()
