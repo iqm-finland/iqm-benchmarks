@@ -333,13 +333,12 @@ def generate_ghz_star_optimal(
     c = ClassicalRegister(num_qubits, "c")
     qc = QuantumCircuit(comp_r, q, c, name="GHZ_star_optimal")
 
-    # Extract calibration data
     cal_data = extract_fidelities(cal_url, all_metrics=True)
     # Determine the best move qubit
     move_dict = {q + 1: cal_data[1][q] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
     best_move = max(move_dict, key=move_dict.get)
 
-    T2 = cal_data[-1]["t2_time"]
+    T2 = cal_data[-1]["t2_echo_time"]
     t2_dict = {qubit + 1: T2[qubit + 1] for qubit in qubit_layout}  ## +1 to match qubit indexing in cal data
     cz_order = dict(sorted(t2_dict.items(), key=lambda item: item[1], reverse=True))
     qubits_to_measure = list(cz_order.keys())
@@ -355,7 +354,6 @@ def generate_ghz_star_optimal(
     qc.measure(sorted(qubits_to_measure), list(range(num_qubits)))
 
     if inv:
-        # Initialize quantum and classical registers
         comp_r = QuantumRegister(1, "comp_r")  # Computational resonator
         q = QuantumRegister(backend.num_qubits, "q")  # Qubits
         c = ClassicalRegister(num_qubits, "c")
