@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.51
+============
+* Circuit transpilation improvements for Q-score implemented.
+
 Version 2.50
 ============
 * Update iqm-client and iqm-station-control-client dependency versions as part of IQM OS 4.3 release.
