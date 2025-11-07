@@ -321,6 +321,8 @@ def generate_ghz_star_optimal(
             The calibration URL for extracting fidelities.
         backend: IQMBackendBase
             The backend to be used for the quantum circuit.
+        inv: bool
+            Whether to generate the inverse circuit.
 
     Returns:
         QuantumCircuit: A quantum circuit generating a GHZ state on a given number of qubits.
@@ -349,6 +351,7 @@ def generate_ghz_star_optimal(
     qc.move(best_move, 0)
     for qubit in cz_order.keys():
         qc.cx(0, qubit)
+        qc.barrier()
     qc.move(best_move, 0)
     qc.barrier()
     qc.measure(sorted(qubits_to_measure), list(range(num_qubits)))
@@ -362,6 +365,7 @@ def generate_ghz_star_optimal(
         qc.move(best_move, 0)
         for qubit in reversed(cz_order.keys()):
             qc.cx(0, qubit)
+            qc.barrier()
         qc.move(best_move, 0)
         qc.h(best_move)
         qc.barrier()
