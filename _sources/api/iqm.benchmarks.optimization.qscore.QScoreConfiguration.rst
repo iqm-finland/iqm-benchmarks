@@ -26,6 +26,7 @@ iqm.benchmarks.optimization.qscore.QScoreConfiguration
       ~QScoreConfiguration.custom_qubits_array
       ~QScoreConfiguration.qiskit_optim_level
       ~QScoreConfiguration.optimize_sqg
+      ~QScoreConfiguration.num_trials
       ~QScoreConfiguration.seed
       ~QScoreConfiguration.REM
       ~QScoreConfiguration.mit_shots

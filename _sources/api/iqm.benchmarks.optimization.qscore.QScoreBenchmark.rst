@@ -30,5 +30,7 @@ iqm.benchmarks.optimization.qscore.QScoreBenchmark
       ~QScoreBenchmark.choose_qubits_naive
       ~QScoreBenchmark.execute
       ~QScoreBenchmark.generate_maxcut_ansatz
+      ~QScoreBenchmark.generate_maxcut_ansatz_star
+      ~QScoreBenchmark.greedy_vertex_cover_with_mapping
    
    

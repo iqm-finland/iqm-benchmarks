@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.optimization.qscore &#8212; IQM Benchmarks 2.50 documentation</title>
+    <title>iqm.benchmarks.optimization.qscore &#8212; IQM Benchmarks 2.51 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=3c85b58e"></script>
+    <script src="../_static/documentation_options.js?v=87793793"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.optimization" href="iqm.benchmarks.optimization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.50" />
-    <meta name="docbuild:last-update" content="2025-10-30"/>
+  <meta name="docsearch:version" content="2.51" />
+    <meta name="docbuild:last-update" content="2025-11-07"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.50 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.50 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.51 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.51 documentation - Home"/>
   
   
 </a></div>
@@ -441,7 +441,7 @@
                   
   <section id="module-iqm.benchmarks.optimization.qscore">
 <span id="iqm-benchmarks-optimization-qscore"></span><h1>iqm.benchmarks.optimization.qscore<a class="headerlink" href="#module-iqm.benchmarks.optimization.qscore" title="Link to this heading">#</a></h1>
-<p>Qscore benchmark</p>
+<p>This module contains functions and classes for the Qscore benchmarking process.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
@@ -460,16 +460,19 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.get_optimal_angles.html#iqm.benchmarks.optimization.qscore.get_optimal_angles" title="iqm.benchmarks.optimization.qscore.get_optimal_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_optimal_angles</span></code></a>(num_layers)</p></td>
 <td><p>provides the optimal angles for QAOA MaxCut ansatz given the number of layers</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.is_successful.html#iqm.benchmarks.optimization.qscore.is_successful" title="iqm.benchmarks.optimization.qscore.is_successful"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_successful</span></code></a>(approximation_ratio)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.group_rzz_gates.html#iqm.benchmarks.optimization.qscore.group_rzz_gates" title="iqm.benchmarks.optimization.qscore.group_rzz_gates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">group_rzz_gates</span></code></a>(circuit)</p></td>
+<td><p>Extract and group commuting RZZ gates so that gates sharing a qubit are placed next to each other.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.is_successful.html#iqm.benchmarks.optimization.qscore.is_successful" title="iqm.benchmarks.optimization.qscore.is_successful"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_successful</span></code></a>(approximation_ratio)</p></td>
 <td><p>Check whether a Q-score benchmark returned approximation ratio above beta*, therefore being successful.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.plot_approximation_ratios.html#iqm.benchmarks.optimization.qscore.plot_approximation_ratios" title="iqm.benchmarks.optimization.qscore.plot_approximation_ratios"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_approximation_ratios</span></code></a>(nodes, beta_ratio, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.plot_approximation_ratios.html#iqm.benchmarks.optimization.qscore.plot_approximation_ratios" title="iqm.benchmarks.optimization.qscore.plot_approximation_ratios"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_approximation_ratios</span></code></a>(nodes, beta_ratio, ...)</p></td>
 <td><p>Generate the figure of approximation ratios vs number of nodes,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.qscore_analysis.html#iqm.benchmarks.optimization.qscore.qscore_analysis" title="iqm.benchmarks.optimization.qscore.qscore_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qscore_analysis</span></code></a>(run)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.qscore_analysis.html#iqm.benchmarks.optimization.qscore.qscore_analysis" title="iqm.benchmarks.optimization.qscore.qscore_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qscore_analysis</span></code></a>(run)</p></td>
 <td><p>Analysis function for a QScore experiment</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.run_QAOA.html#iqm.benchmarks.optimization.qscore.run_QAOA" title="iqm.benchmarks.optimization.qscore.run_QAOA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_QAOA</span></code></a>(counts, graph_physical, qubit_node, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.optimization.qscore.run_QAOA.html#iqm.benchmarks.optimization.qscore.run_QAOA" title="iqm.benchmarks.optimization.qscore.run_QAOA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_QAOA</span></code></a>(counts, graph_physical, qubit_node, ...)</p></td>
 <td><p>Solves the cut size of MaxCut for a graph using QAOA.</p></td>
 </tr>
 </tbody>
@@ -561,7 +564,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-10-30.
+  Last updated on 2025-11-07.
   <br/>
 </p>
   </div>

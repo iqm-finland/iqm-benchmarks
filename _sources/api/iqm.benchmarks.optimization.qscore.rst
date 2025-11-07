@@ -19,6 +19,7 @@ iqm.benchmarks.optimization.qscore
       create_objective_function
       cut_cost_function
       get_optimal_angles
+      group_rzz_gates
       is_successful
       plot_approximation_ratios
       qscore_analysis
