@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.52
+============
+* Circuit transpilation improvements for GHZ benchmark implemented.
+
 Version 2.51
 ============
 * Circuit transpilation improvements for Q-score implemented.
