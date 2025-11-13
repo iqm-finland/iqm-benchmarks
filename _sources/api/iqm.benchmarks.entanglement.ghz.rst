@@ -22,6 +22,7 @@ iqm.benchmarks.entanglement.ghz
       generate_ghz_log_mooney
       generate_ghz_spanning_tree
       generate_ghz_star
+      generate_ghz_star_optimal
       get_cx_map
       get_edges
       plot_fidelities
