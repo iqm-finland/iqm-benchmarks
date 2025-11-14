@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Sequence, Tuple, Type
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
+from numba.core.types import Boolean
 from qiskit.circuit import ParameterVector
 import xarray as xr
 
@@ -127,8 +128,8 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
     # Set axis labels and limits
     ax1.set_ylabel("Total CLOPS experiment time (seconds)")
     ax2.set_ylabel("Total CLOPS experiment time (%)")
-    ax1.set_ylim(-0.2, clops_time + all_data["assign_parameters_total"] + all_data["time_transpile"] + 1)
-    ax2.set_ylim(-0.2, 100)
+    # ax1.set_ylim(-0.2, clops_time + all_data["assign_parameters_total"] + all_data["time_transpile"] + 1)
+    # ax2.set_ylim(-0.2, 100)
 
     # Set x-ticks and labels
     time_types = ["Remote (components)", "Wall-time (CLOPS)", "Wall-time (all components)"]
@@ -140,6 +141,12 @@ def plot_times(clops_data: xr.Dataset, observations: Dict[int, Dict[str, Dict[st
             f"Total execution times for CLOPS experiment\n"
             f"{backend_name}, {execution_timestamp}\n"
             f"CLOPS_v {all_data['clops_v']['value']} on qubits {qubits}\n"
+        )
+    elif "clops_v" not in all_data:
+        plt.title(
+            f"Total execution times for CLOPS experiment\n"
+            f"{backend_name}, {execution_timestamp}\n"
+            f"CLOPS_h {all_data['clops_h']['value']} on qubits {qubits}\n"
         )
     else:
         plt.title(
@@ -162,6 +169,7 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
     Returns:
         Dict[str, float]: A dictionary of elapsed times of all CLOPS jobs
     """
+    job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"
     all_job_elapsed: Dict = {}
     totals_keys: Dict = {}
     for u_index, update in enumerate(job_meta):
@@ -170,20 +178,18 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
             # ["timestamps"] might be empty if backend is a simulator
             if job_meta[update][batch]["timestamps"] is not None:
                 x = job_meta[update][batch]["timestamps"]
-                job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"  # Is it possible to extract this automatically?
                 compile_f = datetime.strptime(x["compilation_ended"], job_time_format)
                 compile_i = datetime.strptime(x["compilation_started"], job_time_format)
-                # submit_f = datetime.strptime(x["submit_end"], job_time_format)
-                # submit_i = datetime.strptime(x["submit_start"], job_time_format)
+                post_processing_i = datetime.strptime(x["post_processing_pending"], job_time_format)
                 execution_f = datetime.strptime(x["execution_ended"], job_time_format)
                 execution_i = datetime.strptime(x["execution_started"], job_time_format)
                 job_f = datetime.strptime(x["ready"], job_time_format)
                 job_i = datetime.strptime(x["received"], job_time_format)
 
                 all_job_elapsed[update][batch] = {
-                    "job_total": job_f - job_i,
+                    "job_total": job_f - job_i, # Job total includes queueing time and thus depends on number of jobs submitted simultaneously
                     "compile_total": compile_f - compile_i,
-                    # "submit_total": submit_f - submit_i,
+                    "post_processing_total": job_f - post_processing_i, # Post-processing is the last step
                     "execution_total": execution_f - execution_i,
                 }
 
@@ -201,7 +207,7 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
     if not totals_keys:
         return overall_elapsed
 
-    overall_elapsed = {k: 0 for k in totals_keys}
+    overall_elapsed = {k: 0 for k in totals_keys} | {"clops_time": 0}
     overall_elapsed_per_update: Dict = {}
     for update in job_meta:
         overall_elapsed_per_update[update] = {k: 0 for k in totals_keys}
@@ -209,8 +215,8 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
             for k in totals_keys:
                 overall_elapsed_per_update[update][k] += all_job_elapsed[update][batch][k].total_seconds()
         for k in totals_keys:
-            overall_elapsed[k] += overall_elapsed_per_update[update][k]
-
+            if k != "job_total":
+                overall_elapsed[k] += overall_elapsed_per_update[update][k]
     return overall_elapsed
 
 
