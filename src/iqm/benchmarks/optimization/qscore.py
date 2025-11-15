@@ -1044,7 +1044,7 @@ class QScoreBenchmark(Benchmark):
                         G1_permuted = nx.relabel_nodes(graph, mapping)
                         theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
                         qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
-                        transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params)
+                        transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params) ## need to check here
                         cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
                         qc_list_temp.append(qc_perm)
                     min_cz_index = cz_count_temp.index(min(cz_count_temp))
@@ -1071,6 +1071,7 @@ class QScoreBenchmark(Benchmark):
                         existing_moves_handling=ExistingMoveHandlingOptions.KEEP,
                         perform_move_routing=False,
                         optimization_level=self.qiskit_optim_level,
+                        initial_layout=active_qubit_set,
                     )
                     for qc in qc_list
                 ]
