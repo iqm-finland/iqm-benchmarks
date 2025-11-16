@@ -923,39 +923,22 @@ class QScoreBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
-        nqubits = self.backend.num_qubits
-
-        if self.choose_qubits_routine == "custom":
-            if self.use_virtual_node:
-                node_numbers = [len(qubit_layout) + 1 for qubit_layout in self.custom_qubits_array]
-            else:
-                node_numbers = [len(qubit_layout) for qubit_layout in self.custom_qubits_array]
-
+        if self.use_virtual_node:
+            max_num_nodes = self.max_num_nodes + 1
         else:
-            if self.max_num_nodes is None or self.max_num_nodes == nqubits + 1:
-                if self.use_virtual_node:
-                    max_num_nodes = nqubits + 1
-                else:
-                    max_num_nodes = nqubits
-            else:
-                max_num_nodes = self.max_num_nodes
-            node_numbers = list(range(self.min_num_nodes, max_num_nodes + 1))
+            max_num_nodes = self.max_num_nodes
+        node_numbers = list(range(self.min_num_nodes, max_num_nodes + 1))
 
         dataset.attrs.update({"max_num_nodes": node_numbers[-1]})
         dataset.attrs.update({"node_numbers": node_numbers})
 
-        for num_nodes in node_numbers:
+        for idx, num_nodes in enumerate(node_numbers):
             qc_list = []
             qc_transpiled_list: List[QuantumCircuit] = []
             execution_results: List[Dict[str, int]] = []
             graph_list = []
             qubit_set_list = []
             theta_list = []
-            ## updates the number of qubits to choose for the graph problem.
-            if self.use_virtual_node:
-                updated_num_nodes = num_nodes - 1
-            else:
-                updated_num_nodes = num_nodes
 
             qcvv_logger.debug(f"Executing on {self.num_instances} random graphs with {num_nodes} nodes.")
 
@@ -971,9 +954,10 @@ class QScoreBenchmark(Benchmark):
 
             # Choose the qubit layout
             if self.choose_qubits_routine.lower() == "naive":
-                qubit_set = self.choose_qubits_naive(updated_num_nodes)
+                qubit_set = self.choose_qubits_naive(num_nodes)
             elif self.choose_qubits_routine.lower() == "custom" or self.choose_qubits_routine.lower() == "mapomatic":
-                qubit_set = self.choose_qubits_custom(updated_num_nodes)
+                self.custom_qubits_array = self.custom_qubits_array + [self.custom_qubits_array[-1]]  # to avoid index error
+                qubit_set = self.custom_qubits_array[idx]
             else:
                 raise ValueError('choose_qubits_routine must either be "naive" or "custom".')
             qubit_set_list.append(qubit_set)
@@ -1038,6 +1022,7 @@ class QScoreBenchmark(Benchmark):
                 else:
                     qc_list_temp = []
                     cz_count_temp = []
+                    qc_transpiled_list = []
                     for _ in range(self.num_trials):
                         perm = np.random.permutation(num_nodes)
                         mapping = dict(zip(graph.nodes, perm))
@@ -1045,6 +1030,7 @@ class QScoreBenchmark(Benchmark):
                         theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
                         qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
                         transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params) ## need to check here
+                        qc_transpiled_list.append(transpiled_qc_temp[0])
                         cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
                         qc_list_temp.append(qc_perm)
                     min_cz_index = cz_count_temp.index(min(cz_count_temp))
@@ -1066,12 +1052,12 @@ class QScoreBenchmark(Benchmark):
                 transpiled_qc = [
                     transpile_to_IQM(
                         qc,
-                        self.backend,
+                        backend = self.backend,
                         optimize_single_qubits=self.optimize_sqg,
                         existing_moves_handling=ExistingMoveHandlingOptions.KEEP,
                         perform_move_routing=False,
                         optimization_level=self.qiskit_optim_level,
-                        initial_layout=active_qubit_set,
+                        coupling_map = effective_coupling_map,
                     )
                     for qc in qc_list
                 ]
