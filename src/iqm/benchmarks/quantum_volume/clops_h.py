@@ -292,9 +292,9 @@ class CLOPSHBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
-        if self.num_circuits != 5000 or self.depth != 100 or self.num_shots != 100:
+        if self.num_circuits != 1000 or self.depth != 100 or self.num_shots != 100:
             qcvv_logger.info(
-                f"NB: CLOPS parameters, by definition, are [num_circuits=5000, num_layers=100, num_shots=100]"
+                f"NB: CLOPS parameters, by definition, are [num_circuits=1000, num_layers=100, num_shots=100]"
                 f" You chose"
                 f" [num_circuits={self.num_circuits}, num_layers={self.depth}, num_shots={self.num_shots}]."
             )
@@ -384,15 +384,16 @@ class CLOPSHBenchmark(Benchmark):
 
 class CLOPSHConfiguration(BenchmarkConfigurationBase):
     """CLOPS configuration.
-
     Attributes:
         benchmark (Type[Benchmark]): CLOPS Benchmark.
         qubits (Sequence[int]): The Sequence (List or Tuple) of physical qubit labels in which to run the benchmark.
                             * The physical qubit layout should correspond to the one used to establish QV.
         num_circuits (int): The number of parametrized circuit layouts.
-                            * By definition of arXiv:2110.14108 [quant-ph] set to 100.
+                            * Default is 1000.
         num_shots (int): The number of measurement shots per circuit to perform.
-                            * By definition of arXiv:2110.14108 [quant-ph] set to 100.
+                            * By definition set to 100.
+        num_layers (int): The number of layers in each circuit.
+                            * By definition set to 100.
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
                             * The optimization level should correspond to the one used to establish QV.
                             * Default is 3.
@@ -400,14 +401,17 @@ class CLOPSHConfiguration(BenchmarkConfigurationBase):
                             * The optimize_sqg value should correspond to the one used to establish QV.
                             * Default is True
         entangling_gate (str): The entangling gate to use for the 2-qubit layers. It must be natively supported by the backend.
+                            * Default is "cz".
+        max_circuits_per_batch (int): Maximum number of circuits to submit in a single batch.
+                            * Default is 100, but this depends on the backend restrictions and can be adjusted accordingly.
     """
 
     benchmark: Type[Benchmark] = CLOPSHBenchmark
     qubits: Sequence[int]
-    num_circuits: int = 100
+    num_circuits: int = 1000
     num_shots: int = 100
     num_layers: int = 100
-    qiskit_optim_level: int = 3
-    optimize_sqg: bool = True
+    qiskit_optim_level: int = 0
+    optimize_sqg: bool = False
     entangling_gate: str = "cz"
     max_circuits_per_batch: int = 100

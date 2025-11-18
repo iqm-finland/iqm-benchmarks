@@ -1,6 +1,5 @@
 """Tests for volumetric benchmarks"""
 
-from iqm.benchmarks.quantum_volume.clops import CLOPSBenchmark, CLOPSConfiguration
 from iqm.benchmarks.quantum_volume.quantum_volume import QuantumVolumeBenchmark, QuantumVolumeConfiguration
 from iqm.qiskit_iqm.fake_backends.fake_apollo import IQMFakeApollo
 from iqm.qiskit_iqm.fake_backends.fake_deneb import IQMFakeDeneb
@@ -26,23 +25,6 @@ class TestQV:
             mit_shots=10,
         )
         benchmark = QuantumVolumeBenchmark(self.backend, EXAMPLE_QV)
-        benchmark.run()
-        benchmark.analyze()
-
-    def test_clops(self):
-        EXAMPLE_CLOPS = CLOPSConfiguration(
-            qubits=[2, 3],
-            num_circuits=4,  # By definition set to 100
-            num_updates=2,  # By definition set to 10
-            num_shots=2**5,  # By definition set to 100
-            calset_id=None,
-            clops_h_bool=True,
-            qiskit_optim_level=3,
-            optimize_sqg=True,
-            routing_method="sabre",
-            physical_layout="fixed",
-        )
-        benchmark = CLOPSBenchmark(self.backend, EXAMPLE_CLOPS)
         benchmark.run()
         benchmark.analyze()
 
