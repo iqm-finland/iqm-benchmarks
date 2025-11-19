@@ -254,14 +254,17 @@ class CLOPSHBenchmark(Benchmark):
                     break # In star architectures entangling use move-cz-move sequences which are not parallelizable
             qc.barrier()
             # 1 qubit layer
-            np.random.uniform(0, np.pi * 2)
             for q in qubits:
-                z_angles = [np.random.uniform(0, np.pi * 2) for _ in range(3)]
-                qc.rz(z_angles[0], q)
-                qc.x(q)
-                qc.rz(z_angles[1], q)
-                qc.x(q)
-                qc.rz(z_angles[2], q)
+                angles = [np.random.uniform(0, np.pi * 2) for _ in range(3)]
+                # qc.rz(angles[0], q)
+                # qc.x(q)
+                # qc.rz(angles[1], q)
+                # qc.x(q)
+                # qc.rz(angles[2], q)
+
+                qc.rz(angles[0],q)
+                qc.r(angles[1], 0,q)
+                qc.rz(angles[2],q)
             qc.barrier()
         qc.measure_all()
 
@@ -269,14 +272,14 @@ class CLOPSHBenchmark(Benchmark):
 
     @timeit
     def generate_circuit_list(
-            self,
+            self, n_circuits: int
     ) -> List[QuantumCircuit]:
         """Generate a list of parametrized QV quantum circuits, with measurements at the end.
 
         Returns:
             List[QuantumCircuit]: the list of parametrized QV quantum circuits.
         """
-        qc_list = [self.generate_single_circuit() for _ in range(self.num_circuits)]
+        qc_list = [self.generate_single_circuit() for _ in range(n_circuits)]
         self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=f"{self.qubits}", circuits=qc_list))
         return qc_list
 
@@ -299,47 +302,50 @@ class CLOPSHBenchmark(Benchmark):
                 f" [num_circuits={self.num_circuits}, num_layers={self.depth}, num_shots={self.num_shots}]."
             )
 
-        qcvv_logger.info(
-            f"Now generating {self.num_circuits} parametrized circuit templates on {len(self.qubits)} qubits",
-        )
-        qc_list, time_circuit_generate = self.generate_circuit_list()
-        self.time_circuit_generate = time_circuit_generate
-
-        qcvv_logger.info(
-            f"Transpiling {self.num_circuits} circuits on qubits {self.qubits}",
-        )
-
-        transpiled_qc_list, time_transpile = perform_backend_transpilation(
-            qc_list,
-            self.backend,
-            self.qubits,
-            coupling_map=self.backend.coupling_map,
-            qiskit_optim_level=self.qiskit_optim_level,
-            optimize_sqg=False, # Necessary, otherwise single qubit gates are optimized away
-            routing_method=self.routing_method,
-        )
-        self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=f"{self.qubits}", circuits=transpiled_qc_list))
-
-        qcvv_logger.info(f"Submitting all jobs")
-
         all_times_submit = {}
         all_times_retrieve = {}
-
-        # Submit all circuits to execute
         all_jobs = []
+        all_untranspiled_circuits = []
+        all_transpiled_circuits = []
+        total_time_circuit_generate = 0.0
+        total_time_transpile = 0.0
+
         n_batches = int(np.ceil(self.num_circuits / self.configuration.max_circuits_per_batch))
         self.num_updates = n_batches
+
         for update in range(n_batches):
-            batch_qc_list = transpiled_qc_list[
-                update
-                * self.configuration.max_circuits_per_batch : min(
-                    (update + 1) * self.configuration.max_circuits_per_batch, self.num_circuits
-                )
-            ]
-            qcvv_logger.info(f"Submitting batch {update + 1} / {n_batches} with {len(batch_qc_list)} circuits")
+            circuits_in_batch = min(
+                self.configuration.max_circuits_per_batch,
+                self.num_circuits - update * self.configuration.max_circuits_per_batch
+            )
+
+            qcvv_logger.info(
+                f"Generating {circuits_in_batch} parametrized circuit templates for batch {update + 1} / {n_batches}",
+            )
+            qc_list, time_circuit_generate = self.generate_circuit_list(circuits_in_batch)
+            all_untranspiled_circuits.extend(qc_list)
+            total_time_circuit_generate += time_circuit_generate
+
+            qcvv_logger.info(
+                f"Transpiling {circuits_in_batch} circuits on qubits {self.qubits} for batch {update + 1} / {n_batches}",
+            )
+
+            transpiled_qc_list, time_transpile = perform_backend_transpilation(
+                qc_list,
+                self.backend,
+                self.qubits,
+                coupling_map=self.backend.coupling_map,
+                qiskit_optim_level=self.qiskit_optim_level,
+                optimize_sqg=False, # Necessary to be False, otherwise single qubit gates are optimized away
+                routing_method=self.routing_method,
+            )
+            all_transpiled_circuits.extend(transpiled_qc_list)
+            total_time_transpile += time_transpile
+
+            qcvv_logger.info(f"Submitting batch {update + 1} / {n_batches} with {len(transpiled_qc_list)} circuits")
 
             batch_jobs, time_submit = submit_execute(
-                {tuple(self.qubits): batch_qc_list},
+                {tuple(self.qubits): transpiled_qc_list},
                 backend,
                 self.num_shots,
                 self.calset_id,
@@ -349,6 +355,9 @@ class CLOPSHBenchmark(Benchmark):
             all_jobs.append(batch_jobs)
             all_times_submit[f"update_{update + 1}"] = time_submit
 
+        self.untranspiled_circuits.circuit_groups.append(CircuitGroup(name=f"{self.qubits}", circuits=all_untranspiled_circuits))
+        self.transpiled_circuits.circuit_groups.append(CircuitGroup(name=f"{self.qubits}", circuits=all_transpiled_circuits))
+        self.time_circuit_generate = total_time_circuit_generate
 
         qcvv_logger.info(f"Retrieving counts")
         for update in range(n_batches):
@@ -362,12 +371,12 @@ class CLOPSHBenchmark(Benchmark):
             all_times_retrieve[f"update_{update + 1}"] = time_retrieve
 
         # COUNT OPERATIONS
-        all_op_counts = count_native_gates(backend, transpiled_qc_list)
+        all_op_counts = count_native_gates(backend, all_transpiled_circuits)
 
         dataset.attrs.update(
             {
-                "time_circuit_generate": time_circuit_generate,
-                "time_transpile": time_transpile,
+                "time_circuit_generate": total_time_circuit_generate,
+                "time_transpile": total_time_transpile,
                 "job_meta_per_update": self.job_meta_per_update,
                 "operation_counts": all_op_counts,
                 "all_times_submit": all_times_submit,
