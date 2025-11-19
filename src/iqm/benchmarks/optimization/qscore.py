@@ -726,9 +726,9 @@ class QScoreBenchmark(Benchmark):
 
     def generate_maxcut_ansatz_star(  # pylint: disable=too-many-branches
         self,
-        graph,
-        theta,
-        qubit_set,
+        graph: Graph,
+        theta: list[float],
+        qubit_set: Optional[list[int]] = None,
     ):
         """Generate an ansatz circuit for QAOA MaxCut, with measurements at the end.
 
