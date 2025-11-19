@@ -46,6 +46,7 @@ from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
     extract_fidelities,
+    extract_fidelities_external,
     perform_backend_transpilation,
     reduce_to_active_qubits,
     retrieve_all_counts,
@@ -690,7 +691,10 @@ class GHZBenchmark(Benchmark):
                     f"The current backend is a star architecture for which a suboptimal state generation routine is chosen. Consider setting state_generation_routine={routine}."
                 )
             if self.cal_url:
-                edges_cal, fidelities_cal, _ = extract_fidelities(self.cal_url)
+                if "localhost" in self.cal_url:
+                    edges_cal, fidelities_cal = extract_fidelities_external(self.cal_url)
+                else:
+                    edges_cal, fidelities_cal, _, _ = extract_fidelities(self.cal_url)
                 graph = get_edges(self.backend.coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
                 graph = get_edges(self.backend.coupling_map, qubit_layout)
