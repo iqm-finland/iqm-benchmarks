@@ -930,6 +930,9 @@ class QScoreBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
+        if self.max_num_nodes is None:
+            ValueError(f"max_num_nodes must be specified in QScoreConfiguration and should not exceed {self.backend.num_qubits}.")
+
         if self.choose_qubits_routine == "custom":
             if self.use_virtual_node:
                 node_numbers = [len(qubit_layout) + 1 for qubit_layout in self.custom_qubits_array]
@@ -1146,7 +1149,6 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
         min_num_nodes (int): The min number of nodes to be taken into account, which should be >= 2.
                             * Default is 2.
         max_num_nodes (int): The max number of nodes to be taken into account, which has to be <= num_qubits + 1.
-                            * Default is None
         use_virtual_node (bool): Parameter to increase the potential Qscore by +1.
                             * Default is True.
         use_classically_optimized_angles (bool): Use pre-optimised tuned parameters in the QAOA circuit.
@@ -1176,7 +1178,7 @@ class QScoreConfiguration(BenchmarkConfigurationBase):
     num_instances: int
     num_qaoa_layers: int = 1
     min_num_nodes: int = 2
-    max_num_nodes: Optional[int] = None
+    max_num_nodes: int
     use_virtual_node: bool = True
     use_classically_optimized_angles: bool = True
     choose_qubits_routine: Literal["naive", "custom"] = "naive"
