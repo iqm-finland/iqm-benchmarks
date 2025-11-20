@@ -541,12 +541,12 @@ def qscore_analysis(run: BenchmarkRunResult) -> BenchmarkAnalysisResult:
 
         if success:
             qcvv_logger.info(
-                f"Q-Score = {num_nodes} passed with approximation ratio (Beta) {approximation_ratio:.4f} with uncertainty {std_of_approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+                f"Q-Score = {num_nodes} passed with approximation ratio (Beta) {approximation_ratio:.4f} ± {std_of_approximation_ratio:.4f} with uncertainty; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
             )
             qscore = num_nodes
         else:
             qcvv_logger.info(
-                f"Q-Score = {num_nodes} failed with approximation ratio (Beta) {approximation_ratio:.4f} < 0.2 with uncertainty {std_of_approximation_ratio:.4f}; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
+                f"Q-Score = {num_nodes} failed with approximation ratio (Beta) {approximation_ratio:.4f} ± {std_of_approximation_ratio:.4f} < 0.2; Avg MaxCut size: {np.mean(cut_sizes_list):.4f}"
             )
         qubit_indices = dataset.attrs[num_nodes]["qubit_set"][0]
         observations.extend(
