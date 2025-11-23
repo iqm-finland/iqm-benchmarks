@@ -744,17 +744,21 @@ class QScoreBenchmark(Benchmark):
         beta = theta[self.num_qaoa_layers :]
         if qubit_set is None:
             qubit_set_resonator = list(range(self.graph_physical.number_of_nodes() + 1))
-            qubit_set_resonator = [q+1 for q in qubit_set_resonator]
-        else:    
-            qubit_set_resonator = [q+1 for q in qubit_set]
+            qubit_set_resonator = [q + 1 for q in qubit_set_resonator]
+        else:
+            qubit_set_resonator = [q + 1 for q in qubit_set]
         if self.graph_physical.number_of_nodes() != graph.number_of_nodes():
             num_qubits = self.graph_physical.number_of_nodes()
             # re-label the nodes to be between 0 and _num_qubits
-            self.node_to_qubit = {node: qubit_set_resonator[qubit] for qubit, node in enumerate(list(self.graph_physical.nodes))}
+            self.node_to_qubit = {
+                node: qubit_set_resonator[qubit] for qubit, node in enumerate(list(self.graph_physical.nodes))
+            }
             self.qubit_to_node = dict(enumerate(list(self.graph_physical.nodes)))
         else:
             num_qubits = graph.number_of_nodes()
-            self.node_to_qubit = {node: qubit_set_resonator[node] for node in list(self.graph_physical.nodes)}  # no relabeling
+            self.node_to_qubit = {
+                node: qubit_set_resonator[node] for node in list(self.graph_physical.nodes)
+            }  # no relabeling
             self.qubit_to_node = {node: node for node in list(self.graph_physical.nodes)}
 
         covermap = self.greedy_vertex_cover_with_mapping(self.graph_physical)
@@ -767,7 +771,7 @@ class QScoreBenchmark(Benchmark):
         q = QuantumRegister(self.backend.num_qubits, "q")
         c = ClassicalRegister(num_qubits, "c")
         qaoa_qc = IQMCircuit(compr, q, c)
-        qubit_list = sorted(list(self.node_to_qubit.values()))
+        qubit_list = list(self.node_to_qubit.values())
 
         # in case the graph is trivial: return empty circuit
         if num_qubits == 0:
@@ -931,7 +935,9 @@ class QScoreBenchmark(Benchmark):
         self.add_all_meta_to_dataset(dataset)
 
         if self.max_num_nodes is None:
-            ValueError(f"max_num_nodes must be specified in QScoreConfiguration and should not exceed {self.backend.num_qubits}.")
+            ValueError(
+                f"max_num_nodes must be specified in QScoreConfiguration and should not exceed {self.backend.num_qubits}."
+            )
 
         if self.choose_qubits_routine == "custom":
             if self.use_virtual_node:
@@ -940,7 +946,7 @@ class QScoreBenchmark(Benchmark):
                 node_numbers = [len(qubit_layout) for qubit_layout in self.custom_qubits_array]
 
         else:
-            if self.use_virtual_node: ## if nqubits are used then with virtual node, max_num_nodes is nqubits + 1
+            if self.use_virtual_node:  ## if nqubits are used then with virtual node, max_num_nodes is nqubits + 1
                 max_num_nodes = self.max_num_nodes + 1
             else:
                 max_num_nodes = self.max_num_nodes
