@@ -31,6 +31,7 @@ from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
+import warnings
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
@@ -483,7 +484,7 @@ def get_edges(
     for idx, edge in enumerate(coupling_map):
         if edge[0] in qubit_layout and edge[1] in qubit_layout:
             if not set(edge) in edges_patch:
-                edges_patch.append(set(edge))
+                edges_patch.append(edge)
 
     if fidelities_cal is not None and edges_cal is not None:
         fidelities_cal = list(
@@ -492,9 +493,13 @@ def get_edges(
         fidelities_patch = []
         for edge in edges_patch:
             for idx, edge_2 in enumerate(edges_cal):
-                if edge == set(edge_2):
+                if set(edge) == set(edge_2):
                     fidelities_patch.append(fidelities_cal[idx])
-        weights = -np.log(np.array(fidelities_patch))
+        if len(fidelities_patch) != len(edges_patch):
+            warnings.warn(f"Not all calibration fidelities were found for the selected qubit layout {qubit_layout}, using unweighted graph for circuit creation.")
+            weights = np.ones(len(edges_patch))
+        else:
+            weights = -np.log(np.array(fidelities_patch))
     else:
         weights = np.ones(len(edges_patch))
     graph = Graph()
@@ -502,6 +507,7 @@ def get_edges(
         graph.add_edge(*edge, weight=weights[idx])
     if not is_connected(graph):
         print("Warning: The subgraph of selected qubit_layout is not connected.")
+    print(edges_patch, edges_cal)
     return graph
 
 
