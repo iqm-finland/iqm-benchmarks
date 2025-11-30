@@ -934,11 +934,6 @@ class QScoreBenchmark(Benchmark):
         dataset = xr.Dataset()
         self.add_all_meta_to_dataset(dataset)
 
-        if self.max_num_nodes is None:
-            ValueError(
-                f"max_num_nodes must be specified in QScoreConfiguration and should not exceed {self.backend.num_qubits}."
-            )
-
         if self.choose_qubits_routine == "custom":
             if self.use_virtual_node:
                 node_numbers = [len(qubit_layout) + 1 for qubit_layout in self.custom_qubits_array]
