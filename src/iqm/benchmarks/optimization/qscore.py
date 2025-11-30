@@ -1037,24 +1037,29 @@ class QScoreBenchmark(Benchmark):
                 else:
                     theta = get_optimal_angles(self.num_qaoa_layers)
 
-                theta_list.append(theta)
-
                 if self.backend.has_resonators():
                     qc_opt = self.generate_maxcut_ansatz_star(graph, theta, active_qubit_set)
                 else:
                     qc_list_temp = []
                     cz_count_temp = []
+                    theta_temp = []
                     for _ in range(self.num_trials):
                         perm = np.random.permutation(num_nodes)
                         mapping = dict(zip(graph.nodes, perm))
                         G1_permuted = nx.relabel_nodes(graph, mapping)
-                        theta = calculate_optimal_angles_for_QAOA_p1(G1_permuted)
+                        theta = (
+                            calculate_optimal_angles_for_QAOA_p1(G1_permuted)
+                            if G1_permuted.number_of_edges() != 0
+                            else [1.0, 1.0]
+                        )
                         qc_perm = self.generate_maxcut_ansatz(G1_permuted, theta)
                         transpiled_qc_temp, _ = perform_backend_transpilation([qc_perm], **transpilation_params)
                         cz_count_temp.append(transpiled_qc_temp[0].count_ops().get("cz", 0))
                         qc_list_temp.append(qc_perm)
+                        theta_temp.append(theta)
                     min_cz_index = cz_count_temp.index(min(cz_count_temp))
                     qc_opt = qc_list_temp[min_cz_index]
+                    theta_list.append(theta_temp[min_cz_index])
 
                 if len(qc_opt.count_ops()) != 0:
                     qc_list.append(qc_opt)
