@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Q-Score &#8212; IQM Benchmarks 2.52 documentation</title>
+    <title>Q-Score &#8212; IQM Benchmarks 2.53 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=900db7f5"></script>
+    <script src="../_static/documentation_options.js?v=2bf135e8"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="Greenberger–Horne–Zeilinger (GHZ) State Fidelity" href="example_ghz.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.52" />
-    <meta name="docbuild:last-update" content="2025-11-13"/>
+  <meta name="docsearch:version" content="2.53" />
+    <meta name="docbuild:last-update" content="2025-12-08"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.52 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.52 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.53 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.53 documentation - Home"/>
   
   
 </a></div>
@@ -471,7 +471,7 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;fakeadonis&quot;</span>
-<span class="c1">#backend = &quot;fakeapollo&quot;</span>
+<span class="c1"># backend = &quot;fakeapollo&quot;</span>
 <span class="c1">#backend = &quot;garnet&quot;</span>
 <span class="c1">#backend = &quot;deneb&quot;</span>
 <span class="c1">#backend = &quot;pyrite&quot;</span>
@@ -500,20 +500,19 @@
     <span class="n">num_qaoa_layers</span><span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">shots</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
     <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># calibration set ID, default is None</span>
-    <span class="n">min_num_nodes</span> <span class="o">=</span>  <span class="mi">2</span><span class="p">,</span>
-    <span class="n">max_num_nodes</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># put it to run for all the node sizes</span>
+    <span class="n">min_num_nodes</span> <span class="o">=</span>  <span class="mi">3</span><span class="p">,</span>
+    <span class="n">max_num_nodes</span><span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="c1"># put it to run for all the node sizes</span>
     <span class="n">use_virtual_node</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_classically_optimized_angles</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">choose_qubits_routine</span> <span class="o">=</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span>
     <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[</span>
-                    <span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                     <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                     <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
                     <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
     <span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">999999</span><span class="p">),</span>
     <span class="n">REM</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">num_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># number of trials per instance to improve transpilation robustness</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -641,7 +640,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-11-13.
+  Last updated on 2025-12-08.
   <br/>
 </p>
   </div>
