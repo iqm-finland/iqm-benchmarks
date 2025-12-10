@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.53
+============
+* Update iqm-client and iqm-station-control-client dependency ranges for compatibility with IQM OS 4.4.
+
 Version 2.52
 ============
 * Circuit transpilation improvements for GHZ benchmark implemented.
