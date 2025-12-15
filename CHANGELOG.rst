@@ -8,7 +8,6 @@ Version 2.54
 
 Version 2.53
 ============
-=======
 * Improvements made for QScore benchmark to take custom layout for Star processors.
 
 Version 2.52
