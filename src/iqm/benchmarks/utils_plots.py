@@ -471,6 +471,7 @@ def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: 
 
 def plot_layout_fidelity_graph(
     cal_url: str,
+    coupling_map: list[tuple[int]],
     qubit_layouts: Optional[list[list[int]]] = None,
     station: Optional[str] = None,
     sq_metric: Optional[str] = "coherence",
@@ -508,6 +509,11 @@ def plot_layout_fidelity_graph(
         qubit_to_idx = {qubit - 1: idx for qubit, idx in qubit_mapping.items()}
         qubit_nodes = list(idx_to_qubit.keys())
         fig, ax = plt.subplots(figsize=(1.5 * np.sqrt(len(qubit_nodes)), 1.5 * np.sqrt(len(qubit_nodes))))
+
+    # Filter out any edges that are not in the backend's coupling map
+    fidelities_cal = [fidelity for edge, fidelity in zip(edges_cal, fidelities_cal)
+                        if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map]
+    edges_cal = [edge for edge in edges_cal if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map]
 
     weights = -np.log(np.array(fidelities_cal))
     calibrated_nodes = list(idx_to_qubit.keys())
@@ -572,7 +578,7 @@ def plot_layout_fidelity_graph(
     node_colors = ["darkgray" for _ in range(len(nodes))]
     if qubit_layouts is not None:
         for qb in {qb for layout in qubit_layouts for qb in layout}:
-            node_colors[qb] = "orange"
+            node_colors[idx_to_qubit[qb]] = "orange"
     max_radius = 0.12 + np.max(radii) / np.max(radii) / 2.5
 
     for idx, node in enumerate(qubit_nodes):
