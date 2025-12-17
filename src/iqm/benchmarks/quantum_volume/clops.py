@@ -170,15 +170,13 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
             # ["timestamps"] might be empty if backend is a simulator
             if job_meta[update][batch]["timestamps"] is not None:
                 x = job_meta[update][batch]["timestamps"]
-                job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"  # Is it possible to extract this automatically?
-                compile_f = datetime.strptime(x["compilation_ended"], job_time_format)
-                compile_i = datetime.strptime(x["compilation_started"], job_time_format)
-                # submit_f = datetime.strptime(x["submit_end"], job_time_format)
-                # submit_i = datetime.strptime(x["submit_start"], job_time_format)
-                execution_f = datetime.strptime(x["execution_ended"], job_time_format)
-                execution_i = datetime.strptime(x["execution_started"], job_time_format)
-                job_f = datetime.strptime(x["ready"], job_time_format)
-                job_i = datetime.strptime(x["received"], job_time_format)
+                # job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"  # Is it possible to extract this automatically?
+                compile_f = x["compilation_ended"]
+                compile_i = x["compilation_started"]
+                execution_f = x["execution_ended"]
+                execution_i = x["execution_started"]
+                job_f = x["ready"]
+                job_i = x["received"]
 
                 all_job_elapsed[update][batch] = {
                     "job_total": job_f - job_i,
@@ -574,6 +572,7 @@ class CLOPSBenchmark(Benchmark):
         # Retrieve and save all job metadata
         all_job_metadata = retrieve_all_job_metadata(all_jobs)
         self.job_meta_per_update["update_" + str(update + 1)] = all_job_metadata
+        self.all_jobs = all_jobs
 
         return time_parameter_assign, time_submit, time_retrieve
 

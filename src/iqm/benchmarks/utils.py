@@ -944,8 +944,8 @@ def retrieve_all_counts(iqm_jobs: List[IQMJob], identifier: Optional[str] = None
 
 
 def retrieve_all_job_metadata(
-    iqm_jobs: List[IQMJob],
-) -> Dict[str, Dict[str, Any]]:
+    iqm_jobs,
+) -> Dict[str, dict[str, Any]]:
     """Retrieve the counts from a list of IQMJob objects.
     Args:
         iqm_jobs List[IQMJob]: The list of IQMJob objects.
@@ -954,7 +954,9 @@ def retrieve_all_job_metadata(
         Dict[str, Dict[str, Any]]: Relevant metadata of all the IQMJob objects.
     """
     all_meta = {}
-
+    timestamps = {}
+    for entry in iqm_jobs[0]._iqm_job.data.timeline:
+        timestamps.update({entry.status: entry.timestamp})
     for index, j in enumerate(iqm_jobs):
         all_attributes_j = dir(j)
         all_meta.update(
@@ -967,8 +969,8 @@ def retrieve_all_job_metadata(
                     "circuits_in_batch": (
                         len(cast(List, j.circuit_metadata)) if "circuit_metadata" in all_attributes_j else None
                     ),
-                    "shots": j.metadata["shots"] if "shots" in j.metadata.keys() else None,
-                    "timestamps": j.metadata["timestamps"] if "timestamps" in j.metadata.keys() else None,
+                    "shots": j._iqm_job._parameters.shots if "shots" in j._iqm_job._parameters.__dict__.keys() else None,
+                    "timestamps": timestamps,
                 }
             }
         )
