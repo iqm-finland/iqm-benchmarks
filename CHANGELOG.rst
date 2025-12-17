@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.54
+============
+* Update iqm-client and iqm-station-control-client dependency ranges for compatibility with IQM OS 4.4.
+
 Version 2.53
 ============
 * Improvements made for QScore benchmark to take custom layout for Star processors.
