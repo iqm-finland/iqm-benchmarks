@@ -24,7 +24,6 @@ from typing import Any, Dict, List, Sequence, Tuple, Type
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
-from numba.core.types import Boolean
 from qiskit.circuit import ParameterVector
 import xarray as xr
 
