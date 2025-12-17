@@ -698,9 +698,15 @@ class GHZBenchmark(Benchmark):
                 )
             if self.cal_url:
                 if "localhost" in self.cal_url:
-                    edges_cal, fidelities_cal = extract_fidelities_external(self.cal_url)
+                    edges_cal, fidelities_cal, _, _ = extract_fidelities_external(self.cal_url)
                 else:
                     edges_cal, fidelities_cal, _, _ = extract_fidelities(self.cal_url)
+
+                # Replace fidelities >= 1.0 with median of fidelities < 1.0
+                valid_fidelities = [f for f in fidelities_cal if f < 1.0]
+                if valid_fidelities:
+                    median_fidelity = np.median(valid_fidelities)
+                    fidelities_cal = [f if f < 1.0 else median_fidelity for f in fidelities_cal]
                 graph = get_edges(self.backend.coupling_map, qubit_layout, edges_cal, fidelities_cal)
             else:
                 graph = get_edges(self.backend.coupling_map, qubit_layout)

@@ -390,26 +390,77 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
 
     return list_couplings, list_fids, topology, qubit_mapping, metrics_dict
 
-def extract_fidelities_external(cal_url) -> Tuple[List[List[int]], List[float]]:
+# def extract_fidelities_external(cal_url) -> Tuple[List[List[int]], List[float]]:
+#     """Returns couplings and CZ-fidelities from calibration data URL for external station API
+#
+#     Args:
+#         cal_url: str
+#             The url under which the calibration data for the backend can be found
+#     Returns:
+#         list_couplings: List[List[int]]
+#             A list of pairs, each of which is a qubit coupling for which the calibration
+#             data contains a fidelity.
+#         list_fids: List[float]
+#             A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
+#     """
+#
+#     # Create a dictionary to map key names to their corresponding metrics
+#     cz_fidelity: dict[str, float] = {}
+#
+#     metrics_map = {
+#         "cz_gate_fidelity": cz_fidelity,
+#     }
+#
+#     headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
+#     r = requests.get(cal_url, headers=headers, timeout=60)
+#     calibration = r.json()
+#
+#     cal = calibration["metrics"]
+#     list_couplings = []
+#     list_fids = []
+#     for metrics in cal:
+#         metric_key = metrics
+#         value = float(cal[metric_key]["value"])
+#         if "cz" in metric_key and "crf" in metric_key:
+#             qubit_name1, qubit_name2 = metric_key.split('.')[4].split('__')
+#             qubit_index1 = int(qubit_name1.split('QB')[1]) - 1
+#             qubit_index2 = int(qubit_name2.split('QB')[1]) - 1
+#             list_couplings.append([qubit_index1, qubit_index2])
+#             list_fids.append(value)
+#     return list_couplings, list_fids
+
+def extract_fidelities_external(
+        cal_url: str, all_metrics: bool = False
+) -> Union[
+    Tuple[List[List[int]], List[float]],
+    Tuple[List[List[int]], List[float], Dict[str, Dict[Union[int, str], float]]],
+]:
     """Returns couplings and CZ-fidelities from calibration data URL for external station API
 
     Args:
         cal_url: str
             The url under which the calibration data for the backend can be found
+        all_metrics: bool
+            If True, returns a dictionary with all metrics from the calibration data
+            Default is False
     Returns:
         list_couplings: List[List[int]]
             A list of pairs, each of which is a qubit coupling for which the calibration
             data contains a fidelity.
         list_fids: List[float]
             A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
+        metrics_dict: Dict
+            Dictionary of all metrics (returned only if all_metrics=True)
+            Format: {metric_name: {qubit: value}} for single qubit metrics
+            Format: {metric_name: {(qubit_1, qubit_2): value}} for two qubit metrics
     """
-
-    # Create a dictionary to map key names to their corresponding metrics
-    cz_fidelity: dict[str, float] = {}
-
-    metrics_map = {
-        "cz_gate_fidelity": cz_fidelity,
-    }
+    # Create dictionaries to map key names to their corresponding metrics
+    cz_fidelity: Dict[Union[int, Tuple[int, int]], float] = {}
+    single_qubit_fidelity: Dict[int, float] = {}
+    readout_fidelity: Dict[int, float] = {}
+    t1: Dict[int, float] = {}
+    t2: Dict[int, float] = {}
+    move_fidelity: Dict[Tuple[int, int], float] = {}
 
     headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
     r = requests.get(cal_url, headers=headers, timeout=60)
@@ -418,17 +469,74 @@ def extract_fidelities_external(cal_url) -> Tuple[List[List[int]], List[float]]:
     cal = calibration["metrics"]
     list_couplings = []
     list_fids = []
+
+    if "move" in cal:
+        topology = "star"
+    else:
+        topology = "crystal"
+
     for metrics in cal:
         metric_key = metrics
         value = float(cal[metric_key]["value"])
-        if "cz" in metric_key and "crf" in metric_key:
+
+        if "ssro.measure_fidelity" in metric_key and ".fidelity" in metric_key:
+            qubit_index = int(metric_key.split('QB')[1].split('.')[0])
+            readout_fidelity[qubit_index] = value
+        elif "prx" in metric_key and "drag" in metric_key:
+            qubit_index = int(metric_key.split('QB')[1].split('.')[0])
+            single_qubit_fidelity[qubit_index] = value
+        elif "t1" in metric_key and "QB" in metric_key:
+            qubit_index = int(metric_key.split('QB')[1].split('.')[0])
+            t1[qubit_index] = value * 10**6
+        elif "t2_time" in metric_key and "QB" in metric_key:
+            qubit_index = int(metric_key.split('QB')[1].split('.')[0])
+            t2[qubit_index] = value * 10**6
+        elif "move" in metric_key and "crf" in metric_key:
+            qubit_index = int(metric_key.split('QB')[1].split('.')[0])
+            # Assuming resonator is index 0 or needs special handling
+            move_fidelity[(qubit_index, 0)] = value
+            move_fidelity[(0, qubit_index)] = value
+        elif "cz" in metric_key and "crf" in metric_key:
             qubit_name1, qubit_name2 = metric_key.split('.')[4].split('__')
-            qubit_index1 = int(qubit_name1.split('QB')[1]) - 1
-            qubit_index2 = int(qubit_name2.split('QB')[1]) - 1
+            qubit_index1 = int(qubit_name1.split('QB')[1])
+            qubit_index2 = int(qubit_name2.split('QB')[1])
             list_couplings.append([qubit_index1, qubit_index2])
             list_fids.append(value)
-    return list_couplings, list_fids
+            cz_fidelity[(qubit_index1, qubit_index2)] = value
+            cz_fidelity[(qubit_index2, qubit_index1)] = value
 
+
+    metrics_dict: Dict[str, Dict[Union[int, Tuple[int, int]], float]] = {
+        "cz_gate_fidelity": cz_fidelity,
+        "fidelity_1qb_gates_averaged": single_qubit_fidelity,
+        "single_shot_readout_fidelity": readout_fidelity,
+        "t1_time": t1,
+        "t2_time": t2,
+        "double_move_gate_fidelity": move_fidelity,
+    }
+    # Enumerate all calibrated qubits starting from 0
+    calibrated_qubits = set(np.array(list_couplings).reshape(-1))
+    qubit_mapping = {qubit: idx for idx, qubit in enumerate(calibrated_qubits)}
+    list_couplings = [[qubit_mapping[edge[0]], qubit_mapping[edge[1]]] for edge in list_couplings]
+
+    # Apply the qubit mapping to metrics_dict
+    remapped_metrics_dict = {}
+    for metric_key, metric_values in metrics_dict.items():
+        remapped_metrics_dict[metric_key] = {}
+        for key, value in metric_values.items():
+            if isinstance(key, tuple):
+                # Two-qubit metric
+                remapped_metrics_dict[metric_key][(qubit_mapping[key[0]], qubit_mapping[key[1]])] = value
+            else:
+                # Single-qubit metric
+                remapped_metrics_dict[metric_key][qubit_mapping[key]] = value
+    metrics_dict = remapped_metrics_dict
+
+    # If all_metrics is False, only return everything related to CZ fidelites
+    if not all_metrics:
+        return list_couplings, list_fids, topology, qubit_mapping
+
+    return list_couplings, list_fids, topology, qubit_mapping, metrics_dict
 
 # pylint: disable=too-many-branches
 def get_iqm_backend(backend_label: str) -> IQMBackendBase:

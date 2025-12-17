@@ -29,7 +29,7 @@ import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
 
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.utils import extract_fidelities, get_iqm_backend, random_hamiltonian_path
+from iqm.benchmarks.utils import extract_fidelities, extract_fidelities_external, get_iqm_backend, random_hamiltonian_path
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -493,14 +493,19 @@ def plot_layout_fidelity_graph(
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
     """
     # pylint: disable=unbalanced-tuple-unpacking, disable=too-many-statements
-    edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url, all_metrics=True)
+    if "localhost" in cal_url:
+        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities_external(cal_url, all_metrics=True)
+    else:
+        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url, all_metrics=True)
     if topology == "star":
         idx_to_qubit = {idx: qubit for qubit, idx in qubit_mapping.items()}
+        qubit_to_idx = {qubit: idx for qubit, idx in qubit_mapping.items()}
         qubit_nodes = list(idx_to_qubit.keys())[1:]
         fig, ax = plt.subplots(figsize=(len(qubit_nodes), 3))
     else:
         # For other topologies, qubits are indexed starting from 0 as per the Qiskit convention
         idx_to_qubit = {idx: qubit - 1 for qubit, idx in qubit_mapping.items()}
+        qubit_to_idx = {qubit - 1: idx for qubit, idx in qubit_mapping.items()}
         qubit_nodes = list(idx_to_qubit.keys())
         fig, ax = plt.subplots(figsize=(1.5 * np.sqrt(len(qubit_nodes)), 1.5 * np.sqrt(len(qubit_nodes))))
 
@@ -520,17 +525,47 @@ def plot_layout_fidelity_graph(
         else:
             graph.add_edge(idx_to_qubit[edge[0]], idx_to_qubit[edge[1]], weight)
 
-    # Draw the main graph
+    # # Draw the main graph
+    # visualization.mpl_draw(
+    #     graph,
+    #     ax=ax,
+    #     with_labels=True,
+    #     node_color="none",  # No node color since we're using circles
+    #     pos=qubit_positions,
+    #     labels=lambda node: str(qubit_to_idx[node]) if node in qubit_to_idx else "",
+    #     font_color="white",
+    #     width=graph.edges() / np.max(graph.edges()) * 10 + 0.1,
+    # )  # type: ignore[call-arg]
+    # Draw the main graph structure first
     visualization.mpl_draw(
         graph,
         ax=ax,
         with_labels=True,
         node_color="none",  # No node color since we're using circles
         pos=qubit_positions,
-        labels=lambda node: node,
+        labels=lambda node: str(qubit_to_idx[node]) if node in qubit_to_idx else "",
         font_color="white",
-        width=graph.edges() / np.max(graph.edges()) * 10,
-    )  # type: ignore[call-arg]
+        edge_color="white",
+    )
+
+    # Draw edges manually with custom styles and colors
+    for idx, (edge, weight) in enumerate(zip(list(graph.edge_list()), graph.edges())):
+        x1, y1 = qubit_positions[edge[0]]
+        x2, y2 = qubit_positions[edge[1]]
+
+        # Define edge properties (customize these as needed)
+        edge_width = weight / np.max(graph.edges()) * 10 + 0.1
+        edge_color = "black"
+        edge_style = "solid"
+
+        # Highlight edges with zero weight (wrong calibration)
+        if weight == 0:
+            edge_width = 1
+            edge_style = "dashed"
+            edge_color = "red"
+
+        ax.plot([x1, x2], [y1, y2], color=edge_color, linewidth=edge_width,
+                linestyle=edge_style, zorder=1)
 
     # Draw nodes as circles with varying radii given by the single qubit metric
     radii = calculate_node_radii(metric_dict, qubit_nodes, sq_metric)
