@@ -294,7 +294,7 @@ class Benchmark(ABC):
         """
         backend_for_execute = copy.copy(self.backend)
         backend_for_execute.run = functools.partial(
-            self.backend.run, calibration_set_id=calibration_set_id
+            self.backend.run
         )  # type: ignore
         dataset = self.execute(backend_for_execute)
         run = BenchmarkRunResult(dataset, self.circuits)
