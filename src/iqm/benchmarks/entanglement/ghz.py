@@ -458,7 +458,7 @@ def generate_ghz_spanning_tree(
 
 
 def get_edges(
-    coupling_map: CouplingMap,
+    coupling_map: list[tuple[int]],
     qubit_layout: List[int],
     edges_cal: Optional[List[List[int]]] = None,
     fidelities_cal: Optional[List[float]] = None,
@@ -507,7 +507,6 @@ def get_edges(
         graph.add_edge(*edge, weight=weights[idx])
     if not is_connected(graph):
         print("Warning: The subgraph of selected qubit_layout is not connected.")
-    print(edges_patch, edges_cal)
     return graph
 
 

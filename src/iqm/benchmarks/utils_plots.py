@@ -27,6 +27,7 @@ import numpy as np
 from qiskit.transpiler import CouplingMap
 import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
+from sympy.printing.cxx import reserved
 
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import extract_fidelities, extract_fidelities_external, get_iqm_backend, random_hamiltonian_path
@@ -522,6 +523,15 @@ def plot_layout_fidelity_graph(
     weights = -np.log(np.array(fidelities_cal))
     calibrated_nodes = list(idx_to_qubit.keys())
 
+    valid_fidelities = [f for f in fidelities_cal if f < 1.0]
+    if valid_fidelities:
+        median_fidelity = np.median(valid_fidelities)
+        fidelities_cal = [f if f < 1.0 else median_fidelity for f in fidelities_cal]
+    from iqm.benchmarks.entanglement.ghz import get_cx_map, get_edges, generate_ghz_spanning_tree
+    graph = get_edges(coupling_map, qubit_layouts[0], edges_cal, fidelities_cal)
+    cx_map = get_cx_map(qubit_layouts[0], graph)
+    print(f"Edge map:", cx_map)
+
     # Define qubit positions in plot
     qubit_positions = GraphPositions.get_positions(station=station, graph=None, num_qubits=len(calibrated_nodes))
 
@@ -536,17 +546,6 @@ def plot_layout_fidelity_graph(
             graph.add_edge(idx_to_qubit[edge[0]], idx_to_qubit[edge[1]], weight)
 
     # # Draw the main graph
-    # visualization.mpl_draw(
-    #     graph,
-    #     ax=ax,
-    #     with_labels=True,
-    #     node_color="none",  # No node color since we're using circles
-    #     pos=qubit_positions,
-    #     labels=lambda node: str(qubit_to_idx[node]) if node in qubit_to_idx else "",
-    #     font_color="white",
-    #     width=graph.edges() / np.max(graph.edges()) * 10 + 0.1,
-    # )  # type: ignore[call-arg]
-    # Draw the main graph structure first
     visualization.mpl_draw(
         graph,
         ax=ax,
@@ -572,6 +571,8 @@ def plot_layout_fidelity_graph(
         if weight == 0:
             edge_width = 1
             edge_style = "dashed"
+        mapped_edge = [qubit_to_idx[edge[0]], qubit_to_idx[edge[1]]]
+        if mapped_edge in cx_map or list(reversed(mapped_edge)) in cx_map:
             edge_color = "red"
 
         ax.plot([x1, x2], [y1, y2], color=edge_color, linewidth=edge_width,
