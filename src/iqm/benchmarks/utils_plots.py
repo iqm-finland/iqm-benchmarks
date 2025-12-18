@@ -189,6 +189,10 @@ class GraphPositions:
         "iqmfakedeneb": deneb_positions,
         "emerald": emerald_positions,
         "sirius": sirius_positions,
+        "crystal54": emerald_positions,
+        "crystal20": garnet_positions,
+        "star": sirius_positions,
+        "star24": sirius_positions
     }
 
     @staticmethod

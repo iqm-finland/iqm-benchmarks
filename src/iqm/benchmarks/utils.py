@@ -390,45 +390,6 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
 
     return list_couplings, list_fids, topology, qubit_mapping, metrics_dict
 
-# def extract_fidelities_external(cal_url) -> Tuple[List[List[int]], List[float]]:
-#     """Returns couplings and CZ-fidelities from calibration data URL for external station API
-#
-#     Args:
-#         cal_url: str
-#             The url under which the calibration data for the backend can be found
-#     Returns:
-#         list_couplings: List[List[int]]
-#             A list of pairs, each of which is a qubit coupling for which the calibration
-#             data contains a fidelity.
-#         list_fids: List[float]
-#             A list of CZ fidelities from the calibration url, ordered in the same way as list_couplings
-#     """
-#
-#     # Create a dictionary to map key names to their corresponding metrics
-#     cz_fidelity: dict[str, float] = {}
-#
-#     metrics_map = {
-#         "cz_gate_fidelity": cz_fidelity,
-#     }
-#
-#     headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
-#     r = requests.get(cal_url, headers=headers, timeout=60)
-#     calibration = r.json()
-#
-#     cal = calibration["metrics"]
-#     list_couplings = []
-#     list_fids = []
-#     for metrics in cal:
-#         metric_key = metrics
-#         value = float(cal[metric_key]["value"])
-#         if "cz" in metric_key and "crf" in metric_key:
-#             qubit_name1, qubit_name2 = metric_key.split('.')[4].split('__')
-#             qubit_index1 = int(qubit_name1.split('QB')[1]) - 1
-#             qubit_index2 = int(qubit_name2.split('QB')[1]) - 1
-#             list_couplings.append([qubit_index1, qubit_index2])
-#             list_fids.append(value)
-#     return list_couplings, list_fids
-
 def extract_fidelities_external(
         cal_url: str, all_metrics: bool = False
 ) -> Union[
@@ -496,7 +457,7 @@ def extract_fidelities_external(
             # Assuming resonator is index 0 or needs special handling
             move_fidelity[(qubit_index, 0)] = value
             move_fidelity[(0, qubit_index)] = value
-        elif "cz" in metric_key and "crf" in metric_key:
+        elif "rb" in metric_key and "uz_cz" in metric_key:
             qubit_name1, qubit_name2 = metric_key.split('.')[4].split('__')
             qubit_index1 = int(qubit_name1.split('QB')[1])
             qubit_index2 = int(qubit_name2.split('QB')[1])
