@@ -480,6 +480,7 @@ def plot_layout_fidelity_graph(
     qubit_layouts: Optional[list[list[int]]] = None,
     station: Optional[str] = None,
     sq_metric: Optional[str] = "coherence",
+    show_ghz_path: bool = False,
 ):
     """Plot a graph showing the quantum chip layout with fidelity information.
 
@@ -494,6 +495,7 @@ def plot_layout_fidelity_graph(
                 If None, positions will be generated algorithmically.
         sq_metric: Optional single qubit metric to use for the visualization, can be either "fidelity", "coherence",
                 or "readout".
+        show_ghz_path: Whether to highlight the edges that are part of the GHZ state creation tree path.
 
     Returns:
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
@@ -523,14 +525,15 @@ def plot_layout_fidelity_graph(
     weights = -np.log(np.array(fidelities_cal))
     calibrated_nodes = list(idx_to_qubit.keys())
 
-    valid_fidelities = [f for f in fidelities_cal if f < 1.0]
-    if valid_fidelities:
-        median_fidelity = np.median(valid_fidelities)
-        fidelities_cal = [f if f < 1.0 else median_fidelity for f in fidelities_cal]
-    from iqm.benchmarks.entanglement.ghz import get_cx_map, get_edges, generate_ghz_spanning_tree
-    graph = get_edges(coupling_map, qubit_layouts[0], edges_cal, fidelities_cal)
-    cx_map = get_cx_map(qubit_layouts[0], graph)
-    print(f"Edge map:", cx_map)
+    if show_ghz_path and qubit_layouts is not None and any(len(layout) >= 2 for layout in qubit_layouts):
+        valid_fidelities = [f for f in fidelities_cal if f < 1.0]
+        if valid_fidelities:
+            median_fidelity = np.median(valid_fidelities)
+            fidelities_cal = [f if f < 1.0 else median_fidelity for f in fidelities_cal]
+        from iqm.benchmarks.entanglement.ghz import get_cx_map, get_edges, generate_ghz_spanning_tree
+        graph = get_edges(coupling_map, qubit_layouts[0], edges_cal, fidelities_cal)
+        cx_map = get_cx_map(qubit_layouts[0], graph)
+        print(f"Edge map:", cx_map)
 
     # Define qubit positions in plot
     qubit_positions = GraphPositions.get_positions(station=station, graph=None, num_qubits=len(calibrated_nodes))
@@ -571,9 +574,10 @@ def plot_layout_fidelity_graph(
         if weight == 0:
             edge_width = 1
             edge_style = "dashed"
-        mapped_edge = [qubit_to_idx[edge[0]], qubit_to_idx[edge[1]]]
-        if mapped_edge in cx_map or list(reversed(mapped_edge)) in cx_map:
-            edge_color = "red"
+        if show_ghz_path and qubit_layouts is not None and any(len(layout) >= 2 for layout in qubit_layouts):
+            mapped_edge = [qubit_to_idx[edge[0]], qubit_to_idx[edge[1]]]
+            if mapped_edge in cx_map or list(reversed(mapped_edge)) in cx_map:
+                edge_color = "red"
 
         ax.plot([x1, x2], [y1, y2], color=edge_color, linewidth=edge_width,
                 linestyle=edge_style, zorder=1)
