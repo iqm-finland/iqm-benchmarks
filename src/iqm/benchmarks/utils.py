@@ -449,7 +449,7 @@ def extract_fidelities_external(
         elif "t1" in metric_key and "QB" in metric_key:
             qubit_index = int(metric_key.split('QB')[1].split('.')[0])
             t1[qubit_index] = value * 10**6
-        elif "t2_time" in metric_key and "QB" in metric_key:
+        elif "t2_echo_time" in metric_key and "QB" in metric_key:
             qubit_index = int(metric_key.split('QB')[1].split('.')[0])
             t2[qubit_index] = value * 10**6
         elif "move" in metric_key and "crf" in metric_key:
@@ -465,7 +465,6 @@ def extract_fidelities_external(
             list_fids.append(value)
             cz_fidelity[(qubit_index1, qubit_index2)] = value
             cz_fidelity[(qubit_index2, qubit_index1)] = value
-
 
     metrics_dict: Dict[str, Dict[Union[int, Tuple[int, int]], float]] = {
         "cz_gate_fidelity": cz_fidelity,
