@@ -286,10 +286,8 @@ def get_active_qubits(qc: QuantumCircuit) -> List[int]:
     return list(active_qubits)
 
 
-def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
-    Tuple[List[List[int]], List[float], str, Dict[int, int]],
-    Tuple[List[List[int]], List[float], str, Dict[int, int], Dict[str, Dict[Union[int, Tuple[int, int]], float]]],
-]:
+def extract_fidelities(cal_url: str) -> Tuple[List[List[int]], List[float], str,
+Dict[int, int], Dict[str, Dict[Union[int, Tuple[int, int]], float]]]:
     """Returns couplings and CZ-fidelities from calibration data URL
 
     Args:
@@ -384,18 +382,11 @@ def extract_fidelities(cal_url: str, all_metrics: bool = False) -> Union[
                 remapped_metrics_dict[metric_key][qubit_mapping[key]] = value
     metrics_dict = remapped_metrics_dict
 
-    # If all_metrics is False, only return everything related to CZ fidelites
-    if not all_metrics:
-        return list_couplings, list_fids, topology, qubit_mapping
-
     return list_couplings, list_fids, topology, qubit_mapping, metrics_dict
 
 def extract_fidelities_external(
         cal_url: str, all_metrics: bool = False
-) -> Union[
-    Tuple[List[List[int]], List[float]],
-    Tuple[List[List[int]], List[float], Dict[str, Dict[Union[int, str], float]]],
-]:
+) -> tuple[list[list[int]], list[float], str, dict[Any, int], dict[str, dict[int | tuple[int, int], float]]]:
     """Returns couplings and CZ-fidelities from calibration data URL for external station API
 
     Args:
@@ -491,10 +482,6 @@ def extract_fidelities_external(
                 # Single-qubit metric
                 remapped_metrics_dict[metric_key][qubit_mapping[key]] = value
     metrics_dict = remapped_metrics_dict
-
-    # If all_metrics is False, only return everything related to CZ fidelites
-    if not all_metrics:
-        return list_couplings, list_fids, topology, qubit_mapping
 
     return list_couplings, list_fids, topology, qubit_mapping, metrics_dict
 
@@ -904,38 +891,50 @@ def retrieve_all_counts(iqm_jobs: List[IQMJob], identifier: Optional[str] = None
 
 
 def retrieve_all_job_metadata(
-    iqm_jobs,
-) -> Dict[str, dict[str, Any]]:
-    """Retrieve the counts from a list of IQMJob objects.
+    iqm_jobs: list[IQMJob],
+) -> dict[str, dict[str, Any]]:
+    """Retrieve the metadata from a list of Job objects.
+
     Args:
-        iqm_jobs List[IQMJob]: The list of IQMJob objects.
+        iqm_jobs : List[IQMJob]
+            The list of IQMJob objects.
 
     Returns:
         Dict[str, Dict[str, Any]]: Relevant metadata of all the IQMJob objects.
+
     """
     all_meta = {}
-    timestamps = {}
-    for entry in iqm_jobs[0]._iqm_job.data.timeline:
-        timestamps.update({entry.status: entry.timestamp})
     for index, j in enumerate(iqm_jobs):
         all_attributes_j = dir(j)
+        if not hasattr(j, "_iqm_job"):
+            shots = j.metadata["shots"] if "shots" in j.metadata.keys() else None
+            timestamps = j.metadata["timestamps"] if "timestamps" in j.metadata.keys() else None
+        else:
+            job_parameters = j._iqm_job._parameters
+            if job_parameters is not None:
+                shots = job_parameters.shots if "shots" in job_parameters.__dict__.keys() else None
+            else:
+                raise ValueError("Job parameters return None, cannot retrieve shots information.")
+            timestamps = {}
+            for entry in j._iqm_job.data.timeline:
+                timestamps.update({entry.status: entry.timestamp})
         all_meta.update(
             {
-                "batch_job_"
-                + str(index + 1): {
+                "batch_job_" + str(index + 1): {
                     "job_id": j.job_id() if "job_id" in all_attributes_j else None,
-                    "backend": j.backend().name if "backend" in all_attributes_j else None,
-                    "status": j.status().value if "status" in all_attributes_j else None,
+                    "backend": (j.backend().name if "backend" in all_attributes_j else None),
+                    "status": (j.status().value if "status" in all_attributes_j else None),
                     "circuits_in_batch": (
-                        len(cast(List, j.circuit_metadata)) if "circuit_metadata" in all_attributes_j else None
+                        len(cast(list, j.circuit_metadata)) if "circuit_metadata" in all_attributes_j else None
                     ),
-                    "shots": j._iqm_job._parameters.shots if "shots" in j._iqm_job._parameters.__dict__.keys() else None,
+                    "shots": shots,
                     "timestamps": timestamps,
                 }
             }
         )
 
     return all_meta
+
 
 
 def set_coupling_map(

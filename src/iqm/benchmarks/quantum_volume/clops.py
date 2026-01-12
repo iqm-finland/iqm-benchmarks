@@ -170,13 +170,23 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
             # ["timestamps"] might be empty if backend is a simulator
             if job_meta[update][batch]["timestamps"] is not None:
                 x = job_meta[update][batch]["timestamps"]
-                # job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"  # Is it possible to extract this automatically?
-                compile_f = x["compilation_ended"]
-                compile_i = x["compilation_started"]
-                execution_f = x["execution_ended"]
-                execution_i = x["execution_started"]
-                job_f = x["ready"]
-                job_i = x["received"]
+
+                # Check if timestamps need parsing or are already datetime objects
+                if isinstance(x["compilation_ended"], str):
+                    job_time_format = "%Y-%m-%dT%H:%M:%S.%f%z"
+                    compile_f = datetime.strptime(x["compilation_ended"], job_time_format)
+                    compile_i = datetime.strptime(x["compilation_started"], job_time_format)
+                    execution_f = datetime.strptime(x["execution_ended"], job_time_format)
+                    execution_i = datetime.strptime(x["execution_started"], job_time_format)
+                    job_f = datetime.strptime(x["ready"], job_time_format)
+                    job_i = datetime.strptime(x["received"], job_time_format)
+                else:
+                    compile_f = x["compilation_ended"]
+                    compile_i = x["compilation_started"]
+                    execution_f = x["execution_ended"]
+                    execution_i = x["execution_started"]
+                    job_f = x["ready"]
+                    job_i = x["received"]
 
                 all_job_elapsed[update][batch] = {
                     "job_total": job_f - job_i,
@@ -184,6 +194,7 @@ def retrieve_clops_elapsed_times(job_meta: Dict[str, Dict[str, Any]]) -> Dict[st
                     # "submit_total": submit_f - submit_i,
                     "execution_total": execution_f - execution_i,
                 }
+
 
                 # Save the keys, will be needed later
                 totals_keys = all_job_elapsed[update][batch].keys()

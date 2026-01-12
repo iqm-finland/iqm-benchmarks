@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.55
+============
+* Compatibility with alternative calibration metric and job metadata formats.
+
 Version 2.54
 ============
 * Update iqm-client and iqm-station-control-client dependency ranges for compatibility with IQM OS 4.4.

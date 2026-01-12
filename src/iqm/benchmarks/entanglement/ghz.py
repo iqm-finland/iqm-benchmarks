@@ -19,6 +19,7 @@ GHZ state benchmark
 from itertools import chain
 from time import strftime
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, cast
+import warnings
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -337,7 +338,7 @@ def generate_ghz_star_optimal(
     c = ClassicalRegister(num_qubits, "c")
     qc = QuantumCircuit(comp_r, q, c, name="GHZ_star_optimal")
 
-    cal_data = extract_fidelities(cal_url, all_metrics=True)
+    cal_data = extract_fidelities(cal_url)
     # Determine the best move qubit
     move_dict = {q + 1: cal_data[1][q] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
     best_move = max(move_dict, key=move_dict.get)
@@ -697,9 +698,9 @@ class GHZBenchmark(Benchmark):
                 )
             if self.cal_url:
                 if "localhost" in self.cal_url:
-                    edges_cal, fidelities_cal, _, _ = extract_fidelities_external(self.cal_url)
+                    edges_cal, fidelities_cal, _, _, _ = extract_fidelities_external(self.cal_url)
                 else:
-                    edges_cal, fidelities_cal, _, _ = extract_fidelities(self.cal_url)
+                    edges_cal, fidelities_cal, _, _, _ = extract_fidelities(self.cal_url)
 
                 # Replace fidelities >= 1.0 with median of fidelities < 1.0
                 valid_fidelities = [f for f in fidelities_cal if f < 1.0]

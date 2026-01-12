@@ -27,8 +27,9 @@ import numpy as np
 from qiskit.transpiler import CouplingMap
 import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
-from sympy.printing.cxx import reserved
 
+
+from iqm.benchmarks.entanglement.ghz import get_cx_map, get_edges
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.utils import extract_fidelities, extract_fidelities_external, get_iqm_backend, random_hamiltonian_path
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
@@ -490,6 +491,7 @@ def plot_layout_fidelity_graph(
 
     Args:
         cal_url: URL to retrieve calibration data from
+        coupling_map: List of tuples representing the coupling map of the backend
         qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
         station: Name of the quantum computing station to use predefined positions for.
                 If None, positions will be generated algorithmically.
@@ -502,12 +504,12 @@ def plot_layout_fidelity_graph(
     """
     # pylint: disable=unbalanced-tuple-unpacking, disable=too-many-statements
     if "localhost" in cal_url:
-        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities_external(cal_url, all_metrics=True)
+        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities_external(cal_url)
     else:
-        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url, all_metrics=True)
+        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url)
     if topology == "star":
         idx_to_qubit = {idx: qubit for qubit, idx in qubit_mapping.items()}
-        qubit_to_idx = {qubit: idx for qubit, idx in qubit_mapping.items()}
+        qubit_to_idx = qubit_mapping
         qubit_nodes = list(idx_to_qubit.keys())[1:]
         fig, ax = plt.subplots(figsize=(len(qubit_nodes), 3))
     else:
@@ -518,9 +520,13 @@ def plot_layout_fidelity_graph(
         fig, ax = plt.subplots(figsize=(1.5 * np.sqrt(len(qubit_nodes)), 1.5 * np.sqrt(len(qubit_nodes))))
 
     # Filter out any edges that are not in the backend's coupling map
-    fidelities_cal = [fidelity for edge, fidelity in zip(edges_cal, fidelities_cal)
-                        if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map]
+    fidelities_cal = [
+        fidelity
+        for edge, fidelity in zip(edges_cal, fidelities_cal, strict=True)
+        if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map
+    ]
     edges_cal = [edge for edge in edges_cal if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map]
+
 
     weights = -np.log(np.array(fidelities_cal))
     calibrated_nodes = list(idx_to_qubit.keys())
@@ -561,12 +567,13 @@ def plot_layout_fidelity_graph(
     )
 
     # Draw edges manually with custom styles and colors
-    for idx, (edge, weight) in enumerate(zip(list(graph.edge_list()), graph.edges())):
+    graph_edge_pairs = [list(edge) for edge in graph.edge_list()]
+    for _, (edge, weight) in enumerate(zip(graph_edge_pairs, graph.edges(), strict=True)):
         x1, y1 = qubit_positions[edge[0]]
         x2, y2 = qubit_positions[edge[1]]
 
         # Define edge properties (customize these as needed)
-        edge_width = weight / np.max(graph.edges()) * 10 + 0.1
+        edge_width = weight / np.max(list(graph.edges())) * 10 + 0.1
         edge_color = "black"
         edge_style = "solid"
 
@@ -574,13 +581,14 @@ def plot_layout_fidelity_graph(
         if weight == 0:
             edge_width = 1
             edge_style = "dashed"
+        # Highlight edges that are part of the GHZ path
         if show_ghz_path and qubit_layouts is not None and any(len(layout) >= 2 for layout in qubit_layouts):
             mapped_edge = [qubit_to_idx[edge[0]], qubit_to_idx[edge[1]]]
             if mapped_edge in cx_map or list(reversed(mapped_edge)) in cx_map:
                 edge_color = "red"
 
-        ax.plot([x1, x2], [y1, y2], color=edge_color, linewidth=edge_width,
-                linestyle=edge_style, zorder=1)
+        ax.plot([x1, x2], [y1, y2], color=edge_color, linewidth=edge_width, linestyle=edge_style, zorder=1)
+
 
     # Draw nodes as circles with varying radii given by the single qubit metric
     radii = calculate_node_radii(metric_dict, qubit_nodes, sq_metric)
@@ -598,7 +606,7 @@ def plot_layout_fidelity_graph(
 
     # Add edge labels using matplotlib's annotate
     # for idx, edge in enumerate(edges_cal):
-    for edge, weight in zip(list(graph.edge_list()), graph.edges()):
+    for edge, weight in zip(graph_edge_pairs, list(graph.edges()), strict=True):
         x1, y1 = qubit_positions[edge[0]]
         x2, y2 = qubit_positions[edge[1]]
         x = (x1 + x2) / 2
