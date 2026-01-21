@@ -28,11 +28,9 @@ from networkx import Graph, all_pairs_shortest_path, is_connected, minimum_spann
 import numpy as np
 from qiskit import ClassicalRegister, QuantumRegister
 from qiskit.quantum_info import random_clifford
-from qiskit.transpiler import CouplingMap
 from qiskit_aer import Aer
 from scipy.spatial.distance import hamming
 import xarray as xr
-import warnings
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
@@ -47,8 +45,7 @@ from iqm.benchmarks.circuit_containers import BenchmarkCircuit, CircuitGroup, Ci
 from iqm.benchmarks.logging_config import qcvv_logger
 from iqm.benchmarks.readout_mitigation import apply_readout_error_mitigation
 from iqm.benchmarks.utils import (
-    extract_fidelities,
-    extract_fidelities_external,
+    extract_fidelities_unified,
     perform_backend_transpilation,
     reduce_to_active_qubits,
     retrieve_all_counts,
@@ -312,7 +309,7 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
 
 
 def generate_ghz_star_optimal(
-    qubit_layout: List[int], cal_url: str, backend: IQMBackendBase, inv: bool = False
+    qubit_layout: List[int], iqm_server_url: str, backend: IQMBackendBase, inv: bool = False
 ) -> QuantumCircuit:
     """
     Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
@@ -320,8 +317,8 @@ def generate_ghz_star_optimal(
     Args:
         qubit_layout: List[int]
             The layout of qubits for the GHZ state.
-        cal_url: str
-            The calibration URL for extracting fidelities.
+        iqm_server_url: str
+            The IQM server URL for extracting fidelities.
         backend: IQMBackendBase
             The backend to be used for the quantum circuit.
         inv: bool
@@ -338,12 +335,14 @@ def generate_ghz_star_optimal(
     c = ClassicalRegister(num_qubits, "c")
     qc = QuantumCircuit(comp_r, q, c, name="GHZ_star_optimal")
 
-    cal_data = extract_fidelities(cal_url)
+    cal_data = extract_fidelities_unified(iqm_server_url, backend)
     # Determine the best move qubit
-    move_dict = {q + 1: cal_data[1][q] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
+    double_move_fidelities = {k[0]: v for k, v in list(cal_data[-1]["double_move_gate_fidelity"].items())[::2]}
+    move_dict = {q + 1: double_move_fidelities[q + 1] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
+    # move_dict = {q + 1: cal_data[1][q] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
     best_move = max(move_dict, key=move_dict.get)
 
-    T2 = cal_data[-1]["t2_echo_time"]
+    T2 = cal_data[-1]["t2_time"]
     t2_dict = {qubit + 1: T2[qubit + 1] for qubit in qubit_layout}  ## +1 to match qubit indexing in cal data
     cz_order = dict(sorted(t2_dict.items(), key=lambda item: item[1], reverse=True))
     qubits_to_measure = list(cz_order.keys())
@@ -497,7 +496,9 @@ def get_edges(
                 if set(edge) == set(edge_2):
                     fidelities_patch.append(fidelities_cal[idx])
         if len(fidelities_patch) != len(edges_patch):
-            warnings.warn(f"Not all calibration fidelities were found for the selected qubit layout {qubit_layout}, using unweighted graph for circuit creation.")
+            warnings.warn(
+                f"Not all calibration fidelities were found for the selected qubit layout {qubit_layout}, using unweighted graph for circuit creation."
+            )
             weights = np.ones(len(edges_patch))
         else:
             weights = -np.log(np.array(fidelities_patch))
@@ -653,7 +654,7 @@ class GHZBenchmark(Benchmark):
         self.num_RMs = configuration.num_RMs
         self.rem = configuration.rem
         self.mit_shots = configuration.mit_shots
-        self.cal_url = configuration.cal_url
+        self.iqm_server_url = configuration.iqm_server_url
         self.timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
 
@@ -696,12 +697,8 @@ class GHZBenchmark(Benchmark):
                 qcvv_logger.warning(
                     f"The current backend is a star architecture for which a suboptimal state generation routine is chosen. Consider setting state_generation_routine={routine}."
                 )
-            if self.cal_url:
-                if "localhost" in self.cal_url:
-                    edges_cal, fidelities_cal, _, _, _ = extract_fidelities_external(self.cal_url)
-                else:
-                    edges_cal, fidelities_cal, _, _, _ = extract_fidelities(self.cal_url)
-
+            if self.iqm_server_url is not None:
+                edges_cal, fidelities_cal, _, _, _ = extract_fidelities_unified(self.iqm_server_url, self.backend)
                 # Replace fidelities >= 1.0 with median of fidelities < 1.0
                 valid_fidelities = [f for f in fidelities_cal if f < 1.0]
                 if valid_fidelities:
@@ -734,9 +731,9 @@ class GHZBenchmark(Benchmark):
             )
             final_ghz = ghz_native_transpiled
         elif routine == "star_optimal":
-            if self.cal_url is None:
-                raise ValueError("Calibration URL must be provided for 'star_optimal' routine.")
-            ghz = generate_ghz_star_optimal(qubit_layout, self.cal_url, self.backend)
+            if self.iqm_server_url is None:
+                raise ValueError("IQM server url must be provided for 'star_optimal' routine.")
+            ghz = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.backend)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled = transpile_to_IQM(
                 ghz,
@@ -791,7 +788,7 @@ class GHZBenchmark(Benchmark):
         qc.remove_final_measurements()
         phases = [np.pi * i / (qubit_count + 1) for i in range(2 * qubit_count + 2)]
         if self.state_generation_routine == "star_optimal":
-            qc_inv = generate_ghz_star_optimal(qubit_layout, self.cal_url, self.backend, inv=True)
+            qc_inv = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.backend, inv=True)
             for phase in phases:
                 qc_phase = qc.copy()
                 qc_phase.barrier()
@@ -1042,7 +1039,7 @@ class GHZConfiguration(BenchmarkConfigurationBase):
             * Default: True
         mit_shots (int): Total number of shots for readout error mitigation
             * Default: 1000
-        cal_url (Optional[str]): Optional URL where the calibration data for the selected backend can be retrieved from
+        iqm_server_url (Optional[str]): Optional iqm server URL where the calibration data for the selected backend can be retrieved from
             The calibration data is used for the "tree" state generation routine to prioritize couplings with high
             CZ fidelity.
             * Default: None
@@ -1059,4 +1056,4 @@ class GHZConfiguration(BenchmarkConfigurationBase):
     num_RMs: Optional[int] = 100
     rem: bool = True
     mit_shots: int = 1_000
-    cal_url: Optional[str] = None
+    iqm_server_url: Optional[str] = None
