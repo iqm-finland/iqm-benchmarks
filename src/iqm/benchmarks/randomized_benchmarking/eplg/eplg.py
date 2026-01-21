@@ -245,7 +245,7 @@ class EPLGBenchmark(Benchmark):
         self.chain_length = configuration.chain_length
         self.chain_path_samples = configuration.chain_path_samples
         self.num_disjoint_layers = configuration.num_disjoint_layers
-        self.calibration_url = configuration.calibration_url
+        self.iqm_server_url = configuration.iqm_server_url
         self.max_hamiltonian_path_tries = configuration.max_hamiltonian_path_tries
 
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
@@ -298,8 +298,8 @@ class EPLGBenchmark(Benchmark):
             raise ValueError("The number of chain path samples must be a positive integer.")
 
         # Check calibration URL - this is a temporary solution, normally the backend should be enough to specify this
-        if self.calibration_url is None:
-            raise ValueError("The calibration URL must be specified if custom qubits array is not specified.")
+        if self.iqm_server_url is None:
+            raise ValueError("The IQM server URL must be specified if custom qubits array is not specified.")
 
         if self.num_disjoint_layers is None:
             self.num_disjoint_layers = 2
@@ -336,7 +336,7 @@ class EPLGBenchmark(Benchmark):
                 self.chain_length,
                 self.chain_path_samples,
                 self.backend,
-                self.calibration_url,
+                self.iqm_server_url,
                 self.max_hamiltonian_path_tries,
             )
             qcvv_logger.info("Extracting the path that maximizes total 2Q calibration fidelity")
@@ -391,7 +391,7 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
                 * Default is None: assigns 2 disjoint layers (arbitrary).
         max_hamiltonian_path_tries (Optional[int]): The maximum number of tries to find a Hamiltonian path.
                 * Default is None: assigns 10 tries (arbitrary).
-        calibration_url (Optional[str]): The URL of the IQM station to retrieve calibration data from.
+        iqm_server_url (Optional[str]): The URL of the IQM station to retrieve calibration data from.
                 * It must be specified if custom_qubits_array is not specified.
                 * Default is None - raises an error if custom_qubits_array is not specified.
 
@@ -405,4 +405,4 @@ class EPLGConfiguration(BenchmarkConfigurationBase):
     chain_path_samples: Optional[int] = None
     num_disjoint_layers: Optional[int] = None
     max_hamiltonian_path_tries: Optional[int] = None
-    calibration_url: Optional[str] = None
+    iqm_server_url: Optional[str] = None
