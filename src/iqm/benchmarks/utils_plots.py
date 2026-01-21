@@ -25,13 +25,11 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 from qiskit.transpiler import CouplingMap
-import requests
 from rustworkx import PyGraph, spring_layout, visualization  # pylint: disable=no-name-in-module
-
 
 from iqm.benchmarks.entanglement.ghz import get_cx_map, get_edges
 from iqm.benchmarks.logging_config import qcvv_logger
-from iqm.benchmarks.utils import extract_fidelities, extract_fidelities_external, get_iqm_backend, random_hamiltonian_path
+from iqm.benchmarks.utils import extract_fidelities_unified, get_iqm_backend, random_hamiltonian_path
 from iqm.qiskit_iqm.iqm_backend import IQMBackendBase
 
 
@@ -194,7 +192,7 @@ class GraphPositions:
         "crystal54": emerald_positions,
         "crystal20": garnet_positions,
         "star": sirius_positions,
-        "star24": sirius_positions
+        "star24": sirius_positions,
     }
 
     @staticmethod
@@ -406,32 +404,25 @@ def evaluate_hamiltonian_paths(
 
     # Get scores for all paths
     # Retrieve fidelity data
-    two_qubit_fidelity = {}
-
-    headers = {"Accept": "application/json", "Authorization": "Bearer " + os.environ["IQM_TOKEN"]}
-    r = requests.get(url, headers=headers, timeout=60)
-    calibration = r.json()
-
-    for iq in calibration["calibrations"][0]["metrics"][0]["metrics"]:
-        temp = list(iq.values())
-        two_qubit_fidelity[str(temp[0])] = temp[1]
-        two_qubit_fidelity[str([temp[0][1], temp[0][0]])] = temp[1]
-
+    cal_data = extract_fidelities_unified(url, backend)
+    two_qubit_fidelity = cal_data[-1]["cz_gate_fidelity"]
     # Rate all the paths
     path_costs = {}  # keys are costs, values are edge paths
     for h_path in all_paths:
         total_cost = 1
         for edge in h_path:
             if len(edge) == 2:
-                total_cost *= two_qubit_fidelity[
-                    str([backend.index_to_qubit_name(edge[0]), backend.index_to_qubit_name(edge[1])])
-                ]
+                qb0 = backend.index_to_qubit_name(edge[0]).replace("QB", "")
+                qb1 = backend.index_to_qubit_name(edge[1]).replace("QB", "")
+                total_cost *= two_qubit_fidelity[[qb0, qb1]]
         path_costs[total_cost] = h_path
 
     return path_costs
 
 
-def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: List[int], sq_metric: str) -> np.ndarray:
+def calculate_node_radii(
+    metric_dict: Dict[str, Dict[int, float]], qubit_nodes: List[int], sq_metric: str
+) -> np.ndarray:
     """Calculate node radii based on the specified single qubit metric. For the coherence metric, the fidelity is calculated as the idling fidelity of a single qubit gate duration.
 
     Args:
@@ -449,9 +440,7 @@ def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: 
     if sq_metric == "fidelity":
         radii = -np.log(np.array([metric_dict["fidelity_1qb_gates_averaged"][node] for node in qubit_nodes]))
         if "fidelity_1qb_gates_averaged" not in metric_dict:
-            raise ValueError(
-                "The metric 'fidelity_1qb_gates_averaged' is not available in the backend metrics."
-            )
+            raise ValueError("The metric 'fidelity_1qb_gates_averaged' is not available in the backend metrics.")
     elif sq_metric == "coherence":
         if "t1_time" not in metric_dict or "t2_time" not in metric_dict:
             raise ValueError(
@@ -464,9 +453,7 @@ def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: 
         radii = -np.log(idle_fidelities)
     elif sq_metric == "readout":
         if "single_shot_readout_fidelity" not in metric_dict:
-            raise ValueError(
-                "The metric 'single_shot_readout_fidelity' is both available in the backend metrics."
-            )
+            raise ValueError("The metric 'single_shot_readout_fidelity' is both available in the backend metrics.")
         readout_fidelities = [metric_dict["single_shot_readout_fidelity"][node] for node in qubit_nodes]
         radii = -np.log(readout_fidelities)
     else:
@@ -475,8 +462,10 @@ def calculate_node_radii(metric_dict: Dict[str, Dict[int, float]], qubit_nodes: 
         )
     return radii
 
+
 def plot_layout_fidelity_graph(
-    cal_url: str,
+    iqm_server_url: str,
+    backend: IQMBackendBase,
     coupling_map: list[tuple[int]],
     qubit_layouts: Optional[list[list[int]]] = None,
     station: Optional[str] = None,
@@ -490,7 +479,8 @@ def plot_layout_fidelity_graph(
     (thinner edges mean better fidelity) and selected qubits are highlighted in orange.
 
     Args:
-        cal_url: URL to retrieve calibration data from
+        iqm_server_url: URL to retrieve calibration data from.
+        backend: IQM backend instance.
         coupling_map: List of tuples representing the coupling map of the backend
         qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
         station: Name of the quantum computing station to use predefined positions for.
@@ -503,10 +493,11 @@ def plot_layout_fidelity_graph(
         matplotlib.figure.Figure: The generated figure object containing the graph visualization
     """
     # pylint: disable=unbalanced-tuple-unpacking, disable=too-many-statements
-    if "localhost" in cal_url:
-        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities_external(cal_url)
-    else:
-        edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities(cal_url)
+
+    edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities_unified(
+        iqm_server_url, backend
+    )
+
     if topology == "star":
         idx_to_qubit = {idx: qubit for qubit, idx in qubit_mapping.items()}
         qubit_to_idx = qubit_mapping
@@ -527,7 +518,6 @@ def plot_layout_fidelity_graph(
     ]
     edges_cal = [edge for edge in edges_cal if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map]
 
-
     weights = -np.log(np.array(fidelities_cal))
     calibrated_nodes = list(idx_to_qubit.keys())
 
@@ -536,7 +526,8 @@ def plot_layout_fidelity_graph(
         if valid_fidelities:
             median_fidelity = np.median(valid_fidelities)
             fidelities_cal = [f if f < 1.0 else median_fidelity for f in fidelities_cal]
-        from iqm.benchmarks.entanglement.ghz import get_cx_map, get_edges, generate_ghz_spanning_tree
+        from iqm.benchmarks.entanglement.ghz import generate_ghz_spanning_tree, get_cx_map, get_edges
+
         graph = get_edges(coupling_map, qubit_layouts[0], edges_cal, fidelities_cal)
         cx_map = get_cx_map(qubit_layouts[0], graph)
         print(f"Edge map:", cx_map)
@@ -588,7 +579,6 @@ def plot_layout_fidelity_graph(
                 edge_color = "red"
 
         ax.plot([x1, x2], [y1, y2], color=edge_color, linewidth=edge_width, linestyle=edge_style, zorder=1)
-
 
     # Draw nodes as circles with varying radii given by the single qubit metric
     radii = calculate_node_radii(metric_dict, qubit_nodes, sq_metric)
