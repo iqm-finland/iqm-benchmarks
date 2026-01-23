@@ -115,4 +115,5 @@ class BenchmarkConfigurationBase(BaseModel):
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "sabre"
     physical_layout: Literal["fixed", "batching"] = "fixed"
     use_dd: Optional[bool] = False
+    active_reset_cycles: int | None = None
     dd_strategy: Optional[DDStrategy] = None
