@@ -330,50 +330,47 @@ def generate_ghz_star_optimal(
     num_qubits = len(qubit_layout)
 
     # Initialize quantum and classical registers
-    comp_r = QuantumRegister(1, "comp_r")  # Computational resonator
     q = QuantumRegister(backend.num_qubits, "q")  # Qubits
     c = ClassicalRegister(num_qubits, "c")
-    qc = QuantumCircuit(comp_r, q, c, name="GHZ_star_optimal")
-
+    qc = QuantumCircuit(q, c, name="GHZ_star_optimal")
+    # Extract calibration data
     cal_data = extract_fidelities_unified(iqm_server_url, backend)
     # Determine the best move qubit
     double_move_fidelities = {k[0]: v for k, v in list(cal_data[-1]["double_move_gate_fidelity"].items())[::2]}
-    move_dict = {q + 1: double_move_fidelities[q + 1] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
+    move_dict = {q: double_move_fidelities[q + 1] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
     # move_dict = {q + 1: cal_data[1][q] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
     best_move = max(move_dict, key=move_dict.get)
 
     T2 = cal_data[-1]["t2_time"]
-    t2_dict = {qubit + 1: T2[qubit + 1] for qubit in qubit_layout}  ## +1 to match qubit indexing in cal data
+    t2_dict = {qubit: T2[qubit + 1] for qubit in qubit_layout}  ## +1 to match qubit indexing in cal data
     cz_order = dict(sorted(t2_dict.items(), key=lambda item: item[1], reverse=True))
     qubits_to_measure = list(cz_order.keys())
     cz_order.pop(best_move)
 
     # Construct the quantum circuit
-    qc.h(best_move)
-    qc.move(best_move, 0)
+    qc.r(np.pi/2, 3*np.pi/2, best_move)
+    qc.barrier(best_move)
     for qubit in cz_order.keys():
-        qc.cx(0, qubit)
-        qc.barrier()
-    qc.move(best_move, 0)
+        qc.barrier(qubit)
+        qc.r(np.pi/2, 3*np.pi/2, qubit)
+        qc.cz(best_move, qubit)
+        qc.r(np.pi/2, 5*np.pi/2, qubit)
+        qc.barrier(qubit)
     qc.barrier()
     qc.measure(sorted(qubits_to_measure), list(range(num_qubits)))
-
+    qcvv_logger.info(f"Best MOVE qubit selected: {best_move} with double MOVE fidelity {move_dict[best_move]:.4f} and T2 time {t2_dict[best_move]:.2f} us.")
     if inv:
-        comp_r = QuantumRegister(1, "comp_r")  # Computational resonator
         q = QuantumRegister(backend.num_qubits, "q")  # Qubits
         c = ClassicalRegister(num_qubits, "c")
-        qc = QuantumCircuit(comp_r, q, c, name="GHZ_star_optimal_inv")
-
-        qc.move(best_move, 0)
+        qc = QuantumCircuit(q, c, name="GHZ_star_optimal_inv")
         for qubit in reversed(cz_order.keys()):
-            qc.cx(0, qubit)
-            qc.barrier()
-        qc.move(best_move, 0)
-        qc.h(best_move)
-        qc.barrier()
-
+            qc.barrier(qubit)
+            qc.r(np.pi/2, 5*np.pi/2, qubit)
+            qc.cz(best_move, qubit)
+            qc.r(np.pi/2, 3*np.pi/2, qubit)
+            qc.barrier(qubit)
+        qc.r(np.pi/2, 3*np.pi/2, best_move)
     return qc
-
 
 def generate_ghz_star(num_qubits: int) -> QuantumCircuit:
     """
