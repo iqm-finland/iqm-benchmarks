@@ -4,7 +4,9 @@ Changelog
 
 Version 2.55
 ============
-* Compatibility with alternative calibration metric and job metadata formats.
+* Compatibility with new job metadata formats.
+* Unified fetching of calibration data via IQMClient.
+* Addition of active reset and approximate transpilation options in the configurations.
 
 Version 2.54
 ============
