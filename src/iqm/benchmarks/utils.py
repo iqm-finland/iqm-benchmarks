@@ -835,6 +835,7 @@ def perform_backend_transpilation(
     optimize_sqg: bool = False,
     drop_final_rz: bool = True,
     routing_method: Optional[str] = "sabre",
+    approximation_degree: float = 1.0,
 ) -> List[QuantumCircuit]:
     """
     Transpile a list of circuits to backend specifications.
@@ -849,6 +850,7 @@ def perform_backend_transpilation(
         optimize_sqg (bool): Whether SQG optimization is performed taking into account virtual Z.
         drop_final_rz (bool): Whether the SQG optimizer drops a final RZ gate.
         routing_method (Optional[str]): The routing method employed by Qiskit's transpilation pass.
+        approximation_degree (int): The target fidelity to which arbitrary two qubit gates are approximated.
 
     Returns:
         List[QuantumCircuit]: A list of transpiled quantum circuits.
@@ -870,6 +872,7 @@ def perform_backend_transpilation(
                 optimize_single_qubits=optimize_sqg,
                 remove_final_rzs=drop_final_rz,
                 coupling_map=coupling_map_red,
+                approximation_degree=approximation_degree,
                 # initial_layout=qubits if aux_qc is None else None,
             )
         else:
@@ -880,6 +883,7 @@ def perform_backend_transpilation(
                 optimization_level=qiskit_optim_level,
                 initial_layout=qubits if aux_qc is None else None,
                 routing_method=routing_method,
+                approximation_degree=approximation_degree,
             )
             if aux_qc is not None:
                 transpiled = aux_qc.compose(transpiled, qubits=qubits, clbits=list(range(qc.num_clbits)))
