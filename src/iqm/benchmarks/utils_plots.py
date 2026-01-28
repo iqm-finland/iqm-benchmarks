@@ -363,6 +363,7 @@ def evaluate_hamiltonian_paths(
     path_samples: int,
     backend_arg: str | IQMBackendBase,
     url: str,
+    quantum_computer: str,
     max_tries: int = 10,
 ) -> Dict[int, List[Tuple[int, int]]]:
     """Evaluates Hamiltonian paths according to the product of 2Q gate fidelities on the corresponding edges of the backend graph.
@@ -404,7 +405,7 @@ def evaluate_hamiltonian_paths(
 
     # Get scores for all paths
     # Retrieve fidelity data
-    cal_data = extract_fidelities_unified(url, backend)
+    cal_data = extract_fidelities_unified(url, backend, quantum_computer=quantum_computer)
     two_qubit_fidelity = cal_data[-1]["cz_gate_fidelity"]
     # Rate all the paths
     path_costs = {}  # keys are costs, values are edge paths

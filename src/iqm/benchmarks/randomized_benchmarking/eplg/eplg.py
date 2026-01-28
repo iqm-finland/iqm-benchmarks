@@ -246,6 +246,7 @@ class EPLGBenchmark(Benchmark):
         self.chain_path_samples = configuration.chain_path_samples
         self.num_disjoint_layers = configuration.num_disjoint_layers
         self.iqm_server_url = configuration.iqm_server_url
+        self.quantum_computer = self.backend_configuration_name
         self.max_hamiltonian_path_tries = configuration.max_hamiltonian_path_tries
 
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):
@@ -332,11 +333,14 @@ class EPLGBenchmark(Benchmark):
             self.validate_random_chain_inputs()
             num_qubits = cast(int, self.chain_length)
             qcvv_logger.info("Generating linear chain path")
+            if self.iqm_server_url is None or self.quantum_computer is None:
+                raise ValueError("IQM server URL and quantum computer name must be specified for random chain evaluation.")
             h_path_costs = evaluate_hamiltonian_paths(
                 self.chain_length,
                 self.chain_path_samples,
                 self.backend,
                 self.iqm_server_url,
+                self.quantum_computer,
                 self.max_hamiltonian_path_tries,
             )
             qcvv_logger.info("Extracting the path that maximizes total 2Q calibration fidelity")

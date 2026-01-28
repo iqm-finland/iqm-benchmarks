@@ -309,7 +309,7 @@ def generate_ghz_log_cruz(num_qubits: int) -> QuantumCircuit:
 
 
 def generate_ghz_star_optimal(
-    qubit_layout: List[int], iqm_server_url: str, backend: IQMBackendBase, inv: bool = False
+    qubit_layout: List[int], iqm_server_url: str, backend: IQMBackendBase, quantum_computer: str, inv: bool = False,
 ) -> QuantumCircuit:
     """
     Generates the circuit for creating a GHZ state by maximizing the number of CZ gates between a pair of MOVE gates.
@@ -321,6 +321,8 @@ def generate_ghz_star_optimal(
             The IQM server URL for extracting fidelities.
         backend: IQMBackendBase
             The backend to be used for the quantum circuit.
+        quantum_computer: str
+            The name of the quantum computer to be used for calbration data, i.e. "garnet", "emerald", ...
         inv: bool
             Whether to generate the inverse circuit.
 
@@ -334,7 +336,7 @@ def generate_ghz_star_optimal(
     c = ClassicalRegister(num_qubits, "c")
     qc = QuantumCircuit(q, c, name="GHZ_star_optimal")
     # Extract calibration data
-    cal_data = extract_fidelities_unified(iqm_server_url, backend)
+    cal_data = extract_fidelities_unified(iqm_server_url, backend, quantum_computer)
     # Determine the best move qubit
     double_move_fidelities = {k[0]: v for k, v in list(cal_data[-1]["double_move_gate_fidelity"].items())[::2]}
     move_dict = {q: double_move_fidelities[q + 1] for q in qubit_layout}  ## +1 to match qubit indexing in cal data
@@ -729,9 +731,10 @@ class GHZBenchmark(Benchmark):
             )
             final_ghz = ghz_native_transpiled
         elif routine == "star_optimal":
-            if self.iqm_server_url is None:
-                raise ValueError("IQM server url must be provided for 'star_optimal' routine.")
-            ghz = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.backend)
+            if self.iqm_server_url is None or self.quantum_computer is None:
+                raise ValueError("IQM server url and quantum_computer argument must be provided "
+                                 "for 'star_optimal' routine.")
+            ghz = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.quantum_computer, self.backend)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled = transpile_to_IQM(
                 ghz,
@@ -786,7 +789,7 @@ class GHZBenchmark(Benchmark):
         qc.remove_final_measurements()
         phases = [np.pi * i / (qubit_count + 1) for i in range(2 * qubit_count + 2)]
         if self.state_generation_routine == "star_optimal":
-            qc_inv = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.backend, inv=True)
+            qc_inv = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.backend, self.quantum_computer, inv=True)
             for phase in phases:
                 qc_phase = qc.copy()
                 qc_phase.barrier()
