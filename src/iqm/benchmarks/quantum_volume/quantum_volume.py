@@ -788,23 +788,23 @@ class QuantumVolumeConfiguration(BenchmarkConfigurationBase):
     Attributes:
         benchmark (Type[Benchmark]): QuantumVolumeBenchmark
         num_circuits (int): The number of circuits to use.
-                            * Should be at least 100 for a meaningful QV experiment.
+            Should be at least 100 for a meaningful QV experiment.
         num_sigmas (int): The number of sample standard deviations to consider with for the threshold criteria.
-                            * Default by consensus is 2
+            Default by consensus is 2
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
-                            * Default is "custom".
+            Default is "custom".
         custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
-                            * Default is [[0, 2]].
+            Default is [[0, 2]].
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
-                            * Default is 3.
+            Default is 3.
         optimize_sqg (bool): Whether Single Qubit Gate Optimization is performed upon transpilation.
-                            * Default is True.
+            Default is True.
         approximation_degree (float): The target fidelity to which arbitrary two qubit gates are approximated.
         rem (bool): Whether Readout Error Mitigation is applied in post-processing. When set to True, both results
             (readout-unmitigated and -mitigated) are produced.
-                            - Default is True.
+            Default is True.
         mit_shots (int): The measurement shots to use for readout calibration.
-                            * Default is 1_000.
+            Default is 1_000.
     """
 
     benchmark: Type[Benchmark] = QuantumVolumeBenchmark
