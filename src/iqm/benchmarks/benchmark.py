@@ -109,6 +109,7 @@ class BenchmarkConfigurationBase(BaseModel):
 
     benchmark: Type[BenchmarkBase]
     shots: int = 2**8
+    quantum_computer: str | None = None
     max_gates_per_batch: Optional[int] = None
     max_circuits_per_batch: Optional[int] = None
     calset_id: Optional[str] = None

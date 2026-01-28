@@ -466,9 +466,8 @@ def calculate_node_radii(
 def plot_layout_fidelity_graph(
     iqm_server_url: str,
     backend: IQMBackendBase,
-    coupling_map: list[tuple[int]],
     qubit_layouts: Optional[list[list[int]]] = None,
-    station: Optional[str] = None,
+    quantum_computer: Optional[str] = None,
     sq_metric: Optional[str] = "coherence",
     show_ghz_path: bool = False,
 ):
@@ -481,9 +480,8 @@ def plot_layout_fidelity_graph(
     Args:
         iqm_server_url: URL to retrieve calibration data from.
         backend: IQM backend instance.
-        coupling_map: List of tuples representing the coupling map of the backend
         qubit_layouts: List of qubit layouts where each layout is a list of qubit indices
-        station: Name of the quantum computing station to use predefined positions for.
+        quantum_computer: Name of the quantum computing station to use predefined positions for.
                 If None, positions will be generated algorithmically.
         sq_metric: Optional single qubit metric to use for the visualization, can be either "fidelity", "coherence",
                 or "readout".
@@ -495,7 +493,7 @@ def plot_layout_fidelity_graph(
     # pylint: disable=unbalanced-tuple-unpacking, disable=too-many-statements
 
     edges_cal, fidelities_cal, topology, qubit_mapping, metric_dict = extract_fidelities_unified(
-        iqm_server_url, backend
+        iqm_server_url, backend, quantum_computer
     )
 
     if topology == "star":
@@ -514,9 +512,10 @@ def plot_layout_fidelity_graph(
     fidelities_cal = [
         fidelity
         for edge, fidelity in zip(edges_cal, fidelities_cal, strict=True)
-        if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map
+        if (edge[0], edge[1]) in backend.coupling_map or (edge[1], edge[0]) in backend.coupling_map
     ]
-    edges_cal = [edge for edge in edges_cal if (edge[0], edge[1]) in coupling_map or (edge[1], edge[0]) in coupling_map]
+    edges_cal = [edge for edge in edges_cal if (edge[0], edge[1])
+                 in backend.coupling_map or (edge[1], edge[0]) in backend.coupling_map]
 
     weights = -np.log(np.array(fidelities_cal))
     calibrated_nodes = list(idx_to_qubit.keys())
@@ -528,12 +527,12 @@ def plot_layout_fidelity_graph(
             fidelities_cal = [f if f < 1.0 else median_fidelity for f in fidelities_cal]
         from iqm.benchmarks.entanglement.ghz import generate_ghz_spanning_tree, get_cx_map, get_edges
 
-        graph = get_edges(coupling_map, qubit_layouts[0], edges_cal, fidelities_cal)
+        graph = get_edges(backend.coupling_map, qubit_layouts[0], edges_cal, fidelities_cal)
         cx_map = get_cx_map(qubit_layouts[0], graph)
         print(f"Edge map:", cx_map)
 
     # Define qubit positions in plot
-    qubit_positions = GraphPositions.get_positions(station=station, graph=None, num_qubits=len(calibrated_nodes))
+    qubit_positions = GraphPositions.get_positions(station=quantum_computer, graph=None, num_qubits=len(calibrated_nodes))
 
     graph = PyGraph()
     nodes = list(set(qubit_positions.keys()))

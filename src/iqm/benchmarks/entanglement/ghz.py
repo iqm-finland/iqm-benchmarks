@@ -652,6 +652,7 @@ class GHZBenchmark(Benchmark):
         self.rem = configuration.rem
         self.mit_shots = configuration.mit_shots
         self.iqm_server_url = configuration.iqm_server_url
+        self.quantum_computer = configuration.quantum_computer
         self.timestamp = strftime("%Y%m%d-%H%M%S")
         self.execution_timestamp = ""
 
@@ -695,7 +696,7 @@ class GHZBenchmark(Benchmark):
                     f"The current backend is a star architecture for which a suboptimal state generation routine is chosen. Consider setting state_generation_routine={routine}."
                 )
             if self.iqm_server_url is not None:
-                edges_cal, fidelities_cal, _, _, _ = extract_fidelities_unified(self.iqm_server_url, self.backend)
+                edges_cal, fidelities_cal, _, _, _ = extract_fidelities_unified(self.iqm_server_url, self.backend, self.quantum_computer)
                 # Replace fidelities >= 1.0 with median of fidelities < 1.0
                 valid_fidelities = [f for f in fidelities_cal if f < 1.0]
                 if valid_fidelities:
