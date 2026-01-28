@@ -835,7 +835,7 @@ def perform_backend_transpilation(
     optimize_sqg: bool = False,
     drop_final_rz: bool = True,
     routing_method: Optional[str] = "sabre",
-    approximation_degree: int = 1.0,
+    approximation_degree: float = 1.0,
 ) -> List[QuantumCircuit]:
     """
     Transpile a list of circuits to backend specifications.
