@@ -17,7 +17,7 @@ iqm.benchmarks.utils
       bootstrap_counts
       count_2q_layers
       count_native_gates
-      extract_fidelities
+      extract_fidelities_unified
       generate_state_tomography_circuits
       get_Pauli_expectation
       get_active_qubits
@@ -45,6 +45,14 @@ iqm.benchmarks.utils
 
    
    
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: autosummary-class-template.rst
+   
+      ObservationType
+   
    
 
    
@@ -56,4 +64,9 @@ iqm.benchmarks.utils
 
 
 
+
+.. rubric:: Inheritance
+
+.. inheritance-diagram:: iqm.benchmarks.utils
+   :parts: 1
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration &#8212; IQM Benchmarks 2.54 documentation</title>
+    <title>iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration &#8212; IQM Benchmarks 2.55 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=bee4b739"></script>
+    <script src="../_static/documentation_options.js?v=05183524"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark" href="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.54" />
-    <meta name="docbuild:last-update" content="2025-12-17"/>
+  <meta name="docsearch:version" content="2.55" />
+    <meta name="docbuild:last-update" content="2026-01-29"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.54 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.54 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.55 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.55 documentation - Home"/>
   
   
 </a></div>
@@ -243,7 +243,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities_unified.html">iqm.benchmarks.utils.extract_fidelities_unified</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.generate_state_tomography_circuits.html">iqm.benchmarks.utils.generate_state_tomography_circuits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_Pauli_expectation.html">iqm.benchmarks.utils.get_Pauli_expectation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_active_qubits.html">iqm.benchmarks.utils.get_active_qubits</a></li>
@@ -266,6 +266,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.ObservationType.html">iqm.benchmarks.utils.ObservationType</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -445,7 +446,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.chain_path_samples"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.chain_path_samples</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.num_disjoint_layers"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.num_disjoint_layers</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.max_hamiltonian_path_tries"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.max_hamiltonian_path_tries</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.calibration_url</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.iqm_server_url"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.iqm_server_url</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.model_config"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.model_config</span></code></a></li>
 </ul>
 </li>
@@ -464,7 +465,7 @@
 <h1>iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration<a class="headerlink" href="#iqm-benchmarks-randomized-benchmarking-eplg-eplg-eplgconfiguration" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.eplg.eplg.</span></span><span class="sig-name descname"><span class="pre">EPLGConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark'&gt;,</span> <span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_circuits_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre',</span> <span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed',</span> <span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed',</span> <span class="pre">use_dd:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">dd_strategy:</span> <span class="pre">~iqm.station_control.interface.models.circuit.DDStrategy</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">drb_depths:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">drb_circuit_samples:</span> <span class="pre">int,</span> <span class="pre">custom_qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Tuple[int,</span> <span class="pre">int]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">chain_length:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">chain_path_samples:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">num_disjoint_layers:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_hamiltonian_path_tries:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calibration_url:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iqm.benchmarks.randomized_benchmarking.eplg.eplg.</span></span><span class="sig-name descname"><span class="pre">EPLGConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">benchmark:</span> <span class="pre">~typing.Type[~iqm.benchmarks.benchmark_definition.Benchmark]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGBenchmark'&gt;,</span> <span class="pre">shots:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">256,</span> <span class="pre">quantum_computer:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_gates_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_circuits_per_batch:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">calset_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">routing_method:</span> <span class="pre">~typing.Literal['basic',</span> <span class="pre">'lookahead',</span> <span class="pre">'stochastic',</span> <span class="pre">'sabre',</span> <span class="pre">'none']</span> <span class="pre">=</span> <span class="pre">'sabre',</span> <span class="pre">physical_layout:</span> <span class="pre">~typing.Literal['fixed',</span> <span class="pre">'batching']</span> <span class="pre">=</span> <span class="pre">'fixed',</span> <span class="pre">use_dd:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">active_reset_cycles:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">dd_strategy:</span> <span class="pre">~iqm.station_control.interface.models.circuit.DDStrategy</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">drb_depths:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">drb_circuit_samples:</span> <span class="pre">int,</span> <span class="pre">custom_qubits_array:</span> <span class="pre">~typing.Sequence[~typing.Tuple[int,</span> <span class="pre">int]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">chain_length:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">chain_path_samples:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">num_disjoint_layers:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">max_hamiltonian_path_tries:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">iqm_server_url:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="iqm.benchmarks.benchmark.BenchmarkConfigurationBase.html#iqm.benchmarks.benchmark.BenchmarkConfigurationBase" title="iqm.benchmarks.benchmark.BenchmarkConfigurationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfigurationBase</span></code></a></p>
 <p>EPLG Configuration</p>
 <dl class="field-list simple">
@@ -472,12 +473,14 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>benchmark</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Type" title="(in Python v3.11)"><em>Type</em></a><em>[</em><a class="reference internal" href="iqm.benchmarks.benchmark_definition.Benchmark.html#iqm.benchmarks.benchmark_definition.Benchmark" title="iqm.benchmarks.benchmark_definition.Benchmark"><em>Benchmark</em></a><em>]</em>) – </p></li>
 <li><p><strong>shots</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>quantum_computer</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>max_gates_per_batch</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>max_circuits_per_batch</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>calset_id</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>routing_method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'basic'</em><em>, </em><em>'lookahead'</em><em>, </em><em>'stochastic'</em><em>, </em><em>'sabre'</em><em>, </em><em>'none'</em><em>]</em>) – </p></li>
 <li><p><strong>physical_layout</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'fixed'</em><em>, </em><em>'batching'</em><em>]</em>) – </p></li>
 <li><p><strong>use_dd</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>active_reset_cycles</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>dd_strategy</strong> (<em>DDStrategy</em><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>drb_depths</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – </p></li>
 <li><p><strong>drb_circuit_samples</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
@@ -486,7 +489,7 @@
 <li><p><strong>chain_path_samples</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>num_disjoint_layers</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>max_hamiltonian_path_tries</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>calibration_url</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>iqm_server_url</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -574,8 +577,8 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url">
-<span class="sig-name descname"><span class="pre">calibration_url</span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.iqm_server_url">
+<span class="sig-name descname"><span class="pre">iqm_server_url</span></span><a class="headerlink" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.iqm_server_url" title="Link to this definition">#</a></dt>
 <dd><p>The URL of the IQM station to retrieve calibration data from.
 * It must be specified if custom_qubits_array is not specified.
 * Default is None - raises an error if custom_qubits_array is not specified.</p>
@@ -616,28 +619,34 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.max_hamiltonian_path_tries" title="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.max_hamiltonian_path_tries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_hamiltonian_path_tries</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url" title="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibration_url</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.iqm_server_url" title="iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.iqm_server_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iqm_server_url</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shots</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_gates_per_batch</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantum_computer</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_circuits_per_batch</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_gates_per_batch</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calset_id</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_circuits_per_batch</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">routing_method</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calset_id</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">physical_layout</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">routing_method</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_dd</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">physical_layout</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_dd</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">active_reset_cycles</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dd_strategy</span></code></p></td>
@@ -716,7 +725,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.chain_path_samples"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.chain_path_samples</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.num_disjoint_layers"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.num_disjoint_layers</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.max_hamiltonian_path_tries"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.max_hamiltonian_path_tries</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.calibration_url"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.calibration_url</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.iqm_server_url"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.iqm_server_url</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iqm.benchmarks.randomized_benchmarking.eplg.eplg.EPLGConfiguration.model_config"><code class="docutils literal notranslate"><span class="pre">EPLGConfiguration.model_config</span></code></a></li>
 </ul>
 </li>
@@ -753,7 +762,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-12-17.
+  Last updated on 2026-01-29.
   <br/>
 </p>
   </div>

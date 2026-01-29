@@ -22,14 +22,16 @@ iqm.benchmarks.randomized\_benchmarking.eplg.eplg.EPLGConfiguration
       ~EPLGConfiguration.chain_path_samples
       ~EPLGConfiguration.num_disjoint_layers
       ~EPLGConfiguration.max_hamiltonian_path_tries
-      ~EPLGConfiguration.calibration_url
+      ~EPLGConfiguration.iqm_server_url
       ~EPLGConfiguration.shots
+      ~EPLGConfiguration.quantum_computer
       ~EPLGConfiguration.max_gates_per_batch
       ~EPLGConfiguration.max_circuits_per_batch
       ~EPLGConfiguration.calset_id
       ~EPLGConfiguration.routing_method
       ~EPLGConfiguration.physical_layout
       ~EPLGConfiguration.use_dd
+      ~EPLGConfiguration.active_reset_cycles
       ~EPLGConfiguration.dd_strategy
    
    

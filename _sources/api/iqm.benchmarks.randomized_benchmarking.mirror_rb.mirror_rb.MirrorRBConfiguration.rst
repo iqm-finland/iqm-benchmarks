@@ -26,12 +26,14 @@ iqm.benchmarks.randomized\_benchmarking.mirror\_rb.mirror\_rb.MirrorRBConfigurat
       ~MirrorRBConfiguration.sqg_gate_ensemble
       ~MirrorRBConfiguration.simulation_method
       ~MirrorRBConfiguration.shots
+      ~MirrorRBConfiguration.quantum_computer
       ~MirrorRBConfiguration.max_gates_per_batch
       ~MirrorRBConfiguration.max_circuits_per_batch
       ~MirrorRBConfiguration.calset_id
       ~MirrorRBConfiguration.routing_method
       ~MirrorRBConfiguration.physical_layout
       ~MirrorRBConfiguration.use_dd
+      ~MirrorRBConfiguration.active_reset_cycles
       ~MirrorRBConfiguration.dd_strategy
    
    

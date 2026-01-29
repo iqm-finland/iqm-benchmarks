@@ -20,12 +20,14 @@ iqm.benchmarks.randomized\_benchmarking.clifford\_rb.clifford\_rb.CliffordRBConf
       ~CliffordRBConfiguration.num_circuit_samples
       ~CliffordRBConfiguration.parallel_execution
       ~CliffordRBConfiguration.shots
+      ~CliffordRBConfiguration.quantum_computer
       ~CliffordRBConfiguration.max_gates_per_batch
       ~CliffordRBConfiguration.max_circuits_per_batch
       ~CliffordRBConfiguration.calset_id
       ~CliffordRBConfiguration.routing_method
       ~CliffordRBConfiguration.physical_layout
       ~CliffordRBConfiguration.use_dd
+      ~CliffordRBConfiguration.active_reset_cycles
       ~CliffordRBConfiguration.dd_strategy
    
    

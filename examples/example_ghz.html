@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.54 documentation</title>
+    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.55 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=bee4b739"></script>
+    <script src="../_static/documentation_options.js?v=05183524"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Circuit Layer Operations Per Second (CLOPS)" href="example_clops.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.54" />
-    <meta name="docbuild:last-update" content="2025-12-17"/>
+  <meta name="docsearch:version" content="2.55" />
+    <meta name="docbuild:last-update" content="2026-01-29"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.54 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.54 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.55 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.55 documentation - Home"/>
   
   
 </a></div>
@@ -245,7 +245,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.extract_fidelities_unified.html">iqm.benchmarks.utils.extract_fidelities_unified</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.generate_state_tomography_circuits.html">iqm.benchmarks.utils.generate_state_tomography_circuits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_Pauli_expectation.html">iqm.benchmarks.utils.get_Pauli_expectation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.get_active_qubits.html">iqm.benchmarks.utils.get_active_qubits</a></li>
@@ -268,6 +268,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/iqm.benchmarks.utils.ObservationType.html">iqm.benchmarks.utils.ObservationType</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../api/iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -439,7 +440,11 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-the-benchmark-configuration">Definition of the benchmark configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamical-decoupling-strategy">Dynamical decoupling strategy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-the-benchmark-configuration">Definition of the benchmark configuration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improved-qubit-selection-via-layout-fidelity-graph">Improved qubit selection via layout fidelity graph</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-benchmark">Running the benchmark</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-results">Accessing the results</a></li>
 </ul>
@@ -472,11 +477,60 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.ghz</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;fakeapollo&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
+<span class="c1"># backend = &quot;fakeapollo&quot;</span>
+
+
+<span class="c1"># token = &quot;YOUR_TOKEN_HERE&quot;</span>
+<span class="c1"># os.environ[&quot;IQM_TOKEN&quot;] = token</span>
+<span class="n">quantum_computer</span> <span class="o">=</span> <span class="s2">&quot;emerald&quot;</span>
+<span class="n">iqm_server_url</span> <span class="o">=</span> <span class="s2">&quot;https://resonance.meetiqm.com&quot;</span>
+<span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">quantum_computer</span> <span class="o">=</span> <span class="n">quantum_computer</span><span class="p">)</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
+<section id="dynamical-decoupling-strategy">
+<h2>Dynamical decoupling strategy<a class="headerlink" href="#dynamical-decoupling-strategy" title="Link to this heading">#</a></h2>
+<p>The success of dynamical decoupling (DD) depends on the coherence several factors, like</p>
+<ul class="simple">
+<li><p>Amount and lenght of idle segments in the circuit,</p></li>
+<li><p>Magnitude of idling errors,</p></li>
+<li><p>Single qubit gate fidelities (since DD adds additional single qubit gates).</p></li>
+</ul>
+<p>Therefore just using the default DD strategy is not guaranteed to improve the results. In this notebook we apply a minimal DD strategy which only add single qubit gates on qubits with a high single qubit gate fidelity, and only adds a minimal amount of extra gates per idle segment (just tow X-Gates). This strategy should improve outcomes in most cases.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.iqm_client.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DDStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_fidelities_unified</span>
+
+<span class="c1"># Fetch latest calibration data</span>
+<span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span> <span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">extract_fidelities_unified</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">quantum_computer</span><span class="p">)</span>
+
+<span class="c1"># Define DD strategy</span>
+<span class="n">dd_qubits</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;QB</span><span class="si">{</span><span class="n">qubit_name</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">qubit_name</span><span class="p">,</span> <span class="n">fidelity</span> <span class="ow">in</span> <span class="n">metrics_dict</span><span class="p">[</span><span class="s2">&quot;fidelity_1qb_gates_averaged&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">fidelity</span> <span class="o">&gt;</span> <span class="mf">0.999</span><span class="p">]</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">DDStrategy</span><span class="p">(</span><span class="n">gate_sequences</span><span class="o">=</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;XX&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)],</span> <span class="n">target_qubits</span> <span class="o">=</span> <span class="n">dd_qubits</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimal dynamical decoupling strategy:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">strategy</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Minimal dynamical decoupling strategy:
+	merge_contiguous_waits: True
+	target_qubits: frozenset({&#39;QB51&#39;, &#39;QB42&#39;, &#39;QB35&#39;, &#39;QB1&#39;, &#39;QB43&#39;, &#39;QB23&#39;, &#39;QB33&#39;, &#39;QB3&#39;, &#39;QB37&#39;, &#39;QB40&#39;, &#39;QB32&#39;, &#39;QB14&#39;, &#39;QB22&#39;, &#39;QB29&#39;, &#39;QB12&#39;, &#39;QB38&#39;, &#39;QB2&#39;, &#39;QB5&#39;, &#39;QB11&#39;, &#39;QB53&#39;, &#39;QB6&#39;, &#39;QB26&#39;, &#39;QB10&#39;, &#39;QB41&#39;, &#39;QB49&#39;, &#39;QB24&#39;, &#39;QB20&#39;, &#39;QB21&#39;, &#39;QB52&#39;, &#39;QB48&#39;, &#39;QB50&#39;, &#39;QB46&#39;, &#39;QB18&#39;, &#39;QB39&#39;, &#39;QB7&#39;, &#39;QB15&#39;, &#39;QB25&#39;, &#39;QB4&#39;, &#39;QB13&#39;, &#39;QB31&#39;, &#39;QB47&#39;, &#39;QB19&#39;})
+	skip_leading_wait: True
+	skip_trailing_wait: True
+	gate_sequences: [(6, &#39;XYYX&#39;, &#39;center&#39;)]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 <section id="definition-of-the-benchmark-configuration">
 <h2>Definition of the benchmark configuration<a class="headerlink" href="#definition-of-the-benchmark-configuration" title="Link to this heading">#</a></h2>
 <p>The important parameters are:</p>
@@ -492,22 +546,24 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MINIMAL_GHZ</span> <span class="o">=</span> <span class="n">GHZConfiguration</span><span class="p">(</span>
     <span class="n">state_generation_routine</span><span class="o">=</span><span class="s2">&quot;tree&quot;</span><span class="p">,</span>
-            <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">[</span><span class="mi">18</span><span class="p">,</span><span class="mi">19</span><span class="p">],</span>
-                <span class="p">[</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">19</span><span class="p">],</span>
-                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
-                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
+            <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[</span> <span class="c1"># These are naive settings, replace with better qubit layouts!</span>
                 <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)),</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">20</span><span class="p">)),</span>
             <span class="p">],</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">fidelity_routine</span><span class="o">=</span><span class="s2">&quot;coherences&quot;</span><span class="p">,</span> 
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">use_dd</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">dd_strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+    <span class="n">quantum_computer</span><span class="o">=</span><span class="n">quantum_computer</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<section id="improved-qubit-selection-via-layout-fidelity-graph">
+<h3>Improved qubit selection via layout fidelity graph<a class="headerlink" href="#improved-qubit-selection-via-layout-fidelity-graph" title="Link to this heading">#</a></h3>
 <p>For thinking about which qubit layouts to use, the following visualization of the connectivity and CZ fidelities is helpful.</p>
 <p>Requirements:</p>
 <ul class="simple">
@@ -521,6 +577,7 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <li><p>Each edge is also labeled with the width value.</p></li>
 <li><p>Some graph layouts are predefined to match the layout as shown in IQM-Resonance. If the layout is not predefined, a graph in grid or star layout will be automatically generated, dependeing on the backend. Automatically generated graphs might need to be rerun a few times until a nice node layout is found.</p></li>
 <li><p>Single qubit errors are visualized as node size (<strong>smaller radius is better</strong>), with the node size being determined by <span class="math notranslate nohighlight">\(- \mathrm{log}(\mathcal{F})\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is either the single qubit average gate fidelity, the single qubit readout fidelity, or the single qubit idle gate fidelity. Which of these is used can be controlled by the <code class="docutils literal notranslate"><span class="pre">sq_metric</span></code> argument, which can be set to “fidelity” “readout”, or “coherence”, where the latter option leads to the idle fidelities being shown.</p></li>
+<li><p>If the option <code class="docutils literal notranslate"><span class="pre">show_ghz_path</span></code> is set to True, the connections used for creating the GHZ state are highlighted red. Furthermore the “Edge map” is printed, which is the list of qubit pairs on which CZ gates act in the GHZ circuit. The list is ordered, so the first pair is scheduled first, and so on. CZ-Gates on subsequent pairs that don’t share the same qubit are executed in parallel.</p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -528,19 +585,20 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check if access token environment variable is set: </span><span class="si">{</span><span class="s1">&#39;IQM_TOKEN&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">cal_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://api.resonance.meetiqm.com/quantum-computers/v1/garnet/calibrations&quot;</span> 
-<span class="n">qubit_layouts</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">6</span><span class="p">]]</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_layout_fidelity_graph</span><span class="p">(</span><span class="n">cal_url</span><span class="p">,</span> <span class="n">qubit_layouts</span> <span class="o">=</span> <span class="n">qubit_layouts</span><span class="p">,</span> <span class="n">sq_metric</span><span class="o">=</span><span class="s2">&quot;coherence&quot;</span><span class="p">)</span>
+<span class="n">qubit_layouts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">))]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_layout_fidelity_graph</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">quantum_computer</span> <span class="o">=</span> <span class="n">quantum_computer</span><span class="p">,</span> <span class="n">qubit_layouts</span> <span class="o">=</span> <span class="n">qubit_layouts</span><span class="p">,</span> <span class="n">sq_metric</span><span class="o">=</span><span class="s2">&quot;coherence&quot;</span><span class="p">,</span> <span class="n">show_ghz_path</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Check if access token environment variable is set: True
+Edge map: [[10, 11], [10, 18], [11, 5], [18, 17], [11, 12], [11, 19], [5, 4], [17, 16], [5, 6], [12, 13], [4, 3], [4, 0], [16, 15], [3, 2], [3, 9], [0, 1], [15, 14], [15, 7], [2, 8]]
 </pre></div>
 </div>
-<img alt="../_images/78aae61e0aa0d1ad29eaa1fbcf259a8b7407d541cef8d442f42d072e5d6f035c.png" src="../_images/78aae61e0aa0d1ad29eaa1fbcf259a8b7407d541cef8d442f42d072e5d6f035c.png" />
+<img alt="../_images/cb6b60673ff39705788f7c0ac332979e21718a4425bb1848367286aa8adc07ea.png" src="../_images/cb6b60673ff39705788f7c0ac332979e21718a4425bb1848367286aa8adc07ea.png" />
 </div>
 </div>
+</section>
 </section>
 <section id="running-the-benchmark">
 <h2>Running the benchmark<a class="headerlink" href="#running-the-benchmark" title="Link to this heading">#</a></h2>
@@ -552,36 +610,36 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-07-21 17:13:58,543 - iqm.benchmarks.logging_config - INFO - Now generating a 2-qubit GHZ state on qubits [18, 19]
-2025-07-21 17:13:58,546 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:13:59,166 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:13:59,259 - iqm.benchmarks.logging_config - INFO - Submitting batch with 7 circuits corresponding to qubits [18, 19]
-2025-07-21 17:13:59,263 - iqm.benchmarks.logging_config - INFO - Now generating a 3-qubit GHZ state on qubits [17, 18, 19]
-2025-07-21 17:13:59,711 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:13:59,731 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:13:59,879 - iqm.benchmarks.logging_config - INFO - Submitting batch with 9 circuits corresponding to qubits [17, 18, 19]
-2025-07-21 17:13:59,884 - iqm.benchmarks.logging_config - INFO - Now generating a 4-qubit GHZ state on qubits [0, 1, 3, 4]
-2025-07-21 17:13:59,885 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:13:59,950 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:14:00,439 - iqm.benchmarks.logging_config - INFO - Submitting batch with 11 circuits corresponding to qubits [0, 1, 3, 4]
-2025-07-21 17:14:00,463 - iqm.benchmarks.logging_config - INFO - Now generating a 5-qubit GHZ state on qubits [0, 1, 2, 3, 4]
-2025-07-21 17:14:00,492 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:14:00,960 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:14:01,248 - iqm.benchmarks.logging_config - INFO - Submitting batch with 13 circuits corresponding to qubits [0, 1, 2, 3, 4]
-2025-07-21 17:14:01,272 - iqm.benchmarks.logging_config - INFO - Now generating a 10-qubit GHZ state on qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-2025-07-21 17:14:01,318 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:14:01,810 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMFakeApolloBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2025-07-21 17:14:02,444 - iqm.benchmarks.logging_config - INFO - Submitting batch with 23 circuits corresponding to qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-2025-07-21 17:14:02,465 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-07-21 17:14:02,532 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-07-21 17:14:09,078 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-07-21 17:14:09,104 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-07-21 17:14:09,576 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-07-21 17:14:09,602 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-07-21 17:14:09,961 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-07-21 17:14:09,985 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-2025-07-21 17:14:10,509 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2025-07-21 17:14:10,572 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-28 12:05:53,608 - iqm.benchmarks.logging_config - INFO - Now generating a 10-qubit GHZ state on qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2026-01-28 12:05:53,612 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
+2026-01-28 12:05:56,697 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
+2026-01-28 12:05:59,045 - iqm.benchmarks.logging_config - INFO - Submitting batch with 23 circuits corresponding to qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
+  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
+2026-01-28 12:06:00,134 - iqm.benchmarks.logging_config - INFO - Now generating a 20-qubit GHZ state on qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+2026-01-28 12:06:00,147 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
+2026-01-28 12:06:00,435 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
+2026-01-28 12:06:06,656 - iqm.benchmarks.logging_config - INFO - Submitting batch with 43 circuits corresponding to qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
+  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
+2026-01-28 12:06:08,527 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2026-01-28 12:06:08,777 - iqm.iqm_server_client.iqm_server_client - INFO - Waiting for job 019c0448-1793-7341-922d-58a52de74b76 to finish...
+2026-01-28 12:06:20,159 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
+2026-01-28 12:06:20,313 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;rep_delay&#39;: None}
+  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b0776c6fa4f14fa4aa6d7924d3dd8a46", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-28 12:06:43,940 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
+2026-01-28 12:06:44,108 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
+2026-01-28 12:06:44,472 - iqm.iqm_server_client.iqm_server_client - INFO - Waiting for job 019c0448-381c-7ec1-8091-78f4ee536965 to finish...
+2026-01-28 12:06:48,789 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
+2026-01-28 12:06:49,109 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
+C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;rep_delay&#39;: None}
+  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2c78de84604648afb6eaeac69d3d9447", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-28 12:07:24,338 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
 </pre></div>
 </div>
 </div>
@@ -600,7 +658,7 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <p>The plot allows a comparison of all layout results with and without REM, where the data point description labels “L0”, “L1”, … enumerate the layouts in the order defined in the configuration.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qubit_layout</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">observation</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">observations</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">observation</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">string_identifier</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">qubit_layout</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">observation</span><span class="o">.</span><span class="n">uncertainty</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -609,7 +667,11 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/15562c4374f892deca56e05e55dead819f77052d64027bccfb5be8e516c32485.png" src="../_images/15562c4374f892deca56e05e55dead819f77052d64027bccfb5be8e516c32485.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>fidelity: 0.5166038909963064 +/- None
+fidelity_rem: 0.6460375601220506 +/- None
+</pre></div>
+</div>
+<img alt="../_images/048d2edc6eacafc9e3b12d31cb44059777ae7f0eeea5b987d50d7427fcca3468.png" src="../_images/048d2edc6eacafc9e3b12d31cb44059777ae7f0eeea5b987d50d7427fcca3468.png" />
 </div>
 </div>
 </section>
@@ -661,7 +723,11 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-the-benchmark-configuration">Definition of the benchmark configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamical-decoupling-strategy">Dynamical decoupling strategy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-the-benchmark-configuration">Definition of the benchmark configuration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improved-qubit-selection-via-layout-fidelity-graph">Improved qubit selection via layout fidelity graph</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-benchmark">Running the benchmark</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-the-results">Accessing the results</a></li>
 </ul>
@@ -697,7 +763,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-12-17.
+  Last updated on 2026-01-29.
   <br/>
 </p>
   </div>

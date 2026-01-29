@@ -23,12 +23,14 @@ iqm.benchmarks.randomized\_benchmarking.interleaved\_rb.interleaved\_rb.Interlea
       ~InterleavedRBConfiguration.interleaved_gate_params
       ~InterleavedRBConfiguration.simultaneous_fit
       ~InterleavedRBConfiguration.shots
+      ~InterleavedRBConfiguration.quantum_computer
       ~InterleavedRBConfiguration.max_gates_per_batch
       ~InterleavedRBConfiguration.max_circuits_per_batch
       ~InterleavedRBConfiguration.calset_id
       ~InterleavedRBConfiguration.routing_method
       ~InterleavedRBConfiguration.physical_layout
       ~InterleavedRBConfiguration.use_dd
+      ~InterleavedRBConfiguration.active_reset_cycles
       ~InterleavedRBConfiguration.dd_strategy
    
    

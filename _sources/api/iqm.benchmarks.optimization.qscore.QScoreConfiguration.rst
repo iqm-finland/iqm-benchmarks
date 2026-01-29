@@ -31,12 +31,14 @@ iqm.benchmarks.optimization.qscore.QScoreConfiguration
       ~QScoreConfiguration.REM
       ~QScoreConfiguration.mit_shots
       ~QScoreConfiguration.shots
+      ~QScoreConfiguration.quantum_computer
       ~QScoreConfiguration.max_gates_per_batch
       ~QScoreConfiguration.max_circuits_per_batch
       ~QScoreConfiguration.calset_id
       ~QScoreConfiguration.routing_method
       ~QScoreConfiguration.physical_layout
       ~QScoreConfiguration.use_dd
+      ~QScoreConfiguration.active_reset_cycles
       ~QScoreConfiguration.dd_strategy
    
    

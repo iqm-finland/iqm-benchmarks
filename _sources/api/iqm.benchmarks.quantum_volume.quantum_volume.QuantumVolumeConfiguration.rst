@@ -21,15 +21,18 @@ iqm.benchmarks.quantum\_volume.quantum\_volume.QuantumVolumeConfiguration
       ~QuantumVolumeConfiguration.custom_qubits_array
       ~QuantumVolumeConfiguration.qiskit_optim_level
       ~QuantumVolumeConfiguration.optimize_sqg
+      ~QuantumVolumeConfiguration.approximation_degree
       ~QuantumVolumeConfiguration.rem
       ~QuantumVolumeConfiguration.mit_shots
       ~QuantumVolumeConfiguration.shots
+      ~QuantumVolumeConfiguration.quantum_computer
       ~QuantumVolumeConfiguration.max_gates_per_batch
       ~QuantumVolumeConfiguration.max_circuits_per_batch
       ~QuantumVolumeConfiguration.calset_id
       ~QuantumVolumeConfiguration.routing_method
       ~QuantumVolumeConfiguration.physical_layout
       ~QuantumVolumeConfiguration.use_dd
+      ~QuantumVolumeConfiguration.active_reset_cycles
       ~QuantumVolumeConfiguration.dd_strategy
    
    

@@ -25,13 +25,15 @@ iqm.benchmarks.entanglement.ghz.GHZConfiguration
       ~GHZConfiguration.num_RMs
       ~GHZConfiguration.rem
       ~GHZConfiguration.mit_shots
-      ~GHZConfiguration.cal_url
+      ~GHZConfiguration.iqm_server_url
+      ~GHZConfiguration.quantum_computer
       ~GHZConfiguration.max_gates_per_batch
       ~GHZConfiguration.max_circuits_per_batch
       ~GHZConfiguration.calset_id
       ~GHZConfiguration.routing_method
       ~GHZConfiguration.physical_layout
       ~GHZConfiguration.use_dd
+      ~GHZConfiguration.active_reset_cycles
       ~GHZConfiguration.dd_strategy
    
    

@@ -27,11 +27,13 @@ iqm.benchmarks.randomized\_benchmarking.direct\_rb.direct\_rb.DirectRBConfigurat
       ~DirectRBConfiguration.sqg_gate_ensembles
       ~DirectRBConfiguration.routing_method
       ~DirectRBConfiguration.shots
+      ~DirectRBConfiguration.quantum_computer
       ~DirectRBConfiguration.max_gates_per_batch
       ~DirectRBConfiguration.max_circuits_per_batch
       ~DirectRBConfiguration.calset_id
       ~DirectRBConfiguration.physical_layout
       ~DirectRBConfiguration.use_dd
+      ~DirectRBConfiguration.active_reset_cycles
       ~DirectRBConfiguration.dd_strategy
    
    

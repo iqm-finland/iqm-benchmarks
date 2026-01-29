@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.utils &#8212; IQM Benchmarks 2.54 documentation</title>
+    <title>iqm.benchmarks.utils &#8212; IQM Benchmarks 2.55 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=bee4b739"></script>
+    <script src="../_static/documentation_options.js?v=05183524"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.readout_mitigation.M3IQM" href="iqm.benchmarks.readout_mitigation.M3IQM.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.54" />
-    <meta name="docbuild:last-update" content="2025-12-17"/>
+  <meta name="docsearch:version" content="2.55" />
+    <meta name="docbuild:last-update" content="2026-01-29"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.54 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.54 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.55 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.55 documentation - Home"/>
   
   
 </a></div>
@@ -243,7 +243,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.bootstrap_counts.html">iqm.benchmarks.utils.bootstrap_counts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_2q_layers.html">iqm.benchmarks.utils.count_2q_layers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html">iqm.benchmarks.utils.count_native_gates</a></li>
-<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities.html">iqm.benchmarks.utils.extract_fidelities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities_unified.html">iqm.benchmarks.utils.extract_fidelities_unified</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.generate_state_tomography_circuits.html">iqm.benchmarks.utils.generate_state_tomography_circuits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_Pauli_expectation.html">iqm.benchmarks.utils.get_Pauli_expectation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.get_active_qubits.html">iqm.benchmarks.utils.get_active_qubits</a></li>
@@ -266,6 +266,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.submit_execute.html">iqm.benchmarks.utils.submit_execute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.timeit.html">iqm.benchmarks.utils.timeit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.xrvariable_to_counts.html">iqm.benchmarks.utils.xrvariable_to_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iqm.benchmarks.utils.ObservationType.html">iqm.benchmarks.utils.ObservationType</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="iqm.benchmarks.utils_plots.html">iqm.benchmarks.utils_plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -454,8 +455,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.count_native_gates.html#iqm.benchmarks.utils.count_native_gates" title="iqm.benchmarks.utils.count_native_gates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_native_gates</span></code></a>(backend_arg, ...)</p></td>
 <td><p>Count the number of IQM native gates of each quantum circuit in a list.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities.html#iqm.benchmarks.utils.extract_fidelities" title="iqm.benchmarks.utils.extract_fidelities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fidelities</span></code></a>(cal_url[, all_metrics])</p></td>
-<td><p>Returns couplings and CZ-fidelities from calibration data URL</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.extract_fidelities_unified.html#iqm.benchmarks.utils.extract_fidelities_unified" title="iqm.benchmarks.utils.extract_fidelities_unified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fidelities_unified</span></code></a>(iqm_server_url, ...)</p></td>
+<td><p>Returns couplings and CZ-fidelities from calibration data URL for external station API</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.generate_state_tomography_circuits.html#iqm.benchmarks.utils.generate_state_tomography_circuits" title="iqm.benchmarks.utils.generate_state_tomography_circuits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_state_tomography_circuits</span></code></a>(qc, ...)</p></td>
 <td><p>Generate all quantum circuits required for a quantum state tomography experiment.</p></td>
@@ -500,7 +501,7 @@
 <td><p>Retrieve the counts from a list of IQMJob objects.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.retrieve_all_job_metadata.html#iqm.benchmarks.utils.retrieve_all_job_metadata" title="iqm.benchmarks.utils.retrieve_all_job_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_all_job_metadata</span></code></a>(iqm_jobs)</p></td>
-<td><p>Retrieve the counts from a list of IQMJob objects.</p></td>
+<td><p>Retrieve the metadata from a list of Job objects.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.utils.set_coupling_map.html#iqm.benchmarks.utils.set_coupling_map" title="iqm.benchmarks.utils.set_coupling_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_coupling_map</span></code></a>(qubits, backend[, ...])</p></td>
 <td><p>Set a coupling map according to the specified physical layout.</p></td>
@@ -526,7 +527,21 @@
 </tbody>
 </table>
 </div>
-</section>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.utils.ObservationType.html#iqm.benchmarks.utils.ObservationType" title="iqm.benchmarks.utils.ObservationType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObservationType</span></code></a>(value[, names, module, ...])</p></td>
+<td><p>Enumeration representing relevant keys to fetch for each operation in the observations.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Inheritance</p>
+<div class="graphviz"><img src="../_images/inheritance-d9103bc0b65cc4c21a74f45a404707b0ea1a9a07.png" alt="Inheritance diagram of iqm.benchmarks.utils" usemap="#inheritance1389bc74f9" class="inheritance graphviz" /></div>
+<map id="inheritance1389bc74f9" name="inheritance1389bc74f9">
+<area shape="rect" id="node1" href="https://docs.python.org/3.11/library/enum.html#enum.Enum" target="_top" title="Create a collection of name/value pairs." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node2" href="iqm.benchmarks.utils.ObservationType.html#iqm.benchmarks.utils.ObservationType" target="_top" title="Enumeration representing relevant keys to fetch for each operation in the observations." alt="" coords="125,5,256,31"/>
+</map></section>
 
 
                 </article>
@@ -592,7 +607,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2025-12-17.
+  Last updated on 2026-01-29.
   <br/>
 </p>
   </div>

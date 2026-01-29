@@ -21,12 +21,14 @@ iqm.benchmarks.entanglement.graph\_states.GraphStateConfiguration
       ~GraphStateConfiguration.n_random_unitaries
       ~GraphStateConfiguration.n_median_of_means
       ~GraphStateConfiguration.shots
+      ~GraphStateConfiguration.quantum_computer
       ~GraphStateConfiguration.max_gates_per_batch
       ~GraphStateConfiguration.max_circuits_per_batch
       ~GraphStateConfiguration.calset_id
       ~GraphStateConfiguration.routing_method
       ~GraphStateConfiguration.physical_layout
       ~GraphStateConfiguration.use_dd
+      ~GraphStateConfiguration.active_reset_cycles
       ~GraphStateConfiguration.dd_strategy
    
    
