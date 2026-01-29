@@ -413,9 +413,7 @@ def evaluate_hamiltonian_paths(
         total_cost = 1
         for edge in h_path:
             if len(edge) == 2:
-                qb0 = backend.index_to_qubit_name(edge[0]).replace("QB", "")
-                qb1 = backend.index_to_qubit_name(edge[1]).replace("QB", "")
-                total_cost *= two_qubit_fidelity[[qb0, qb1]]
+                total_cost *= two_qubit_fidelity[edge]
         path_costs[total_cost] = h_path
 
     return path_costs

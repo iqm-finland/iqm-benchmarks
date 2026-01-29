@@ -246,7 +246,7 @@ class EPLGBenchmark(Benchmark):
         self.chain_path_samples = configuration.chain_path_samples
         self.num_disjoint_layers = configuration.num_disjoint_layers
         self.iqm_server_url = configuration.iqm_server_url
-        self.quantum_computer = self.backend_configuration_name
+        self.quantum_computer = configuration.quantum_computer
         self.max_hamiltonian_path_tries = configuration.max_hamiltonian_path_tries
 
     def add_all_meta_to_dataset(self, dataset: xr.Dataset):

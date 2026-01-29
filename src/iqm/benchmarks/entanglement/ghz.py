@@ -734,13 +734,11 @@ class GHZBenchmark(Benchmark):
             if self.iqm_server_url is None or self.quantum_computer is None:
                 raise ValueError("IQM server url and quantum_computer argument must be provided "
                                  "for 'star_optimal' routine.")
-            ghz = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.quantum_computer, self.backend)
+            ghz = generate_ghz_star_optimal(qubit_layout, self.iqm_server_url, self.backend, self.quantum_computer)
             circuit_group.add_circuit(ghz)
             ghz_native_transpiled = transpile_to_IQM(
                 ghz,
                 self.backend,
-                existing_moves_handling=True,
-                perform_move_routing=False,
                 optimize_single_qubits=self.optimize_sqg,
                 optimization_level=self.qiskit_optim_level,
             )
@@ -818,8 +816,6 @@ class GHZBenchmark(Benchmark):
                 transpile_to_IQM(
                     ghz,
                     self.backend,
-                    existing_moves_handling=True,
-                    perform_move_routing=False,
                     optimize_single_qubits=self.optimize_sqg,
                     optimization_level=self.qiskit_optim_level,
                 )
