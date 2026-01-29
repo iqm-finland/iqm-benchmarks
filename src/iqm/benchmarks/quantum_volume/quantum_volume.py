@@ -470,6 +470,7 @@ class QuantumVolumeBenchmark(Benchmark):
 
         self.qiskit_optim_level = configuration.qiskit_optim_level
         self.optimize_sqg = configuration.optimize_sqg
+        self.approximation_degree = configuration.approximation_degree
 
         self.rem = configuration.rem
         self.mit_shots = configuration.mit_shots
@@ -528,65 +529,6 @@ class QuantumVolumeBenchmark(Benchmark):
                     str(inner_key): inner_values for inner_key, inner_values in outer_value.items()
                 }
             dataset.attrs[key] = dictionary
-
-    # def get_mapomatic_average_qv_scores(self) -> List[List[int]]:
-    #     """Estimate the average mapomatic scores for N quantum volume circuit samples
-    #     Returns:
-    #         List[List[object]]: the mapomatic layout scores sorted from the smallest mean*(1+std/sqrt(N)) cost score
-    #     """
-    #     qv_circ_samples = self.mapomatic_qv_samples
-    #
-    #     # Get calibration data once
-    #     token = input("Trying to access IQM calibration data\nEnter your IQM token (without quote marks): ")
-    #     calibration_data = get_calibration_fidelities(self.backend.architecture.name, token)
-    #
-    #     qcvv_logger.info(
-    #         "Evaluating matching layouts for QV",
-    #     )
-    #
-    #     all_scores: Dict[Tuple, List[float]] = {}
-    #     for mapomatic_qv_sample in range(qv_circ_samples):
-    #         qcvv_logger.info(
-    #             f"Estimating layout costs for QV circuit sample {mapomatic_qv_sample+1}"
-    #         )
-    #         # Generate a representative quantum circuit sample
-    #         qv_circ = get_circuit("quantum_volume", self.mapomatic_num_qubits)
-    #         # Get all matching layouts
-    #         layouts = matching_layouts(
-    #             qv_circ,
-    #             self.backend,
-    #             self.backend.coupling_map,
-    #             self.qiskit_optim_level,
-    #         )
-    #         # Evaluate all layouts
-    #         scores = evaluate_costs(
-    #             layouts,
-    #             qv_circ,
-    #             self.backend,
-    #             calibration_data,
-    #             self.qiskit_optim_level,
-    #         )
-    #         for score in scores:
-    #             all_scores.setdefault(tuple(cast(list[int], score[0])), []).extend([cast(float, score[1])])
-    #         qv_circ.clear()
-    #
-    #     # Consider mean and std of the cost scores as mean*(1+std/sqrt(N))
-    #     all_scores_mean_plus_std = {
-    #         s_k: np.mean(s_v) * (1 + np.std(s_v) / np.sqrt(qv_circ_samples)) for s_k, s_v in all_scores.items()
-    #     }
-    #     # Turn into an array ([[tuple_layout0, score0], [tuple_layout1,score1], ... ])
-    #     sorted_scores_mean_plus_std = list(sorted(all_scores_mean_plus_std.items(), key=lambda y: y[1]))
-    #     # Return indices to list type for layouts ([[list_layout0, score0], [list_layout1,score1], ... ])
-    #     layout_meanscore = [[list(s[0]), s[1]] for s in sorted_scores_mean_plus_std]
-    #
-    #     mapomatic_qv_layouts = [x[0] for x in layout_meanscore[: self.mapomatic_num_layouts]]
-    #     mapomatic_qv_costs = [x[1] for x in layout_meanscore[: self.mapomatic_num_layouts]]
-    #
-    #     qcvv_logger.info(
-    #         f"Will execute QV on layouts {mapomatic_qv_layouts}, of mapomatic average costs {mapomatic_qv_costs}"
-    #     )
-    #
-    #     return mapomatic_qv_layouts
 
     @staticmethod
     def generate_single_circuit(
@@ -755,6 +697,7 @@ class QuantumVolumeBenchmark(Benchmark):
                 qiskit_optim_level=self.qiskit_optim_level,
                 optimize_sqg=self.optimize_sqg,
                 routing_method=self.routing_method,
+                approximation_degree=self.approximation_degree,
             )
             # Batching
             sorted_transpiled_qc_list: Dict[Tuple[int, ...], List[QuantumCircuit]] = {}
@@ -845,27 +788,23 @@ class QuantumVolumeConfiguration(BenchmarkConfigurationBase):
     Attributes:
         benchmark (Type[Benchmark]): QuantumVolumeBenchmark
         num_circuits (int): The number of circuits to use.
-                            * Should be at least 100 for a meaningful QV experiment.
+            Should be at least 100 for a meaningful QV experiment.
         num_sigmas (int): The number of sample standard deviations to consider with for the threshold criteria.
-                            * Default by consensus is 2
+            Default by consensus is 2
         choose_qubits_routine (Literal["custom"]): The routine to select qubit layouts.
-                            * Default is "custom".
+            Default is "custom".
         custom_qubits_array (Optional[Sequence[Sequence[int]]]): The physical qubit layouts to perform the benchmark on.
-                            * Default is [[0, 2]].
+            Default is [[0, 2]].
         qiskit_optim_level (int): The Qiskit transpilation optimization level.
-                            * Default is 3.
+            Default is 3.
         optimize_sqg (bool): Whether Single Qubit Gate Optimization is performed upon transpilation.
-                            * Default is True.
-        routing_method (Literal["basic", "lookahead", "stochastic", "sabre", "none"]): The Qiskit transpilation routing method to use.
-                            * Default is "sabre".
-        physical_layout (Literal["fixed", "batching"]): Whether the coupling map is restricted to qubits in the input layout or not.
-                            - "fixed": Restricts the coupling map to only the specified qubits.
-                            - "batching": Considers the full coupling map of the backend and circuit execution is batched per final layout.
-                            * Default is "fixed"
-        rem (bool): Whether Readout Error Mitigation is applied in post-processing. When set to True, both results (readout-unmitigated and -mitigated) are produced.
-                            - Default is True.
+            Default is True.
+        approximation_degree (float): The target fidelity to which arbitrary two qubit gates are approximated.
+        rem (bool): Whether Readout Error Mitigation is applied in post-processing. When set to True, both results
+            (readout-unmitigated and -mitigated) are produced.
+            Default is True.
         mit_shots (int): The measurement shots to use for readout calibration.
-                            * Default is 1_000.
+            Default is 1_000.
     """
 
     benchmark: Type[Benchmark] = QuantumVolumeBenchmark
@@ -875,5 +814,6 @@ class QuantumVolumeConfiguration(BenchmarkConfigurationBase):
     custom_qubits_array: Sequence[Sequence[int]]
     qiskit_optim_level: int = 3
     optimize_sqg: bool = True
+    approximation_degree: float = 1.0
     rem: bool = True
     mit_shots: int = 1_000

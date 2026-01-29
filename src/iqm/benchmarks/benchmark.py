@@ -109,10 +109,12 @@ class BenchmarkConfigurationBase(BaseModel):
 
     benchmark: Type[BenchmarkBase]
     shots: int = 2**8
+    quantum_computer: str | None = None
     max_gates_per_batch: Optional[int] = None
     max_circuits_per_batch: Optional[int] = None
     calset_id: Optional[str] = None
     routing_method: Literal["basic", "lookahead", "stochastic", "sabre", "none"] = "sabre"
     physical_layout: Literal["fixed", "batching"] = "fixed"
     use_dd: Optional[bool] = False
+    active_reset_cycles: int | None = None
     dd_strategy: Optional[DDStrategy] = None

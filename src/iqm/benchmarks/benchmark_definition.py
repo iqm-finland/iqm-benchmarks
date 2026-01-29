@@ -254,11 +254,16 @@ class Benchmark(ABC):
                 qcvv_logger.warning(
                     f"Beware that activating dynamical decoupling will change fidelities, error models and their interpretation."
                 )
-            self.circuit_compilation_options = CircuitCompilationOptions(
-                dd_mode=DDMode.ENABLED, dd_strategy=self.configuration.dd_strategy
-            )
+            dd_mode = DDMode.ENABLED
+
         else:
-            self.circuit_compilation_options = CircuitCompilationOptions(dd_mode=DDMode.DISABLED)
+            dd_mode = DDMode.DISABLED
+
+        self.circuit_compilation_options = CircuitCompilationOptions(
+            dd_mode=dd_mode,
+            dd_strategy=self.configuration.dd_strategy,
+            active_reset_cycles=self.configuration.active_reset_cycles
+            )
 
     @classmethod
     @abstractmethod
@@ -294,7 +299,7 @@ class Benchmark(ABC):
         """
         backend_for_execute = copy.copy(self.backend)
         backend_for_execute.run = functools.partial(
-            self.backend.run, calibration_set_id=calibration_set_id
+            self.backend.run
         )  # type: ignore
         dataset = self.execute(backend_for_execute)
         run = BenchmarkRunResult(dataset, self.circuits)
