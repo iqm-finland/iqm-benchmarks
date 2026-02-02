@@ -792,10 +792,10 @@ class GHZBenchmark(Benchmark):
                 qc_phase = qc.copy()
                 qc_phase.barrier()
                 for _, qubit in enumerate(qubit_layout):
-                    qc_phase.p(phase, qubit + 1)
+                    qc_phase.p(phase, qubit)
                 qc_phase.barrier()
                 qc_phase.compose(qc_inv, inplace=True)
-                qc_phase.measure([q + 1 for q in qubit_layout], list(range(qubit_count)))
+                qc_phase.measure(qubit_layout, list(range(qubit_count)))
                 qc_list.append(qc_phase)
         else:
             qc_inv = qc.inverse()
