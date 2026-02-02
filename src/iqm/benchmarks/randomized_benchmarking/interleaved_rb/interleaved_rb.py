@@ -22,7 +22,6 @@ from typing import Any, Dict, List, Literal, Optional, Sequence, Type
 from matplotlib.figure import Figure
 import numpy as np
 import xarray as xr
-from pycparser.ply.ctokens import t_STRING
 
 from iqm.benchmarks.benchmark import BenchmarkConfigurationBase
 from iqm.benchmarks.benchmark_definition import (
