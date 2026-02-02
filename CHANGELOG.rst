@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 2.56
+============
+* Fixed import bug with iRB.
+* Improved execution of star_optimal GHZ creation circuit.
+
 Version 2.55
 ============
 * Compatibility with new job metadata formats.
