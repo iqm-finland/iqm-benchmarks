@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.55 documentation</title>
+    <title>Greenberger–Horne–Zeilinger (GHZ) State Fidelity &#8212; IQM Benchmarks 2.56 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=05183524"></script>
+    <script src="../_static/documentation_options.js?v=126cb542"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -55,8 +55,8 @@
     <link rel="prev" title="Circuit Layer Operations Per Second (CLOPS)" href="example_clops.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.55" />
-    <meta name="docbuild:last-update" content="2026-01-29"/>
+  <meta name="docsearch:version" content="2.56" />
+    <meta name="docbuild:last-update" content="2026-02-02"/>
   </head>
   
   
@@ -135,8 +135,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.55 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.55 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.56 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.56 documentation - Home"/>
   
   
 </a></div>
@@ -479,14 +479,13 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.entanglement.ghz</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
-<span class="c1"># backend = &quot;fakeapollo&quot;</span>
 
-
-<span class="c1"># token = &quot;YOUR_TOKEN_HERE&quot;</span>
-<span class="c1"># os.environ[&quot;IQM_TOKEN&quot;] = token</span>
-<span class="n">quantum_computer</span> <span class="o">=</span> <span class="s2">&quot;emerald&quot;</span>
-<span class="n">iqm_server_url</span> <span class="o">=</span> <span class="s2">&quot;https://resonance.meetiqm.com&quot;</span>
-<span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">quantum_computer</span> <span class="o">=</span> <span class="n">quantum_computer</span><span class="p">)</span>
+<span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;XXXXXXX&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+<span class="n">quantum_computer</span> <span class="o">=</span> <span class="s2">&quot;qc_name&quot;</span> <span class="c1"># provide actual quantum computer name</span>
+<span class="n">iqm_server_url</span> <span class="o">=</span> <span class="s2">&quot;iqm_server_url&quot;</span> <span class="c1"># provide actual IQM server URL</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_SERVER_URL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iqm_server_url</span>
+<span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">quantum_computer</span><span class="o">=</span><span class="n">quantum_computer</span><span class="p">)</span>
 <span class="n">backend</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -504,28 +503,12 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.iqm_client.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DDStrategy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.benchmarks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_fidelities_unified</span>
 
-<span class="c1"># Fetch latest calibration data</span>
-<span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span> <span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">extract_fidelities_unified</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">quantum_computer</span><span class="p">)</span>
-
-<span class="c1"># Define DD strategy</span>
-<span class="n">dd_qubits</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;QB</span><span class="si">{</span><span class="n">qubit_name</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">qubit_name</span><span class="p">,</span> <span class="n">fidelity</span> <span class="ow">in</span> <span class="n">metrics_dict</span><span class="p">[</span><span class="s2">&quot;fidelity_1qb_gates_averaged&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">fidelity</span> <span class="o">&gt;</span> <span class="mf">0.999</span><span class="p">]</span>
-<span class="n">strategy</span> <span class="o">=</span> <span class="n">DDStrategy</span><span class="p">(</span><span class="n">gate_sequences</span><span class="o">=</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;XX&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)],</span> <span class="n">target_qubits</span> <span class="o">=</span> <span class="n">dd_qubits</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">DDStrategy</span><span class="p">(</span><span class="n">gate_sequences</span><span class="o">=</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;XX&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)],</span> <span class="n">target_qubits</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimal dynamical decoupling strategy:&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">strategy</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Minimal dynamical decoupling strategy:
-	merge_contiguous_waits: True
-	target_qubits: frozenset({&#39;QB51&#39;, &#39;QB42&#39;, &#39;QB35&#39;, &#39;QB1&#39;, &#39;QB43&#39;, &#39;QB23&#39;, &#39;QB33&#39;, &#39;QB3&#39;, &#39;QB37&#39;, &#39;QB40&#39;, &#39;QB32&#39;, &#39;QB14&#39;, &#39;QB22&#39;, &#39;QB29&#39;, &#39;QB12&#39;, &#39;QB38&#39;, &#39;QB2&#39;, &#39;QB5&#39;, &#39;QB11&#39;, &#39;QB53&#39;, &#39;QB6&#39;, &#39;QB26&#39;, &#39;QB10&#39;, &#39;QB41&#39;, &#39;QB49&#39;, &#39;QB24&#39;, &#39;QB20&#39;, &#39;QB21&#39;, &#39;QB52&#39;, &#39;QB48&#39;, &#39;QB50&#39;, &#39;QB46&#39;, &#39;QB18&#39;, &#39;QB39&#39;, &#39;QB7&#39;, &#39;QB15&#39;, &#39;QB25&#39;, &#39;QB4&#39;, &#39;QB13&#39;, &#39;QB31&#39;, &#39;QB47&#39;, &#39;QB19&#39;})
-	skip_leading_wait: True
-	skip_trailing_wait: True
-	gate_sequences: [(6, &#39;XYYX&#39;, &#39;center&#39;)]
 </pre></div>
 </div>
 </div>
@@ -590,13 +573,6 @@ Thus for consistent comparisons one of the first two methods should be chosen, w
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Check if access token environment variable is set: True
-Edge map: [[10, 11], [10, 18], [11, 5], [18, 17], [11, 12], [11, 19], [5, 4], [17, 16], [5, 6], [12, 13], [4, 3], [4, 0], [16, 15], [3, 2], [3, 9], [0, 1], [15, 14], [15, 7], [2, 8]]
-</pre></div>
-</div>
-<img alt="../_images/cb6b60673ff39705788f7c0ac332979e21718a4425bb1848367286aa8adc07ea.png" src="../_images/cb6b60673ff39705788f7c0ac332979e21718a4425bb1848367286aa8adc07ea.png" />
-</div>
 </div>
 </section>
 </section>
@@ -606,40 +582,6 @@ Edge map: [[10, 11], [10, 18], [11, 5], [18, 17], [11, 12], [11, 19], [5, 4], [1
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_ghz</span> <span class="o">=</span> <span class="n">GHZBenchmark</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">MINIMAL_GHZ</span><span class="p">)</span>
 <span class="n">run_ghz</span> <span class="o">=</span> <span class="n">benchmark_ghz</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-28 12:05:53,608 - iqm.benchmarks.logging_config - INFO - Now generating a 10-qubit GHZ state on qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-2026-01-28 12:05:53,612 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2026-01-28 12:05:56,697 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2026-01-28 12:05:59,045 - iqm.benchmarks.logging_config - INFO - Submitting batch with 23 circuits corresponding to qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
-2026-01-28 12:06:00,134 - iqm.benchmarks.logging_config - INFO - Now generating a 20-qubit GHZ state on qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-2026-01-28 12:06:00,147 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2026-01-28 12:06:00,435 - iqm.benchmarks.logging_config - INFO - Transpiling for backend IQMBackend with optimization level 3, sabre routing method including SQG optimization all circuits
-2026-01-28 12:06:06,656 - iqm.benchmarks.logging_config - INFO - Submitting batch with 43 circuits corresponding to qubits [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;calibration_set_id&#39;: None}
-  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
-2026-01-28 12:06:08,527 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2026-01-28 12:06:08,777 - iqm.iqm_server_client.iqm_server_client - INFO - Waiting for job 019c0448-1793-7341-922d-58a52de74b76 to finish...
-2026-01-28 12:06:20,159 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
-2026-01-28 12:06:20,313 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;rep_delay&#39;: None}
-  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
-</pre></div>
-</div>
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b0776c6fa4f14fa4aa6d7924d3dd8a46", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-28 12:06:43,940 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
-2026-01-28 12:06:44,108 - iqm.benchmarks.logging_config - INFO - Retrieving all counts
-2026-01-28 12:06:44,472 - iqm.iqm_server_client.iqm_server_client - INFO - Waiting for job 019c0448-381c-7ec1-8091-78f4ee536965 to finish...
-2026-01-28 12:06:48,789 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
-2026-01-28 12:06:49,109 - iqm.benchmarks.logging_config - INFO - Applying readout error mitigation
-C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages\iqm\qiskit_iqm\iqm_provider.py:191: UserWarning: Unknown backend option(s): {&#39;rep_delay&#39;: None}
-  warnings.warn(f&quot;Unknown backend option(s): {unknown_options}&quot;)
-</pre></div>
-</div>
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2c78de84604648afb6eaeac69d3d9447", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-28 12:07:24,338 - iqm.benchmarks.logging_config - INFO - Adding counts to dataset
 </pre></div>
 </div>
 </div>
@@ -665,13 +607,6 @@ C:\Users\RaphaelBrieger\.local\share\mamba\envs\benchmarks_new\Lib\site-packages
 <span class="n">result</span><span class="o">.</span><span class="n">plot_all</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>fidelity: 0.5166038909963064 +/- None
-fidelity_rem: 0.6460375601220506 +/- None
-</pre></div>
-</div>
-<img alt="../_images/048d2edc6eacafc9e3b12d31cb44059777ae7f0eeea5b987d50d7427fcca3468.png" src="../_images/048d2edc6eacafc9e3b12d31cb44059777ae7f0eeea5b987d50d7427fcca3468.png" />
 </div>
 </div>
 </section>
@@ -763,7 +698,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-01-29.
+  Last updated on 2026-02-02.
   <br/>
 </p>
   </div>

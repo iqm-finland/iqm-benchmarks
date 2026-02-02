@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Quantum Volume (QV) &#8212; IQM Benchmarks 2.55 documentation</title>
+    <title>Quantum Volume (QV) &#8212; IQM Benchmarks 2.56 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=05183524"></script>
+    <script src="../_static/documentation_options.js?v=126cb542"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="Compressive Gate Set Tomography (GST)" href="example_gst.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.55" />
-    <meta name="docbuild:last-update" content="2026-01-29"/>
+  <meta name="docsearch:version" content="2.56" />
+    <meta name="docbuild:last-update" content="2026-02-02"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.55 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.55 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.56 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.56 documentation - Home"/>
   
   
 </a></div>
@@ -438,8 +438,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-iqm-token-if-using-resonance">Set IQM Token if using Resonance.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend-and-initialise-token">Choose (or define) a backend and initialise token</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customising-dd">Customising DD</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-volume-configuration">Quantum Volume Configuration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-analysis">Perform Analysis</a></li>
@@ -465,25 +465,37 @@
 </div>
 </div>
 </div>
-<section id="choose-or-define-a-backend">
-<h2>Choose (or define) a backend<a class="headerlink" href="#choose-or-define-a-backend" title="Link to this heading">#</a></h2>
+<section id="choose-or-define-a-backend-and-initialise-token">
+<h2>Choose (or define) a backend and initialise token<a class="headerlink" href="#choose-or-define-a-backend-and-initialise-token" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#backend = &quot;fakeadonis&quot;</span>
-<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;fakeapollo&quot;</span>
-<span class="c1">#backend = &quot;garnet&quot;</span>
-<span class="c1">#backend = &quot;deneb&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iqm.qiskit_iqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">IQMProvider</span>
+
+<span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;XXXXXXX&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+<span class="n">quantum_computer</span> <span class="o">=</span> <span class="s2">&quot;qc_name&quot;</span> <span class="c1"># provide actual quantum computer name</span>
+<span class="n">iqm_server_url</span> <span class="o">=</span> <span class="s2">&quot;iqm_server_url&quot;</span> <span class="c1"># provide actual IQM server URL</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IQM_SERVER_URL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iqm_server_url</span>
+<span class="n">provider</span> <span class="o">=</span> <span class="n">IQMProvider</span><span class="p">(</span><span class="n">iqm_server_url</span><span class="p">,</span> <span class="n">quantum_computer</span><span class="o">=</span><span class="n">quantum_computer</span><span class="p">)</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="set-iqm-token-if-using-resonance">
-<h2>Set IQM Token if using Resonance.<a class="headerlink" href="#set-iqm-token-if-using-resonance" title="Link to this heading">#</a></h2>
+<section id="customising-dd">
+<h2>Customising DD<a class="headerlink" href="#customising-dd" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import os</span>
-<span class="c1"># os.environ[&quot;IQM_TOKEN&quot;] = &quot;&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iqm.iqm_client.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DDStrategy</span>
+
+<span class="c1"># Define DD strategy</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">DDStrategy</span><span class="p">(</span><span class="n">gate_sequences</span><span class="o">=</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;XX&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)],</span> <span class="n">target_qubits</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimal dynamical decoupling strategy:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">strategy</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -503,17 +515,14 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EXAMPLE_QV</span> <span class="o">=</span> <span class="n">QuantumVolumeConfiguration</span><span class="p">(</span>
     <span class="n">num_circuits</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">shots</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">calset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">num_sigmas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">choose_qubits_routine</span><span class="o">=</span><span class="s2">&quot;custom&quot;</span><span class="p">,</span>
     <span class="n">custom_qubits_array</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span>
-    <span class="n">qiskit_optim_level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">optimize_sqg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">routing_method</span><span class="o">=</span><span class="s2">&quot;sabre&quot;</span><span class="p">,</span>
-    <span class="n">physical_layout</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
-    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">60_000</span><span class="p">,</span>
+    <span class="n">max_gates_per_batch</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span>
     <span class="n">rem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">mit_shots</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
+    <span class="n">dd_strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+    <span class="n">use_dd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1274,8 +1283,8 @@ vanilla_REM_4_qubits_[0, 1, 3, 4]
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend">Choose (or define) a backend</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-iqm-token-if-using-resonance">Set IQM Token if using Resonance.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-or-define-a-backend-and-initialise-token">Choose (or define) a backend and initialise token</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customising-dd">Customising DD</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-volume-configuration">Quantum Volume Configuration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-experiment">Run the experiment</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-analysis">Perform Analysis</a></li>
@@ -1313,7 +1322,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-01-29.
+  Last updated on 2026-02-02.
   <br/>
 </p>
   </div>
