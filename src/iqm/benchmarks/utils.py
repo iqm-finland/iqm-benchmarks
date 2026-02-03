@@ -331,6 +331,7 @@ def extract_fidelities_unified(
     t1: Dict[int, float] = {}
     t2: Dict[int, float] = {}
     move_fidelity: Dict[Tuple[int, int], float] = {}
+    clifford_fidelity: Dict[Union[int, Tuple[int, int]], float] = {}
     quality_metric_set = IQMClient(iqm_server_url, quantum_computer=quantum_computer).get_quality_metric_set()
     calibration_metrics = quality_metric_set.observations
 
@@ -393,9 +394,22 @@ def extract_fidelities_unified(
             cz_fidelity[(qby, qbx)] = values
             list_couplings.append([qbx, qby])
             list_fids.append(values)
+        elif all(obs in dut_field for obs in ObservationType.CLIFFORD.value) and backend.has_resonators():
+            qb_matches = re.findall(r"QB\d+", dut_field)
+            qbx = qb_matches[0]
+            qb_matches = re.findall(r"QB\d+", dut_field)
+            qbx = int(qb_matches[0].split("QB")[1])
+            clifford_fidelity[(qbx, 0)] = values
+            clifford_fidelity[(0, qbx)] = values
+        elif all(obs in dut_field for obs in ObservationType.CLIFFORD.value) and not backend.has_resonators():
+            qb_matches = re.findall(r"QB\d+", dut_field)
+            qbx, qby = int(qb_matches[0].split("QB")[1]), int(qb_matches[1].split("QB")[1])
+            clifford_fidelity[(qbx, qby)] = values
+            clifford_fidelity[(qby, qbx)] = values
 
     metrics_dict: Dict[str, Dict[Union[int, Tuple[int, int]], float]] = {
         "cz_gate_fidelity": cz_fidelity,
+        "clifford_fidelity": clifford_fidelity,
         "fidelity_1qb_gates_averaged": single_qubit_fidelity,
         "single_shot_readout_fidelity": readout_fidelity,
         "t1_time": t1,
