@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.57
+============
+* Added calibration data for Clifford fidelities.
+
 Version 2.56
 ============
 * Fixed import bug with iRB.
