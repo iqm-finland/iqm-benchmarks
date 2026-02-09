@@ -52,7 +52,7 @@ class TestSubmitExecute(unittest.TestCase):
     @patch('iqm.benchmarks.utils.qcvv_logger')
     def test_submit_execute_no_restrictions(self, mock_logger):
         """Test with no batch size restrictions."""
-        jobs, _ = submit_execute(self.sorted_circuits, self.mock_backend, shots=1000)
+        jobs, _ = submit_execute(self.sorted_circuits, self.mock_backend, shots=1000, circuit_compilation_options=None)
 
         # Should return after first batch
         self.assertEqual(len(jobs), 2)
@@ -60,7 +60,8 @@ class TestSubmitExecute(unittest.TestCase):
         # Check that backend.run was called with each circuit list
         expected_calls = []
         for key in self.sorted_circuits.keys():
-            expected_calls.append(call(self.sorted_circuits[key], shots=1000, calibration_set_id=None))
+            expected_calls.append(call(self.sorted_circuits[key], shots=1000, calibration_set_id=None,
+                                       circuit_compilation_options=None))
         self.mock_backend.run.assert_has_calls(expected_calls, any_order=True)
 
     @patch('iqm.benchmarks.utils.qcvv_logger')

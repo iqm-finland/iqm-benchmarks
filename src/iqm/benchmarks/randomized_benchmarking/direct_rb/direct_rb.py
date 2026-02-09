@@ -732,6 +732,7 @@ class DirectRandomizedBenchmarking(Benchmark):
             self.calset_id,
             max_gates_per_batch=self.max_gates_per_batch,
             max_circuits_per_batch=self.configuration.max_circuits_per_batch,
+            circuit_compilation_options=self.circuit_compilation_options,
         )
         drb_submit_results = {
             "qubits": qubits,
@@ -829,6 +830,7 @@ class DirectRandomizedBenchmarking(Benchmark):
                             calset_id=self.calset_id,
                             max_gates_per_batch=self.max_gates_per_batch,
                             max_circuits_per_batch=self.configuration.max_circuits_per_batch,
+                            circuit_compilation_options=self.circuit_compilation_options,
                         )
                     )
                     total_submit += time() - t_start
