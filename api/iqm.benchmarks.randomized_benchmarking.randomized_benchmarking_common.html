@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common &#8212; IQM Benchmarks 2.57 documentation</title>
+    <title>iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common &#8212; IQM Benchmarks 2.58 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=a990375f"></script>
+    <script src="../_static/documentation_options.js?v=e336b6a1"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
@@ -53,8 +53,8 @@
     <link rel="prev" title="iqm.benchmarks.randomized_benchmarking.multi_lmfit.multi_dataset_residual" href="iqm.benchmarks.randomized_benchmarking.multi_lmfit.multi_dataset_residual.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.57" />
-    <meta name="docbuild:last-update" content="2026-02-03"/>
+  <meta name="docsearch:version" content="2.58" />
+    <meta name="docbuild:last-update" content="2026-02-10"/>
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.57 documentation - Home"/>
-    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.57 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="IQM Benchmarks 2.58 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="IQM Benchmarks 2.58 documentation - Home"/>
   
   
 </a></div>
@@ -495,11 +495,11 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.relabel_qubits_array_from_zero.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.relabel_qubits_array_from_zero" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.relabel_qubits_array_from_zero"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relabel_qubits_array_from_zero</span></code></a>(arr[, ...])</p></td>
 <td><p>Helper function to relabel a qubits array to an increasingly ordered one starting from zero e.g., [[2,3], [5], [7,8]]  -&gt;  [[0,1], [2], [3,4]] Note: this assumes the input array is sorted in increasing order!</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_parallel_rb_job</span></code></a>(backend_arg, ...)</p></td>
-<td><p>Submit fixed-depth parallel MRB jobs for execution in the specified IQMBackend :param backend_arg: the IQM backend to submit the job :type backend_arg: IQMBackendBase :param qubits_array: the qubits to identify the submitted job :type qubits_array: Sequence[Sequence[int]] :param depth: the depth (number of canonical layers) of the circuits to identify the submitted job :type depth: int :param sorted_transpiled_circuit_dicts: A dictionary containing all MRB circuits :type sorted_transpiled_circuit_dicts: Dict[Tuple[int,...], List[QuantumCircuit]] :param shots: the number of shots to submit the job :type shots: int :param calset_id: the calibration identifier :type calset_id: Optional[str] :param max_gates_per_batch: the maximum number of gates per batch to submit the job :type max_gates_per_batch: Optional[str] :param max_circuits_per_batch: the maximum number of circuits per batch to submit the job.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_parallel_rb_job"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_parallel_rb_job</span></code></a>(backend_arg, ...[, ...])</p></td>
+<td><p>Submit fixed-depth parallel MRB jobs for execution in the specified IQMBackend :param backend_arg: the IQM backend to submit the job :param qubits_array: the qubits to identify the submitted job :param depth: the depth (number of canonical layers) of the circuits to identify the submitted job :param sorted_transpiled_circuit_dicts: A dictionary containing all MRB circuits :param shots: the number of shots to submit the job :param calset_id: the calibration identifier :param max_gates_per_batch: the maximum number of gates per batch to submit the job :param max_circuits_per_batch: the maximum number of circuits per batch to submit the job.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_sequential_rb_jobs.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_sequential_rb_jobs" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.submit_sequential_rb_jobs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_sequential_rb_jobs</span></code></a>(qubits, ...[, ...])</p></td>
-<td><p>Submit sequential RB jobs for execution in the specified IQMBackend :param qubits: the qubits to identify the submitted job :type qubits: List[int] :param transpiled_circuits: A dictionary containing all MRB circuits :type transpiled_circuits: Dict[str, List[QuantumCircuit]] :param shots: the number of shots to submit per job :type shots: int :param backend_arg: the IQM backend to submit the job :type backend_arg: IQMBackendBase :param calset_id: the calibration identifier :type calset_id: Optional[str] :param max_gates_per_batch: the maximum number of gates per batch :type max_gates_per_batch: Optional[int] :param max_circuits_per_batch: the maximum number of circuits per batch :type max_circuits_per_batch: Optional[int] :param circuit_compilation_options: Compilation options passed to submit_execute :type circuit_compilation_options: Optional[CircuitCompilationOptions]</p></td>
+<td><p>Submit sequential RB jobs for execution in the specified IQMBackend :param qubits: the qubits to identify the submitted job :param transpiled_circuits: A dictionary containing all MRB circuits :param shots: the number of shots to submit per job :param backend_arg: the IQM backend to submit the job :param calset_id: the calibration identifier :param max_gates_per_batch: the maximum number of gates per batch :param max_circuits_per_batch: the maximum number of circuits per batch :param circuit_compilation_options: Compilation options passed to submit_execute</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.survival_probabilities_parallel.html#iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.survival_probabilities_parallel" title="iqm.benchmarks.randomized_benchmarking.randomized_benchmarking_common.survival_probabilities_parallel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">survival_probabilities_parallel</span></code></a>(...[, ...])</p></td>
 <td><p>Estimates marginalized survival probabilities from a parallel RB execution (at fixed depth).</p></td>
@@ -579,7 +579,7 @@ By IQM Benchmarks developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2026-02-03.
+  Last updated on 2026-02-10.
   <br/>
 </p>
   </div>
