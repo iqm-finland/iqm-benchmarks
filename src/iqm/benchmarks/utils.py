@@ -1052,7 +1052,10 @@ def submit_execute(
         )
         # Divide into batches according to maximum gate count per batch
         if max_gates_per_batch is None and max_circuits_per_batch is None:
-            jobs = backend.run(sorted_transpiled_qc_list[k], shots=shots, calibration_set_id=calset_id)
+            jobs = backend.run(sorted_transpiled_qc_list[k],
+                               shots=shots,
+                               calibration_set_id=calset_id,
+                               circuit_compilation_options=circuit_compilation_options)
             final_jobs.append(jobs)
 
         else:

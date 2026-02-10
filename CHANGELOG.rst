@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.58
+============
+* Fixed a bug that would lead to circuit compilation options not being applied.
+
 Version 2.57
 ============
 * Added calibration data for Clifford fidelities.

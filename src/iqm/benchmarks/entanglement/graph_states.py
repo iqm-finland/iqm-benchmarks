@@ -1280,7 +1280,8 @@ class GraphStateBenchmark(Benchmark):
             # Post-processing will take care of separating MoMs samples and identifying all unitary (Clifford) labels.
             sorted_transpiled_qc_list = {tuple(unprojected_qubits[idx]): circuits_transpiled[idx]}
             graph_jobs, time_submit = submit_execute(
-                sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch
+                sorted_transpiled_qc_list, backend, self.shots, self.calset_id, self.max_gates_per_batch,
+                circuit_compilation_options=self.circuit_compilation_options,
             )
             total_submit += time_submit
             all_graph_submit_results.append(

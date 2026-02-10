@@ -303,6 +303,7 @@ class CliffordRandomizedBenchmarking(Benchmark):
                         self.calset_id,
                         self.max_gates_per_batch,
                         self.configuration.max_circuits_per_batch,
+                        self.circuit_compilation_options
                     )
                 )
                 total_submit += time() - t_start
