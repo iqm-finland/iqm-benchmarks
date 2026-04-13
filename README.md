@@ -1,5 +1,13 @@
 # IQM Benchmarks
 
+**DISCLAIMER: This repository is ARCHIVED and is no longer maintained.**
+------------------------------------------------------------------------
+
+The repository is **superseded** by IQM-Benchmarks within via the [https://docs.meetiqm.com/](IQM-SDK). 
+The latest versions of IQM-Benchmarks are still available on PyPI and can be installed with ``pip install iqm-benchmarks``. 
+
+## Overview
+
 IQM Benchmarks is a suite of Quantum Characterization, Verification, and Validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
 
 
@@ -22,7 +30,7 @@ Below is a list of the benchmarks currently available in the suite:
 The project is split into different benchmarks, all sharing the `Benchmark` class or the legacy `BenchmarkBase` class. Each individual benchmark takes as an argument their own `BenchmarkConfigurationBase` class. All the (legacy) benchmarks executed at once are wrapped by the `BenchmarkExperiment` class, which handles dependencies among the benchmarks, storing the results, producing the plots...
 
 
-## Installation _(latest release)_
+## Installation 
 
 [uv](https://docs.astral.sh/uv/) is highly recommended for practical Python environment and package management.
 With uv installed in your system, start a terminal in your machine and create a new Python environment
