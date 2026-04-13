@@ -3,8 +3,15 @@
 **DISCLAIMER: This repository is ARCHIVED and is no longer maintained.**
 ------------------------------------------------------------------------
 
-The repository is **superseded** by IQM-Benchmarks within via the [https://docs.meetiqm.com/](IQM-SDK). 
-The latest versions of IQM-Benchmarks are still available on PyPI and can be installed with ``pip install iqm-benchmarks``. 
+This repository is **superseded** by the identically named IQM-Benchmarks package which is now internally developed at IQM. This step was taken
+in order to unify the development of IQM-Benchmarks with the rest of the IQM-SDK, which leads to better version compatibility and generally improved interoperability with other IQM packages.
+
+Key points to note:
+- The code is still open source and can be viewed via the [https://github.com/iqm-finland/sdk](IQM-SDK) repository on Gitlab. 
+- The documentation for the latest version is available via [https://docs.meetiqm.com/](IQM-Docs). 
+- As before, the latest version is available on PyPI and can be installed with ``pip install iqm-benchmarks``. 
+- No pull requests can be made by non-IQM members from now on, but issues can be opened at [https://github.com/iqm-finland/sdk/issues](Gitlab).
+
 
 ## Overview
 
