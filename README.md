@@ -10,7 +10,7 @@ Key points to note:
 - The code is still open source and can be viewed via the [IQM-SDK](https://github.com/iqm-finland/sdk) on GitHub. 
 - The documentation for the latest version is available via [IQM-Docs](https://docs.meetiqm.com/). 
 - As before, the **latest version is available on PyPI** and can be installed with ``pip install iqm-benchmarks``. 
-- No pull requests can be made by non-IQM members from now on, but issues can be opened at the [IQM-SDK](https://github.com/iqm-finland/sdk/issues).
+- No pull requests can be made by external contributors from now on, but issues can be opened under the [IQM-SDK](https://github.com/iqm-finland/sdk/issues).
 
 
 ## Overview
