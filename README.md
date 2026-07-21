@@ -1,21 +1,21 @@
 # IQM Benchmarks
 
-**DISCLAIMER: This repository is ARCHIVED and is no longer maintained.**
+**DISCLAIMER: This repository has been moved to [https://github.com/iqm-finland/sdk](IQM-SDK).**
 ------------------------------------------------------------------------
 
-This repository is **superseded** by the identically named IQM-Benchmarks package which is now internally developed at IQM. This step was taken
-in order to unify the development of IQM-Benchmarks with the rest of the IQM-SDK, which leads to better version compatibility and generally improved interoperability with other IQM packages.
+The repository here on GitHub is archived and **superseded** by the identically named IQM-Benchmarks package, which is now internally developed at IQM. 
+This change unifies the development of IQM-Benchmarks with the rest of the IQM-SDK, which leads to better version compatibility and generally improved interoperability with other IQM packages.
 
 Key points to note:
-- The code is still open source and can be viewed via the [https://github.com/iqm-finland/sdk](IQM-SDK) repository on Gitlab. 
+- The code is still open source and can be viewed via the [https://github.com/iqm-finland/sdk](IQM-SDK-Mirror) on GitHub. 
 - The documentation for the latest version is available via [https://docs.meetiqm.com/](IQM-Docs). 
-- As before, the latest version is available on PyPI and can be installed with ``pip install iqm-benchmarks``. 
-- No pull requests can be made by non-IQM members from now on, but issues can be opened at [https://github.com/iqm-finland/sdk/issues](Gitlab).
+- As before, the **latest version is available on PyPI** and can be installed with ``pip install iqm-benchmarks``. 
+- No pull requests can be made by non-IQM members from now on, but issues can be opened at [https://github.com/iqm-finland/sdk/issues](GitHub).
 
 
 ## Overview
 
-IQM Benchmarks is a suite of Quantum Characterization, Verification, and Validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. The suite is designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
+IQM Benchmarks is a suite of Quantum Characterization, Verification, and Validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. It is also designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
 
 
 Below is a list of the benchmarks currently available in the suite:
@@ -108,7 +108,7 @@ python update-requirements.py
 
 ## Characterize Physical Hardware
 
-The IQM Benchmarks suite is designed to be used with real quantum hardware. To use the suite, you will need to have access to a quantum computer. The suite is designed to work with both IQM Resonance (IQM's quantum cloud service) and on-prem devices, but can be easily adapted to work with other quantum computing platforms.
+The IQM Benchmarks suite is designed to be used with real quantum hardware. To use IQM-Benchmarks, you will need to have access to a quantum computer. The suite is designed to work with both IQM Resonance (IQM's quantum cloud service) and on-prem devices, but can be easily adapted to work with other quantum computing platforms.
 
 To use the suite with IQM Resonance, you will need to set up an account and obtain an API token. You can then set the `IQM_TOKEN` environment variable to your API token. The suite will automatically use this token to authenticate with IQM Resonance.
 
