@@ -1,22 +1,21 @@
 # IQM Benchmarks
 
-**DISCLAIMER: This repository has been moved to [https://github.com/iqm-finland/sdk](IQM-SDK).**
+**DISCLAIMER: This repository has been moved to [IQM-SDK](https://github.com/iqm-finland/sdk).**
 ------------------------------------------------------------------------
 
 The repository here on GitHub is archived and **superseded** by the identically named IQM-Benchmarks package, which is now internally developed at IQM. 
 This change unifies the development of IQM-Benchmarks with the rest of the IQM-SDK, which leads to better version compatibility and generally improved interoperability with other IQM packages.
 
 Key points to note:
-- The code is still open source and can be viewed via the [https://github.com/iqm-finland/sdk](IQM-SDK-Mirror) on GitHub. 
-- The documentation for the latest version is available via [https://docs.meetiqm.com/](IQM-Docs). 
+- The code is still open source and can be viewed via the [IQM-SDK](https://github.com/iqm-finland/sdk) on GitHub. 
+- The documentation for the latest version is available via [IQM-Docs](https://docs.meetiqm.com/). 
 - As before, the **latest version is available on PyPI** and can be installed with ``pip install iqm-benchmarks``. 
-- No pull requests can be made by non-IQM members from now on, but issues can be opened at [https://github.com/iqm-finland/sdk/issues](GitHub).
+- No pull requests can be made by non-IQM members from now on, but issues can be opened at the [IQM-SDK](https://github.com/iqm-finland/sdk/issues).
 
 
 ## Overview
 
 IQM Benchmarks is a suite of Quantum Characterization, Verification, and Validation (QCVV) tools for quantum computing. It is designed to be a comprehensive tool for benchmarking quantum hardware. The suite is designed to be modular, allowing users to easily add new benchmarks and customize existing ones. It is also designed to be easy to use, with a simple API that allows users to run benchmarks with a single command.
-
 
 Below is a list of the benchmarks currently available in the suite:
 * Gates / Layers:
